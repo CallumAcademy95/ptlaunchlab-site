@@ -1,0 +1,45 @@
+const features = [
+  { icon: "📱", title: "Study on your phone",             body: "Delivered through the Merve app. Study at your pace, your schedule — no classrooms, no fixed hours, no commute.", badge: null },
+  { icon: "📚", title: "12 structured modules",           body: "Covering everything from anatomy and nutrition to exercise prescription and programme design. Built to get you qualified and confident.", badge: null },
+  { icon: "💼", title: "Business training built in",      body: "Learn how to get clients, set your rates, build your brand, and run your PT business from day one — not as an afterthought.", badge: null },
+  { icon: "👤", title: "Your own personal tutor",         body: "Not a chatbot. Not a generic support line. A real tutor assigned to you throughout your entire qualification.", badge: "Included" },
+  { icon: "📁", title: "Templates & resources",           body: "Done-for-you client forms, programme templates, and marketing resources so you're not starting from zero when you qualify.", badge: null },
+  { icon: "🎯", title: "Mentorship from Ryan & the team", body: "We've done this. We guide you through the exact steps we took to build a full-time income as independent personal trainers.", badge: "Exclusive" },
+];
+
+export default function WhatYouGet() {
+  return (
+    <section className="bg-[#141B2D] py-24">
+      <div className="max-w-6xl mx-auto px-6">
+        <h2 className="text-3xl md:text-5xl font-bold text-white text-center leading-tight mb-4">
+          Everything you need.
+          <br />
+          Nothing you don&apos;t.
+        </h2>
+        <p className="text-[#9CA3AF] text-lg text-center mb-16">
+          One course. One community. One team that&apos;s been exactly where you are.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {features.map((feat) => (
+            <div
+              key={feat.title}
+              className="bg-[#0A0E1A] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all duration-300"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <span className="text-3xl">{feat.icon}</span>
+                {feat.badge && (
+                  <span className="text-[10px] font-bold bg-[#F5C518] text-[#0A0E1A] px-2.5 py-1 rounded-full uppercase tracking-wide">
+                    {feat.badge}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-white font-bold text-[17px] mb-3">{feat.title}</h3>
+              <p className="text-[#9CA3AF] text-sm leading-relaxed">{feat.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,219 @@
+[
+  {
+    "id": "ba3c304f-fcf0-46eb-8cf6-d46aabf09264",
+    "timestamp": "2026-03-12T10:24:57.142Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "online",
+    "answers": [
+      {
+        "label": "Online coach"
+      },
+      {
+        "label": "Fat loss focused"
+      },
+      {
+        "label": "Flexibility"
+      },
+      {
+        "label": "Just exploring"
+      },
+      {
+        "label": "Don't know where to start"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:online"
+    ]
+  },
+  {
+    "id": "b3e543fd-db4a-4dc6-948e-cefa32b7b0b7",
+    "timestamp": "2026-03-12T11:20:14.161Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "onFloor",
+    "answers": [
+      {
+        "label": "On-floor PT"
+      },
+      {
+        "label": "General population"
+      },
+      {
+        "label": "Income"
+      },
+      {
+        "label": "Just exploring"
+      },
+      {
+        "label": "Don't know where to start"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:onFloor"
+    ]
+  },
+  {
+    "id": "dd2110f0-5631-4055-9642-00be784f3058",
+    "timestamp": "2026-03-12T11:20:56.896Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "alreadyQualified",
+    "answers": [
+      {
+        "label": "Hybrid coach"
+      },
+      {
+        "label": "Women's coaching"
+      },
+      {
+        "label": "In-person coaching"
+      },
+      {
+        "label": "Already qualified but need direction"
+      },
+      {
+        "label": "Need a clear path forward"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:alreadyQualified"
+    ]
+  },
+  {
+    "id": "23d3f954-1817-443f-aa66-f855c2d7f639",
+    "timestamp": "2026-03-12T11:34:16.129Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "onFloor",
+    "answers": [
+      {
+        "label": "On-floor PT"
+      },
+      {
+        "label": "Fat loss focused"
+      },
+      {
+        "label": "Flexibility"
+      },
+      {
+        "label": "Just exploring"
+      },
+      {
+        "label": "Don't know where to start"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:onFloor"
+    ]
+  },
+  {
+    "id": "1dbdb370-aa5e-4677-be01-c01e97fbd38b",
+    "timestamp": "2026-03-12T11:58:26.081Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "alreadyQualified",
+    "answers": [
+      {
+        "label": "Hybrid coach"
+      },
+      {
+        "label": "Women's coaching"
+      },
+      {
+        "label": "In-person coaching"
+      },
+      {
+        "label": "Already qualified but need direction"
+      },
+      {
+        "label": "Need a clear path forward"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:alreadyQualified"
+    ]
+  },
+  {
+    "id": "736b4f23-7cbb-48df-8f5b-5cfe3b1d14e8",
+    "timestamp": "2026-03-12T12:20:58.323Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "alreadyQualified",
+    "answers": [
+      {
+        "label": "Online coach"
+      },
+      {
+        "label": "Women's coaching"
+      },
+      {
+        "label": "In-person coaching"
+      },
+      {
+        "label": "Already qualified but need direction"
+      },
+      {
+        "label": "Need a clear path forward"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:alreadyQualified"
+    ]
+  },
+  {
+    "id": "6b891aa2-0eda-4108-b681-12ed2220ac9e",
+    "timestamp": "2026-03-12T13:30:08.444Z",
+    "name": "Callum Brown",
+    "phone": "+447399635694",
+    "email": "callumbrown581@gmail.com",
+    "result": "alreadyQualified",
+    "answers": [
+      {
+        "label": "On-floor PT"
+      },
+      {
+        "label": "Strength & performance"
+      },
+      {
+        "label": "Helping people"
+      },
+      {
+        "label": "Already qualified but need direction"
+      },
+      {
+        "label": "Don't know my niche"
+      }
+    ],
+    "source": "quiz-funnel",
+    "status": "new",
+    "followedUp": false,
+    "tags": [
+      "quiz-result:alreadyQualified"
+    ]
+  }
+]
