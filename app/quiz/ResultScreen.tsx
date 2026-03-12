@@ -132,14 +132,14 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-1">Step 2</p>
         <h4 className="text-white font-bold text-xl mb-1">Book Your Free Strategy Call</h4>
         <p className="text-[#8CA3BF] text-sm mb-5">
-          15 minutes. No pressure. We'll map out your exact path into PT and answer every question you have.
+          15 minutes. No pressure. We'll map out your exact path into PT and answer every question you have got.
         </p>
 
         {/* What to expect */}
         <ul className="space-y-2 mb-6">
           {[
             "We'll break down the cost and show you exactly how to make it work financially",
-            "We'll map out how to transition out of your job — without gambling your income",
+            "We'll map out how to transition out of your job without gambling your income",
             "We'll show you how our students get their first clients before they even qualify",
           ].map((point) => (
             <li key={point} className="flex items-start gap-2 text-[#8CA3BF] text-sm">
