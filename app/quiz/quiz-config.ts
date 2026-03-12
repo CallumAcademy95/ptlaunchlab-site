@@ -55,12 +55,12 @@ export const questions: QuizQuestion[] = [
   },
   {
     id: 3,
-    question: "What's the fear that keeps stopping you?",
+    question: "What's actually holding you back?",
     options: [
-      { label: "I won't earn enough to survive on",                      scores: { online: 2, hybrid: 1 } },
-      { label: "I'll qualify and still not know how to get clients",     scores: { onFloor: 2, alreadyQualified: 1 } },
-      { label: "I'll still be stuck — just in a different job",          scores: { online: 2, hybrid: 2 } },
-      { label: "I'll keep thinking about it and never actually do it",   scores: { onFloor: 1, online: 1, hybrid: 1 } },
+      { label: "The cost — I can't justify it financially right now",    scores: { onFloor: 1, online: 1, hybrid: 1 } },
+      { label: "My job — I'm scared to leave the security behind",       scores: { onFloor: 2, hybrid: 1 } },
+      { label: "Myself — what if I qualify and still can't get clients", scores: { onFloor: 2, alreadyQualified: 1 } },
+      { label: "Nothing — I'm nearly ready, just need a final push",     scores: { online: 1, hybrid: 1 } },
     ],
   },
   {
@@ -75,12 +75,12 @@ export const questions: QuizQuestion[] = [
   },
   {
     id: 5,
-    question: "Where are you right now?",
+    question: "How close are you to actually doing this?",
     options: [
-      { label: "No qualification yet — but I'm ready to move",           scores: { onFloor: 1, online: 1, hybrid: 1 } },
-      { label: "Still researching — haven't committed yet",              scores: { onFloor: 1 } },
-      { label: "Ready to go — just need the right people around me",     scores: { online: 1, hybrid: 1 } },
-      { label: "Already qualified — just not where I want to be",        scores: { alreadyQualified: 5 } },
+      { label: "I'm ready — I just need to pull the trigger",            scores: { online: 1, hybrid: 1 } },
+      { label: "Probably the next few months — still figuring it out",   scores: { onFloor: 1 } },
+      { label: "I want to, but I keep talking myself out of it",         scores: { onFloor: 1, online: 1, hybrid: 1 } },
+      { label: "I'm already qualified — I just need to make it work",    scores: { alreadyQualified: 5 } },
     ],
   },
 ];
