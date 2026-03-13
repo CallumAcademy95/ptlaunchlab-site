@@ -19,14 +19,18 @@ export default function FounderStory() {
             <br />
             we hated too.
           </h2>
+          <p className="text-white text-lg font-semibold mb-4">
+            We don&apos;t just run PT courses. We run gyms. We hire trainers. We know what works.
+          </p>
           <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-4">
-            Callum, Miles and Ryan built this course from lived experience — not a
-            textbook. Before PT Launch Lab, we scaled Ultimate Shred to over £500K in revenue as
-            independent personal trainers.
+            Callum, Miles and Ryan built this from lived experience — not a textbook. We scaled
+            Ultimate Shred to over £500K in revenue as independent personal trainers, and we&apos;ve
+            personally hired over 500 PTs across our gyms and partnerships.
           </p>
           <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-10">
-            We didn&apos;t do it through a chain gym or someone else&apos;s business. We built it
-            ourselves — from scratch, with no playbook. And now we teach you exactly how.
+            That&apos;s why our course is different. When we teach you what gyms look for, it&apos;s
+            because we&apos;re the ones doing the hiring. When we talk about building income, it&apos;s
+            because we&apos;ve done it ourselves — and now we hand you the exact playbook.
           </p>
           <div className="flex flex-wrap gap-4">
             <a

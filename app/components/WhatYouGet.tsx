@@ -11,13 +11,16 @@ export default function WhatYouGet() {
   return (
     <section className="bg-[#112035] py-24">
       <div className="max-w-6xl mx-auto px-6">
+        <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
+          What&apos;s inside the system
+        </p>
         <h2 className="text-3xl md:text-5xl font-bold text-white text-center leading-tight mb-4">
-          Everything you need.
+          We&apos;re not selling you a course.
           <br />
-          Nothing you don&apos;t.
+          <span className="text-[#F5C518]">We&apos;re building you a career.</span>
         </h2>
         <p className="text-[#8CA3BF] text-lg text-center mb-16">
-          One course. One community. One team that&apos;s been exactly where you are.
+          Everything inside The PT Launch Method™ — built by gym owners who&apos;ve hired 500+ trainers.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

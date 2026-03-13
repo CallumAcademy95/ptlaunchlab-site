@@ -25,9 +25,15 @@ export default function Hero() {
           Actually Pays You.
         </h1>
 
+        {/* Positioning line */}
+        <p className="text-xl md:text-2xl text-white font-semibold max-w-2xl mx-auto leading-snug mb-4 animate-fade-in-up animate-delay-100">
+          Most PT courses teach theory.{" "}
+          <span className="text-[#F5C518]">We build personal trainers gyms actually want to hire.</span>
+        </p>
+
         {/* Sub */}
-        <p className="text-lg md:text-xl text-[#8CA3BF] max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in-up animate-delay-100">
-          Online Level 2 &amp; 3 PT qualification, fast-track, industry recognised — done around your current job. Mentorship included. Guaranteed gym interviews when you qualify.
+        <p className="text-base md:text-lg text-[#8CA3BF] max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in-up animate-delay-100">
+          Online Level 2 &amp; 3, fast-track, Ofqual regulated — done around your current job. Mentorship, guaranteed gym interviews, and a full business launchpad included.
         </p>
 
         {/* CTA buttons */}
