@@ -4,8 +4,8 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
 // ─── CONFIGURATION — replace these placeholders before going live ─────────────
-const FULL_PAYMENT_STRIPE_LINK  = "FULL_PAYMENT_STRIPE_LINK";   // TODO: Stripe full payment link
-const DEPOSIT_STRIPE_LINK       = "DEPOSIT_PAYMENT_STRIPE_LINK"; // TODO: Stripe deposit link
+const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/bJecMZ4Ew6de52q4EifEk09";
+const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const TERMS_URL                 = "/terms";                       // TODO: Terms & Conditions page
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";       // TODO: Support email
 const SUPPORT_PHONE             = "01977 365001";
