@@ -77,7 +77,7 @@ export default function ConversionSection() {
               ))}
             </ul>
             <a
-              href="#book-call"
+              href="/book-call"
               className="block w-full text-center py-4 rounded-full border-2 border-[#F5C518] text-[#F5C518] font-bold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all mb-3"
             >
               Book a Free Call →

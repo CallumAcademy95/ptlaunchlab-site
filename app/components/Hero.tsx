@@ -41,7 +41,7 @@ export default function Hero() {
             Start Today →
           </a>
           <a
-            href="#book-call"
+            href="/book-call"
             className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all"
           >
             Not sure? Book a free call

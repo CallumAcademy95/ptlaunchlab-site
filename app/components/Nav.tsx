@@ -36,7 +36,7 @@ export default function Nav() {
         {/* CTA buttons */}
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="#book-call"
+            href="/book-call"
             className="px-5 py-2.5 rounded-full border border-[#F5C518] text-[#F5C518] text-sm font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all"
           >
             Book a Free Call
@@ -72,7 +72,7 @@ export default function Nav() {
             </a>
           ))}
           <div className="flex flex-col gap-3 pt-4 border-t border-[#3B82F6]/20">
-            <a href="#book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all">
+            <a href="/book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all">
               Book a Free Call
             </a>
             <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer" className="text-center px-5 py-3 rounded-full bg-[#F5C518] text-[#091524] font-bold hover:brightness-110 transition-all">
