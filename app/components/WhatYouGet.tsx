@@ -3,7 +3,7 @@ const features = [
   { icon: "📚", title: "12 structured modules",           body: "Covering everything from anatomy and nutrition to exercise prescription and programme design. Built to get you qualified and confident.", badge: null },
   { icon: "💼", title: "Business training built in",      body: "Learn how to get clients, set your rates, build your brand, and run your PT business from day one — not as an afterthought.", badge: null },
   { icon: "👤", title: "Your own personal tutor",         body: "Not a chatbot. Not a generic support line. A real tutor assigned to you throughout your entire qualification.", badge: "Included" },
-  { icon: "📁", title: "Templates & resources",           body: "Done-for-you client forms, programme templates, and marketing resources so you're not starting from zero when you qualify.", badge: null },
+  { icon: "🏋️", title: "Guaranteed gym interviews",       body: "Once you qualify, we guarantee gym interviews. We've hired 500+ PTs ourselves — we know what gyms look for and we prepare you for it.", badge: "Guaranteed" },
   { icon: "🎯", title: "Mentorship from Ryan & the team", body: "We've done this. We guide you through the exact steps we took to build a full-time income as independent personal trainers.", badge: "Exclusive" },
 ];
 

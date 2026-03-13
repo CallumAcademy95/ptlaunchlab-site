@@ -8,13 +8,13 @@ const steps = [
   {
     num: "02",
     title: "Qualify",
-    body: "Complete your NCFE Level 3 Personal Training qualification, regulated by Ofqual. Recognised across the entire UK fitness industry.",
+    body: "Complete your NCFE Level 2 & 3 Personal Training qualification, fast-track, regulated by Ofqual and recognised across the entire UK fitness industry.",
     highlight: false,
   },
   {
     num: "03",
     title: "Launch",
-    body: "This is where most courses stop. We're just getting started. Mentorship, client acquisition, pricing, social media, systems — we help you build a business, not just a certificate.",
+    body: "This is where most courses stop. We're just getting started. Guaranteed gym interviews, mentorship, client acquisition, pricing, social media, systems — we help you build a career, not just earn a certificate.",
     highlight: true,
   },
 ];

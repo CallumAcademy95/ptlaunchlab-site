@@ -1,18 +1,18 @@
 const cards = [
   {
     icon: "😔",
-    title: "You dread Monday morning",
-    body: "You're turning up to a job that drains you. You're good at what you do — but none of it means anything to you anymore.",
+    title: "You're stuck in the wrong job",
+    body: "You don't enjoy it. You're doing it for security. And you don't want to risk leaving until you know something better will actually work.",
   },
   {
-    icon: "🔒",
-    title: "You feel completely stuck",
-    body: "You know fitness is what you're meant to do. But you don't know how to turn that passion into something that pays the bills.",
+    icon: "🤔",
+    title: "Too many courses, no clear answer",
+    body: "You've looked. There are loads of options and you don't know who to trust, which qualification gyms respect, or which one will actually help you get work.",
   },
   {
-    icon: "🔥",
-    title: "You've lost your spark",
-    body: "Training used to energise you. Now it's the only hour of the day you feel like yourself — and you want to build a life around it.",
+    icon: "💸",
+    title: "You don't want to waste money",
+    body: "It's not a small decision. You want to know the course is legit, the support is real, and you'll have a clear path to earning as a PT before you commit.",
   },
 ];
 

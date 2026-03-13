@@ -7,14 +7,13 @@ export default function FinalCTA() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-8">
-          The only thing standing between you
+          You don&apos;t need to quit your job today.
           <br />
-          and a career you love is the{" "}
-          <span className="text-[#F5C518]">decision to start.</span>
+          <span className="text-[#F5C518]">You just need to decide.</span>
         </h2>
         <p className="text-[#9CA3AF] text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
-          You can keep doing what you&apos;re doing — or you can start something new today.
-          Enrol now and get access immediately — or book a 15-minute call if you have questions first.
+          Do you want to stay where you are — or start moving towards a career you actually enjoy?
+          If we can get you qualified around your job, with guaranteed gym interviews at the end, is there any reason not to start?
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

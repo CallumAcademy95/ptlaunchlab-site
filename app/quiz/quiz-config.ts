@@ -98,7 +98,7 @@ export const results: Record<ResultKey, ResultType> = {
     description:
       "Working face to face with clients, building trust through presence, delivering results you can see in real time. This is the most direct and most rewarding path into PT. It's where most great coaches start and where real careers are built. You don't need to be online to build something meaningful.",
     nextStep:
-      "Get your NCFE Level 3 and start your career with real mentorship from day one. We'll help you get your first clients, price your sessions properly, and build a roster that actually pays you.",
+      "Get your Level 2 & 3 fast-track and we'll guide you from day one — qualification, your first clients, and guaranteed gym interviews when you're done. Our team has hired 500+ PTs. We know exactly what gyms look for and we prepare you for it.",
     guideTitle: 'The On-Floor PT Starter Guide',
     guideDescription:
       'How to get your first 5 clients and build a full gym floor roster in 90 days.',
@@ -111,7 +111,7 @@ export const results: Record<ResultKey, ResultType> = {
     description:
       "You want to coach clients online, build systems, and create income that isn't tied to your physical presence. The online coaching model gives you scale, flexibility, and the ability to reach clients anywhere. Done right, it's the most scalable way to build a PT business.",
     nextStep:
-      "Get qualified, build your online presence from day one, and learn how to sign clients without a gym floor. We'll show you how PTs are doing this right now and how they built their businesses from scratch.",
+      "Get your Level 2 & 3 fast-track around your current job, build your online presence from day one, and learn how to sign clients without a gym floor. Mentorship included — not just a qualification. Guaranteed gym interviews when you're ready to go in-person too.",
     guideTitle: 'The Online PT Launch Guide',
     guideDescription:
       'How to build your online coaching business from zero. Clients, content, and recurring income.',
@@ -124,7 +124,7 @@ export const results: Record<ResultKey, ResultType> = {
     description:
       "You want real connection with clients and the freedom that comes with online income. A hybrid model gives you multiple revenue streams without being stuck in a gym 40 hours a week. This is how the best modern PTs build businesses that actually last.",
     nextStep:
-      "Get your Level 3, start building in-person, then grow your online income alongside it. We'll show you how to run both without dropping the ball and when to make the shift as you scale.",
+      "Get your Level 2 & 3 fast-track, start building in-person with guaranteed gym interviews, then grow your online income alongside it. We've built this exact model ourselves — £500K+ as independent PTs — and we show you step by step how to do the same.",
     guideTitle: 'The Hybrid PT Blueprint',
     guideDescription:
       'How to run in-person and online coaching at the same time without burning out.',

@@ -9,6 +9,16 @@ const reviews = [
   { name: "Jordan Wills",           label: "Level 3 Personal Training",  quote: "I got qualified through PT Launch Lab who were really helpful throughout the process and have continued to help me get my PT business up and running. Highly recommended." },
   { name: "Leon Jones",             label: "Level 3 Personal Training",  quote: "Friendly, responsive and very helpful. Helped me every step of the way and provided great information and knowledge. Would highly recommend to anyone wanting their PT certification." },
   { name: "Sam Jordan",             label: "Level 3 Personal Training",  quote: "Great experience all round. They make getting your qualification so simple with an easy-to-use online learning platform. Highly recommend." },
+  { name: "Sam Brown",              label: "PT Launch Lab Student",       quote: "Callum and Ryan helped me so much with not only the course but with also any other challenges I was unsure on. Nothing was too much to ask and both explained everything brilliantly — both really patient and understanding people. Could not recommend enough, thank you both very much!" },
+  { name: "Liam Greenwood",         label: "Level 3 Personal Training",  quote: "Very good place to do your PT course, very knowledgeable on everything. You learn everything you need and the tutoring from Callum is great." },
+  { name: "Kenan Kocar",            label: "PT Launch Lab Student",       quote: "Constantly getting face to face support as well as online, always giving you tips and help on questions you are unsure about." },
+  { name: "Rebecca Sykes",          label: "Level 3 Personal Training",  quote: "Wow absolutely amazing place to train and learn to become a qualified PT! I've just become qualified and I honestly wouldn't have been able to do it without the support from Callum Brown all throughout. He's there every step of the way. If you're looking to learn to become qualified then I can 100% recommend these guys!" },
+  { name: "Michelle",               label: "Level 3 Personal Training",  quote: "Highly recommend using PT Launch Lab. I work full time on a busy schedule, but they allowed me to complete the coursework and learn in my own time. I had the support and knowledge every step of the way from Cal. I am now a qualified Level 3 Personal Trainer and I couldn't have done it without the team!" },
+  { name: "Terri Altilar",          label: "Level 3 Personal Training",  quote: "Highly recommend PT Launch Lab, especially if you want flexible learning. I work full time and generally very busy day to day, however PT Launch Lab allowed me to learn at my own rate while still ensuring I had the support and knowledge every step of the way. Callum Brown has been on hand pretty much 24/7 to help advise, support and answer any questions. I can't thank you all enough for helping me become a Level 3 Qualified PT!" },
+  { name: "Mel Hume",               label: "Level 3 Personal Training",  quote: "Passed my Level 3 Personal Training yesterday with PT Launch Lab. Loved every minute. Callum was on hand to answer all my questions. Thank you for all the help and support." },
+  { name: "Aydan Colley",           label: "PT Launch Lab Student",       quote: "Very positive experience with great content and support." },
+  { name: "Declan Marsden",         label: "Level 3 Personal Training",  quote: "Officially passed my Level 3 personal training qualification today. Just want to give a shout-out to Cal, Chris and Craig for all the support I was given. If you're thinking about becoming a personal trainer then do not hesitate to go to PT Launch Lab." },
+  { name: "Rob Fullam",             label: "PT Launch Lab Student",       quote: "Joined over a year ago, never looked back. Great set of lads running the place with plenty of knowledge and experience. From beginners to more experienced — PT Launch Lab suits all levels. If you want to train, lift or work 1-to-1 with a trainer, you're sure to find a fit here." },
 ];
 
 export default function Reviews() {
@@ -72,7 +82,7 @@ export default function Reviews() {
             <div className="flex items-center gap-2 mt-3">
               <span className="text-[#F5C518] text-base">★★★★★</span>
               <span className="text-white text-sm font-semibold">5.0</span>
-              <span className="text-[#9CA3AF] text-sm">· 8 Google Reviews</span>
+              <span className="text-[#9CA3AF] text-sm">· 17 Verified Reviews</span>
               <a
                 href="https://www.google.com/search?q=pt+launch+lab+pontefract+reviews"
                 target="_blank"

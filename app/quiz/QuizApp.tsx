@@ -185,12 +185,18 @@ export default function QuizApp() {
                 training career suits you best — and what to do next.
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-2 text-[#4A6280] text-sm mb-10">
+              <div className="flex flex-wrap items-center justify-center gap-2 text-[#4A6280] text-sm mb-6">
                 <span>5 questions</span>
                 <span className="text-white/10">·</span>
                 <span>Under 2 minutes</span>
                 <span className="text-white/10">·</span>
                 <span>Free personalised results</span>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-4 text-[#4A6280] text-xs mb-10">
+                <span>✓ Guaranteed gym interviews</span>
+                <span>✓ 500+ PTs hired by our team</span>
+                <span>✓ 30+ years industry experience</span>
               </div>
 
               <button

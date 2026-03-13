@@ -1,6 +1,7 @@
 const stats = [
-  { value: "£500K+", label: "Revenue generated\nas independent PTs" },
-  { value: "3",      label: "Active gym\npartnerships" },
+  { value: "500+",   label: "PTs hired by\nour team" },
+  { value: "30+",    label: "Years industry\nexperience" },
+  { value: "£500K+", label: "Revenue as\nindependent PTs" },
   { value: "100s",   label: "Students\nqualified" },
 ];
 
@@ -47,10 +48,10 @@ export default function FounderStory() {
 
         {/* Right — stats */}
         <div className="grid grid-cols-2 gap-4">
-          {stats.map((stat, i) => (
+          {stats.map((stat) => (
             <div
               key={stat.value}
-              className={`bg-[#0A0E1A] border border-[#3B82F6]/25 rounded-2xl p-6 ${i === 2 ? "col-span-2 sm:col-span-1 sm:col-start-1" : ""}`}
+              className="bg-[#0A0E1A] border border-[#3B82F6]/25 rounded-2xl p-6"
             >
               <p className="text-[#F5C518] text-4xl font-bold mb-2">{stat.value}</p>
               <p className="text-[#9CA3AF] text-sm leading-relaxed whitespace-pre-line">{stat.label}</p>

@@ -138,9 +138,10 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         {/* What to expect */}
         <ul className="space-y-2 mb-6">
           {[
-            "We'll break down the cost and show you exactly how to make it work financially",
-            "We'll map out how to transition out of your job without gambling your income",
-            "We'll show you how our students get their first clients before they even qualify",
+            "We'll show you exactly how the course fits around your current job",
+            "We'll be honest about what you can earn as a PT and how quickly",
+            "We'll explain the guaranteed gym interview process and what it means for you",
+            "We'll walk through the payment options so the cost makes sense",
           ].map((point) => (
             <li key={point} className="flex items-start gap-2 text-[#8CA3BF] text-sm">
               <span className="text-[#F5C518] mt-0.5 shrink-0">→</span>

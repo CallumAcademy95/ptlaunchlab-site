@@ -2,10 +2,12 @@
 import { useState } from "react";
 
 const faqs = [
-  { q: "How long does it take to qualify?", a: "Most students complete their Level 3 qualification in 8–12 weeks, studying around their current job. The course is fully self-paced so you're in control of your timeline." },
+  { q: "Will I actually get a job after qualifying?", a: "Yes — and we back that up. We guarantee gym interviews once you're qualified. Our team has personally hired over 500 PTs, so we know exactly what gyms look for and we prepare you for it. We'll also help you understand how PTs actually make money, whether that's in a gym, online, or both." },
+  { q: "What is the guaranteed gym interview?", a: "Once you complete your Level 2 & 3 qualification, we actively connect you with gym partners for interviews. This isn't a vague promise — it's part of the course. We've built gym partnerships specifically to support our graduates into work. You qualify, we open the doors." },
+  { q: "How long does it take to qualify?", a: "Most students complete their Level 2 & 3 qualification in 8–16 weeks, studying around their current job. The course is fully self-paced so you're in control of your timeline." },
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or you've been training for years, the course starts from the foundations and builds up. All you need is a passion for fitness and the drive to make it your career." },
   { q: "What does it cost?", a: "We have options to suit different budgets, including payment plans. View all pricing and enrolment options on our sign-up page." },
-  { q: "Will my qualification be recognised?", a: "Yes. Your NCFE Level 3 PT qualification is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym and insurance provider will accept it." },
+  { q: "Will my qualification be recognised?", a: "Yes. Your NCFE Level 2 & 3 PT qualification is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym and insurance provider will accept it." },
   { q: "When can I start?", a: "Immediately. As soon as you enrol you get full access to the course, your learning platform, and your personal tutor. There's no waiting around." },
   { q: "I have a full-time job and a family. Is this realistic?", a: "Absolutely. The course is designed around real life. Study in the morning, evenings, weekends — whenever works for you. Most of our students qualify while working full-time." },
 ];

@@ -10,7 +10,7 @@ export default function Hero() {
         {/* Pill label */}
         <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/30 bg-[#141B2D] mb-10">
           <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
-            NCFE Level 3 · Ofqual Regulated · CIMSPA Accredited
+            Level 2 &amp; 3 PT · Fast Track · NCFE · Ofqual · CIMSPA
           </span>
         </div>
 
@@ -27,8 +27,7 @@ export default function Hero() {
 
         {/* Sub */}
         <p className="text-lg md:text-xl text-[#9CA3AF] max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-in-up animate-delay-100">
-          Get your NCFE Level 3 PT qualification online — in as little as 8 weeks — with real
-          mentorship, business support, and a community that actually gives a damn about your success.
+          Online Level 2 &amp; 3 PT qualification, fast-track, industry recognised — done around your current job. Mentorship included. Guaranteed gym interviews when you qualify.
         </p>
 
         {/* CTA buttons */}
@@ -53,11 +52,13 @@ export default function Hero() {
         <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-[#6B7280] text-sm animate-fade-in-up animate-delay-300">
           <span>⭐ 5-Star Rated</span>
           <span className="hidden sm:inline">·</span>
+          <span>Guaranteed Gym Interviews</span>
+          <span className="hidden sm:inline">·</span>
+          <span>500+ PTs Hired</span>
+          <span className="hidden sm:inline">·</span>
           <span>NCFE &amp; Ofqual Regulated</span>
           <span className="hidden sm:inline">·</span>
-          <span>CIMSPA Accredited</span>
-          <span className="hidden sm:inline">·</span>
-          <span>Study Online</span>
+          <span>Study Around Your Job</span>
         </div>
       </div>
     </section>
