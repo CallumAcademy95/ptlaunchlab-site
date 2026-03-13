@@ -171,7 +171,7 @@ export default function EnrolmentFlow() {
       e.preventDefault(); isDrawing.current = true; lastPos.current = pos(e);
     }
     function move(e: MouseEvent | TouchEvent) {
-      if (!isDrawing.current) return;
+      if (!isDrawing.current || !ctx) return;
       e.preventDefault();
       const p = pos(e);
       if (lastPos.current) {
