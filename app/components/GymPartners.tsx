@@ -2,16 +2,16 @@ import Image from "next/image";
 
 // Gym partner logos
 const gymPartners = [
-  { name: "Leodis 24/7 Gym",      src: "/logos/leodis-gym.png"       },
-  { name: "Iron Wolf Gym",         src: "/logos/iron-wolf-gym.png"    },
-  { name: "1079 Fitness",          src: "/logos/1079-fitness.png"     },
-  { name: "Ultimate Shred",        src: "/logos/ultimate-shred.png"   },
+  { name: "Leodis 24/7 Gym", src: "/logos/leodis-gym.png",     dark: false },
+  { name: "Iron Wolf Gym",    src: "/logos/iron-wolf-gym.png",  dark: false },
+  { name: "1079 Fitness",     src: "/logos/1079-fitness.png",   dark: false },
+  { name: "Ultimate Shred",   src: "/logos/ultimate-shred.png", dark: true  },
+  { name: "6FitGym",          src: "/logos/6fit-gym.png",       dark: true  },
 ];
 
 // Accreditation logos
 const accreditations = [
-  { name: "NCFE",   src: "/logos/ncfe.png"   },
-  { name: "Ofqual", src: "/logos/ofqual.png" },
+  { name: "NCFE", src: "/logos/ncfe.png", dark: false },
 ];
 
 export default function GymPartners() {
@@ -34,7 +34,7 @@ export default function GymPartners() {
           {gymPartners.map((p) => (
             <div
               key={p.name}
-              className="bg-white/95 rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className={`${p.dark ? "bg-[#1a1a1a]" : "bg-white/95"} rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105`}
             >
               <div className="relative w-full h-full">
                 <Image
@@ -60,7 +60,7 @@ export default function GymPartners() {
           {accreditations.map((p) => (
             <div
               key={p.name}
-              className="bg-white/95 rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className={`${p.dark ? "bg-[#1a1a1a]" : "bg-white/95"} rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105`}
             >
               <div className="relative w-full h-full">
                 <Image
