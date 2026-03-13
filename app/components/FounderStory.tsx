@@ -20,7 +20,7 @@ export default function FounderStory() {
             we hated too.
           </h2>
           <p className="text-[#9CA3AF] text-[17px] leading-relaxed mb-4">
-            Ryan and the PT Launch Lab team built this course from lived experience — not a
+            Callum, Miles and Ryan built this course from lived experience — not a
             textbook. Before PT Launch Lab, we scaled Ultimate Shred to over £500K in revenue as
             independent personal trainers.
           </p>

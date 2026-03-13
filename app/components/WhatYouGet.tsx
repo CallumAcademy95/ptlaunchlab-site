@@ -4,7 +4,7 @@ const features = [
   { icon: "💼", title: "Business training built in",      body: "Learn how to get clients, set your rates, build your brand, and run your PT business from day one — not as an afterthought.", badge: null },
   { icon: "👤", title: "Your own personal tutor",         body: "Not a chatbot. Not a generic support line. A real tutor assigned to you throughout your entire qualification.", badge: "Included" },
   { icon: "🏋️", title: "Guaranteed gym interviews",       body: "Once you qualify, we guarantee gym interviews. We've hired 500+ PTs ourselves — we know what gyms look for and we prepare you for it.", badge: "Guaranteed" },
-  { icon: "🎯", title: "Mentorship from Ryan & the team", body: "We've done this. We guide you through the exact steps we took to build a full-time income as independent personal trainers.", badge: "Exclusive" },
+  { icon: "🎯", title: "Mentorship from Callum, Miles & Ryan", body: "We've done this. We guide you through the exact steps we took to build a full-time income as independent personal trainers.", badge: "Exclusive" },
 ];
 
 export default function WhatYouGet() {
