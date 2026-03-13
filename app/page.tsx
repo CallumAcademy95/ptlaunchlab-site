@@ -9,6 +9,7 @@ import VideoTestimonial from "./components/VideoTestimonial";
 import Reviews from "./components/Reviews";
 import Accreditation from "./components/Accreditation";
 import GymPartners from "./components/GymPartners";
+import Podcast from "./components/Podcast";
 import ConversionSection from "./components/ConversionSection";
 import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
@@ -29,6 +30,7 @@ export default function Home() {
         <Reviews />
         <Accreditation />
         <GymPartners />
+        <Podcast />
         <ConversionSection />
         <FAQ />
         <FinalCTA />

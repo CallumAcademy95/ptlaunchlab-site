@@ -13,7 +13,7 @@ export default function VideoTestimonial() {
         {/* Video embed — replace VIDEO_ID with real YouTube ID */}
         <div className="relative rounded-2xl overflow-hidden border border-[#3B82F6]/25 shadow-2xl shadow-[#3B82F6]/10 aspect-video max-w-4xl mx-auto mb-6">
           <iframe
-            src="https://www.youtube.com/embed/VIDEO_ID"
+            src="https://www.youtube.com/embed/pAm1jvDKRM0"
             title="How I escaped the 9-5 with PT Launch Lab — Gemma's Story"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen

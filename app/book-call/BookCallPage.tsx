@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
-import { Header } from "./components/Header";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
 import { ContentCard } from "./components/ContentCard";
 import { VideoPlaceholder } from "./components/VideoPlaceholder";
 import { StepCard } from "./components/StepCard";
@@ -20,10 +21,10 @@ export default function BookCallPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#072B4A] via-[#0A3A66] to-[#0E4C80]">
-      <Header />
+      <Nav />
 
       {/* SUCCESS CONFIRMATION */}
-      <section className="pt-32 pb-8 px-6">
+      <section className="pt-[104px] pb-8 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-3 mb-8">
             <CheckCircle2 className="w-6 h-6 text-[#35C6A4]" />
@@ -181,35 +182,7 @@ export default function BookCallPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-12 px-6 bg-[#061F36] border-t border-[rgba(255,255,255,0.12)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <h3 className="text-white text-xl mb-4 font-bold">PT Launch Lab</h3>
-              <p className="text-[#9FB3C8] text-sm">Empowering the next generation of personal trainers.</p>
-            </div>
-            <div>
-              <h4 className="text-white mb-4 font-bold">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><a href="/" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Home</a></li>
-                <li><a href="/quiz" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Free Quiz</a></li>
-                <li><a href="/enrol" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Enrol Now</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white mb-4 font-bold">Legal</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-[rgba(255,255,255,0.12)] pt-8 text-center">
-            <p className="text-[#9FB3C8] text-sm">© 2026 PT Launch Lab. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

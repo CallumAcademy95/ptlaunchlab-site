@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 // ─── CONFIGURATION — replace these placeholders before going live ─────────────
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/bJecMZ4Ew6de52q4EifEk09";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
-const TERMS_URL                 = "/terms";                       // TODO: Terms & Conditions page
+const TERMS_URL                 = "/terms";
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";       // TODO: Support email
 const SUPPORT_PHONE             = "01977 365001";
 // ─────────────────────────────────────────────────────────────────────────────
@@ -277,7 +277,7 @@ export default function EnrolmentFlow() {
   }
 
   // ─── Payment ───────────────────────────────────────────────────────────────
-  function pay(type: "full" | "deposit") {
+  async function pay(type: "full" | "deposit") {
     const record = {
       learnerDetails: learner,
       learningDetails: learning,
@@ -297,9 +297,14 @@ export default function EnrolmentFlow() {
       submittedAt: new Date().toISOString(),
       source: "website-enrolment-flow-v1",
     };
-    // Persist locally — wire to API / Google Sheets / CRM later
-    // POST endpoint: /api/enrolments  (TODO: build this route)
+    // Persist locally as backup
     try { localStorage.setItem("ptll_enrolment_pending", JSON.stringify(record)); } catch (_) {}
+    // Fire and forget — don't block the Stripe redirect if the email fails
+    fetch("/api/enrolments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    }).catch(() => {});
     window.location.href = type === "full" ? FULL_PAYMENT_STRIPE_LINK : DEPOSIT_STRIPE_LINK;
   }
 

@@ -50,9 +50,8 @@ export default function Footer() {
         <div className="border-t border-[#3B82F6]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[#4A6280] text-xs">
           <p>© 2026 PT Launch Lab. All rights reserved.</p>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Sitemap</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a>
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
           </div>
         </div>
       </div>
