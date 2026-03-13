@@ -7,12 +7,42 @@ export const metadata = {
 };
 
 const curriculum = [
-  { num: "01", title: "Anatomy, Physiology & Nutrition", body: "The science behind how the body works, moves, and responds to training. Everything you need to coach with confidence and pass your qualification." },
-  { num: "02", title: "Behaviour Change & Motivation", body: "How to actually get clients to follow through — the psychology of habit, motivation, and sustainable change." },
-  { num: "03", title: "Client Consultations & Goal Setting", body: "How to run a proper consultation, set realistic goals, and build client trust from day one." },
-  { num: "04", title: "Exercise Technique & Programme Design", body: "Build programmes that get results. Technique cues, progressions, periodisation — the practical skills that separate good trainers from great ones." },
-  { num: "05", title: "Common Medical Conditions", body: "How to safely coach clients with health considerations — the knowledge that makes you hireable in any gym." },
-  { num: "06", title: "Launching Your PT Business", body: "Pricing, clients, social media, systems. How to actually make money as a personal trainer — not taught as an afterthought, but built into the core." },
+  {
+    num: "01",
+    title: "Anatomy & Exercise Science",
+    body: "How the body works, moves, and adapts to training. You'll learn the muscles, joints, energy systems, and principles behind every session you'll ever programme. The foundation everything else is built on.",
+    tag: "Core",
+  },
+  {
+    num: "02",
+    title: "Nutrition Fundamentals",
+    body: "Macros, energy balance, practical nutrition coaching. Not fad diets — the evidence-based knowledge clients actually ask about, and the ability to give them real, useful answers.",
+    tag: "Core",
+  },
+  {
+    num: "03",
+    title: "Programme Design & Exercise Technique",
+    body: "Build training programmes that get results. Technique cues, progressions, periodisation, loading principles — the practical skills that separate good trainers from great ones.",
+    tag: "Core",
+  },
+  {
+    num: "04",
+    title: "Client Consultations & Behaviour Change",
+    body: "How to run a proper initial consultation, set realistic goals, and keep clients motivated long-term. The psychology behind why people change — and how to use it in every session.",
+    tag: "Core",
+  },
+  {
+    num: "05",
+    title: "Health Conditions & Safe Practice",
+    body: "How to safely coach clients with common medical conditions — diabetes, hypertension, obesity, musculoskeletal issues. The knowledge that makes you hireable in any professional gym environment.",
+    tag: "Core",
+  },
+  {
+    num: "06",
+    title: "Business Launch & Client Acquisition",
+    body: "Pricing, sales, social media, and systems. How to find your first clients, set your rates, build your brand, and start earning as a PT. This isn't an optional extra — it's the whole point.",
+    tag: "Unique to us",
+  },
 ];
 
 const method = [
@@ -124,13 +154,21 @@ export default function CoursesPage() {
         <section className="bg-[#072B4A] py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">What you&apos;ll study</p>
-            <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-4">
               6 core modules. Built to get<br />you qualified <span className="text-[#F5C518]">and employed.</span>
             </h2>
+            <p className="text-[#8CA3BF] text-center text-lg mb-16 max-w-xl mx-auto">
+              12 modules total. These are the ones that matter most — the knowledge and skills every gym, insurer, and client expects from a qualified PT.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {curriculum.map((mod) => (
-                <div key={mod.num} className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all">
-                  <p className="text-[#3B82F6] text-3xl font-bold mb-4">{mod.num}</p>
+                <div key={mod.num} className={`rounded-2xl p-7 border transition-all hover:-translate-y-1 duration-300 ${mod.tag === "Unique to us" ? "bg-[#0D3559] border-[#F5C518]/50 shadow-lg shadow-[#F5C518]/8" : "bg-[#0D3559] border-[#3B82F6]/25 hover:border-[#F5C518]/40"}`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <p className={`text-3xl font-bold ${mod.tag === "Unique to us" ? "text-[#F5C518]" : "text-[#3B82F6]"}`}>{mod.num}</p>
+                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide ${mod.tag === "Unique to us" ? "bg-[#F5C518] text-[#072B4A]" : "bg-[#3B82F6]/20 text-[#3B82F6]"}`}>
+                      {mod.tag}
+                    </span>
+                  </div>
                   <h3 className="text-white font-bold text-lg mb-3">{mod.title}</h3>
                   <p className="text-[#8CA3BF] text-sm leading-relaxed">{mod.body}</p>
                 </div>
