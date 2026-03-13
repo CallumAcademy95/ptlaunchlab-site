@@ -20,24 +20,21 @@ export default function Hero() {
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-6 animate-fade-in-up">
-              Become a Qualified
+              Quit the job you hate.
               <br />
-              Personal Trainer.
+              <span className="text-[#F5C518]">Train for the life</span>
               <br />
-              <span className="text-[#F5C518]">Build a Business That</span>
-              <br />
-              Actually Pays You.
+              <span className="text-[#F5C518]">you want.</span>
             </h1>
 
             {/* Positioning line */}
             <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4 animate-fade-in-up animate-delay-100">
-              Most PT courses teach theory.{" "}
-              <span className="text-[#F5C518]">We build personal trainers gyms actually want to hire.</span>
+              We qualify you as a Personal Trainer and guide you as you turn it into a real business.
             </p>
 
             {/* Sub */}
             <p className="text-base text-blue-100/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              Online Level 2 &amp; 3, fast-track, Ofqual regulated — done around your current job. Mentorship, guaranteed gym interviews, and a full business launchpad included.
+              Not just theory — real mentorship, from people who&apos;ve built it themselves. From your first lesson right through to your first paying client.
             </p>
 
             {/* CTA buttons */}

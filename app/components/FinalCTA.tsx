@@ -6,12 +6,17 @@ export default function FinalCTA() {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-8">
+        <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">Ready to make the jump?</p>
+        <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-6">
           You don&apos;t need to quit your job today.
           <br />
-          <span className="text-[#F5C518]">You just need to decide.</span>
+          <span className="text-[#F5C518]">You just need to take your first lesson.</span>
         </h2>
-        <p className="text-[#8CA3BF] text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-[#8CA3BF] text-lg max-w-2xl mx-auto mb-4 leading-relaxed">
+          We limit enrolments each month so every student gets proper 1-to-1 support.
+          If there&apos;s a spot available, it&apos;s worth taking it.
+        </p>
+        <p className="text-[#8CA3BF] text-base max-w-xl mx-auto mb-12 leading-relaxed">
           Do you want to stay where you are — or start moving towards a career you actually enjoy?
           If we can get you qualified around your job, with guaranteed gym interviews at the end, is there any reason not to start?
         </p>
@@ -29,7 +34,7 @@ export default function FinalCTA() {
             href="/book-call"
             className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
           >
-            Book a Free Call
+            Prefer to talk first? Book a call
           </a>
         </div>
       </div>

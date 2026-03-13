@@ -1,10 +1,10 @@
 const features = [
-  { icon: "📱", title: "Study on your phone",             body: "Delivered through the Merve app. Study at your pace, your schedule — no classrooms, no fixed hours, no commute.", badge: null },
-  { icon: "📚", title: "12 structured modules",           body: "Covering everything from anatomy and nutrition to exercise prescription and programme design. Built to get you qualified and confident.", badge: null },
-  { icon: "💼", title: "Business training built in",      body: "Learn how to get clients, set your rates, build your brand, and run your PT business from day one — not as an afterthought.", badge: null },
-  { icon: "👤", title: "Your own personal tutor",         body: "Not a chatbot. Not a generic support line. A real tutor assigned to you throughout your entire qualification.", badge: "Included" },
-  { icon: "🏋️", title: "Guaranteed gym interviews",       body: "Once you qualify, we guarantee gym interviews. We've hired 500+ PTs ourselves — we know what gyms look for and we prepare you for it.", badge: "Guaranteed" },
-  { icon: "🎯", title: "Mentorship from Callum, Miles & Ryan", body: "We've done this. We guide you through the exact steps we took to build a full-time income as independent personal trainers.", badge: "Exclusive" },
+  { icon: "📱", title: "Learn on your phone",             body: "Everything's in the Merve app. Study whenever you've got a spare moment — track your progress, see what's coming next, no classrooms or fixed hours.", badge: null },
+  { icon: "📚", title: "12 focused modules",              body: "Nutrition, anatomy, programming, client coaching — just what you need to do the job, nothing you don't. Built to get you qualified and confident fast.", badge: null },
+  { icon: "💼", title: "Business training built in",      body: "How to get clients. Marketing, sales, content creation — the stuff most courses don't bother teaching. This isn't an optional extra. It's the whole point.", badge: null },
+  { icon: "👤", title: "Your own personal tutor",         body: "They know your name, where you're stuck, and what you need next. Direct support whenever you need it — not a help desk ticket system.", badge: "Included" },
+  { icon: "🏋️", title: "Guaranteed gym interviews",       body: "Once you qualify, we guarantee interviews with our partner gyms. We've hired 500+ PTs ourselves — we know exactly what gyms look for.", badge: "Guaranteed" },
+  { icon: "🎯", title: "Mentorship from Ryan & the team", body: "Direct access to the people who built Ultimate Shred to £500k+ in revenue. They keep you on track and tell you what's working right now.", badge: "Exclusive" },
 ];
 
 export default function WhatYouGet() {

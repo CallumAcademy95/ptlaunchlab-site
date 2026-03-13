@@ -1,32 +1,29 @@
 const steps = [
   {
     num: "01",
-    title: "Qualification",
-    body: "Complete your NCFE Level 2 & 3 Personal Training qualification — fast-track, Ofqual regulated, and recognised across the entire UK fitness industry. Done around your job.",
+    icon: "📚",
+    title: "Learn",
+    subtitle: "Learn the fundamentals",
+    body: "Everything you need to coach real people — safely, confidently, and effectively. Anatomy, nutrition, exercise science, client consultations, and behaviour change. Study online at your own pace, around your current job.",
+    bullets: ["Anatomy, nutrition & exercise science", "Client consultations & goal setting", "Behaviour change & motivation strategies"],
     highlight: false,
   },
   {
     num: "02",
-    title: "Mentorship",
-    body: "Direct access to Callum, Miles and Ryan throughout your entire journey. Not a chatbot. Not a helpdesk. The people who've actually built successful PT businesses.",
-    highlight: false,
-  },
-  {
-    num: "03",
-    title: "Gym Placement",
-    body: "Once you qualify, we guarantee interviews with our partner gyms. We've hired 500+ PTs ourselves — we know exactly what gyms look for and we prepare you for it.",
+    icon: "🏅",
+    title: "Qualify",
+    subtitle: "Get qualified",
+    body: "You'll earn an NCFE Level 3 qualification that every UK gym recognises. The same one we used to launch our own careers. Ofqual regulated, with continuous tutor support throughout.",
+    bullets: ["NCFE & Ofqual-regulated certification", "Online and practical assessments", "Continuous tutor feedback & support"],
     highlight: true,
   },
   {
-    num: "04",
-    title: "Income Building",
-    body: "Learn how to price your services, get your first clients, set up your business, and actually make money — from the people who've done it at scale.",
-    highlight: false,
-  },
-  {
-    num: "05",
-    title: "Online Coaching",
-    body: "Expand beyond the gym floor. Build an online income stream that runs alongside your in-person work — and scales without a ceiling.",
+    num: "03",
+    icon: "🚀",
+    title: "Launch",
+    subtitle: "Launch your business",
+    body: "Other courses stop once you pass. We stay until you've built something real. Find and convert your first clients, build your brand, and use proven systems to reach £5K per month.",
+    bullets: ["Find & convert your first clients", "Build your online & in-person PT brand", "Proven systems to reach £5K/month"],
     highlight: false,
   },
 ];
@@ -36,37 +33,58 @@ export default function HowItWorks() {
     <section className="bg-[#072B4A] py-24">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
-          A system, not just a course
+          How it works
         </p>
         <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-3">
-          The PT Launch Method™
+          Three steps to a career
+          <br />
+          <span className="text-[#F5C518]">you actually want.</span>
         </h2>
         <p className="text-[#8CA3BF] text-center text-lg mb-16 max-w-xl mx-auto">
           We don&apos;t just get you qualified. We get you hired, earning, and building.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-14">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
           {steps.map((step) => (
             <div
               key={step.num}
-              className={`rounded-2xl p-7 border transition-all ${
+              className={`rounded-2xl p-8 border transition-all ${
                 step.highlight
-                  ? "bg-[#0D3559] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10"
+                  ? "bg-[#0D3559] border-[#F5C518]/60 shadow-xl shadow-[#F5C518]/10"
                   : "bg-[#0D3559] border-[#3B82F6]/25"
               }`}
             >
-              <p className={`text-3xl font-bold mb-5 ${step.highlight ? "text-[#F5C518]" : "text-[#3B82F6]"}`}>
-                {step.num}
-              </p>
-              <h3 className="text-white font-bold text-lg mb-3">
-                {step.title}
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
+                  step.highlight ? "bg-[#F5C518]/15 border border-[#F5C518]/40" : "bg-[#072B4A] border border-[#3B82F6]/25"
+                }`}>
+                  {step.icon}
+                </div>
+                <div>
+                  <p className={`text-xs font-bold tracking-widest uppercase ${step.highlight ? "text-[#F5C518]" : "text-[#3B82F6]"}`}>
+                    Step {step.num}
+                  </p>
+                  <h3 className="text-white font-bold text-2xl leading-none">{step.title}</h3>
+                </div>
                 {step.highlight && (
-                  <span className="ml-2 text-xs bg-[#F5C518] text-[#072B4A] px-2 py-0.5 rounded-full font-bold">
-                    ⭐ Key
+                  <span className="ml-auto text-[10px] bg-[#F5C518] text-[#072B4A] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide shrink-0">
+                    Key Step
                   </span>
                 )}
-              </h3>
-              <p className="text-[#8CA3BF] text-sm leading-relaxed">{step.body}</p>
+              </div>
+
+              <p className="text-white font-semibold text-sm mb-3">{step.subtitle}</p>
+              <p className="text-[#8CA3BF] text-sm leading-relaxed mb-5">{step.body}</p>
+
+              <ul className="space-y-2">
+                {step.bullets.map((b) => (
+                  <li key={b} className="flex items-start gap-2 text-[#8CA3BF] text-sm">
+                    <span className="text-[#F5C518] mt-0.5 shrink-0">✓</span>
+                    {b}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

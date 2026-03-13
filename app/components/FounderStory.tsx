@@ -50,17 +50,28 @@ export default function FounderStory() {
           </div>
         </div>
 
-        {/* Right — stats */}
-        <div className="grid grid-cols-2 gap-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.value}
-              className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-6"
-            >
-              <p className="text-[#F5C518] text-4xl font-bold mb-2">{stat.value}</p>
-              <p className="text-[#8CA3BF] text-sm leading-relaxed whitespace-pre-line">{stat.label}</p>
-            </div>
-          ))}
+        {/* Right — stats + case study */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.value}
+                className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-6"
+              >
+                <p className="text-[#F5C518] text-4xl font-bold mb-2">{stat.value}</p>
+                <p className="text-[#8CA3BF] text-sm leading-relaxed whitespace-pre-line">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Student success story */}
+          <div className="bg-[#072B4A] border border-[#F5C518]/30 rounded-2xl p-6">
+            <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">Student Success Story</p>
+            <h4 className="text-white font-bold text-lg mb-2">Gemma&apos;s Journey: Corporate to Coaching</h4>
+            <p className="text-[#8CA3BF] text-sm leading-relaxed">
+              Gemma left corporate life behind and retrained through PT Launch Lab. Now she runs her own PT business, works on her own terms, and helps people transform their lives every day.
+            </p>
+          </div>
         </div>
       </div>
     </section>

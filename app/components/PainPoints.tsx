@@ -1,18 +1,18 @@
 const cards = [
   {
-    icon: "😔",
-    title: "You're stuck in the wrong job",
-    body: "You don't enjoy it. You're doing it for security. And you don't want to risk leaving until you know something better will actually work.",
+    icon: "😩",
+    title: "You hate Mondays",
+    body: "You dread Sunday evenings because you know what's coming. Another week doing work that drains you — not something that energises you.",
   },
   {
-    icon: "🤔",
-    title: "Too many courses, no clear answer",
-    body: "You've looked. There are loads of options and you don't know who to trust, which qualification gyms respect, or which one will actually help you get work.",
+    icon: "🔒",
+    title: "You feel stuck",
+    body: "You want out, but there are bills to pay. So you stay put, watching the months turn into years — waiting for the right moment that never comes.",
   },
   {
-    icon: "💸",
-    title: "You don't want to waste money",
-    body: "It's not a small decision. You want to know the course is legit, the support is real, and you'll have a clear path to earning as a PT before you commit.",
+    icon: "💡",
+    title: "You know you're capable of more",
+    body: "You're not lazy. You're not unmotivated. You're just in the wrong place. You just need someone to show you there's a real way out.",
   },
 ];
 

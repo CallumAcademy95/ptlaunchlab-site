@@ -15,13 +15,21 @@ export default function Nav() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#061F36] border-b border-[#3B82F6]/20">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
-        <a href="/" className="flex items-center">
+        <a href="/" className="flex items-center group">
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="PT Launch Lab"
             width={160}
             height={56}
-            className="h-14 w-auto object-contain"
+            className="h-12 w-auto object-contain block group-hover:hidden"
+            priority
+          />
+          <Image
+            src="/logo-hover.svg"
+            alt="PT Launch Lab"
+            width={160}
+            height={56}
+            className="h-12 w-auto object-contain hidden group-hover:block"
             priority
           />
         </a>
