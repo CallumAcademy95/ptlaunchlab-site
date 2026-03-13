@@ -1,4 +1,6 @@
+"use client";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 // Gym partner logos
 const gymPartners = [
@@ -15,6 +17,15 @@ const accreditations = [
 ];
 
 export default function GymPartners() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((c) => (c + 1) % gymPartners.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="bg-[#112035] py-16 border-t border-[#3B82F6]/15">
       <div className="max-w-6xl mx-auto px-6 text-center">
@@ -29,19 +40,37 @@ export default function GymPartners() {
           6 partner gyms across the UK.
         </p>
 
-        {/* Gym partner logos */}
-        <div className="flex flex-wrap items-center justify-center gap-10 mb-10">
+        {/* Mobile: auto carousel */}
+        <div className="block lg:hidden mb-10">
+          <div className="relative w-56 h-32 mx-auto">
+            {gymPartners.map((p, i) => (
+              <div
+                key={p.name}
+                className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
+              >
+                <Image src={p.src} alt={p.name} fill className="object-contain" />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center gap-2 mt-4">
+            {gymPartners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-[#F5C518] w-5" : "bg-[#3B82F6]/30 w-1.5"}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop: flex grid */}
+        <div className="hidden lg:flex flex-wrap items-center justify-center gap-10 mb-10">
           {gymPartners.map((p) => (
             <div
               key={p.name}
               className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
-              <Image
-                src={p.src}
-                alt={p.name}
-                fill
-                className="object-contain"
-              />
+              <Image src={p.src} alt={p.name} fill className="object-contain" />
             </div>
           ))}
         </div>
@@ -60,12 +89,7 @@ export default function GymPartners() {
               key={p.name}
               className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
-              <Image
-                src={p.src}
-                alt={p.name}
-                fill
-                className="object-contain"
-              />
+              <Image src={p.src} alt={p.name} fill className="object-contain" />
             </div>
           ))}
         </div>
