@@ -20,12 +20,18 @@ export default function Reframe() {
               <br />
               <span className="text-[#F5C518]">You&apos;re just in the wrong place.</span>
             </h2>
-            <p className="text-lg text-[#8CA3BF] leading-relaxed">
+            <p className="text-lg text-[#8CA3BF] leading-relaxed mb-8">
               Most people who come to us aren&apos;t career changers by accident. They&apos;re driven,
               passionate, and sick of wasting their potential. They just need the right qualification,
               the right support, and someone who&apos;s actually done it — to show them the way.
               That&apos;s exactly what PT Launch Lab was built for.
             </p>
+            <a
+              href="/quiz"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5C518] text-[#091524] text-sm font-bold hover:brightness-110 transition-all"
+            >
+              Take the free quiz — find out if PT is right for you →
+            </a>
           </div>
 
           {/* Right — future vision */}
