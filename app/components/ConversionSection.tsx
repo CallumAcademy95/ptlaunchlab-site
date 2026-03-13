@@ -41,9 +41,7 @@ export default function ConversionSection() {
               ))}
             </ul>
             <a
-              href="https://signup-lauchlab.co.uk/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/enrol"
               className="block w-full text-center py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mb-3"
             >
               Enrol Now — Start Today →

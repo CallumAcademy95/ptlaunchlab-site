@@ -111,7 +111,7 @@ export default function CoursesPage() {
               NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, guaranteed gym interviews, and a complete business launchpad included.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
+              <a href="/enrol"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
                 Start Application →
               </a>
@@ -252,7 +252,7 @@ export default function CoursesPage() {
                       </li>
                     ))}
                   </ul>
-                  <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
+                  <a href="/enrol"
                     className={`text-center px-6 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-[#F5C518] text-[#072B4A] hover:brightness-110" : "border border-[#F5C518] text-[#F5C518] hover:bg-[#F5C518] hover:text-[#072B4A]"}`}>
                     Get Started →
                   </a>
@@ -291,7 +291,7 @@ export default function CoursesPage() {
               Enrol today and start your Level 2 &amp; 3 qualification immediately — or book a free call if you want to talk it through first.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
+              <a href="/enrol"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
                 Enrol Now →
               </a>

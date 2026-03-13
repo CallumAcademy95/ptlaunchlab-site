@@ -162,7 +162,7 @@ export default function ContactPage() {
               <a href="/courses" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">View the Course</a>
               <a href="/book-call" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Book a Free Call</a>
               <a href="/quiz" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Take the Free Quiz</a>
-              <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Enrol Now</a>
+              <a href="/enrol" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Enrol Now</a>
             </div>
           </div>
         </section>

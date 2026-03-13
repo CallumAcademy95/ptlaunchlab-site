@@ -34,9 +34,7 @@ export default function FounderStory() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href="https://signup-lauchlab.co.uk/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/enrol"
               className="px-7 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
             >
               View Courses →

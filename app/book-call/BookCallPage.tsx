@@ -194,7 +194,7 @@ export default function BookCallPage() {
               <ul className="space-y-2">
                 <li><a href="/" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Home</a></li>
                 <li><a href="/quiz" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Free Quiz</a></li>
-                <li><a href="https://signup-lauchlab.co.uk/" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Enrol Now</a></li>
+                <li><a href="/enrol" className="text-[#9FB3C8] hover:text-white text-sm transition-colors">Enrol Now</a></li>
               </ul>
             </div>
             <div>

@@ -34,9 +34,7 @@ export function Header() {
 
           <div className="flex items-center gap-4">
             <a
-              href="https://signup-lauchlab.co.uk/"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/enrol"
               className="px-5 py-2 bg-[#FFD400] hover:bg-[#F5C400] text-[#072B4A] text-sm font-bold rounded-lg transition-all"
             >
               Enrol Now

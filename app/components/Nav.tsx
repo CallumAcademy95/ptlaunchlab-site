@@ -55,9 +55,7 @@ export default function Nav() {
             Book a Free Call
           </a>
           <a
-            href="https://signup-lauchlab.co.uk/"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/enrol"
             className="px-5 py-2.5 rounded-full bg-[#F5C518] text-[#072B4A] text-sm font-bold hover:brightness-110 transition-all"
           >
             Start Today →
@@ -88,7 +86,7 @@ export default function Nav() {
             <a href="/book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
               Book a Free Call
             </a>
-            <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer" className="text-center px-5 py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all">
+            <a href="/enrol" className="text-center px-5 py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all">
               Start Today →
             </a>
           </div>

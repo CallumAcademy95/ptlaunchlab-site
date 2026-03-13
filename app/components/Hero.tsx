@@ -40,9 +40,7 @@ export default function Hero() {
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-10 animate-fade-in-up animate-delay-200">
               <a
-                href="https://signup-lauchlab.co.uk/"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/enrol"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
               >
                 Start Today →
