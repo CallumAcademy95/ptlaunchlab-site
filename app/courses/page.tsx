@@ -68,13 +68,6 @@ const pricing = [
     recommended: true,
   },
   {
-    title: "Standard",
-    price: "£1,599",
-    saving: null,
-    features: ["Level 2 & 3 qualification", "Personal tutor throughout", "Business training built in", "Guaranteed gym interviews", "Mentorship from Callum, Miles & Ryan"],
-    recommended: false,
-  },
-  {
     title: "Deposit Plan",
     price: "£599",
     saving: "then £200 × 5 months",
@@ -239,7 +232,7 @@ export default function CoursesPage() {
             <p className="text-[#8CA3BF] text-center text-lg mb-16 max-w-xl mx-auto">
               No hidden fees. Finance available. Pay in a way that works for you.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {pricing.map((plan) => (
                 <div key={plan.title} className={`rounded-2xl p-8 border flex flex-col ${plan.recommended ? "bg-[#072B4A] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10 relative" : "bg-[#072B4A] border-[#3B82F6]/25"}`}>
                   {plan.recommended && (
