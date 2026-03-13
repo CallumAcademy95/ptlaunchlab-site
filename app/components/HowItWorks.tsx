@@ -21,7 +21,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="bg-[#0A0E1A] py-24">
+    <section className="bg-[#091524] py-24">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           Simple. Structured. Proven.
@@ -36,8 +36,8 @@ export default function HowItWorks() {
               key={step.num}
               className={`rounded-2xl p-8 border transition-all ${
                 step.highlight
-                  ? "bg-[#141B2D] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10"
-                  : "bg-[#141B2D] border-[#3B82F6]/25"
+                  ? "bg-[#112035] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10"
+                  : "bg-[#112035] border-[#3B82F6]/25"
               }`}
             >
               <p
@@ -50,12 +50,12 @@ export default function HowItWorks() {
               <h3 className="text-white font-bold text-xl mb-3">
                 {step.title}
                 {step.highlight && (
-                  <span className="ml-2 text-sm bg-[#F5C518] text-[#0A0E1A] px-2 py-0.5 rounded-full font-bold">
+                  <span className="ml-2 text-sm bg-[#F5C518] text-[#091524] px-2 py-0.5 rounded-full font-bold">
                     ⭐ Key
                   </span>
                 )}
               </h3>
-              <p className="text-[#9CA3AF] text-[15px] leading-relaxed">{step.body}</p>
+              <p className="text-[#8CA3BF] text-[15px] leading-relaxed">{step.body}</p>
             </div>
           ))}
         </div>
@@ -65,7 +65,7 @@ export default function HowItWorks() {
             href="https://signup-lauchlab.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-4 rounded-full bg-[#F5C518] text-[#0A0E1A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+            className="inline-block px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
             Start Today →
           </a>

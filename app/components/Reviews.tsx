@@ -71,7 +71,7 @@ export default function Reviews() {
   const cardWidthPct = 100 / visibleCount;
 
   return (
-    <section className="bg-[#141B2D] py-24 overflow-hidden">
+    <section className="bg-[#112035] py-24 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
@@ -82,7 +82,7 @@ export default function Reviews() {
             <div className="flex items-center gap-2 mt-3">
               <span className="text-[#F5C518] text-base">★★★★★</span>
               <span className="text-white text-sm font-semibold">5.0</span>
-              <span className="text-[#9CA3AF] text-sm">· 17 Verified Reviews</span>
+              <span className="text-[#8CA3BF] text-sm">· 17 Verified Reviews</span>
               <a
                 href="https://www.google.com/search?q=pt+launch+lab+pontefract+reviews"
                 target="_blank"
@@ -134,14 +134,14 @@ export default function Reviews() {
                 className="shrink-0 px-3"
                 style={{ width: `${cardWidthPct}%` }}
               >
-                <div className="bg-[#0A0E1A] border border-[#3B82F6]/20 rounded-2xl p-6 h-full flex flex-col gap-4 hover:border-[#F5C518]/30 transition-colors">
+                <div className="bg-[#091524] border border-[#3B82F6]/20 rounded-2xl p-6 h-full flex flex-col gap-4 hover:border-[#F5C518]/30 transition-colors">
                   <div className="text-[#F5C518] text-base">★★★★★</div>
                   <p className="text-white text-sm leading-relaxed flex-1">
                     &ldquo;{rev.quote}&rdquo;
                   </p>
                   <div>
                     <p className="text-[#F5C518] text-sm font-bold">{rev.name}</p>
-                    <p className="text-[#9CA3AF] text-xs">{rev.label}</p>
+                    <p className="text-[#8CA3BF] text-xs">{rev.label}</p>
                   </div>
                 </div>
               </div>

@@ -16,7 +16,7 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="bg-[#141B2D] py-24">
+    <section className="bg-[#112035] py-24">
       <div className="max-w-3xl mx-auto px-6">
         <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
           Got questions? We&apos;ve got answers.
@@ -26,10 +26,10 @@ export default function FAQ() {
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="bg-[#0A0E1A] border border-[#3B82F6]/20 rounded-xl overflow-hidden"
+              className="bg-[#091524] border border-[#3B82F6]/20 rounded-xl overflow-hidden"
             >
               <button
-                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#141B2D] transition-colors"
+                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#112035] transition-colors"
                 onClick={() => setOpen(open === i ? null : i)}
               >
                 <span className="text-white font-semibold text-[15px] pr-4">{faq.q}</span>
@@ -43,7 +43,7 @@ export default function FAQ() {
               </button>
               {open === i && (
                 <div className="px-6 pb-6">
-                  <p className="text-[#9CA3AF] text-[15px] leading-relaxed">{faq.a}</p>
+                  <p className="text-[#8CA3BF] text-[15px] leading-relaxed">{faq.a}</p>
                 </div>
               )}
             </div>

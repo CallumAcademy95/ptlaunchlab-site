@@ -9,14 +9,14 @@ const features = [
 
 export default function WhatYouGet() {
   return (
-    <section className="bg-[#141B2D] py-24">
+    <section className="bg-[#112035] py-24">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="text-3xl md:text-5xl font-bold text-white text-center leading-tight mb-4">
           Everything you need.
           <br />
           Nothing you don&apos;t.
         </h2>
-        <p className="text-[#9CA3AF] text-lg text-center mb-16">
+        <p className="text-[#8CA3BF] text-lg text-center mb-16">
           One course. One community. One team that&apos;s been exactly where you are.
         </p>
 
@@ -24,18 +24,18 @@ export default function WhatYouGet() {
           {features.map((feat) => (
             <div
               key={feat.title}
-              className="bg-[#0A0E1A] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all duration-300"
+              className="bg-[#091524] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
                 <span className="text-3xl">{feat.icon}</span>
                 {feat.badge && (
-                  <span className="text-[10px] font-bold bg-[#F5C518] text-[#0A0E1A] px-2.5 py-1 rounded-full uppercase tracking-wide">
+                  <span className="text-[10px] font-bold bg-[#F5C518] text-[#091524] px-2.5 py-1 rounded-full uppercase tracking-wide">
                     {feat.badge}
                   </span>
                 )}
               </div>
               <h3 className="text-white font-bold text-[17px] mb-3">{feat.title}</h3>
-              <p className="text-[#9CA3AF] text-sm leading-relaxed">{feat.body}</p>
+              <p className="text-[#8CA3BF] text-sm leading-relaxed">{feat.body}</p>
             </div>
           ))}
         </div>

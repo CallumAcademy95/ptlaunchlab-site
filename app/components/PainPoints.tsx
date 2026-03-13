@@ -18,7 +18,7 @@ const cards = [
 
 export default function PainPoints() {
   return (
-    <section className="bg-[#0A0E1A] py-24 border-t border-[#3B82F6]/15">
+    <section className="bg-[#091524] py-24 border-t border-[#3B82F6]/15">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           Does this sound familiar?
@@ -33,11 +33,11 @@ export default function PainPoints() {
           {cards.map((card) => (
             <div
               key={card.title}
-              className="bg-[#141B2D] border border-[#3B82F6]/25 rounded-2xl p-8 hover:border-[#F5C518]/60 transition-all duration-300 hover:-translate-y-1"
+              className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-8 hover:border-[#F5C518]/60 transition-all duration-300 hover:-translate-y-1"
             >
               <span className="text-4xl mb-6 block">{card.icon}</span>
               <h3 className="text-white font-bold text-xl mb-3">{card.title}</h3>
-              <p className="text-[#9CA3AF] text-[15px] leading-relaxed">{card.body}</p>
+              <p className="text-[#8CA3BF] text-[15px] leading-relaxed">{card.body}</p>
             </div>
           ))}
         </div>

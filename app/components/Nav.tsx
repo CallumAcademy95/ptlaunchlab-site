@@ -7,7 +7,7 @@ export default function Nav() {
   const links = ["Home", "Course", "About", "Blog", "Contact"];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0A0E1A] border-b border-[#3B82F6]/20">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0F2040] border-b border-[#3B82F6]/20">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
         <a href="#" className="flex items-center">
@@ -24,11 +24,11 @@ export default function Nav() {
         {/* Desktop links */}
         <div className="hidden lg:flex items-center gap-8">
           {links.map((l) => (
-            <a key={l} href="#" className="text-[#9CA3AF] hover:text-white text-sm font-medium transition-colors">
+            <a key={l} href="#" className="text-[#8CA3BF] hover:text-white text-sm font-medium transition-colors">
               {l}
             </a>
           ))}
-          <a href="#" className="text-[#9CA3AF] hover:text-white text-xs transition-colors">
+          <a href="#" className="text-[#8CA3BF] hover:text-white text-xs transition-colors">
             Existing Students
           </a>
         </div>
@@ -37,7 +37,7 @@ export default function Nav() {
         <div className="hidden lg:flex items-center gap-3">
           <a
             href="#book-call"
-            className="px-5 py-2.5 rounded-full border border-[#F5C518] text-[#F5C518] text-sm font-semibold hover:bg-[#F5C518] hover:text-[#0A0E1A] transition-all"
+            className="px-5 py-2.5 rounded-full border border-[#F5C518] text-[#F5C518] text-sm font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all"
           >
             Book a Free Call
           </a>
@@ -45,7 +45,7 @@ export default function Nav() {
             href="https://signup-lauchlab.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-full bg-[#F5C518] text-[#0A0E1A] text-sm font-bold hover:brightness-110 transition-all"
+            className="px-5 py-2.5 rounded-full bg-[#F5C518] text-[#091524] text-sm font-bold hover:brightness-110 transition-all"
           >
             Start Today →
           </a>
@@ -65,17 +65,17 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden bg-[#141B2D] border-t border-[#3B82F6]/20 px-6 py-6 flex flex-col gap-4">
+        <div className="lg:hidden bg-[#112035] border-t border-[#3B82F6]/20 px-6 py-6 flex flex-col gap-4">
           {links.map((l) => (
-            <a key={l} href="#" className="text-[#9CA3AF] hover:text-white font-medium py-1 transition-colors">
+            <a key={l} href="#" className="text-[#8CA3BF] hover:text-white font-medium py-1 transition-colors">
               {l}
             </a>
           ))}
           <div className="flex flex-col gap-3 pt-4 border-t border-[#3B82F6]/20">
-            <a href="#book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#0A0E1A] transition-all">
+            <a href="#book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all">
               Book a Free Call
             </a>
-            <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer" className="text-center px-5 py-3 rounded-full bg-[#F5C518] text-[#0A0E1A] font-bold hover:brightness-110 transition-all">
+            <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer" className="text-center px-5 py-3 rounded-full bg-[#F5C518] text-[#091524] font-bold hover:brightness-110 transition-all">
               Start Today →
             </a>
           </div>

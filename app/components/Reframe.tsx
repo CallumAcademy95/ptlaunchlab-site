@@ -8,7 +8,7 @@ const futures = [
 
 export default function Reframe() {
   return (
-    <section className="bg-[#0A0E1A] py-28">
+    <section className="bg-[#091524] py-28">
       <div className="max-w-5xl mx-auto px-6">
         <div className="w-16 h-1 bg-[#F5C518] rounded mx-auto mb-10" />
 
@@ -20,7 +20,7 @@ export default function Reframe() {
               <br />
               <span className="text-[#F5C518]">You&apos;re just in the wrong place.</span>
             </h2>
-            <p className="text-lg text-[#9CA3AF] leading-relaxed">
+            <p className="text-lg text-[#8CA3BF] leading-relaxed">
               Most people who come to us aren&apos;t career changers by accident. They&apos;re driven,
               passionate, and sick of wasting their potential. They just need the right qualification,
               the right support, and someone who&apos;s actually done it — to show them the way.
@@ -29,7 +29,7 @@ export default function Reframe() {
           </div>
 
           {/* Right — future vision */}
-          <div className="bg-[#141B2D] border border-[#3B82F6]/25 rounded-2xl p-8">
+          <div className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-8">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-5">
               What you actually want
             </p>
