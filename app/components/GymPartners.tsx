@@ -30,20 +30,18 @@ export default function GymPartners() {
         </p>
 
         {/* Gym partner logos */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
+        <div className="flex flex-wrap items-center justify-center gap-10 mb-10">
           {gymPartners.map((p) => (
             <div
               key={p.name}
-              className={`${p.dark ? "bg-[#1a1a1a]" : "bg-white/95"} rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105`}
+              className="relative w-40 h-24 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
-              <div className="relative w-full h-full">
-                <Image
-                  src={p.src}
-                  alt={p.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
+              <Image
+                src={p.src}
+                alt={p.name}
+                fill
+                className="object-contain"
+              />
             </div>
           ))}
         </div>
@@ -56,20 +54,18 @@ export default function GymPartners() {
         </div>
 
         {/* Accreditation logos */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-10">
           {accreditations.map((p) => (
             <div
               key={p.name}
-              className={`${p.dark ? "bg-[#1a1a1a]" : "bg-white/95"} rounded-xl p-4 w-36 h-20 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105`}
+              className="relative w-40 h-24 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
-              <div className="relative w-full h-full">
-                <Image
-                  src={p.src}
-                  alt={p.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
+              <Image
+                src={p.src}
+                alt={p.name}
+                fill
+                className="object-contain"
+              />
             </div>
           ))}
         </div>
