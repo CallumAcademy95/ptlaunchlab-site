@@ -33,7 +33,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="bg-[#091524] py-24">
+    <section className="bg-[#072B4A] py-24">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           A system, not just a course
@@ -51,8 +51,8 @@ export default function HowItWorks() {
               key={step.num}
               className={`rounded-2xl p-7 border transition-all ${
                 step.highlight
-                  ? "bg-[#112035] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10"
-                  : "bg-[#112035] border-[#3B82F6]/25"
+                  ? "bg-[#0D3559] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10"
+                  : "bg-[#0D3559] border-[#3B82F6]/25"
               }`}
             >
               <p className={`text-3xl font-bold mb-5 ${step.highlight ? "text-[#F5C518]" : "text-[#3B82F6]"}`}>
@@ -61,7 +61,7 @@ export default function HowItWorks() {
               <h3 className="text-white font-bold text-lg mb-3">
                 {step.title}
                 {step.highlight && (
-                  <span className="ml-2 text-xs bg-[#F5C518] text-[#091524] px-2 py-0.5 rounded-full font-bold">
+                  <span className="ml-2 text-xs bg-[#F5C518] text-[#072B4A] px-2 py-0.5 rounded-full font-bold">
                     ⭐ Key
                   </span>
                 )}
@@ -76,7 +76,7 @@ export default function HowItWorks() {
             href="https://signup-lauchlab.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+            className="inline-block px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
             Start Today →
           </a>

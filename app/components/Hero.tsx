@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-[#091524] overflow-hidden pt-[72px]">
+    <section className="relative min-h-screen flex items-center justify-center bg-[#072B4A] overflow-hidden pt-[72px]">
       {/* Decorative blobs */}
       <div className="absolute -left-48 top-20 w-[600px] h-[600px] rounded-full bg-[#F5C518] opacity-[0.06] blur-3xl pointer-events-none" />
       <div className="absolute -right-32 top-40 w-[500px] h-[500px] rounded-full bg-[#3B82F6] opacity-[0.07] blur-3xl pointer-events-none" />
@@ -8,7 +8,7 @@ export default function Hero() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center py-24">
         {/* Pill label */}
-        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/30 bg-[#112035] mb-10">
+        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/30 bg-[#0D3559] mb-10">
           <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
             Level 2 &amp; 3 PT · Fast Track · NCFE · Ofqual · CIMSPA
           </span>
@@ -42,13 +42,13 @@ export default function Hero() {
             href="https://signup-lauchlab.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
             Start Today →
           </a>
           <a
             href="/book-call"
-            className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all"
+            className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
           >
             Not sure? Book a free call
           </a>

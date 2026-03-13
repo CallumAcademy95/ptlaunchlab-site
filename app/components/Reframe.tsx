@@ -8,7 +8,7 @@ const futures = [
 
 export default function Reframe() {
   return (
-    <section className="bg-[#091524] py-28">
+    <section className="bg-[#072B4A] py-28">
       <div className="max-w-5xl mx-auto px-6">
         <div className="w-16 h-1 bg-[#F5C518] rounded mx-auto mb-10" />
 
@@ -28,14 +28,14 @@ export default function Reframe() {
             </p>
             <a
               href="/quiz"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5C518] text-[#091524] text-sm font-bold hover:brightness-110 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5C518] text-[#072B4A] text-sm font-bold hover:brightness-110 transition-all"
             >
               Take the free quiz — find out if PT is right for you →
             </a>
           </div>
 
           {/* Right — future vision */}
-          <div className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-8">
+          <div className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-8">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-5">
               What you actually want
             </p>

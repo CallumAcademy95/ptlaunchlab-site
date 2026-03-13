@@ -7,7 +7,7 @@ const stats = [
 
 export default function FounderStory() {
   return (
-    <section className="bg-[#112035] py-24">
+    <section className="bg-[#0D3559] py-24">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
@@ -37,13 +37,13 @@ export default function FounderStory() {
               href="https://signup-lauchlab.co.uk/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-7 py-3.5 rounded-full bg-[#F5C518] text-[#091524] font-bold text-sm hover:brightness-110 transition-all"
+              className="px-7 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
             >
               View Courses →
             </a>
             <a
               href="#"
-              className="px-7 py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-sm hover:bg-[#F5C518] hover:text-[#091524] transition-all"
+              className="px-7 py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-sm hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
             >
               Read Our Story
             </a>
@@ -55,7 +55,7 @@ export default function FounderStory() {
           {stats.map((stat) => (
             <div
               key={stat.value}
-              className="bg-[#091524] border border-[#3B82F6]/25 rounded-2xl p-6"
+              className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-6"
             >
               <p className="text-[#F5C518] text-4xl font-bold mb-2">{stat.value}</p>
               <p className="text-[#8CA3BF] text-sm leading-relaxed whitespace-pre-line">{stat.label}</p>

@@ -71,7 +71,7 @@ export default function Reviews() {
   const cardWidthPct = 100 / visibleCount;
 
   return (
-    <section className="bg-[#112035] py-24 overflow-hidden">
+    <section className="bg-[#0D3559] py-24 overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
@@ -134,7 +134,7 @@ export default function Reviews() {
                 className="shrink-0 px-3"
                 style={{ width: `${cardWidthPct}%` }}
               >
-                <div className="bg-[#091524] border border-[#3B82F6]/20 rounded-2xl p-6 h-full flex flex-col gap-4 hover:border-[#F5C518]/30 transition-colors">
+                <div className="bg-[#072B4A] border border-[#3B82F6]/20 rounded-2xl p-6 h-full flex flex-col gap-4 hover:border-[#F5C518]/30 transition-colors">
                   <div className="text-[#F5C518] text-base">★★★★★</div>
                   <p className="text-white text-sm leading-relaxed flex-1">
                     &ldquo;{rev.quote}&rdquo;

@@ -1,6 +1,6 @@
 export default function VideoTestimonial() {
   return (
-    <section className="bg-[#091524] py-24">
+    <section className="bg-[#072B4A] py-24">
       <div className="max-w-5xl mx-auto px-6 text-center">
         <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
           Real people. Real results.

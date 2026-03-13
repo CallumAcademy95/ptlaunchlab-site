@@ -27,7 +27,7 @@ export default function GymPartners() {
   }, []);
 
   return (
-    <section className="bg-[#112035] py-16 border-t border-[#3B82F6]/15">
+    <section className="bg-[#0D3559] py-16 border-t border-[#3B82F6]/15">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">
           Partners &amp; Accreditations

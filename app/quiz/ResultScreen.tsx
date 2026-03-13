@@ -24,7 +24,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
       {/* ── RESULT REVEAL ── */}
       <div className="mb-10">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#112035] mb-5">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#0D3559] mb-5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518] animate-pulse" />
           <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
             Your Result
@@ -42,7 +42,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
 
         <p className="text-white/70 text-lg font-medium mb-5">{r.tagline}</p>
 
-        <div className="bg-[#112035] rounded-2xl p-5 border border-white/5">
+        <div className="bg-[#0D3559] rounded-2xl p-5 border border-white/5">
           <p className="text-[#8CA3BF] leading-relaxed">{r.description}</p>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         {['Watch the training', 'Book your call', 'Build your PT career'].map((label, i) => (
           <div key={label} className="flex items-center gap-3 flex-1 min-w-0">
             <div className="flex flex-col items-center gap-1 min-w-0 flex-1">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-[#F5C518] text-[#091524]' : 'bg-[#112035] text-[#4A6280] border border-white/10'}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-[#F5C518] text-[#072B4A]' : 'bg-[#0D3559] text-[#4A6280] border border-white/10'}`}>
                 {i + 1}
               </div>
               <span className={`text-[10px] font-medium text-center leading-tight ${i === 0 ? 'text-[#F5C518]' : 'text-[#4A6280]'}`}>
@@ -86,7 +86,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         <div className="relative mb-5">
           <div className="absolute -inset-1 rounded-2xl bg-[#F5C518]/10 blur-sm" />
           <div
-            className="relative w-full rounded-2xl overflow-hidden border border-[#F5C518]/20 bg-[#112035]"
+            className="relative w-full rounded-2xl overflow-hidden border border-[#F5C518]/20 bg-[#0D3559]"
             style={{ paddingTop: '56.25%' }}
           >
             <iframe
@@ -128,7 +128,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
       </div>
 
       {/* ── BOOK A CALL CTA ── */}
-      <div className="bg-[#112035] rounded-2xl p-6 border border-white/5 mb-8">
+      <div className="bg-[#0D3559] rounded-2xl p-6 border border-white/5 mb-8">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-1">Step 2</p>
         <h4 className="text-white font-bold text-xl mb-1">Book Your Free Strategy Call</h4>
         <p className="text-[#8CA3BF] text-sm mb-5">
@@ -154,7 +154,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
           href="https://success.signup-lauchlab.co.uk/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+          className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
         >
           Book Your Free Strategy Call →
         </a>

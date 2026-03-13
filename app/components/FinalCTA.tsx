@@ -1,6 +1,6 @@
 export default function FinalCTA() {
   return (
-    <section className="bg-[#091524] py-28 relative overflow-hidden">
+    <section className="bg-[#072B4A] py-28 relative overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-[800px] h-[400px] rounded-full bg-[#3B82F6] opacity-[0.06] blur-3xl" />
       </div>
@@ -21,13 +21,13 @@ export default function FinalCTA() {
             href="https://signup-lauchlab.co.uk/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
             Start Today →
           </a>
           <a
             href="/book-call"
-            className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all"
+            className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
           >
             Book a Free Call
           </a>

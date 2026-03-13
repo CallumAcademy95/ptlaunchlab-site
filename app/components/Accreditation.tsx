@@ -2,7 +2,7 @@ const logos = ["NCFE", "Ofqual Regulated", "CIMSPA", "REPs"];
 
 export default function Accreditation() {
   return (
-    <section className="bg-[#091524] py-20 border-t border-[#3B82F6]/15">
+    <section className="bg-[#072B4A] py-20 border-t border-[#3B82F6]/15">
       <div className="max-w-5xl mx-auto px-6 text-center">
         <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
           Fully accredited. Industry recognised.

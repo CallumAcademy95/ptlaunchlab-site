@@ -4,7 +4,7 @@ const navLinks = ["Home", "Course", "About", "Blog", "Contact"];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#091524] border-t border-[#3B82F6]/15 py-12">
+    <footer className="bg-[#072B4A] border-t border-[#3B82F6]/15 py-12">
       <div className="max-w-6xl mx-auto px-6">
         {/* Top row */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">

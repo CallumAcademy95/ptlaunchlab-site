@@ -23,7 +23,7 @@ export default function ContactPage() {
       <main className="pt-[72px]">
 
         {/* HERO */}
-        <section className="bg-[#091524] py-24 px-6 relative overflow-hidden">
+        <section className="bg-[#072B4A] py-24 px-6 relative overflow-hidden">
           <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-[#F5C518] opacity-[0.05] blur-3xl pointer-events-none" />
           <div className="relative max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
@@ -39,7 +39,7 @@ export default function ContactPage() {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#112035] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
+                  <div className="w-10 h-10 rounded-full bg-[#0D3559] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
                     📞
                   </div>
                   <div>
@@ -49,7 +49,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#112035] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
+                  <div className="w-10 h-10 rounded-full bg-[#0D3559] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
                     📍
                   </div>
                   <div>
@@ -63,7 +63,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#112035] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
+                  <div className="w-10 h-10 rounded-full bg-[#0D3559] border border-[#3B82F6]/25 flex items-center justify-center shrink-0 text-[#F5C518]">
                     🕐
                   </div>
                   <div>
@@ -76,14 +76,14 @@ export default function ContactPage() {
               <div className="mt-10 pt-10 border-t border-[#3B82F6]/15">
                 <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-4">Or book a call directly</p>
                 <a href="/book-call"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5C518] text-[#091524] font-bold text-sm hover:brightness-110 transition-all">
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all">
                   Book a Free Consultation →
                 </a>
               </div>
             </div>
 
             {/* Right — form */}
-            <div className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-8">
+            <div className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-8">
               {submitted ? (
                 <div className="text-center py-12">
                   <p className="text-4xl mb-4">✅</p>
@@ -103,7 +103,7 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         placeholder="Your name"
-                        className="w-full bg-[#091524] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
+                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
                       />
                     </div>
                     <div>
@@ -114,7 +114,7 @@ export default function ContactPage() {
                         value={form.email}
                         onChange={handleChange}
                         placeholder="your@email.com"
-                        className="w-full bg-[#091524] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
+                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
                       />
                     </div>
                     <div>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                         value={form.phone}
                         onChange={handleChange}
                         placeholder="07700 000000"
-                        className="w-full bg-[#091524] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
+                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
                       />
                     </div>
                     <div>
@@ -137,13 +137,13 @@ export default function ContactPage() {
                         required
                         rows={5}
                         placeholder="What would you like to know?"
-                        className="w-full bg-[#091524] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors resize-none"
+                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors resize-none"
                       />
                     </div>
                     <p className="text-[#4A6280] text-xs">Either email or phone number is required.</p>
                     <button
                       type="submit"
-                      className="w-full px-6 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-sm hover:brightness-110 transition-all"
+                      className="w-full px-6 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
                     >
                       Send Message →
                     </button>
@@ -155,7 +155,7 @@ export default function ContactPage() {
         </section>
 
         {/* QUICK LINKS */}
-        <section className="bg-[#112035] py-16 px-6 border-t border-[#3B82F6]/15">
+        <section className="bg-[#0D3559] py-16 px-6 border-t border-[#3B82F6]/15">
           <div className="max-w-5xl mx-auto text-center">
             <p className="text-[#8CA3BF] text-sm mb-6">Looking for something specific?</p>
             <div className="flex flex-wrap justify-center gap-4">

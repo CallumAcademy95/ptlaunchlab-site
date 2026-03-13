@@ -1,6 +1,6 @@
 export default function ConversionSection() {
   return (
-    <section id="book-call" className="bg-[#091524] py-28 relative overflow-hidden">
+    <section id="book-call" className="bg-[#072B4A] py-28 relative overflow-hidden">
       {/* Glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-[700px] h-[400px] rounded-full bg-[#F5C518] opacity-[0.05] blur-3xl" />
@@ -16,9 +16,9 @@ export default function ConversionSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left — Start Today */}
-          <div className="bg-[#112035] border-2 border-[#F5C518]/80 rounded-2xl p-8 text-left flex flex-col shadow-xl shadow-[#F5C518]/10">
+          <div className="bg-[#0D3559] border-2 border-[#F5C518]/80 rounded-2xl p-8 text-left flex flex-col shadow-xl shadow-[#F5C518]/10">
             <div className="inline-block mb-6">
-              <span className="bg-[#F5C518] text-[#091524] text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+              <span className="bg-[#F5C518] text-[#072B4A] text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                 Most Popular
               </span>
             </div>
@@ -44,7 +44,7 @@ export default function ConversionSection() {
               href="https://signup-lauchlab.co.uk/"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mb-3"
+              className="block w-full text-center py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mb-3"
             >
               Enrol Now — Start Today →
             </a>
@@ -52,7 +52,7 @@ export default function ConversionSection() {
           </div>
 
           {/* Right — Book a Call */}
-          <div className="bg-[#112035] border-2 border-[#3B82F6]/70 rounded-2xl p-8 text-left flex flex-col shadow-xl shadow-[#3B82F6]/10">
+          <div className="bg-[#0D3559] border-2 border-[#3B82F6]/70 rounded-2xl p-8 text-left flex flex-col shadow-xl shadow-[#3B82F6]/10">
             <div className="inline-block mb-6">
               <span className="bg-[#3B82F6] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                 No hard sell
@@ -78,7 +78,7 @@ export default function ConversionSection() {
             </ul>
             <a
               href="/book-call"
-              className="block w-full text-center py-4 rounded-full border-2 border-[#F5C518] text-[#F5C518] font-bold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all mb-3"
+              className="block w-full text-center py-4 rounded-full border-2 border-[#F5C518] text-[#F5C518] font-bold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all mb-3"
             >
               Book a Free Call →
             </a>

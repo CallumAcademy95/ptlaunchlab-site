@@ -6,9 +6,9 @@ import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config
 import ResultScreen from './ResultScreen';
 
 // ─── Color tokens (matching success.signup-lauchlab.co.uk) ───────────────────
-// bg-deep:   #091524  — main page background
-// bg-nav:    #0F2040  — header / nav bar
-// bg-card:   #112035  — card / input backgrounds
+// bg-deep:   #072B4A  — main page background
+// bg-nav:    #061F36  — header / nav bar
+// bg-card:   #0D3559  — card / input backgrounds
 // bg-hover:  #1A3558  — hover state on cards
 // yellow:    #F5C518  — primary CTA
 // text-muted:#8CA3BF  — secondary text (blue-tinted)
@@ -132,13 +132,13 @@ export default function QuizApp() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0D1F35] to-[#091524]">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0D1F35] to-[#072B4A]">
       {/* Subtle blue glow blobs */}
       <div className="fixed -left-48 top-0 w-[600px] h-[600px] rounded-full bg-[#1A4A8A] opacity-[0.12] blur-3xl pointer-events-none" />
       <div className="fixed -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-[#0F3060] opacity-[0.15] blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-3 bg-[#0F2040] border-b border-white/5">
+      <header className="relative z-10 flex items-center justify-between px-6 py-3 bg-[#061F36] border-b border-white/5">
         <a href="/">
           <Image
             src="/logo.png"
@@ -169,7 +169,7 @@ export default function QuizApp() {
           {/* ── INTRO ── */}
           {screen === 'intro' && (
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#112035] mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#0D3559] mb-8">
                 <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
                   Free Career Quiz
                 </span>
@@ -201,7 +201,7 @@ export default function QuizApp() {
 
               <button
                 onClick={handleStart}
-                className="px-10 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+                className="px-10 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
               >
                 Find My Path →
               </button>
@@ -245,7 +245,7 @@ export default function QuizApp() {
                         w-full text-left px-5 py-4 rounded-xl border-2 font-medium transition-all duration-150
                         ${isSelected
                           ? 'border-[#F5C518] bg-[#F5C518]/10 text-white scale-[1.01]'
-                          : 'border-white/10 bg-[#112035] text-[#8CA3BF] hover:border-[#2A5080] hover:text-white hover:bg-[#1A3558]'
+                          : 'border-white/10 bg-[#0D3559] text-[#8CA3BF] hover:border-[#2A5080] hover:text-white hover:bg-[#1A3558]'
                         }
                       `}
                     >
@@ -266,7 +266,7 @@ export default function QuizApp() {
               >
                 <button
                   onClick={handleContinue}
-                  className="w-full py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+                  className="w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
                 >
                   {questionIndex === questions.length - 1 ? 'See My Results →' : 'Continue →'}
                 </button>
@@ -285,7 +285,7 @@ export default function QuizApp() {
                   ← Back
                 </button>
 
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#112035] mb-5">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F5C518]/30 bg-[#0D3559] mb-5">
                   <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
                     Almost there
                   </span>
@@ -311,7 +311,7 @@ export default function QuizApp() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Jamie Clarke"
-                    className="w-full px-5 py-4 rounded-xl bg-[#112035] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
+                    className="w-full px-5 py-4 rounded-xl bg-[#0D3559] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
                     required
                     autoComplete="name"
                   />
@@ -326,7 +326,7 @@ export default function QuizApp() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="e.g. 07700 900000"
-                    className="w-full px-5 py-4 rounded-xl bg-[#112035] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
+                    className="w-full px-5 py-4 rounded-xl bg-[#0D3559] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
                     required
                     autoComplete="tel"
                   />
@@ -341,7 +341,7 @@ export default function QuizApp() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@email.com"
-                    className="w-full px-5 py-4 rounded-xl bg-[#112035] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
+                    className="w-full px-5 py-4 rounded-xl bg-[#0D3559] border border-white/10 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518] transition-colors text-base"
                     required
                     autoComplete="email"
                   />
@@ -353,7 +353,7 @@ export default function QuizApp() {
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mt-2"
+                  className="w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mt-2"
                 >
                   Show My Results →
                 </button>

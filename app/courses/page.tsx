@@ -68,11 +68,11 @@ export default function CoursesPage() {
       <main className="pt-[72px]">
 
         {/* HERO */}
-        <section className="bg-[#091524] py-24 px-6 text-center relative overflow-hidden">
+        <section className="bg-[#072B4A] py-24 px-6 text-center relative overflow-hidden">
           <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-[#F5C518] opacity-[0.05] blur-3xl pointer-events-none" />
           <div className="absolute -right-32 top-20 w-[400px] h-[400px] rounded-full bg-[#3B82F6] opacity-[0.06] blur-3xl pointer-events-none" />
           <div className="relative max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/30 bg-[#112035] mb-8">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/30 bg-[#0D3559] mb-8">
               <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
                 Level 2 &amp; 3 PT · NCFE · Ofqual · CIMSPA
               </span>
@@ -89,11 +89,11 @@ export default function CoursesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
+                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
                 Start Application →
               </a>
               <a href="/book-call"
-                className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#091524] transition-all">
+                className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
                 Book a Free Call
               </a>
             </div>
@@ -101,7 +101,7 @@ export default function CoursesPage() {
         </section>
 
         {/* THE PT LAUNCH METHOD */}
-        <section className="bg-[#112035] py-24 px-6">
+        <section className="bg-[#0D3559] py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">A system, not just a course</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-3">The PT Launch Method™</h2>
@@ -110,7 +110,7 @@ export default function CoursesPage() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
               {method.map((step) => (
-                <div key={step.num} className={`rounded-2xl p-7 border ${step.highlight ? "bg-[#091524] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10" : "bg-[#091524] border-[#3B82F6]/25"}`}>
+                <div key={step.num} className={`rounded-2xl p-7 border ${step.highlight ? "bg-[#072B4A] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10" : "bg-[#072B4A] border-[#3B82F6]/25"}`}>
                   <p className={`text-3xl font-bold mb-5 ${step.highlight ? "text-[#F5C518]" : "text-[#3B82F6]"}`}>{step.num}</p>
                   <h3 className="text-white font-bold text-lg mb-3">{step.title}</h3>
                   <p className="text-[#8CA3BF] text-sm leading-relaxed">{step.body}</p>
@@ -121,7 +121,7 @@ export default function CoursesPage() {
         </section>
 
         {/* COURSE CURRICULUM */}
-        <section className="bg-[#091524] py-24 px-6">
+        <section className="bg-[#072B4A] py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">What you&apos;ll study</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16">
@@ -129,7 +129,7 @@ export default function CoursesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {curriculum.map((mod) => (
-                <div key={mod.num} className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all">
+                <div key={mod.num} className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all">
                   <p className="text-[#3B82F6] text-3xl font-bold mb-4">{mod.num}</p>
                   <h3 className="text-white font-bold text-lg mb-3">{mod.title}</h3>
                   <p className="text-[#8CA3BF] text-sm leading-relaxed">{mod.body}</p>
@@ -140,7 +140,7 @@ export default function CoursesPage() {
         </section>
 
         {/* WHY NCFE */}
-        <section className="bg-[#112035] py-24 px-6">
+        <section className="bg-[#0D3559] py-24 px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">The qualification</p>
@@ -166,7 +166,7 @@ export default function CoursesPage() {
                 { value: "500+", label: "PTs hired by our team" },
                 { value: "5.0★", label: "Google review rating" },
               ].map((stat) => (
-                <div key={stat.label} className="bg-[#091524] border border-[#3B82F6]/25 rounded-2xl p-6">
+                <div key={stat.label} className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-6">
                   <p className="text-[#F5C518] text-4xl font-bold mb-2">{stat.value}</p>
                   <p className="text-[#8CA3BF] text-sm">{stat.label}</p>
                 </div>
@@ -176,7 +176,7 @@ export default function CoursesPage() {
         </section>
 
         {/* GRADUATE STORIES */}
-        <section className="bg-[#091524] py-24 px-6">
+        <section className="bg-[#072B4A] py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Graduate stories</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16">
@@ -184,7 +184,7 @@ export default function CoursesPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {stories.map((s) => (
-                <div key={s.name} className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-8 hover:border-[#F5C518]/40 transition-all">
+                <div key={s.name} className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-8 hover:border-[#F5C518]/40 transition-all">
                   <p className="text-[#F5C518] text-xl font-bold mb-4">{s.name}</p>
                   <p className="text-[#8CA3BF] leading-relaxed">{s.body}</p>
                 </div>
@@ -194,7 +194,7 @@ export default function CoursesPage() {
         </section>
 
         {/* PRICING */}
-        <section className="bg-[#112035] py-24 px-6">
+        <section className="bg-[#0D3559] py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Investment</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-4">Simple, transparent pricing.</h2>
@@ -203,9 +203,9 @@ export default function CoursesPage() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {pricing.map((plan) => (
-                <div key={plan.title} className={`rounded-2xl p-8 border flex flex-col ${plan.recommended ? "bg-[#091524] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10 relative" : "bg-[#091524] border-[#3B82F6]/25"}`}>
+                <div key={plan.title} className={`rounded-2xl p-8 border flex flex-col ${plan.recommended ? "bg-[#072B4A] border-[#F5C518]/70 shadow-lg shadow-[#F5C518]/10 relative" : "bg-[#072B4A] border-[#3B82F6]/25"}`}>
                   {plan.recommended && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#F5C518] text-[#091524] px-5 py-1.5 rounded-full text-xs font-bold">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#F5C518] text-[#072B4A] px-5 py-1.5 rounded-full text-xs font-bold">
                       Best Value
                     </div>
                   )}
@@ -222,7 +222,7 @@ export default function CoursesPage() {
                     ))}
                   </ul>
                   <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
-                    className={`text-center px-6 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-[#F5C518] text-[#091524] hover:brightness-110" : "border border-[#F5C518] text-[#F5C518] hover:bg-[#F5C518] hover:text-[#091524]"}`}>
+                    className={`text-center px-6 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-[#F5C518] text-[#072B4A] hover:brightness-110" : "border border-[#F5C518] text-[#F5C518] hover:bg-[#F5C518] hover:text-[#072B4A]"}`}>
                     Get Started →
                   </a>
                 </div>
@@ -235,13 +235,13 @@ export default function CoursesPage() {
         </section>
 
         {/* FAQ */}
-        <section className="bg-[#091524] py-24 px-6">
+        <section className="bg-[#072B4A] py-24 px-6">
           <div className="max-w-3xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">Common questions.</h2>
             <div className="space-y-5">
               {faqs.map((faq) => (
-                <div key={faq.q} className="bg-[#112035] border border-[#3B82F6]/25 rounded-2xl p-7">
+                <div key={faq.q} className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-7">
                   <h3 className="text-white font-bold text-lg mb-3">{faq.q}</h3>
                   <p className="text-[#8CA3BF] leading-relaxed">{faq.a}</p>
                 </div>
@@ -251,7 +251,7 @@ export default function CoursesPage() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="bg-[#112035] py-24 px-6 text-center border-t border-[#3B82F6]/15">
+        <section className="bg-[#0D3559] py-24 px-6 text-center border-t border-[#3B82F6]/15">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Ready to start?<br /><span className="text-[#F5C518]">Let&apos;s build your career.</span>
@@ -261,11 +261,11 @@ export default function CoursesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="https://signup-lauchlab.co.uk/" target="_blank" rel="noopener noreferrer"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#091524] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
+                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
                 Enrol Now →
               </a>
               <a href="/book-call"
-                className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#091524] transition-all">
+                className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
                 Book a Free Call
               </a>
             </div>
