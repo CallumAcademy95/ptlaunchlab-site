@@ -34,7 +34,7 @@ export default function GymPartners() {
           {gymPartners.map((p) => (
             <div
               key={p.name}
-              className="relative w-40 h-24 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
               <Image
                 src={p.src}
@@ -58,7 +58,7 @@ export default function GymPartners() {
           {accreditations.map((p) => (
             <div
               key={p.name}
-              className="relative w-40 h-24 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
               <Image
                 src={p.src}
