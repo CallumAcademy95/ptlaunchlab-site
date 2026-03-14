@@ -239,13 +239,13 @@ export async function POST(req: NextRequest) {
     if (process.env.RESEND_API_KEY) {
       await Promise.all([
         resend.emails.send({
-          from: "PT Launch Lab Enrolments <onboarding@resend.dev>",
+          from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
           to: ADMIN_EMAIL,
           subject: `New Enrolment: ${l.fullName} — ${paymentLabel}`,
           html: adminHtml,
         }),
         resend.emails.send({
-          from: "PT Launch Lab <onboarding@resend.dev>",
+          from: "PT Launch Lab <noreply@ptlaunchlab.co.uk>",
           to: l.email,
           subject: "Your PT Launch Lab Enrolment Confirmation",
           html: studentHtml,
