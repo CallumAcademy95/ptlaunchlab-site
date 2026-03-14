@@ -37,11 +37,11 @@ export async function POST(request: NextRequest) {
         submitted_at: new Date().toISOString(),
       };
 
-      fetch(webhookUrl, {
+      await fetch(webhookUrl, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload),
-      }).catch((err) => console.error('[quiz-submission] Zapier push failed:', err));
+      });
     } else {
       console.warn('[quiz-submission] QUIZ_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
