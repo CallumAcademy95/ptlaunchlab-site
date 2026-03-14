@@ -1,5 +1,6 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import ProspectusButton from "../components/ProspectusButton";
 
 export const metadata = {
   title: "PT Courses | PT Launch Lab",
@@ -167,6 +168,7 @@ export default function CoursesPage() {
                 </div>
               ))}
             </div>
+            <ProspectusButton />
           </div>
         </section>
 
