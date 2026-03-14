@@ -9,7 +9,7 @@ const features = [
 
 export default function WhatYouGet() {
   return (
-    <section className="bg-[#0D3559] py-24">
+    <section className="bg-[#0D3559] py-14 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           What&apos;s inside the system
@@ -19,7 +19,7 @@ export default function WhatYouGet() {
           <br />
           <span className="text-[#F5C518]">We&apos;re building you a career.</span>
         </h2>
-        <p className="text-[#8CA3BF] text-lg text-center mb-16">
+        <p className="text-[#8CA3BF] text-lg text-center mb-10 md:mb-16">
           Everything inside The PT Launch Method™ — built by gym owners who&apos;ve hired 500+ trainers.
         </p>
 
@@ -27,7 +27,7 @@ export default function WhatYouGet() {
           {features.map((feat) => (
             <div
               key={feat.title}
-              className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-7 hover:border-[#F5C518]/40 transition-all duration-300"
+              className="bg-[#072B4A] border border-[#3B82F6]/25 rounded-2xl p-5 md:p-7 hover:border-[#F5C518]/40 transition-all duration-300"
             >
               <div className="flex items-start justify-between mb-4">
                 <span className="text-3xl">{feat.icon}</span>

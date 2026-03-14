@@ -7,8 +7,8 @@ const stats = [
 
 export default function FounderStory() {
   return (
-    <section className="bg-[#0D3559] py-24">
-      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section className="bg-[#0D3559] py-14 md:py-24">
+      <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
         {/* Left */}
         <div>
           <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">
@@ -27,7 +27,7 @@ export default function FounderStory() {
             Ultimate Shred to over £500K in revenue as independent personal trainers, and we&apos;ve
             personally hired over 500 PTs across our gyms and partnerships.
           </p>
-          <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-10">
+          <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-7 md:mb-10">
             That&apos;s why our course is different. When we teach you what gyms look for, it&apos;s
             because we&apos;re the ones doing the hiring. When we talk about building income, it&apos;s
             because we&apos;ve done it ourselves — and now we hand you the exact playbook.

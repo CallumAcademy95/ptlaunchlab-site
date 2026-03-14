@@ -92,7 +92,7 @@ export default function CoursesPage() {
       <main className="pt-[72px]">
 
         {/* HERO */}
-        <section className="bg-[#072B4A] py-24 px-6 text-center relative overflow-hidden">
+        <section className="bg-[#072B4A] py-14 md:py-24 px-6 text-center relative overflow-hidden">
           <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-[#F5C518] opacity-[0.05] blur-3xl pointer-events-none" />
           <div className="absolute -right-32 top-20 w-[400px] h-[400px] rounded-full bg-[#3B82F6] opacity-[0.06] blur-3xl pointer-events-none" />
           <div className="relative max-w-4xl mx-auto">
@@ -125,7 +125,7 @@ export default function CoursesPage() {
         </section>
 
         {/* THE PT LAUNCH METHOD */}
-        <section className="bg-[#0D3559] py-24 px-6">
+        <section className="bg-[#0D3559] py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">A system, not just a course</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-3">The PT Launch Method™</h2>
@@ -145,7 +145,7 @@ export default function CoursesPage() {
         </section>
 
         {/* COURSE CURRICULUM */}
-        <section className="bg-[#072B4A] py-24 px-6">
+        <section className="bg-[#072B4A] py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">What you&apos;ll study</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-4">
@@ -173,7 +173,7 @@ export default function CoursesPage() {
         </section>
 
         {/* WHY NCFE */}
-        <section className="bg-[#0D3559] py-24 px-6">
+        <section className="bg-[#0D3559] py-14 md:py-24 px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
               <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">The qualification</p>
@@ -209,7 +209,7 @@ export default function CoursesPage() {
         </section>
 
         {/* GRADUATE STORIES */}
-        <section className="bg-[#072B4A] py-24 px-6">
+        <section className="bg-[#072B4A] py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Graduate stories</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16">
@@ -227,7 +227,7 @@ export default function CoursesPage() {
         </section>
 
         {/* PRICING */}
-        <section className="bg-[#0D3559] py-24 px-6">
+        <section className="bg-[#0D3559] py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Investment</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-4">Simple, transparent pricing.</h2>
@@ -268,7 +268,7 @@ export default function CoursesPage() {
         </section>
 
         {/* FAQ */}
-        <section className="bg-[#072B4A] py-24 px-6">
+        <section className="bg-[#072B4A] py-14 md:py-24 px-6">
           <div className="max-w-3xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">FAQ</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-16">Common questions.</h2>
@@ -284,7 +284,7 @@ export default function CoursesPage() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="bg-[#0D3559] py-24 px-6 text-center border-t border-[#3B82F6]/15">
+        <section className="bg-[#0D3559] py-14 md:py-24 px-6 text-center border-t border-[#3B82F6]/15">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
               Ready to start?<br /><span className="text-[#F5C518]">Let&apos;s build your career.</span>

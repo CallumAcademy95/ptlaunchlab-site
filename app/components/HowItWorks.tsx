@@ -30,7 +30,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="bg-[#072B4A] py-24">
+    <section className="bg-[#072B4A] py-14 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           How it works
@@ -40,7 +40,7 @@ export default function HowItWorks() {
           <br />
           <span className="text-[#F5C518]">you actually want.</span>
         </h2>
-        <p className="text-[#8CA3BF] text-center text-lg mb-16 max-w-xl mx-auto">
+        <p className="text-[#8CA3BF] text-center text-lg mb-10 md:mb-16 max-w-xl mx-auto">
           We don&apos;t just get you qualified. We get you hired, earning, and building.
         </p>
 
@@ -48,7 +48,7 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.num}
-              className={`rounded-2xl p-8 border transition-all ${
+              className={`rounded-2xl p-6 md:p-8 border transition-all ${
                 step.highlight
                   ? "bg-[#0D3559] border-[#F5C518]/60 shadow-xl shadow-[#F5C518]/10"
                   : "bg-[#0D3559] border-[#3B82F6]/25"

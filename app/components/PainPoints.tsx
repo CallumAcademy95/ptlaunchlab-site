@@ -18,12 +18,12 @@ const cards = [
 
 export default function PainPoints() {
   return (
-    <section className="bg-[#072B4A] py-24 border-t border-[#3B82F6]/15">
+    <section className="bg-[#072B4A] py-14 md:py-24 border-t border-[#3B82F6]/15">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">
           Does this sound familiar?
         </p>
-        <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16 leading-tight">
+        <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-10 md:mb-16 leading-tight">
           You&apos;re good at your job.
           <br />
           You&apos;re just in the wrong one.
@@ -33,7 +33,7 @@ export default function PainPoints() {
           {cards.map((card) => (
             <div
               key={card.title}
-              className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-8 hover:border-[#F5C518]/60 transition-all duration-300 hover:-translate-y-1"
+              className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-6 md:p-8 hover:border-[#F5C518]/60 transition-all duration-300 hover:-translate-y-1"
             >
               <span className="text-4xl mb-6 block">{card.icon}</span>
               <h3 className="text-white font-bold text-xl mb-3">{card.title}</h3>

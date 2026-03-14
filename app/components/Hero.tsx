@@ -8,14 +8,14 @@ export default function Hero() {
       <div className="absolute -right-32 top-40 w-[500px] h-[500px] rounded-full bg-[#60A5FA] opacity-[0.12] blur-3xl pointer-events-none" />
       <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[700px] h-[300px] rounded-full bg-[#072B4A] opacity-[0.5] blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12 md:py-20 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
           {/* Left — text */}
           <div>
             {/* Pill label */}
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-8">
-              <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
+            <div className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-6 md:mb-8">
+              <span className="text-[#F5C518] text-[10px] sm:text-xs font-semibold tracking-widest uppercase leading-relaxed">
                 Level 2 &amp; 3 PT · Fast Track · NCFE · Ofqual · CIMSPA
               </span>
             </div>
@@ -40,7 +40,7 @@ export default function Hero() {
             </p>
 
             {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-10 animate-fade-in-up animate-delay-200">
+            <div className="flex flex-col sm:flex-row gap-3 mb-8 md:mb-10 animate-fade-in-up animate-delay-200">
               <a
                 href="/enrol"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
@@ -67,6 +67,20 @@ export default function Hero() {
               <span className="hidden sm:inline opacity-40">·</span>
               <span>Study Around Your Job</span>
             </div>
+          </div>
+
+          {/* Mobile stats strip — visible only on mobile */}
+          <div className="lg:hidden grid grid-cols-3 gap-3 mt-2">
+            {[
+              { value: "500+", label: "PTs Hired" },
+              { value: "5.0★", label: "Google Rating" },
+              { value: "NCFE", label: "Ofqual Regulated" },
+            ].map((s) => (
+              <div key={s.label} className="bg-white/10 border border-white/20 rounded-xl p-3 text-center">
+                <p className="text-[#F5C518] font-bold text-base leading-none mb-1">{s.value}</p>
+                <p className="text-blue-100/70 text-[10px] font-medium">{s.label}</p>
+              </div>
+            ))}
           </div>
 
           {/* Right — slideshow */}
