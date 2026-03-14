@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { generateEnrolmentPDF } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
@@ -144,6 +145,7 @@ export default function EnrolmentFlow() {
   const [agreement, setA]       = useState<AgreementState>(blankAgreement);
   const [errors, setErrors]     = useState<Record<string, string>>({});
   const [signMode, setSignMode] = useState<"drawn" | "typed">("drawn");
+  const [submitting, setSubmitting] = useState(false);
   const [typedSig, setTypedSig] = useState("");
   const canvasRef               = useRef<HTMLCanvasElement>(null);
   const isDrawing               = useRef(false);
@@ -278,6 +280,9 @@ export default function EnrolmentFlow() {
 
   // ─── Payment ───────────────────────────────────────────────────────────────
   async function pay(type: "full" | "deposit") {
+    if (submitting) return;
+    setSubmitting(true);
+
     const record = {
       learnerDetails: learner,
       learningDetails: learning,
@@ -297,14 +302,28 @@ export default function EnrolmentFlow() {
       submittedAt: new Date().toISOString(),
       source: "website-enrolment-flow-v1",
     };
+
     // Persist locally as backup
     try { localStorage.setItem("ptll_enrolment_pending", JSON.stringify(record)); } catch (_) {}
-    // Fire and forget — don't block the Stripe redirect if the email fails
-    fetch("/api/enrolments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(record),
-    }).catch(() => {});
+
+    // Send to server (Zapier + Resend emails) — awaited so emails fire before redirect
+    try {
+      await fetch("/api/enrolments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+    } catch (_) {
+      console.warn("Enrolment API call failed — continuing to payment.");
+    }
+
+    // Generate and download the signed PDF for the learner's records
+    try {
+      await generateEnrolmentPDF(record);
+    } catch (_) {
+      console.warn("PDF generation failed — continuing to payment.");
+    }
+
     window.location.href = type === "full" ? FULL_PAYMENT_STRIPE_LINK : DEPOSIT_STRIPE_LINK;
   }
 
@@ -632,8 +651,8 @@ export default function EnrolmentFlow() {
               {/* Payment options */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full payment */}
-                <button onClick={() => pay("full")}
-                  className="bg-[#0A2A44] border-2 border-[#F5C518]/50 hover:border-[#F5C518] hover:bg-[#F5C518]/5 rounded-2xl p-7 text-left transition-all group w-full">
+                <button onClick={() => pay("full")} disabled={submitting}
+                  className="bg-[#0A2A44] border-2 border-[#F5C518]/50 hover:border-[#F5C518] hover:bg-[#F5C518]/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                   <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
                   <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                   <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,399</p>
@@ -643,13 +662,13 @@ export default function EnrolmentFlow() {
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> One single payment</li>
                   </ul>
                   <div className="w-full py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                    Pay £1,399 →
+                    {submitting ? "Preparing your documents…" : "Pay £1,399 →"}
                   </div>
                 </button>
 
                 {/* Deposit plan */}
-                <button onClick={() => pay("deposit")}
-                  className="bg-[#0A2A44] border-2 border-[#1A3A5C] hover:border-[#F5C518]/40 rounded-2xl p-7 text-left transition-all group w-full">
+                <button onClick={() => pay("deposit")} disabled={submitting}
+                  className="bg-[#0A2A44] border-2 border-[#1A3A5C] hover:border-[#F5C518]/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                   <p className="text-[#8CA3BF] text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
                   <p className="text-white font-bold text-2xl mb-1">Deposit Plan</p>
                   <p className="text-[#F5C518] text-4xl font-bold mb-1">£599</p>
@@ -660,7 +679,7 @@ export default function EnrolmentFlow() {
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Full access from day one</li>
                   </ul>
                   <div className="w-full py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-bold text-sm text-center group-hover:bg-[#F5C518]/10 transition-all">
-                    Pay £599 Deposit →
+                    {submitting ? "Preparing your documents…" : "Pay £599 Deposit →"}
                   </div>
                 </button>
               </div>
