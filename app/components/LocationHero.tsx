@@ -1,6 +1,6 @@
 import HeroSlideshow from "./HeroSlideshow";
 
-export default function LocationHero({ location }: { location: string }) {
+export default function LocationHero({ location, headline }: { location: string; headline?: string }) {
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden pt-[72px]">
       {/* Decorative blobs */}
@@ -20,13 +20,25 @@ export default function LocationHero({ location }: { location: string }) {
               </span>
             </div>
 
-            {/* Headline — location swapped in */}
+            {/* Headline — location and pathway swapped in */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-6 animate-fade-in-up">
-              PT Courses in {location}.
-              <br />
-              <span className="text-[#F5C518]">Train for the life</span>
-              <br />
-              <span className="text-[#F5C518]">you want.</span>
+              {headline ? (
+                <>
+                  {headline.replace("{location}", location).split("|").map((line, i) => (
+                    i === 0
+                      ? <span key={i}>{line}<br /></span>
+                      : <span key={i} className="text-[#F5C518]">{line}</span>
+                  ))}
+                </>
+              ) : (
+                <>
+                  PT Courses in {location}.
+                  <br />
+                  <span className="text-[#F5C518]">Train for the life</span>
+                  <br />
+                  <span className="text-[#F5C518]">you want.</span>
+                </>
+              )}
             </h1>
 
             {/* Positioning line */}
