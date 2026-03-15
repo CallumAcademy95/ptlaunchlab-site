@@ -113,6 +113,7 @@ export default function PrivacyPage() {
                 "Google (Google Sheets / Google Workspace) — enrolment records are stored in a secure, access-controlled Google Sheet.",
                 "Merve — the learning platform through which course content is delivered. Your name and email are shared for course access.",
                 "Vercel — our website hosting provider. Processes web requests and API calls.",
+                "CookieYes — our cookie consent management platform. Stores your cookie preferences to ensure we only set non-essential cookies with your consent. CookieYes processes consent logs in accordance with GDPR.",
               ])}
               {p("We do not sell your personal data to any third party. We do not use your data for automated decision-making or profiling.")}
             </>
@@ -179,8 +180,10 @@ export default function PrivacyPage() {
           title: "Cookies",
           content: (
             <>
-              {p("This website uses cookies to improve your experience and analyse how the site is used. Essential cookies are required for the site to function. Analytics cookies are only set with your consent.")}
-              {p("You can manage cookie preferences at any time through your browser settings. Disabling certain cookies may affect the functionality of the site.")}
+              {p("This website uses cookies to improve your experience and analyse how the site is used. Essential cookies are required for the site to function. Analytics and marketing cookies are only set with your explicit consent.")}
+              {p("We use CookieYes to manage cookie consent on this website. When you first visit, you will be presented with a cookie banner allowing you to accept, reject or customise your preferences. Your preferences are stored and respected on all future visits.")}
+              {p("You can update or withdraw your cookie consent at any time by clicking the 'Revisit Consent' button in the bottom-left corner of any page on this website.")}
+              {p("For a full list of cookies used on this site, their purposes and durations, please refer to the cookie declaration managed by CookieYes.")}
             </>
           ),
         },
