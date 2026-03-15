@@ -111,7 +111,7 @@ export default function AboutPage() {
         </section>
 
         {/* THE STORY */}
-        <section className="bg-[#072B4A] py-24 px-6">
+        <section id="our-story" className="bg-[#072B4A] py-24 px-6">
           <div className="max-w-5xl mx-auto">
             <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Our story</p>
             <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-16">
