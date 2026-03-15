@@ -15,10 +15,10 @@ import ConversionSection from "@/app/components/ConversionSection";
 import FAQ from "@/app/components/FAQ";
 import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
-import { yorkshireLocations, getLocationBySlug } from "@/app/lib/yorkshireLocations";
+import { ukLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
 export async function generateStaticParams() {
-  return yorkshireLocations.map((l) => ({ location: l.slug }));
+  return ukLocations.map((l) => ({ location: l.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }) {
