@@ -22,6 +22,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          id="cookieyes"
+          type="text/javascript"
+          src="https://cdn-cookieyes.com/client_data/e5ee5d26e0341217ffb7eccd/script.js"
+        />
+      </head>
       <body className={`${poppins.variable} antialiased`}>{children}</body>
     </html>
   );
