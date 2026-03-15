@@ -1,6 +1,11 @@
 import Image from "next/image";
 
-const navLinks = ["Home", "Course", "About", "Blog", "Contact"];
+const navLinks = [
+  { label: "Home",    href: "/" },
+  { label: "Course",  href: "/courses" },
+  { label: "About",   href: "/about" },
+  { label: "Contact", href: "/contact" },
+];
 
 export default function Footer() {
   return (
@@ -20,8 +25,8 @@ export default function Footer() {
           {/* Nav links */}
           <div className="flex flex-wrap justify-center gap-6">
             {navLinks.map((l) => (
-              <a key={l} href="#" className="text-[#8CA3BF] hover:text-white text-sm transition-colors">
-                {l}
+              <a key={l.label} href={l.href} className="text-[#8CA3BF] hover:text-white text-sm transition-colors">
+                {l.label}
               </a>
             ))}
           </div>

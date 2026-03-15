@@ -34,13 +34,13 @@ export default function FounderStory() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href="/enrol"
+              href="/courses"
               className="px-7 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
             >
               View Courses →
             </a>
             <a
-              href="#"
+              href="/about#our-story"
               className="px-7 py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-sm hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
             >
               Read Our Story
