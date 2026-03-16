@@ -2,28 +2,40 @@ const steps = [
   {
     num: "01",
     icon: "📚",
-    title: "Learn",
-    subtitle: "Learn the fundamentals",
-    body: "Everything you need to coach real people — safely, confidently, and effectively. Anatomy, nutrition, exercise science, client consultations, and behaviour change. Study online at your own pace, around your current job.",
-    bullets: ["Anatomy, nutrition & exercise science", "Client consultations & goal setting", "Behaviour change & motivation strategies"],
+    title: "Enrol",
+    subtitle: "Meet your personal tutor from day one",
+    body: "From day one, you're assigned a dedicated personal tutor — not a support inbox, not a chatbot. A real person who knows your name, tracks your progress, and is available whenever you're stuck. They'll walk you through the course structure and set a realistic study schedule around your current job and life.",
+    bullets: [
+      "Immediate access to all course materials on enrolment",
+      "Personal tutor introduction within 24 hours",
+      "Flexible study plan built around your actual life",
+    ],
     highlight: false,
   },
   {
     num: "02",
     icon: "🏅",
     title: "Qualify",
-    subtitle: "Get qualified",
-    body: "You'll earn an NCFE Level 3 qualification that every UK gym recognises. The same one we used to launch our own careers. Ofqual regulated, with continuous tutor support throughout.",
-    bullets: ["NCFE & Ofqual-regulated certification", "Online and practical assessments", "Continuous tutor feedback & support"],
+    subtitle: "The qualification — plus the business training no one else includes",
+    body: "You'll work through your NCFE Level 3 PT qualification online at a pace that fits your life. Alongside the accredited content, you complete PT Launch Lab's business modules — how to get your first clients, how to price yourself, and how to build a sustainable PT income from day one.",
+    bullets: [
+      "Full Level 3: anatomy, nutrition, programme design, client assessment",
+      "Business modules: client acquisition, pricing, self-marketing",
+      "Complete in 8 weeks (intensive) or up to 16 weeks — you choose",
+    ],
     highlight: true,
   },
   {
     num: "03",
     icon: "🚀",
     title: "Launch",
-    subtitle: "Launch your business",
-    body: "Other courses stop once you pass. We stay until you've built something real. Find and convert your first clients, build your brand, and use proven systems to reach £5K per month.",
-    bullets: ["Find & convert your first clients", "Build your online & in-person PT brand", "Proven systems to reach £5K/month"],
+    subtitle: "Qualify — and walk straight into guaranteed interviews",
+    body: "When you complete your qualification, we don't hand you a certificate and wish you luck. We activate your guaranteed gym interviews — direct introductions to employers who are actively hiring CIMSPA-recognised PTs. You've done the work. We make sure the right people know about it.",
+    bullets: [
+      "Guaranteed gym interviews on completion — actual introductions, not job boards",
+      "CV and interview preparation included",
+      "Ongoing career support from the PT Launch Lab team",
+    ],
     highlight: false,
   },
 ];
@@ -36,12 +48,12 @@ export default function HowItWorks() {
           How it works
         </p>
         <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-3">
-          Three steps to a career
+          From sign-up to employed PT
           <br />
-          <span className="text-[#F5C518]">you actually want.</span>
+          <span className="text-[#F5C518]">in 8–16 weeks.</span>
         </h2>
         <p className="text-[#8CA3BF] text-center text-lg mb-10 md:mb-16 max-w-xl mx-auto">
-          We don&apos;t just get you qualified. We get you hired, earning, and building.
+          Here&apos;s exactly what the journey looks like — no ambiguity, no surprises.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-14">
@@ -69,7 +81,7 @@ export default function HowItWorks() {
                 </div>
                 {step.highlight && (
                   <span className="ml-auto text-[10px] bg-[#F5C518] text-[#072B4A] px-2.5 py-1 rounded-full font-bold uppercase tracking-wide shrink-0">
-                    Key Step
+                    The Difference
                   </span>
                 )}
               </div>
@@ -94,7 +106,7 @@ export default function HowItWorks() {
             href="/enrol"
             className="inline-block px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
-            Start Today →
+            Secure Your Place →
           </a>
         </div>
       </div>

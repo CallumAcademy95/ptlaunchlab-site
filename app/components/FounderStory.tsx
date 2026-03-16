@@ -1,8 +1,8 @@
 const stats = [
-  { value: "500+",   label: "PTs hired by\nour team" },
-  { value: "30+",    label: "Years industry\nexperience" },
-  { value: "£500K+", label: "Revenue as\nindependent PTs" },
-  { value: "100s",   label: "Students\nqualified" },
+  { value: "£500K+", label: "Revenue built by our\nfounders at Ultimate Shred" },
+  { value: "500+",   label: "Personal trainers hired\nby the PT Launch Lab team" },
+  { value: "8–16",   label: "Weeks to your fully\nrecognised Level 3 qualification" },
+  { value: "1",      label: "Personal tutor assigned\nto you from day one" },
 ];
 
 export default function FounderStory() {
@@ -15,29 +15,25 @@ export default function FounderStory() {
             Why we built this
           </p>
           <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-6">
-            We&apos;ve been in jobs
+            We built the course
             <br />
-            we hated too.
+            we wish had existed.
           </h2>
           <p className="text-white text-lg font-semibold mb-4">
             We don&apos;t just run PT courses. We run gyms. We hire trainers. We know what works.
           </p>
           <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-4">
-            Callum, Miles and Ryan built this from lived experience — not a textbook. We scaled
-            Ultimate Shred to over £500K in revenue as independent personal trainers, and we&apos;ve
-            personally hired over 500 PTs across our gyms and partnerships.
+            Callum, Miles, and Ryan didn&apos;t start out as course providers. They started as gym owners — building Ultimate Shred from scratch into a business turning over £500,000 a year. Along the way, they hired hundreds of personal trainers. And they saw the same problem, again and again: talented people who&apos;d done the qualification, who loved fitness, who genuinely wanted to help people — but had no idea how to actually run a PT business. They were qualified. They just weren&apos;t ready.
           </p>
           <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-7 md:mb-10">
-            That&apos;s why our course is different. When we teach you what gyms look for, it&apos;s
-            because we&apos;re the ones doing the hiring. When we talk about building income, it&apos;s
-            because we&apos;ve done it ourselves — and now we hand you the exact playbook.
+            PT Launch Lab was built to close that gap. Every module, every piece of business training, every guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk — and who know exactly what separates the PTs who build thriving careers from the ones who quietly give up six months after qualifying.
           </p>
           <div className="flex flex-wrap gap-4">
             <a
               href="/courses"
               className="px-7 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
             >
-              View Courses →
+              View Course Details →
             </a>
             <a
               href="/about#our-story"
@@ -67,7 +63,7 @@ export default function FounderStory() {
             <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">Student Success Story</p>
             <h4 className="text-white font-bold text-lg mb-2">Gemma&apos;s Journey: Corporate to Coaching</h4>
             <p className="text-[#8CA3BF] text-sm leading-relaxed">
-              Gemma left corporate life behind and retrained through PT Launch Lab. Now she runs her own PT business, works on her own terms, and helps people transform their lives every day.
+              Gemma left a corporate career behind and retrained through PT Launch Lab. She had a personal tutor from day one, completed in 12 weeks around her job, and walked into guaranteed gym interviews on the other side. Now she runs her own PT business, earns more than she ever did in the office, and hasn&apos;t dreaded a Monday since.
             </p>
           </div>
         </div>

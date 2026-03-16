@@ -8,31 +8,31 @@ export default function ConversionSection() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
         <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-          Ready to start your new career?
+          Two ways to get started.
         </h2>
         <p className="text-[#8CA3BF] text-lg max-w-xl mx-auto mb-8 md:mb-16">
-          You&apos;ve got two options. Both lead to the same place — a career you actually want.
+          Both lead to the same place — a qualification, a career, and a team behind you every step of the way.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left — Start Today */}
+          {/* Left — Deposit Plan */}
           <div className="bg-[#0D3559] border-2 border-[#F5C518]/80 rounded-2xl p-6 md:p-8 text-left flex flex-col shadow-xl shadow-[#F5C518]/10">
             <div className="inline-block mb-6">
               <span className="bg-[#F5C518] text-[#072B4A] text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                 Most Popular
               </span>
             </div>
-            <h3 className="text-white text-2xl font-bold mb-4">I&apos;m ready. Let&apos;s go.</h3>
+            <h3 className="text-white text-2xl font-bold mb-2">Start With a Deposit</h3>
+            <p className="text-[#F5C518] font-bold text-lg mb-4">£599 today, then 5 × £200</p>
             <p className="text-[#8CA3BF] text-[15px] leading-relaxed mb-7">
-              Enrol today and get immediate access to the full course — your login, your tutor,
-              and everything you need to start your journey to becoming a qualified PT.
+              Put down a deposit to secure your place and get immediate access to your course and tutor. Split the remaining cost over a payment plan that fits your budget. You don&apos;t need the full amount to start today.
             </p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
-                "Immediate access on enrolment",
+                "Immediate course access on deposit",
+                "Personal tutor assigned within 24 hours",
                 "Start your first module today",
-                "Your personal tutor assigned from day one",
-                "Study at your own pace",
+                "Spread the remaining cost over 5 months",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-[#F5C518] text-sm font-medium">
                   <span className="text-[#F5C518] font-bold">✓</span>
@@ -44,29 +44,29 @@ export default function ConversionSection() {
               href="/enrol"
               className="block w-full text-center py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mb-3"
             >
-              Enrol Now — Start Today →
+              Reserve Your Place With a Deposit →
             </a>
-            <p className="text-[#4A6280] text-xs text-center">Immediate access. Start within minutes.</p>
+            <p className="text-[#4A6280] text-xs text-center">Total course fee: £1,399. Start immediately.</p>
           </div>
 
-          {/* Right — Book a Call */}
+          {/* Right — Pay in Full */}
           <div className="bg-[#0D3559] border-2 border-[#3B82F6]/70 rounded-2xl p-6 md:p-8 text-left flex flex-col shadow-xl shadow-[#3B82F6]/10">
             <div className="inline-block mb-6">
               <span className="bg-[#3B82F6] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                No hard sell
+                Best Value
               </span>
             </div>
-            <h3 className="text-white text-2xl font-bold mb-4">I have a few questions first.</h3>
+            <h3 className="text-white text-2xl font-bold mb-2">Pay in Full</h3>
+            <p className="text-[#F5C518] font-bold text-lg mb-4">£1,399 — everything included</p>
             <p className="text-[#8CA3BF] text-[15px] leading-relaxed mb-7">
-              Book a free 15-minute call with our team. We&apos;ll answer every question honestly —
-              and if the course isn&apos;t right for you, we&apos;ll tell you that too.
+              One payment. Immediate access to everything — your tutor, your qualification content, your business training, and your guaranteed interview pipeline. No instalments, no additional fees.
             </p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
-                "15 minutes, completely free",
-                "Honest answers, no pressure",
-                "Talk to a real person",
-                "We'll tell you if it's not right for you",
+                "One payment, fully covered",
+                "Full course access from day one",
+                "Personal tutor, business training, guaranteed interviews",
+                "Best value — no additional fees",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-sm font-medium">
                   <span className="text-[#3B82F6] font-bold">✓</span>
@@ -75,13 +75,26 @@ export default function ConversionSection() {
               ))}
             </ul>
             <a
-              href="/book-call"
+              href="/enrol"
               className="block w-full text-center py-4 rounded-full border-2 border-[#F5C518] text-[#F5C518] font-bold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all mb-3"
             >
-              Book a Free Call →
+              Enrol in Full Today →
             </a>
-            <p className="text-[#4A6280] text-xs text-center">Usually available within 24 hours</p>
+            <p className="text-[#4A6280] text-xs text-center">Start within 24 hours. Everything included.</p>
           </div>
+        </div>
+
+        {/* Objection handler beneath cards */}
+        <div className="mt-10 text-center">
+          <p className="text-[#8CA3BF] text-base mb-3">
+            Not sure which option is right for you?
+          </p>
+          <a
+            href="/book-call"
+            className="inline-flex items-center gap-2 text-[#F5C518] font-semibold hover:underline"
+          >
+            Book a free 15-minute call — straight answers, no sales pressure →
+          </a>
         </div>
       </div>
     </section>

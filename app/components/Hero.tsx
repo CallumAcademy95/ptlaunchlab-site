@@ -16,27 +16,27 @@ export default function Hero() {
             {/* Pill label */}
             <div className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-6 md:mb-8">
               <span className="text-[#F5C518] text-[10px] sm:text-xs font-semibold tracking-widest uppercase leading-relaxed">
-                Level 2 &amp; 3 PT · Fast Track · NCFE · Ofqual · CIMSPA
+                NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Qualify in 8–16 Weeks
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-6 animate-fade-in-up">
-              Quit the job you hate.
+              You&apos;re good enough
               <br />
-              <span className="text-[#F5C518]">Train for the life</span>
+              to be a PT.
               <br />
-              <span className="text-[#F5C518]">you want.</span>
+              <span className="text-[#F5C518]">Here&apos;s how to make it pay.</span>
             </h1>
 
             {/* Positioning line */}
             <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4 animate-fade-in-up animate-delay-100">
-              We qualify you as a Personal Trainer and guide you as you turn it into a real business.
+              The UK&apos;s only PT course built by gym owners who&apos;ve hired over 500 personal trainers — so you learn what actually gets you employed, not just qualified.
             </p>
 
             {/* Sub */}
             <p className="text-base text-blue-100/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              Not just theory — real mentorship, from people who&apos;ve built it themselves. From your first lesson right through to your first paying client.
+              An 8–16 week online Level 3 qualification with business training and guaranteed gym interviews built in. Because a certificate on its own doesn&apos;t pay your rent.
             </p>
 
             {/* CTA buttons */}
@@ -45,27 +45,27 @@ export default function Hero() {
                 href="/enrol"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
               >
-                Start Today →
+                Secure Your Place →
               </a>
               <a
                 href="/book-call"
                 className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center"
               >
-                Not sure? Book a free call
+                Book a Free Call First
               </a>
             </div>
 
             {/* Trust bar */}
             <div className="flex flex-wrap gap-3 md:gap-5 text-blue-200/70 text-xs animate-fade-in-up animate-delay-300">
-              <span>⭐ 5-Star Rated</span>
+              <span>✓ NCFE &amp; Ofqual Regulated</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>Guaranteed Gym Interviews</span>
+              <span>✓ Guaranteed Gym Interviews</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>500+ PTs Hired</span>
+              <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>NCFE &amp; Ofqual Regulated</span>
+              <span>✓ Personal Tutor From Day One</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>Study Around Your Job</span>
+              <span>✓ Study Around Your Current Job</span>
             </div>
           </div>
 
