@@ -26,28 +26,18 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={`${poppins.variable} antialiased`}>
-        {/* 1. Consent Mode v2 defaults — fires before any other scripts */}
-        <Script id="consent-defaults" strategy="beforeInteractive">{`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('consent', 'default', {
-            analytics_storage: 'denied',
-            ad_storage: 'denied',
-            ad_user_data: 'denied',
-            ad_personalization: 'denied',
-            functionality_storage: 'denied',
-            personalization_storage: 'denied',
-            security_storage: 'granted',
-            wait_for_update: 2000
-          });
-          gtag('set', 'ads_data_redaction', true);
-          gtag('set', 'url_passthrough', true);
-        `}</Script>
+        {/* 1. Consent Mode v2 defaults — true inline script, runs synchronously before any async scripts */}
+        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+        <script dangerouslySetInnerHTML={{ __html: `
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted',wait_for_update:2000});
+gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
+        `}} />
         {/* 2. CookieYes — reads consent defaults above, updates them on user choice */}
         <Script
           id="cookieyes"
           src="https://cdn-cookieyes.com/client_data/04abe099864c49fd5daf17ec/script.js"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         {children}
         <Analytics />
