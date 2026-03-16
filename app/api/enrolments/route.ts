@@ -4,6 +4,8 @@ import { Resend } from "resend";
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
+const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID;
+const GA4_API_SECRET = process.env.GA4_API_SECRET;
 
 export async function POST(req: NextRequest) {
   try {
@@ -260,6 +262,25 @@ export async function POST(req: NextRequest) {
       ]);
     } else {
       console.warn("[enrolments] RESEND_API_KEY not set — skipping emails.");
+    }
+
+    // ── GA4 server-side conversion event ──────────────────────────────────
+    if (GA4_MEASUREMENT_ID && GA4_API_SECRET) {
+      fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
+        method: "POST",
+        body: JSON.stringify({
+          client_id: `${Date.now()}.${Math.random().toString(36).slice(2)}`,
+          events: [{
+            name: "enrolment_complete",
+            params: {
+              payment_type: paymentChoice,
+              value: paymentChoice === "full" ? 1399 : 599,
+              currency: "GBP",
+              learner_name: l.fullName,
+            },
+          }],
+        }),
+      }).catch(() => {}); // fire and forget
     }
 
     return NextResponse.json({ ok: true });
