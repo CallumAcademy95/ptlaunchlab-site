@@ -25,13 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* CookieYes — must load first to manage consent */}
-        <script
-          id="cookieyes"
-          type="text/javascript"
-          src="https://cdn-cookieyes.com/client_data/e5ee5d26e0341217ffb7eccd/script.js"
-        />
-        {/* Google Consent Mode v2 defaults — denies until CookieYes grants */}
+        {/* 1. Consent Mode v2 defaults — must be first, before any tags load */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -46,6 +40,12 @@ export default function RootLayout({
               });
             `,
           }}
+        />
+        {/* 2. CookieYes — reads consent defaults above, updates them on user choice */}
+        <script
+          id="cookieyes"
+          type="text/javascript"
+          src="https://cdn-cookieyes.com/client_data/e5ee5d26e0341217ffb7eccd/script.js"
         />
       </head>
       <body className={`${poppins.variable} antialiased`}>
