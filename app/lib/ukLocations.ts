@@ -51,6 +51,10 @@ export const ukLocations: UKLocation[] = [
   { slug: "seacroft",             name: "Seacroft",           region: "West Yorkshire",    nearestCity: "Leeds" },
   { slug: "headingley",           name: "Headingley",         region: "West Yorkshire",    nearestCity: "Leeds" },
   { slug: "roundhay",             name: "Roundhay",           region: "West Yorkshire",    nearestCity: "Leeds" },
+
+  // West Yorkshire additions
+  { slug: "holmfirth",           name: "Holmfirth",          region: "West Yorkshire",    nearestCity: "Huddersfield" },
+
   { slug: "sheffield",            name: "Sheffield",          region: "South Yorkshire",   nearestCity: "Sheffield" },
   { slug: "rotherham",            name: "Rotherham",          region: "South Yorkshire",   nearestCity: "Sheffield" },
   { slug: "barnsley",             name: "Barnsley",           region: "South Yorkshire",   nearestCity: "Barnsley" },
@@ -87,6 +91,16 @@ export const ukLocations: UKLocation[] = [
   { slug: "cottingham",           name: "Cottingham",         region: "East Yorkshire",    nearestCity: "Hull" },
   { slug: "brough",               name: "Brough",             region: "East Yorkshire",    nearestCity: "Hull" },
   { slug: "howden",               name: "Howden",             region: "East Yorkshire",    nearestCity: "Goole" },
+
+  // East Yorkshire additions
+  { slug: "kingston-upon-hull",  name: "Kingston upon Hull", region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "east-hull",           name: "East Hull",          region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "west-hull",           name: "West Hull",          region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "hornsea",             name: "Hornsea",            region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "market-weighton",     name: "Market Weighton",    region: "East Yorkshire",    nearestCity: "York" },
+  { slug: "anlaby",              name: "Anlaby",             region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "withernsea",          name: "Withernsea",         region: "East Yorkshire",    nearestCity: "Hull" },
+  { slug: "willerby",            name: "Willerby",           region: "East Yorkshire",    nearestCity: "Hull" },
 
   // ── NORTH WEST ENGLAND ──────────────────────────────────────────────────
   { slug: "manchester",           name: "Manchester",         region: "Greater Manchester", nearestCity: "Manchester" },
@@ -446,6 +460,10 @@ export const ukLocations: UKLocation[] = [
   { slug: "colwyn-bay",           name: "Colwyn Bay",         region: "Wales",              nearestCity: "Wrexham" },
   { slug: "flint",                name: "Flint",              region: "Wales",              nearestCity: "Wrexham" },
 
+  // North Wales additions
+  { slug: "llandudno",           name: "Llandudno",          region: "North Wales",        nearestCity: "Bangor" },
+  { slug: "bangor",              name: "Bangor",             region: "North Wales",        nearestCity: "Bangor" },
+
   // ── NORTHERN IRELAND ────────────────────────────────────────────────────
   { slug: "belfast",              name: "Belfast",            region: "Northern Ireland",   nearestCity: "Belfast" },
   { slug: "derry",                name: "Derry",              region: "Northern Ireland",   nearestCity: "Derry" },
@@ -460,6 +478,16 @@ export const ukLocations: UKLocation[] = [
   { slug: "bangor-ni",            name: "Bangor",             region: "Northern Ireland",   nearestCity: "Belfast" },
   { slug: "carrickfergus",        name: "Carrickfergus",      region: "Northern Ireland",   nearestCity: "Belfast" },
   { slug: "enniskillen",          name: "Enniskillen",        region: "Northern Ireland",   nearestCity: "Enniskillen" },
+
+  // Broad region slugs
+  { slug: "scotland",            name: "Scotland",           region: "Scotland",           nearestCity: "Glasgow" },
+  { slug: "wales",               name: "Wales",              region: "Wales",              nearestCity: "Cardiff" },
+  { slug: "midlands",            name: "the Midlands",       region: "Midlands",           nearestCity: "Birmingham" },
+  { slug: "yorkshire",           name: "Yorkshire",          region: "Yorkshire",          nearestCity: "Leeds" },
+  { slug: "east-yorkshire",      name: "East Yorkshire",     region: "East Yorkshire",     nearestCity: "Hull" },
+  { slug: "west-yorkshire",      name: "West Yorkshire",     region: "West Yorkshire",     nearestCity: "Leeds" },
+  { slug: "south-west-england",  name: "South West England", region: "South West",         nearestCity: "Bristol" },
+  { slug: "north-west-england",  name: "North West England", region: "North West",         nearestCity: "Manchester" },
 ]
 
 export function getLocationBySlug(slug: string): UKLocation | undefined {
