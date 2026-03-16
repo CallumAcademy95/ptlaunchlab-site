@@ -24,39 +24,34 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* 1. Consent Mode v2 defaults — must be first, before any tags load */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('consent', 'default', {
-                analytics_storage: 'denied',
-                ad_storage: 'denied',
-                ad_user_data: 'denied',
-                ad_personalization: 'denied',
-                functionality_storage: 'denied',
-                personalization_storage: 'denied',
-                security_storage: 'granted',
-                wait_for_update: 2000
-              });
-              gtag('set', 'ads_data_redaction', true);
-              gtag('set', 'url_passthrough', true);
-            `,
-          }}
-        />
-        {/* 2. CookieYes — reads consent defaults above, updates them on user choice */}
-        <script
-          id="cookieyes"
-          type="text/javascript"
-          src="https://cdn-cookieyes.com/client_data/04abe099864c49fd5daf17ec/script.js"
-        />
-      </head>
+      <head />
       <body className={`${poppins.variable} antialiased`}>
+        {/* 1. Consent Mode v2 defaults — fires before any other scripts */}
+        <Script id="consent-defaults" strategy="beforeInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', {
+            analytics_storage: 'denied',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            functionality_storage: 'denied',
+            personalization_storage: 'denied',
+            security_storage: 'granted',
+            wait_for_update: 2000
+          });
+          gtag('set', 'ads_data_redaction', true);
+          gtag('set', 'url_passthrough', true);
+        `}</Script>
+        {/* 2. CookieYes — reads consent defaults above, updates them on user choice */}
+        <Script
+          id="cookieyes"
+          src="https://cdn-cookieyes.com/client_data/04abe099864c49fd5daf17ec/script.js"
+          strategy="beforeInteractive"
+        />
         {children}
         <Analytics />
-        {/* Google Analytics 4 */}
+        {/* 3. Google Analytics 4 — loads after consent is established */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-90W2KGSL55" strategy="afterInteractive" />
         <Script id="ga4-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];
