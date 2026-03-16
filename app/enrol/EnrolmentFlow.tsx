@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { generateEnrolmentPDF } from "../lib/generateEnrolmentPDF";
+import { generateEnrolmentPDF, generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
@@ -306,22 +306,28 @@ export default function EnrolmentFlow() {
     // Persist locally as backup
     try { localStorage.setItem("ptll_enrolment_pending", JSON.stringify(record)); } catch (_) {}
 
-    // Send to server (Zapier + Resend emails) — awaited so emails fire before redirect
+    // Generate PDF — base64 for email attachment + browser download for learner
+    let pdfBase64: string | undefined;
+    let pdfFilename: string | undefined;
+    try {
+      const pdf = await generateEnrolmentPDFBase64(record);
+      pdfBase64 = pdf.base64;
+      pdfFilename = pdf.filename;
+      // Also trigger browser download
+      await generateEnrolmentPDF(record);
+    } catch (_) {
+      console.warn("PDF generation failed — continuing to payment.");
+    }
+
+    // Send to server (Zapier + Resend emails with PDF attached)
     try {
       await fetch("/api/enrolments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(record),
+        body: JSON.stringify({ ...record, pdfBase64, pdfFilename }),
       });
     } catch (_) {
       console.warn("Enrolment API call failed — continuing to payment.");
-    }
-
-    // Generate and download the signed PDF for the learner's records
-    try {
-      await generateEnrolmentPDF(record);
-    } catch (_) {
-      console.warn("PDF generation failed — continuing to payment.");
     }
 
     window.location.href = type === "full" ? FULL_PAYMENT_STRIPE_LINK : DEPOSIT_STRIPE_LINK;

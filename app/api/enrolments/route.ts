@@ -8,7 +8,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt } = body;
+    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename } = body;
 
     if (!l?.fullName || !l?.email) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -235,6 +235,11 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
+    // ── Build PDF attachment if provided ──────────────────────────────────
+    const pdfAttachment = pdfBase64 && pdfFilename
+      ? [{ filename: pdfFilename, content: Buffer.from(pdfBase64, "base64") }]
+      : undefined;
+
     // ── Send emails ───────────────────────────────────────────────────────
     if (process.env.RESEND_API_KEY) {
       await Promise.all([
@@ -243,12 +248,14 @@ export async function POST(req: NextRequest) {
           to: ADMIN_EMAIL,
           subject: `New Enrolment: ${l.fullName} — ${paymentLabel}`,
           html: adminHtml,
+          attachments: pdfAttachment,
         }),
         resend.emails.send({
           from: "PT Launch Lab <noreply@ptlaunchlab.co.uk>",
           to: l.email,
           subject: "Your PT Launch Lab Enrolment Confirmation",
           html: studentHtml,
+          attachments: pdfAttachment,
         }),
       ]);
     } else {

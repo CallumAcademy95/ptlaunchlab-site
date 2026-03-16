@@ -23,7 +23,7 @@ export interface EnrolmentPDFData {
   submittedAt: string;
 }
 
-export async function generateEnrolmentPDF(data: EnrolmentPDFData): Promise<void> {
+async function buildEnrolmentPDF(data: EnrolmentPDFData) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
@@ -252,8 +252,21 @@ export async function generateEnrolmentPDF(data: EnrolmentPDFData): Promise<void
   // ── Footer ────────────────────────────────────────────────────────────────
   addFooter();
 
-  // ── Save ──────────────────────────────────────────────────────────────────
+  // ── Return doc + filename parts ────────────────────────────────────────────
   const safeName = l.fullName.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s+/g, "-");
   const dateStr = dt.toISOString().slice(0, 10);
+  return { doc, safeName, dateStr };
+}
+
+/** Downloads the signed PDF to the learner's browser */
+export async function generateEnrolmentPDF(data: EnrolmentPDFData): Promise<void> {
+  const { doc, safeName, dateStr } = await buildEnrolmentPDF(data);
   doc.save(`PTLL-Enrolment-${safeName}-${dateStr}.pdf`);
+}
+
+/** Returns the PDF as base64 for attaching to emails */
+export async function generateEnrolmentPDFBase64(data: EnrolmentPDFData): Promise<{ base64: string; filename: string }> {
+  const { doc, safeName, dateStr } = await buildEnrolmentPDF(data);
+  const base64 = doc.output("datauristring").split(",")[1];
+  return { base64, filename: `PTLL-Enrolment-${safeName}-${dateStr}.pdf` };
 }
