@@ -490,6 +490,53 @@ export const ukLocations: UKLocation[] = [
   { slug: "north-west-england",  name: "North West England", region: "North West",         nearestCity: "Manchester" },
 ]
 
+// Priority locations for static generation (keyword campaign targets + major UK cities)
+// All other locations still work via dynamicParams = true (rendered on demand)
+export const priorityLocations = ukLocations.filter(l => [
+  // Yorkshire
+  "leeds", "bradford", "wakefield", "huddersfield", "halifax", "pontefract",
+  "normanton", "castleford", "dewsbury", "batley", "morley", "ossett",
+  "horsforth", "shipley", "bingley", "keighley", "guiseley", "yeadon",
+  "otley", "ilkley", "wetherby", "hebden-bridge", "todmorden", "elland",
+  "brighouse", "sowerby-bridge", "heckmondwike", "cleckheaton", "holmfirth",
+  "knottingley", "featherstone", "goole", "pocklington",
+  // East Yorkshire
+  "hull", "kingston-upon-hull", "east-hull", "west-hull", "beverley",
+  "hornsea", "withernsea", "willerby", "anlaby", "hessle", "market-weighton",
+  "brough", "driffield", "bridlington",
+  // South/North Yorkshire
+  "sheffield", "rotherham", "barnsley", "doncaster", "york", "harrogate",
+  "scarborough",
+  // North West
+  "manchester", "liverpool", "bolton", "wigan", "warrington", "rochdale",
+  "blackpool", "burnley", "lancaster", "preston", "salford", "stockport",
+  // Scotland
+  "glasgow", "edinburgh", "aberdeen", "dundee", "inverness", "stirling",
+  "perth", "livingston", "falkirk", "motherwell", "paisley", "kilmarnock",
+  "scotland",
+  // Wales
+  "cardiff", "swansea", "newport", "wrexham", "bridgend", "carmarthen",
+  "aberystwyth", "rhyl", "llandudno", "bangor", "bangor-wales", "merthyr-tydfil",
+  "wales",
+  // Midlands
+  "birmingham", "coventry", "nottingham", "derby", "leicester", "northampton",
+  "stoke-on-trent", "wolverhampton", "loughborough", "midlands",
+  // South East
+  "london", "brighton", "maidstone", "crawley", "oxford", "guildford",
+  "central-london",
+  // South West
+  "bristol", "exeter", "plymouth", "bath", "cheltenham", "gloucester",
+  "swindon", "torquay", "yeovil", "south-west-england",
+  // East England
+  "cambridge", "norwich", "ipswich", "peterborough", "luton", "milton-keynes",
+  // North East
+  "newcastle-upon-tyne", "sunderland", "middlesbrough", "gateshead", "durham",
+  // Other keyword targets
+  "southampton", "chester", "telford", "shrewsbury",
+  // Regions
+  "yorkshire", "east-yorkshire", "west-yorkshire", "north-west-england",
+].includes(l.slug));
+
 export function getLocationBySlug(slug: string): UKLocation | undefined {
   return ukLocations.find((l) => l.slug === slug)
 }

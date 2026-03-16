@@ -15,10 +15,12 @@ import ConversionSection from "@/app/components/ConversionSection";
 import FAQ from "@/app/components/FAQ";
 import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
-import { ukLocations, getLocationBySlug } from "@/app/lib/ukLocations";
+import { ukLocations, priorityLocations, getLocationBySlug } from "@/app/lib/ukLocations";
+
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  return ukLocations.map((l) => ({ location: l.slug }));
+  return priorityLocations.map((l) => ({ location: l.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }) {
