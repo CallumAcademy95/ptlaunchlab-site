@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { generateEnrolmentPDF, generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
+import { generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
@@ -306,15 +306,18 @@ export default function EnrolmentFlow() {
     // Persist locally as backup
     try { localStorage.setItem("ptll_enrolment_pending", JSON.stringify(record)); } catch (_) {}
 
-    // Generate PDF — base64 for email attachment + browser download for learner
+    // Generate PDF once — attach to email AND trigger browser download
     let pdfBase64: string | undefined;
     let pdfFilename: string | undefined;
     try {
       const pdf = await generateEnrolmentPDFBase64(record);
       pdfBase64 = pdf.base64;
       pdfFilename = pdf.filename;
-      // Also trigger browser download
-      await generateEnrolmentPDF(record);
+      // Trigger download from the base64 we already have (avoids building twice)
+      const link = document.createElement("a");
+      link.href = `data:application/pdf;base64,${pdfBase64}`;
+      link.download = pdfFilename;
+      link.click();
     } catch (_) {
       console.warn("PDF generation failed — continuing to payment.");
     }
