@@ -331,10 +331,10 @@ export default function FunnelPage() {
       <section className="bg-[#051D33] py-14 overflow-hidden">
         <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-8">Real learners. Real results.</p>
         <div className="overflow-hidden">
-          <div className="flex gap-4 animate-scroll-x w-max px-4">
-            {/* Duplicate set for seamless loop */}
-            {[1, 2, 3, 4, 1, 2, 3, 4].map((n, i) => (
-              <div key={i} className="relative shrink-0 w-44 h-60 md:w-56 md:h-72 rounded-2xl overflow-hidden border border-white/10 shadow-xl">
+          <div className="flex gap-3 md:gap-4 animate-scroll-x w-max px-4">
+            {/* Duplicate full set for seamless loop */}
+            {[1,2,3,4,5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11,12].map((n, i) => (
+              <div key={i} className="relative shrink-0 w-36 h-52 sm:w-44 sm:h-60 md:w-56 md:h-72 rounded-2xl overflow-hidden border border-white/10 shadow-xl">
                 <Image
                   src={`/learner-${n}.png`}
                   alt="PT Launch Lab learner"

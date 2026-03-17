@@ -45,7 +45,7 @@ body {
   100% { transform: translateX(-50%); }
 }
 .animate-scroll-x {
-  animation: scrollX 24s linear infinite;
+  animation: scrollX 40s linear infinite;
 }
 .animate-scroll-x:hover {
   animation-play-state: paused;
