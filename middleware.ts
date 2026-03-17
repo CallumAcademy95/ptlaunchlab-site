@@ -13,6 +13,21 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Redirect /personal-trainer-courses/[location] → /level-3-personal-trainer-course/[location]
+  const coursesMatch = pathname.match(/^\/personal-trainer-courses\/([a-z][a-z0-9-]*)$/i);
+  if (coursesMatch) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/level-3-personal-trainer-course/${coursesMatch[1].toLowerCase()}`;
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // Redirect /personal-trainer-courses (no location) → /level-3-personal-trainer-course
+  if (pathname === "/personal-trainer-courses") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/level-3-personal-trainer-course";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
   // Match /Something or /Something-Else — one segment, starts with capital
   const match = pathname.match(/^\/([A-Z][A-Za-z-]*)$/);
   if (match) {
