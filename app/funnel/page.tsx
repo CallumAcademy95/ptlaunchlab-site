@@ -6,10 +6,12 @@ import HeroSlideshow from "../components/HeroSlideshow";
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const painPoints = [
-  { icon: "😩", title: "Stuck in a job you hate", body: "You dread Sunday nights. You've got a passion for fitness that your current career never lets you use — and you know it." },
-  { icon: "🤔", title: "Seen loads of courses — don't know who to trust", body: "The internet is full of PT courses that promise the world. You don't know which ones gyms actually respect. That's a real fear — and it's valid." },
-  { icon: "💸", title: "Can't afford to just quit and hope for the best", body: "You've got bills, a life, responsibilities. You need a route in that doesn't mean gambling everything on a certificate." },
-  { icon: "🏋️", title: "Worried gyms won't actually hire you", body: "Qualifying is one thing. Getting hired is another. Most courses don't help you with that bit. You've seen it happen to others." },
+  { icon: "😩", title: "Too many PT courses online — don't know who to trust",  body: "The internet is full of courses promising the world. You don't know which ones gyms actually respect. That's a valid fear." },
+  { icon: "💸", title: "Don't want to waste money on the wrong one",            body: "You've got bills, responsibilities, a life to maintain. You can't afford to gamble everything on a certificate that leads nowhere." },
+  { icon: "🏫", title: "Don't want to sit in a classroom for months",           body: "You've got a job. A life. You need something that fits around reality — not a course that demands you turn up somewhere for weeks on end." },
+  { icon: "🏋️", title: "Don't know if you'll even get a job after qualifying",  body: "Qualifying is one thing. Getting hired is another. Most courses don't help with that part. You've probably seen it happen to others." },
+  { icon: "⏳", title: "Can't quit your job yet",                               body: "You need a route in that doesn't mean walking out before you're ready. You just need the first step — not a life overhaul." },
+  { icon: "🤷", title: "Not sure if PT is even right for you",                  body: "Maybe you love fitness but wonder if you've got what it takes to make it a career. That uncertainty is normal — and we can help you work it out." },
 ];
 
 const comparisonRows = [
@@ -65,13 +67,13 @@ const reviews = [
 ];
 
 const faqs = [
-  { q: "Will gyms actually hire me after I qualify?",              a: "Yes — and we guarantee it. We arrange interviews with our partner gyms the moment you graduate. Our team has personally hired over 500 PTs, so we know exactly what the hiring process looks like from the other side of the desk." },
-  { q: "How long does it take to qualify?",                        a: "Most students complete their Level 2 & 3 qualification in 8–16 weeks, studying around their current job. The course is fully self-paced — you're in control of your timeline." },
-  { q: "Do I need any experience or fitness background?",          a: "None at all. Whether you're completely new to the industry or you've been training for years, we start from the foundations and build from there. All you need is a genuine passion for fitness." },
-  { q: "What does it cost and can I pay in instalments?",          a: "The course is currently £1,599 — reduced from £2,500. We have multiple payment options including Klarna, pay later, deposit + balance, and zero-finance plans. We work hard to make sure the price isn't the barrier." },
-  { q: "Will my qualification be recognised everywhere?",          a: "Yes. Your NCFE Level 3 PT qualification is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym, insurer, and employer accepts it." },
-  { q: "Can I really do this while working full-time?",            a: "Absolutely — that's exactly who we built this for. The course is in your phone. Study in the morning, evenings, weekends — whenever fits your life. Most of our students qualify while still in full-time work." },
-  { q: "When can I start?",                                        a: "Immediately. From the moment you enrol, you have full access to the course, your learning platform, and your personal tutor. There is no waiting around." },
+  { q: "Can I do this around my job?",          a: "Yes — most students study in the evenings or at weekends. The course is fully online and self-paced, so you fit it around your life. No classrooms, no fixed hours." },
+  { q: "Do I need any experience?",             a: "No. We teach everything step by step, from the foundations up. All you need is a genuine passion for fitness and the drive to make it your career." },
+  { q: "Is the qualification recognised?",      a: "Yes. You earn an industry-recognised Level 2 & Level 3 PT qualification — NCFE accredited, Ofqual regulated, and accepted by every gym and insurance provider in the UK." },
+  { q: "Will I get help getting work?",         a: "Yes — mentoring and gym interview opportunities are included. We've personally hired over 500 PTs across our gym network, so we know exactly what gets you through the door." },
+  { q: "Do I need to pay in full?",             a: "No. We have flexible payment plans available including Klarna, pay later, deposit options, and zero-finance plans. We work hard to make sure the cost isn't the barrier." },
+  { q: "How long does it take?",                a: "Most students complete in 8–16 weeks, studying around their job. You set the pace — qualify faster if you want, or take your time if life gets busy." },
+  { q: "When can I start?",                     a: "Immediately. From the moment you enrol, you have full access to the course, your learning platform, and your personal tutor. No waiting around." },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
@@ -196,31 +198,45 @@ export default function FunnelPage() {
               {/* Authority pill */}
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-8 animate-fade-in-up">
                 <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
-                  Run by gym owners who&apos;ve hired 500+ PTs · NCFE · Ofqual Regulated
+                  Online Level 2 &amp; Level 3 · NCFE · Ofqual Regulated · Fast-Track Available
                 </span>
               </div>
 
-              {/* Headline — authority-first */}
+              {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-6 animate-fade-in-up">
-                Most PT Courses
+                Become a Qualified
                 <br />
-                Teach Theory.
+                Personal Trainer —
                 <br />
-                <span className="text-[#F5C518]">We Build Trainers</span>
+                <span className="text-[#F5C518]">With The Only PT Course</span>
                 <br />
-                <span className="text-[#F5C518]">Gyms Actually Hire.</span>
+                <span className="text-[#F5C518]">Run By Gym Owners</span>
+                <br />
+                <span className="text-[#F5C518]">Who Actually Hire Trainers.</span>
               </h1>
 
-              <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-3 animate-fade-in-up animate-delay-100">
-                The only Level 3 PT course run by gym owners — with mentorship, business training, and guaranteed gym interviews built in.
+              <p className="text-base text-blue-100/80 leading-relaxed mb-6 animate-fade-in-up animate-delay-100">
+                Fast-Track &bull; Study Around Your Job &bull; Mentorship Included &bull; Gym Interview Pathway
               </p>
-              <p className="text-base text-blue-100/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-                We don&apos;t just sell courses. We run gyms. We hire trainers. We know exactly what separates the PTs who build careers from the ones who quietly give up — and we hand you the playbook.
-              </p>
+
+              {/* Checklist */}
+              <ul className="space-y-2 mb-8 animate-fade-in-up animate-delay-100">
+                {[
+                  "Industry recognised qualification",
+                  "Payment plans available",
+                  "No classroom required",
+                  "Real gym opportunities after qualifying",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-white text-sm font-medium">
+                    <span className="text-[#F5C518] font-bold text-base shrink-0">✅</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-5 animate-fade-in-up animate-delay-200">
                 <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">
-                  Enrol Now — Start Today →
+                  Apply Now →
                 </a>
                 <a href="/book-call" className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">
                   Book a Free Call
@@ -263,30 +279,31 @@ export default function FunnelPage() {
         <div className="max-w-6xl mx-auto px-6">
           <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Sound familiar?</p>
           <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-4 leading-tight">
-            You love fitness.
+            Love fitness…
             <br />
-            <span className="text-[#F5C518]">Your job is draining your life.</span>
+            <span className="text-[#F5C518]">but stuck in a job you don&apos;t enjoy?</span>
           </h2>
-          <p className="text-[#8CA3BF] text-center text-lg mb-14 max-w-2xl mx-auto">
-            You&apos;ve thought about becoming a PT. Maybe for months. Maybe years. You just don&apos;t know if you can actually make it work — or who to trust to help you get there.
+          <p className="text-[#8CA3BF] text-center text-lg mb-6 max-w-2xl mx-auto">
+            You&apos;ve thought about becoming a Personal Trainer. But…
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
             {painPoints.map((p) => (
-              <div key={p.title} className="flex items-start gap-5 bg-[#0D3559] border border-[#3B82F6]/20 rounded-2xl p-6 hover:border-[#F5C518]/40 transition-all duration-300 group">
-                <span className="text-3xl shrink-0 mt-0.5">{p.icon}</span>
+              <div key={p.title} className="flex items-start gap-4 bg-[#0D3559] border border-[#3B82F6]/20 rounded-2xl p-5 hover:border-[#F5C518]/40 transition-all duration-300 group">
+                <span className="text-2xl shrink-0 mt-0.5">{p.icon}</span>
                 <div>
-                  <h3 className="text-white font-bold text-base mb-2 group-hover:text-[#F5C518] transition-colors">{p.title}</h3>
-                  <p className="text-[#8CA3BF] text-sm leading-relaxed">{p.body}</p>
+                  <h3 className="text-white font-semibold text-sm mb-1 group-hover:text-[#F5C518] transition-colors leading-snug">{p.title}</h3>
+                  <p className="text-[#8CA3BF] text-xs leading-relaxed">{p.body}</p>
                 </div>
               </div>
             ))}
           </div>
           <div className="bg-[#0D3559] border border-[#F5C518]/30 rounded-2xl p-8 md:p-10 text-center max-w-3xl mx-auto">
+            <p className="text-[#F5C518] text-sm font-bold tracking-wide uppercase mb-3">Most people never start because they don&apos;t trust the path.</p>
             <p className="text-white text-xl md:text-2xl font-bold mb-3 leading-snug">
-              These are exactly the fears we built PT Launch Lab to solve.
+              That&apos;s exactly why PT Launch Lab exists.
             </p>
             <p className="text-[#8CA3BF] text-base leading-relaxed mb-6">
-              We&apos;ve been where you are. We built this because we couldn&apos;t find anything that actually prepared trainers for real gym careers — so we created it ourselves.
+              We built this because we couldn&apos;t find anything that actually prepared trainers for real gym careers — so we created it ourselves. From lived experience, not a textbook.
             </p>
             <a href="/quiz" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all">
               🎯 Take the free quiz — find out if PT is right for you →
@@ -298,15 +315,25 @@ export default function FunnelPage() {
       {/* ── AUTHORITY BLOCK ───────────────────────────────────── */}
       <section className="bg-[#0D3559] py-24">
         <div className="max-w-5xl mx-auto px-6">
-          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Why we&apos;re different</p>
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Our positioning</p>
           <h2 className="text-3xl md:text-5xl font-bold text-white text-center leading-tight mb-4">
-            We&apos;re not course sellers.
+            We don&apos;t just run PT courses.
             <br />
-            <span className="text-[#F5C518]">We&apos;re gym owners.</span>
+            <span className="text-[#F5C518]">We run gyms. We hire trainers.</span>
+            <br />
+            <span className="text-white">We know what actually works.</span>
           </h2>
-          <p className="text-[#8CA3BF] text-center text-lg mb-14 max-w-2xl mx-auto">
-            That changes everything about how this course is designed — and who it gets you hired by.
+          <p className="text-[#8CA3BF] text-center text-lg mb-8 max-w-2xl mx-auto">
+            Most course providers teach theory. We build Personal Trainers that gyms actually want to hire.
           </p>
+          {/* USP tick list */}
+          <div className="flex flex-wrap justify-center gap-3 mb-14">
+            {["Run by gym owners", "Hired 500+ PTs in the industry", "Real gym partnerships", "Mentorship included", "Interview opportunities after qualifying"].map((item) => (
+              <span key={item} className="flex items-center gap-2 bg-[#072B4A] border border-[#F5C518]/30 rounded-full px-4 py-2 text-white text-sm font-medium">
+                <span className="text-[#F5C518] font-bold">✔</span> {item}
+              </span>
+            ))}
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-16">
             <div className="space-y-6">
@@ -356,8 +383,10 @@ export default function FunnelPage() {
           </div>
 
           <div className="text-center">
+            <p className="text-white text-xl font-bold mb-2">You&apos;re not just buying a course.</p>
+            <p className="text-[#8CA3BF] text-base mb-6">You&apos;re getting a pathway into the fitness industry.</p>
             <a href="/enrol" className="inline-block px-10 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
-              Train With Gym Owners →
+              Apply Now — See If This Is Right For You →
             </a>
           </div>
         </div>
@@ -411,12 +440,15 @@ export default function FunnelPage() {
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">The honest comparison</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center leading-tight mb-4">
-            Why most PT courses
+            Why most PT courses fail people.
             <br />
-            <span className="text-[#F5C518]">fail the people who take them.</span>
+            <span className="text-[#F5C518]">And why PT Launch Lab is different.</span>
           </h2>
-          <p className="text-[#8CA3BF] text-center text-base mb-12 max-w-2xl mx-auto">
-            Getting a certificate is the easy bit. Building a career that pays is where most courses leave you completely alone.
+          <p className="text-[#8CA3BF] text-center text-base mb-4 max-w-2xl mx-auto">
+            Most courses just give you a certificate. Then leave you on your own.
+          </p>
+          <p className="text-white/60 text-center text-sm mb-12 max-w-xl mx-auto">
+            No help getting work. No mentoring. No real gym connections. No business guidance. That&apos;s why most people never make it as a PT. We built PT Launch Lab to fix that.
           </p>
 
           {/* Comparison table */}
@@ -456,14 +488,12 @@ export default function FunnelPage() {
       {/* ── HOW IT WORKS — 6 STEPS ────────────────────────────── */}
       <section className="bg-[#0D3559] py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">The journey</p>
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">The PT Launch Method™</p>
           <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-3">
-            From where you are now
-            <br />
-            <span className="text-[#F5C518]">to a career you actually want.</span>
+            Simple. Clear. Proven.
           </h2>
           <p className="text-[#8CA3BF] text-center text-lg mb-16 max-w-xl mx-auto">
-            Six steps. Fully online. Built around your life.
+            Six steps from where you are now to a career you actually want — fully online, built around your life.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
             {howItWorksSteps.map((step, i) => (
@@ -533,14 +563,35 @@ export default function FunnelPage() {
       {/* ── WHAT YOU GET ─────────────────────────────────────── */}
       <section id="course-info" className="bg-[#0D3559] py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">What&apos;s inside</p>
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">What you get</p>
           <h2 className="text-3xl md:text-5xl font-bold text-white text-center leading-tight mb-4">
             We&apos;re not selling you a course.
             <br />
             <span className="text-[#F5C518]">We&apos;re building you a career.</span>
           </h2>
-          <p className="text-[#8CA3BF] text-lg text-center mb-16">
+          <p className="text-[#8CA3BF] text-lg text-center mb-10">
             Everything inside The PT Launch Method™ — designed by gym owners who&apos;ve hired 500+ trainers.
+          </p>
+          {/* Quick-scan checklist */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto mb-14">
+            {[
+              "Online Level 2 & Level 3 PT qualification",
+              "Fast-track option available",
+              "Study at home in your own time",
+              "Mentorship included",
+              "Industry recognised certification",
+              "Gym interview opportunities",
+              "Business & coaching guidance",
+              "Payment plans available",
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 bg-[#072B4A] border border-[#3B82F6]/20 rounded-xl px-5 py-3">
+                <span className="text-[#F5C518] font-bold shrink-0">✔</span>
+                <span className="text-white text-sm font-medium">{item}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-white/60 text-sm font-medium mb-14">
+            No classroom. &nbsp;No guesswork. &nbsp;No wasting money on the wrong course.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
             {features.map((feat) => (
@@ -562,10 +613,18 @@ export default function FunnelPage() {
       {/* ── REVIEWS / PROOF ──────────────────────────────────── */}
       <section className="bg-[#072B4A] py-24 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
-          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Student proof</p>
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Real results</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-3">
             Don&apos;t just take our word for it.
           </h2>
+          <p className="text-[#8CA3BF] text-center text-base mb-8 max-w-xl mx-auto">Our students are now:</p>
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            {["Working as Personal Trainers", "Running online coaching businesses", "Coaching in partner gyms", "Earning from fitness — not just training for fun"].map((item) => (
+              <span key={item} className="flex items-center gap-2 bg-[#0D3559] border border-[#F5C518]/20 rounded-full px-4 py-2 text-white text-sm font-medium">
+                <span className="text-[#F5C518]">✓</span> {item}
+              </span>
+            ))}
+          </div>
           <div className="flex items-center justify-center gap-2 mb-12">
             <span className="text-[#F5C518] text-lg">★★★★★</span>
             <span className="text-white text-sm font-semibold">5.0</span>
@@ -636,6 +695,26 @@ export default function FunnelPage() {
             {["NCFE", "Ofqual Regulated", "CIMSPA", "REPs"].map((logo) => (
               <div key={logo} className="px-6 py-4 rounded-xl border border-[#3B82F6]/20 bg-white/5 text-white font-semibold text-sm min-w-[130px] text-center hover:border-[#F5C518]/40 transition-colors">
                 {logo}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── GYM PARTNERS ─────────────────────────────────────── */}
+      <section className="bg-[#051D33] py-14 border-t border-[#3B82F6]/15">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-8">Just a few of our partners</p>
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+            {[
+              { src: "/logos/ultimate-shred.png",  alt: "Ultimate Shred" },
+              { src: "/logos/1079-fitness.png",    alt: "1079 Fitness" },
+              { src: "/logos/6fit-gym.png",        alt: "6Fit Gym" },
+              { src: "/logos/iron-wolf-gym.png",   alt: "Iron Wolf Gym" },
+              { src: "/logos/leodis-gym.png",      alt: "Leodis Gym" },
+            ].map((logo) => (
+              <div key={logo.alt} className="relative h-12 w-32 opacity-60 hover:opacity-100 transition-opacity">
+                <Image src={logo.src} alt={logo.alt} fill className="object-contain" />
               </div>
             ))}
           </div>
@@ -730,18 +809,23 @@ export default function FunnelPage() {
           <div className="w-[600px] h-[400px] rounded-full bg-[#F5C518] opacity-[0.07] blur-3xl" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6">
-          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-6">The only question left</p>
+          <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-6">Your next step</p>
           <h2 className="text-4xl md:text-6xl font-bold text-white leading-[1.05] mb-6">
-            What are you
+            If you&apos;ve been thinking about
             <br />
-            <span className="text-[#F5C518]">waiting for?</span>
+            becoming a PT for a while…
+            <br />
+            <span className="text-[#F5C518]">this is your sign to start.</span>
           </h2>
+          <p className="text-blue-100/80 text-lg mb-4 max-w-xl mx-auto">
+            You don&apos;t need to change your life today.
+          </p>
           <p className="text-blue-100/80 text-lg mb-10 max-w-xl mx-auto">
-            Every week you wait is another week in a job you don&apos;t want. Your qualification, your clients, and your freedom are on the other side of one decision.
+            You just need to take the first step. Apply now and we&apos;ll see if this is right for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <a href="/enrol" className="px-10 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30">
-              Enrol Now — Start Today →
+              Apply Now →
             </a>
             <a href="/book-call" className="px-10 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all">
               Book a Free Call First
