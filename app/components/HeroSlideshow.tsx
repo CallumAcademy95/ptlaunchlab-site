@@ -50,7 +50,7 @@ export default function HeroSlideshow() {
                 src={SLIDES[prev].src}
                 alt="PT Launch Lab learner with certificate"
                 fill
-                className="object-cover object-top"
+                className="object-cover object-center lg:object-top"
                 priority
               />
             </div>
@@ -65,7 +65,7 @@ export default function HeroSlideshow() {
               src={SLIDES[current].src}
               alt="PT Launch Lab learner with certificate"
               fill
-              className="object-cover object-top"
+              className="object-cover object-center lg:object-top"
               priority={current === 0}
             />
           </div>
