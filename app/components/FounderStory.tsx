@@ -1,3 +1,11 @@
+import Image from "next/image";
+
+const founders = [
+  { src: "/callum.jpg", name: "Callum" },
+  { src: "/miles.jpg",  name: "Miles"  },
+  { src: "/ryan.jpg",   name: "Ryan"   },
+];
+
 const stats = [
   { value: "£500K+", label: "Revenue built by our\nfounders at Ultimate Shred" },
   { value: "500+",   label: "Personal trainers hired\nby the PT Launch Lab team" },
@@ -28,6 +36,18 @@ export default function FounderStory() {
           <p className="text-[#8CA3BF] text-[17px] leading-relaxed mb-7 md:mb-10">
             PT Launch Lab was built to close that gap. Every module, every piece of business training, every guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk — and who know exactly what separates the PTs who build thriving careers from the ones who quietly give up six months after qualifying.
           </p>
+          {/* Founder photo strip */}
+          <div className="flex gap-4 mb-7 md:mb-8">
+            {founders.map((f) => (
+              <div key={f.name} className="flex flex-col items-center gap-2">
+                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-[#F5C518]/50 shadow-lg">
+                  <Image src={f.src} alt={f.name} fill className="object-cover object-top" />
+                </div>
+                <span className="text-[#8CA3BF] text-xs font-medium">{f.name}</span>
+              </div>
+            ))}
+          </div>
+
           <div className="flex flex-wrap gap-4">
             <a
               href="/courses"

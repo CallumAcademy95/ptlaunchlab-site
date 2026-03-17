@@ -32,13 +32,13 @@ export default function HeroSlideshow() {
   }, [current]);
 
   return (
-    <div className="hidden lg:flex justify-center items-center animate-fade-in-up animate-delay-200">
-      <div className="relative">
+    <div className="flex justify-center items-center animate-fade-in-up animate-delay-200 mt-2 lg:mt-0">
+      <div className="relative w-full lg:w-auto">
         {/* Outer glow ring */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#F5C518]/30 to-[#3B82F6]/20 blur-2xl scale-105" />
 
         {/* Card */}
-        <div className="relative z-0 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl shadow-black/40 w-[400px] aspect-[3/4]">
+        <div className="relative z-0 rounded-2xl border-2 border-white/20 overflow-hidden shadow-2xl shadow-black/40 w-full aspect-[4/3] lg:w-[400px] lg:aspect-[3/4]">
 
           {/* Previous slide (fading out) */}
           {prev !== null && (
@@ -115,13 +115,13 @@ export default function HeroSlideshow() {
         </div>
 
         {/* Floating stat badge */}
-        <div className="absolute -bottom-5 -left-6 z-50 bg-[#F5C518] rounded-2xl px-5 py-3 shadow-xl shadow-[#F5C518]/30">
+        <div className="hidden lg:block absolute -bottom-5 -left-6 z-50 bg-[#F5C518] rounded-2xl px-5 py-3 shadow-xl shadow-[#F5C518]/30">
           <p className="text-[#072B4A] font-bold text-lg leading-none">500+</p>
           <p className="text-[#072B4A]/70 text-xs font-semibold">PTs Hired</p>
         </div>
 
         {/* Floating accreditation badge */}
-        <div className="absolute -top-4 -right-4 z-50 bg-[#0D3559] border border-[#3B82F6]/40 rounded-xl px-4 py-2.5 shadow-xl">
+        <div className="hidden lg:block absolute -top-4 -right-4 z-50 bg-[#0D3559] border border-[#3B82F6]/40 rounded-xl px-4 py-2.5 shadow-xl">
           <p className="text-white font-bold text-xs">NCFE · Ofqual</p>
           <p className="text-[#8CA3BF] text-[10px]">Regulated &amp; Recognised</p>
         </div>
