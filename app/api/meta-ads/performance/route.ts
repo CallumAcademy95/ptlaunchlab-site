@@ -29,16 +29,16 @@ export async function GET(req: NextRequest) {
             return Promise.all(
               ads.map(async (ad) => {
                 const insights = await getAdInsights(ad.id, datePreset);
-                const score = insights ? scoreAd(insights) : { score: null, label: 'insufficient' as const, reason: 'No data' };
-                return { adId: ad.id, adName: ad.name, status: ad.status, insights, score };
+                const scored = insights ? scoreAd(insights) : { score: null, label: 'insufficient' as const, reason: 'No data' };
+                return { adId: ad.id, adName: ad.name, status: ad.status, insights, score: scored.label, scoreReason: scored.reason };
               }),
             );
           }),
         );
 
         const flat = (await Promise.all(adScores)).flat();
-        const poorAds = flat.filter((a) => a.score.label === 'poor').length;
-        const goodAds = flat.filter((a) => a.score.label === 'good').length;
+        const poorAds = flat.filter((a) => a.score === 'poor').length;
+        const goodAds = flat.filter((a) => a.score === 'good').length;
         const health = poorAds > 0 ? 'poor' : goodAds > 0 ? 'good' : 'ok';
 
         return {
