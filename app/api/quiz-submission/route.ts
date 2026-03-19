@@ -46,6 +46,19 @@ export async function POST(request: NextRequest) {
       console.warn('[quiz-submission] QUIZ_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
 
+    // Trigger Claude warming email sequence (non-blocking)
+    const baseUrl = request.nextUrl.origin;
+    fetch(`${baseUrl}/api/send-warmup-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        result,
+        answers: Array.isArray(answers) ? answers.map((a: { label: string }) => a.label) : [],
+      }),
+    }).catch(err => console.error('[warmup-email trigger]', err));
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('[quiz-submission]', err);

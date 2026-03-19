@@ -13,17 +13,34 @@ import type { NextRequest } from "next/server";
 
 // Map old first-path-segment → new first-path-segment
 const SLUG_REDIRECTS: Record<string, string> = {
-  "personal-trainer-courses":              "level-3-personal-trainer-course",
-  "personal-training-courses":             "level-3-personal-trainer-course",
-  "flexible-personal-trainer-course-uk":   "flexible-personal-trainer-course",
-  "best-online-personal-trainer-course-uk":"best-online-personal-trainer-course",
-  "pt-course-payment-plan-uk":             "pt-course-payment-plan",
-  "online-personal-trainer":               "online-personal-training-course",
-  "ncfe-level-3-personal-training-course": "ncfe-level-3-pt-qualification",
+  "personal-trainer-courses":                "level-3-personal-trainer-course",
+  "personal-training-courses":               "level-3-personal-trainer-course",
+  "personal-trainer-course":                 "personal-trainer-course-with-business-support",
+  "flexible-personal-trainer-course-uk":     "flexible-personal-trainer-course",
+  "best-online-personal-trainer-course-uk":  "best-online-personal-trainer-course",
+  "pt-course-payment-plan-uk":               "pt-course-payment-plan",
+  "pt-courses":                              "pt-course",
+  "online-personal-trainer":                 "online-personal-training-course",
+  "ncfe-level-3-personal-training-course":   "ncfe-level-3-pt-qualification",
+  "become-a-qualified-personal-trainer-uk":  "become-a-qualified-personal-trainer",
+};
+
+// Base routes that exist only as /[slug]/[location] with no root page.tsx
+const BASE_ONLY_REDIRECTS: Record<string, string> = {
+  "quit-9-5-become-a-personal-trainer": "/personal-trainer-course-with-business-support",
 };
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Redirect base-only routes that have no root page.tsx (exact match, no location)
+  const exactSlug = pathname.replace(/^\//, "").toLowerCase();
+  const baseRedirect = BASE_ONLY_REDIRECTS[exactSlug];
+  if (baseRedirect && !pathname.slice(1).includes("/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = baseRedirect;
+    return NextResponse.redirect(url, { status: 301 });
+  }
 
   // Handle old slug redirects (with or without a trailing /location segment)
   const segMatch = pathname.match(/^\/([a-z][a-z0-9-]*)(\/[a-z][a-z0-9-]*)?$/i);
