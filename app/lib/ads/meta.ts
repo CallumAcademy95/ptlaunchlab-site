@@ -29,8 +29,17 @@ async function graphFetch<T>(
   const options: RequestInit = { method };
 
   if (method === 'POST' && body) {
-    options.headers = { 'Content-Type': 'application/json' };
-    options.body = JSON.stringify(body);
+    const form = new URLSearchParams();
+    for (const [k, v] of Object.entries(body)) {
+      if (v === null || v === undefined) continue;
+      if (typeof v === 'object') {
+        form.append(k, JSON.stringify(v));
+      } else {
+        form.append(k, String(v));
+      }
+    }
+    options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+    options.body = form.toString();
   } else if (method === 'GET' && body) {
     Object.entries(body).forEach(([k, v]) =>
       params.append(k, String(v))
