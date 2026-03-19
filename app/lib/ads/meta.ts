@@ -42,7 +42,7 @@ async function graphFetch<T>(
   const json = await res.json();
 
   if (json.error) {
-    throw new Error(`Meta API error ${json.error.code}: ${json.error.message}`);
+    throw new Error(`Meta API error ${json.error.code}: ${json.error.message}${json.error.error_subcode ? ` (subcode: ${json.error.error_subcode})` : ''}${json.error.error_user_msg ? ` — ${json.error.error_user_msg}` : ''}`);
   }
 
   return json as T;
@@ -92,24 +92,14 @@ export async function createAdSet(params: {
     name: params.name,
     campaign_id: params.campaignId,
     billing_event: 'IMPRESSIONS',
-    optimization_goal: 'LEAD_GENERATION',
+    optimization_goal: 'LINK_CLICKS',
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
     daily_budget: params.dailyBudgetPence,
     destination_type: 'WEBSITE',
-    promoted_object: {
-      pixel_id: PIXEL_ID,
-      custom_event_type: 'LEAD',
-    },
     targeting: {
       geo_locations: { countries: ['GB'] },
       age_min: 18,
       age_max: 45,
-      interests: [
-        { id: '6003195797456', name: 'Personal trainer' },
-        { id: '6003397425735', name: 'Fitness' },
-        { id: '6003294426921', name: 'Physical fitness' },
-        { id: '6003488742579', name: 'Gym' },
-      ],
       publisher_platforms: ['facebook', 'instagram'],
       facebook_positions: ['feed', 'story'],
       instagram_positions: ['stream', 'story'],
