@@ -96,6 +96,7 @@ export async function createAdSet(params: {
     bid_strategy: 'LOWEST_COST_WITHOUT_CAP',
     daily_budget: params.dailyBudgetPence,
     destination_type: 'WEBSITE',
+    is_adset_budget_sharing_enabled: false,
     targeting: {
       geo_locations: { countries: ['GB'] },
       age_min: 18,
