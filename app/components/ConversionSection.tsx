@@ -1,3 +1,6 @@
+'use client';
+import { trackEvent } from '@/app/lib/gtag';
+
 export default function ConversionSection() {
   return (
     <section id="book-call" className="bg-[#072B4A] py-14 md:py-28 relative overflow-hidden">
@@ -42,6 +45,7 @@ export default function ConversionSection() {
             </ul>
             <a
               href="/enrol"
+              onClick={() => trackEvent('enrol_click', { method: 'deposit' })}
               className="block w-full text-center py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 mb-3"
             >
               Reserve Your Place With a Deposit →
@@ -76,6 +80,7 @@ export default function ConversionSection() {
             </ul>
             <a
               href="/enrol"
+              onClick={() => trackEvent('enrol_click', { method: 'full' })}
               className="block w-full text-center py-4 rounded-full border-2 border-[#F5C518] text-[#F5C518] font-bold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all mb-3"
             >
               Enrol in Full Today →
@@ -91,6 +96,7 @@ export default function ConversionSection() {
           </p>
           <a
             href="/book-call"
+            onClick={() => trackEvent('book_call_click', { location: 'conversion_section' })}
             className="inline-flex items-center gap-2 text-[#F5C518] font-semibold hover:underline"
           >
             Book a free 15-minute call — straight answers, no sales pressure →

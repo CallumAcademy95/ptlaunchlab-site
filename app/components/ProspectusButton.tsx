@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { trackEvent } from "@/app/lib/gtag";
 
 export default function ProspectusButton() {
   const [open, setOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function ProspectusButton() {
       }
       setOpen(false);
       setForm({ name: "", phone: "", email: "" });
+      trackEvent('prospectus_download');
       window.open("/prospectus.pdf", "_blank");
     } catch {
       setError("Something went wrong. Please try again.");

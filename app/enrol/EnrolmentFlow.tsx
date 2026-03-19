@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { trackEvent } from "@/app/lib/gtag";
 import { generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -333,6 +334,7 @@ export default function EnrolmentFlow() {
       console.warn("Enrolment API call failed — continuing to payment.");
     }
 
+    trackEvent('enrol_complete', { payment_type: type });
     window.location.href = type === "full" ? FULL_PAYMENT_STRIPE_LINK : DEPOSIT_STRIPE_LINK;
   }
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config';
 import ResultScreen from './ResultScreen';
+import { trackEvent } from '@/app/lib/gtag';
 
 // ─── Color tokens (matching success.signup-lauchlab.co.uk) ───────────────────
 // bg-deep:   #072B4A  — main page background
@@ -39,6 +40,7 @@ export default function QuizApp() {
     setAnswers([]);
     setSelected(null);
     bump();
+    trackEvent('quiz_start');
   };
 
   const handleSelect = (option: QuizOption) => setSelected(option);
@@ -100,6 +102,11 @@ export default function QuizApp() {
           answers: answers.map((a) => ({ label: a.label })),
         }),
       });
+      trackEvent('quiz_complete', { quiz_result: calcResult });
+      // Meta Pixel — Lead event
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead', { content_name: calcResult });
+      }
     } catch {
       // Non-blocking — user still gets their result if the save fails
     }

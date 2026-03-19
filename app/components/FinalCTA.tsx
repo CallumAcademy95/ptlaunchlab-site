@@ -1,3 +1,6 @@
+'use client';
+import { trackEvent } from '@/app/lib/gtag';
+
 export default function FinalCTA() {
   return (
     <section className="bg-[#072B4A] py-28 relative overflow-hidden">
@@ -24,12 +27,14 @@ export default function FinalCTA() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <a
             href="/enrol"
+            onClick={() => trackEvent('enrol_click', { location: 'final_cta' })}
             className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
           >
             Secure Your Place →
           </a>
           <a
             href="/book-call"
+            onClick={() => trackEvent('book_call_click', { location: 'final_cta' })}
             className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
           >
             Prefer to talk first? Book a free call
