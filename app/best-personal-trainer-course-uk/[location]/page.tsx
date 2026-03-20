@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Best Personal Trainer Course in ${loc.name} | PT Launch Lab`,
     description: `Looking for the best personal trainer course near ${loc.name}? PT Launch Lab offers an NCFE & Ofqual accredited Level 3 qualification with real business mentorship. Qualify in 12–16 weeks.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/best-personal-trainer-course-uk/${location}` },
   };
 }
 

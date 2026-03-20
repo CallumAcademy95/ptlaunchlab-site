@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Personal Trainer Courses Online UK – Studied from ${loc.name} | PT Launch Lab`,
     description: `Looking for personal trainer courses online near ${loc.name}? PT Launch Lab offers NCFE Level 3, 100% online, with business mentorship. Qualify in 12–16 weeks.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/personal-trainer-courses-online-uk/${location}` },
   };
 }
 

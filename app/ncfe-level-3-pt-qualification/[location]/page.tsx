@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `NCFE Level 3 PT Qualification in ${loc.name} | Ofqual Regulated | PT Launch Lab`,
     description: `Study your NCFE Level 3 personal training qualification from ${loc.name}. 100% online, Ofqual regulated, with business mentorship. Qualify in 12–16 weeks.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/ncfe-level-3-pt-qualification/${location}` },
   };
 }
 

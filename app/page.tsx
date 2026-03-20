@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Nav from "./components/Nav";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk",
+  },
+};
 import Hero from "./components/Hero";
 import PainPoints from "./components/PainPoints";
 import Reframe from "./components/Reframe";

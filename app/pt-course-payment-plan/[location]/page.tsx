@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `PT Course Payment Plan in ${loc.name} | Spread the Cost | PT Launch Lab`,
     description: `Study your personal trainer course from ${loc.name} with flexible payment plans. NCFE Level 3, 100% online, spread the cost over 12 months. Start today.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/pt-course-payment-plan/${location}` },
   };
 }
 

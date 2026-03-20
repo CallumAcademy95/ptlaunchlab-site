@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Career Change to Personal Trainer in ${loc.name} | PT Launch Lab`,
     description: `Thinking of a career change to personal training from ${loc.name}? PT Launch Lab specialises in helping career changers qualify, launch and build a real PT business. Study online, start anytime.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/career-change-personal-trainer/${location}` },
   };
 }
 

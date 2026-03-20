@@ -3,8 +3,51 @@ import Footer from "../components/Footer";
 import ProspectusButton from "../components/ProspectusButton";
 
 export const metadata = {
-  title: "PT Courses | PT Launch Lab",
+  title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
   description: "NCFE Level 2 & 3 Personal Training qualification — fast-track, Ofqual regulated, done around your job. Mentorship, gym interviews and business training included.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/courses",
+  },
+};
+
+const courseSchema = {
+  "@context": "https://schema.org",
+  "@type": "Course",
+  name: "NCFE Level 2 & 3 Personal Trainer Qualification",
+  description:
+    "100% online NCFE Level 2 & 3 PT qualification with business training, personal mentorship, and guaranteed gym interviews. Qualify in 4–8 weeks.",
+  provider: {
+    "@type": "Organization",
+    name: "PT Launch Lab",
+    sameAs: "https://ptlaunchlab.co.uk",
+  },
+  timeRequired: "P8W",
+  educationalCredentialAwarded: "NCFE Level 3 Personal Training Certificate",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "Full Payment",
+      price: "1399",
+      priceCurrency: "GBP",
+      url: "https://ptlaunchlab.co.uk/enrol",
+    },
+    {
+      "@type": "Offer",
+      name: "Deposit Plan",
+      price: "599",
+      priceCurrency: "GBP",
+      url: "https://ptlaunchlab.co.uk/enrol",
+    },
+  ],
+  hasCourseInstance: {
+    "@type": "CourseInstance",
+    courseMode: "online",
+    courseSchedule: {
+      "@type": "Schedule",
+      duration: "P4W",
+      repeatFrequency: "P1W",
+    },
+  },
 };
 
 const curriculum = [
@@ -88,6 +131,10 @@ const faqs = [
 export default function CoursesPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
       <Nav />
       <main className="pt-[72px]">
 

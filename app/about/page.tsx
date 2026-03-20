@@ -4,8 +4,11 @@ import Footer from "../components/Footer";
 import FounderTabs from "../components/FounderTabs";
 
 export const metadata = {
-  title: "About | PT Launch Lab",
+  title: "About PT Launch Lab — PT Academy Founded by Gym Owners",
   description: "PT Launch Lab is a gym-owner run PT academy based in Pontefract, Yorkshire. We don't just run courses — we run gyms, we hire trainers, and we know what works.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/about",
+  },
 };
 
 const values = [

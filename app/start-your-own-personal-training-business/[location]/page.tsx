@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Start Your Own Personal Training Business in ${loc.name} | PT Launch Lab`,
     description: `Start your personal training business from ${loc.name}. Our Level 3 course includes business mentorship, client acquisition strategies, and everything you need to go self-employed.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/start-your-own-personal-training-business/${location}` },
   };
 }
 

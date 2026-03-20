@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Personal Trainer Diploma in ${loc.name} | Level 3 Accredited | PT Launch Lab`,
     description: `Earn your personal trainer diploma from ${loc.name}. NCFE Level 3, 100% online, with real business mentorship built in. Qualify in 12–16 weeks.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/personal-trainer-diploma/${location}` },
   };
 }
 

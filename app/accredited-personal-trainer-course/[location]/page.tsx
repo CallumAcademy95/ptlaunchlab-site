@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Accredited Personal Trainer Course in ${loc.name} | NCFE & Ofqual Recognised | PT Launch Lab`,
     description: `Study an accredited personal trainer course from ${loc.name}. 100% online, NCFE and Ofqual accredited, with business mentorship built in. Qualify in 12–16 weeks.`,
+    alternates: { canonical: `https://ptlaunchlab.co.uk/accredited-personal-trainer-course/${location}` },
   };
 }
 
