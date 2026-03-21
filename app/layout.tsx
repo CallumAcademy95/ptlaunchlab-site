@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     url: "https://ptlaunchlab.co.uk",
     images: [
       {
-        url: "/podcast-thumbnail.jpg",
-        width: 480,
-        height: 480,
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
         alt: "PT Launch Lab — Become a Qualified Personal Trainer",
       },
     ],
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     title: "PT Launch Lab — Become a Qualified Personal Trainer",
     description:
       "NCFE Level 3 PT qualification, 100% online. Built by gym owners who've hired 500+ trainers. Ofqual regulated, CIMSPA recognised.",
-    images: ["/podcast-thumbnail.jpg"],
+    images: ["/og-image.png"],
   },
 };
 
