@@ -52,6 +52,38 @@ const stats = [
 ];
 
 
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: "PT Launch Lab",
+  url: "https://ptlaunchlab.co.uk",
+  logo: "https://ptlaunchlab.co.uk/logo.png",
+  description: "UK personal trainer qualification academy offering NCFE Level 2 & 3 PT courses online. Ofqual regulated, CIMSPA recognised, founded by gym owners.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Pontefract",
+    addressRegion: "West Yorkshire",
+    postalCode: "WF8",
+    addressCountry: "GB",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 53.6917,
+    longitude: -1.3127,
+  },
+  telephone: "",
+  sameAs: [
+    "https://www.youtube.com/@ptlaunchlab",
+    "https://www.instagram.com/ptlaunchlab",
+  ],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: "17",
+    bestRating: "5",
+  },
+};
+
 const foundersSchema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -78,6 +110,10 @@ const foundersSchema = {
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(foundersSchema) }}

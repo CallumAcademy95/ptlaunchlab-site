@@ -16,6 +16,29 @@ export const metadata: Metadata = {
   title: "PT Launch Lab — Become a Qualified Personal Trainer",
   description:
     "Get your NCFE Level 3 PT qualification online in as little as 8 weeks, with real mentorship and business support to launch your career.",
+  openGraph: {
+    type: "website",
+    siteName: "PT Launch Lab",
+    title: "PT Launch Lab — Become a Qualified Personal Trainer",
+    description:
+      "NCFE Level 3 PT qualification, 100% online. Built by gym owners who've hired 500+ trainers. Ofqual regulated, CIMSPA recognised, guaranteed gym interviews.",
+    url: "https://ptlaunchlab.co.uk",
+    images: [
+      {
+        url: "/podcast-thumbnail.jpg",
+        width: 480,
+        height: 480,
+        alt: "PT Launch Lab — Become a Qualified Personal Trainer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PT Launch Lab — Become a Qualified Personal Trainer",
+    description:
+      "NCFE Level 3 PT qualification, 100% online. Built by gym owners who've hired 500+ trainers. Ofqual regulated, CIMSPA recognised.",
+    images: ["/podcast-thumbnail.jpg"],
+  },
 };
 
 export default function RootLayout({

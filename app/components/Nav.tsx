@@ -41,7 +41,7 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <a href="https://ptlauchlab.merve.online/login" target="_blank" rel="noopener noreferrer" className="text-[#8CA3BF] hover:text-white text-xs transition-colors">
+          <a href="https://ptlaunchlab.merve.online/login" target="_blank" rel="noopener noreferrer" className="text-[#8CA3BF] hover:text-white text-xs transition-colors">
             Existing Students
           </a>
         </div>

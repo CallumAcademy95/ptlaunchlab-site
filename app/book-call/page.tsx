@@ -1,8 +1,11 @@
 import BookCallPage from "./BookCallPage";
 
 export const metadata = {
-  title: "Book a Free Call | PT Launch Lab",
-  description: "Book your free 15-minute consultation call with the PT Launch Lab team.",
+  title: "Book a Free 15-Minute Call — Talk to a PT Expert | PT Launch Lab",
+  description: "Book a free 15-minute call with Callum, Miles or Ryan. No pressure, no script — just an honest conversation about becoming a personal trainer and whether PT Launch Lab is right for you.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/book-call",
+  },
 };
 
 export default function Page() {
