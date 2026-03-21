@@ -1,0 +1,258 @@
+import PodcastPage, { type Episode } from "./PodcastPage";
+
+export const metadata = {
+  title: "The PT Launch Lab Podcast — Real Stories from the Fitness Industry",
+  description: "Watch every episode of the PT Launch Lab podcast. Real stories from personal trainers, gym owners and career changers. New episode every week on YouTube.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/podcast",
+  },
+};
+
+const episodes: Episode[] = [
+  {
+    id: "Z6eogOvRtw0",
+    ep: 28,
+    title: "From ICU Nurse to Fitness Business: Maria's Career Change",
+    desc: "Nurse prescriber Maria shares how she transitioned from intensive care to building a biohacking fitness business.",
+    date: "2026-03",
+    category: "transformation",
+  },
+  {
+    id: "bpESntFMy0w",
+    ep: 27,
+    title: "From Addiction to Full-Time Boxing Coach: Pembo's Story",
+    desc: "Raw conversation on transformation — from army and addiction to community boxing coach and fitness business owner.",
+    date: "2026-02",
+    category: "transformation",
+  },
+  {
+    id: "tgDP_hoObwM",
+    ep: 26,
+    title: "Building a Martial Arts Gym from Scratch — Ty Harrison",
+    desc: "Ty Harrison on the story behind Sengoku Martial Arts, growing kids and adults programmes, and family-first culture.",
+    date: "2026-01",
+    category: "industry",
+  },
+  {
+    id: "C8t9nC2HxOM",
+    ep: 25,
+    title: "World-Class Dancer to Yoga Studio Owner: Laura's Story",
+    desc: "Laura's transition from world-class competitive dancer to launching Vibe Yoga in Pontefract.",
+    date: "2026-01",
+    category: "transformation",
+  },
+  {
+    id: "agtjiOXMKOg",
+    ep: 24,
+    title: "From 46 Stone to Qualified Personal Trainer — Jack Atkinson",
+    desc: "Jack Atkinson's raw, powerful journey battling food addiction and rebuilding confidence to qualify as a personal trainer.",
+    date: "2026-01",
+    category: "transformation",
+  },
+  {
+    id: "70EkHHRizj8",
+    ep: 23,
+    title: "The Reality of Running Multiple Fitness Businesses",
+    desc: "Callum and Ryan on shutting down businesses, launching new ventures, and the real rollercoaster of fitness entrepreneurship.",
+    date: "2026-01",
+    category: "business",
+  },
+  {
+    id: "4jITjBvGXXU",
+    ep: 22,
+    title: "British Powerlifting Champion to Bodybuilding Burnout — Sam Hincks",
+    desc: "Decorated powerlifter and former British & World Champion Sam Hincks on pressure, burnout, and personal evolution in fitness.",
+    date: "2025-12",
+    category: "industry",
+  },
+  {
+    id: "NrV3eqA3S5Q",
+    ep: 21,
+    title: "What Most PTs Get Wrong About Movement — Kim Tomlin",
+    desc: "Biomechanics coach Kim Tomlin on movement, training for health vs aesthetics, and what most personal trainers miss.",
+    date: "2025-12",
+    category: "industry",
+  },
+  {
+    id: "oQhgsNsLd-8",
+    ep: 20,
+    title: "How Max Clark Opened His Own Boxing Gym at 18",
+    desc: "From footballer to dedicated boxer — how Max Clark opened Clark's Boxing Academy in Normanton at just 18 years old.",
+    date: "2025-11",
+    category: "industry",
+  },
+  {
+    id: "gfA-LCPXpBM",
+    ep: 19,
+    title: "Super League Debut to Heart Surgery — Kiel's Story",
+    desc: "Kiel opens up about adversity at every stage — Super League debut, heart surgery, and a pancreatic diagnosis. A story of resilience.",
+    date: "2025-11",
+    category: "transformation",
+  },
+  {
+    id: "8477A4T4HBQ",
+    ep: 16,
+    title: "How to Scale Your PT Business Online — with Miles",
+    desc: "How to become an online personal trainer, find your niche, and real industry insights from Miles, a seasoned fitness professional.",
+    date: "2025-10",
+    category: "business",
+  },
+  {
+    id: "4r_4ZegftMY",
+    ep: 15,
+    title: "From Addiction to Personal Trainer — Marcus, Mean and Clean",
+    desc: "Marcus's raw and honest journey through addiction, recovery, and how he built Mean and Clean around his transformation.",
+    date: "2025-10",
+    category: "transformation",
+  },
+  {
+    id: "d8PxJsyje-o",
+    ep: 14,
+    title: "3 Things I Wish I Knew Before Becoming a Personal Trainer — Luke McCarthy",
+    desc: "Luke McCarthy, Head Hybrid Coach at BoFitFam, on the hard lessons from his fitness career and what he'd do differently.",
+    date: "2025-10",
+    category: "business",
+  },
+  {
+    id: "IDkRUIeXU4E",
+    ep: 13,
+    title: "How Personal Training Made Me a Better Racing Driver — Zak Meakin",
+    desc: "How Zak Meakin bridged motorsport and fitness, and what personal training gave him as a competitive racing driver.",
+    date: "2025-09",
+    category: "industry",
+  },
+  {
+    id: "pAm1jvDKRM0",
+    ep: 12,
+    title: "How Gemma Left Her Corporate Job to Become a Personal Trainer",
+    desc: "Gemma from Saddleworth on leaving a stable corporate career and building a PT business from scratch.",
+    date: "2025-09",
+    category: "transformation",
+  },
+  {
+    id: "ZlZxHBwliIk",
+    ep: 11,
+    title: "How Running Saved Me from Addiction — Matty Bell",
+    desc: "Matty Bell on how running became his recovery tool, and how PT Launch Lab helped him channel that into a career in fitness.",
+    date: "2025-09",
+    category: "transformation",
+  },
+  {
+    id: "S9zcs6P5mn8",
+    ep: 10,
+    title: "Why I Shut Down My £500K Online PT Business — The Honest Story",
+    desc: "Callum and Ryan on Shred Lifestyle — what it was, why it worked, and why they chose to shut it down at its peak.",
+    date: "2025-08",
+    category: "business",
+  },
+  {
+    id: "I1Yrhd9GZZU",
+    ep: 9,
+    title: "How We Scaled PT Launch Lab Courses — with Sam, Merve EdTech",
+    desc: "Sam from Merve EdTech on the intersection of education technology and fitness, and how it changed PT Launch Lab's course delivery.",
+    date: "2025-08",
+    category: "business",
+  },
+  {
+    id: "t8yzdFTxZss",
+    ep: 8,
+    title: "What PureGym Looks for When Hiring Personal Trainers — Mac Livock",
+    desc: "PureGym Regional Manager Mac Livock on career growth, what makes a great PT, and what gym employers actually look for.",
+    date: "2025-08",
+    category: "industry",
+  },
+  {
+    id: "brMSj4dfdBE",
+    ep: 7,
+    title: "Is Becoming a Personal Trainer Still Worth It? The Honest Answer",
+    desc: "Callum and Ryan tackle the question head-on — is the PT market saturated, can you make a real living, and is the career still worth it?",
+    date: "2025-08",
+    category: "business",
+  },
+  {
+    id: "1HK7woXEWhI",
+    ep: 6,
+    title: "How I Built an Online PT Business to £500K — Ryan's Full Story",
+    desc: "Ryan goes back to the beginning — how he built an online PT business from nothing to £500K, and what he'd do differently.",
+    date: "2025-07",
+    category: "business",
+  },
+  {
+    id: "0rhp9fkBFsU",
+    ep: null,
+    title: "Sick of the 9–5? How to Build a Fitness Career You Actually Want",
+    desc: "How to become an online personal trainer with full mentorship — and why escaping the rat race through fitness is more achievable than you think.",
+    date: "2025-10",
+    category: "business",
+  },
+  {
+    id: "CDR39D_Esg8",
+    ep: null,
+    title: "Good Clients vs Nightmare Clients — What Every PT Needs to Know",
+    desc: "Callum and Ryan break down the difference between great clients and difficult ones — and how to attract the right people from day one.",
+    date: "2025-07",
+    category: "business",
+  },
+  {
+    id: "gqp9Grs1rF0",
+    ep: null,
+    title: "Will AI Replace Personal Trainers? The Honest Answer",
+    desc: "A genuine look at AI in personal training — where it helps, where it falls short, and why the human element will never be replaced.",
+    date: "2025-07",
+    category: "business",
+  },
+  {
+    id: "LlPK2PzCrRA",
+    ep: null,
+    title: "The Brutal Reality of a Personal Trainer's Working Hours",
+    desc: "The unsociable hours, the grind, and the reality of being a PT that nobody talks about — honest takes from people who've lived it.",
+    date: "2025-07",
+    category: "business",
+  },
+  {
+    id: "of0Zf6Jscgo",
+    ep: null,
+    title: "Why Most Fitness Influencers Are Lying to You",
+    desc: "Callum and Ryan on the problem with fitness influencer culture — and how to pick real role models when you're building a PT career.",
+    date: "2025-07",
+    category: "industry",
+  },
+];
+
+const podcastSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "PT Launch Lab Podcast Episodes",
+  description: "Real stories from personal trainers, gym owners and career changers. New episode every week.",
+  url: "https://ptlaunchlab.co.uk/podcast",
+  itemListElement: episodes.map((ep, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "VideoObject",
+      name: ep.title,
+      description: ep.desc,
+      thumbnailUrl: `https://i.ytimg.com/vi/${ep.id}/hqdefault.jpg`,
+      uploadDate: `${ep.date}-01`,
+      url: `https://www.youtube.com/watch?v=${ep.id}`,
+      embedUrl: `https://www.youtube.com/embed/${ep.id}`,
+      publisher: {
+        "@type": "Organization",
+        name: "PT Launch Lab",
+        url: "https://ptlaunchlab.co.uk",
+      },
+    },
+  })),
+};
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastSchema) }}
+      />
+      <PodcastPage episodes={episodes} />
+    </>
+  );
+}
