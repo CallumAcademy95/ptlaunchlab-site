@@ -15,6 +15,7 @@ import ConversionSection from "@/app/components/ConversionSection";
 import FAQ from "@/app/components/FAQ";
 import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
+import StickyMobileCTA from "@/app/components/StickyMobileCTA";
 import LocationContext from "@/app/components/LocationContext";
 import { ukLocations, priorityLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
@@ -61,6 +62,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
         <FinalCTA />
       </main>
       <Footer />
+      <StickyMobileCTA />
     </>
   );
 }

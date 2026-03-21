@@ -154,6 +154,11 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
           href="https://success.signup-lauchlab.co.uk/"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => {
+            if (typeof window !== 'undefined' && (window as any).fbq) {
+              (window as any).fbq('track', 'Schedule');
+            }
+          }}
           className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
         >
           Book Your Free Strategy Call →

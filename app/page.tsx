@@ -15,6 +15,7 @@ import ConversionSection from "./components/ConversionSection";
 import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
+import StickyMobileCTA from "./components/StickyMobileCTA";
 
 export const metadata: Metadata = {
   alternates: {
@@ -110,6 +111,7 @@ export default function Home() {
         <FinalCTA />
       </main>
       <Footer />
+      <StickyMobileCTA />
     </>
   );
 }

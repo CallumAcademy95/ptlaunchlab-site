@@ -24,22 +24,23 @@ export default function FinalCTA() {
           Every month you wait is another month you&apos;re not earning in a career you love. If we can get you qualified in 8–16 weeks, around your current job, with guaranteed gym interviews at the end — is there a reason not to start?
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <a
-            href="/enrol"
-            onClick={() => trackEvent('enrol_click', { location: 'final_cta' })}
-            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
-          >
-            Secure Your Place →
-          </a>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
           <a
             href="/book-call"
             onClick={() => trackEvent('book_call_click', { location: 'final_cta' })}
+            className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+          >
+            Book a Free Call →
+          </a>
+          <a
+            href="/enrol"
+            onClick={() => trackEvent('enrol_click', { location: 'final_cta' })}
             className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
           >
-            Prefer to talk first? Book a free call
+            Start Today
           </a>
         </div>
+        <p className="text-[#4A6280] text-xs mb-8">Free 15-min call · No pressure · Straight answers</p>
 
         <p className="text-[#4A6280] text-xs">
           NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Personal Tutor Included · Guaranteed Gym Interviews · Study in 8–16 Weeks

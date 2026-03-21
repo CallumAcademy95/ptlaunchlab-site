@@ -40,20 +40,25 @@ export default function Hero() {
             </p>
 
             {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8 md:mb-10 animate-fade-in-up animate-delay-200">
-              <a
-                href="/enrol"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
-              >
-                Secure Your Place →
-              </a>
+            <div className="flex flex-col sm:flex-row gap-3 mb-4 animate-fade-in-up animate-delay-200">
               <a
                 href="/book-call"
+                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
+              >
+                Book a Free Call →
+              </a>
+              <a
+                href="/enrol"
                 className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center"
               >
-                Book a Free Call First
+                Start Today
               </a>
             </div>
+
+            {/* Urgency line */}
+            <p className="text-blue-200/60 text-xs mb-6 animate-fade-in-up animate-delay-200">
+              Free 15-min call · No pressure · Tutor assigned within 24 hours of enrolling
+            </p>
 
             {/* Trust bar */}
             <div className="flex flex-wrap gap-3 md:gap-5 text-blue-200/70 text-xs animate-fade-in-up animate-delay-300">
