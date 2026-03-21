@@ -48,6 +48,33 @@ const courseSchema = {
       repeatFrequency: "P1W",
     },
   },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "5.0",
+    reviewCount: "17",
+    bestRating: "5",
+    worstRating: "1",
+  },
+  review: [
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Gemma" },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody: "Left a corporate career to build her own independent PT business. Now coaching full-time on her own terms. The business training and mentorship made all the difference.",
+    },
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Matty" },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody: "Turned a personal journey through adversity into a running and coaching brand that's still growing. PT Launch Lab gave me the foundation and the confidence to do it.",
+    },
+    {
+      "@type": "Review",
+      author: { "@type": "Person", name: "Mac" },
+      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+      reviewBody: "Started as a trainee and rose to manager at PureGym. The guaranteed gym interviews and mentorship got me in the door — I did the rest.",
+    },
+  ],
 };
 
 const curriculum = [

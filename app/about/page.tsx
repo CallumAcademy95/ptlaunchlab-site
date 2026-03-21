@@ -52,9 +52,36 @@ const stats = [
 ];
 
 
+const foundersSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: "Callum Brown",
+      jobTitle: "Co-Founder & Educator",
+      worksFor: { "@type": "Organization", name: "PT Launch Lab", url: "https://ptlaunchlab.co.uk" },
+      url: "https://ptlaunchlab.co.uk/about",
+      sameAs: ["https://www.youtube.com/@ptlaunchlab", "https://www.instagram.com/ptlaunchlab"],
+      description: "Co-founder of PT Launch Lab and experienced personal trainer and gym owner. Has hired 500+ personal trainers and built a fitness business generating over £500K in revenue.",
+    },
+    {
+      "@type": "Person",
+      name: "Ryan Robinson",
+      jobTitle: "Co-Founder",
+      worksFor: { "@type": "Organization", name: "PT Launch Lab", url: "https://ptlaunchlab.co.uk" },
+      url: "https://ptlaunchlab.co.uk/about",
+      description: "Co-founder of PT Launch Lab with 30+ years combined experience in the UK fitness industry as a gym owner and personal trainer.",
+    },
+  ],
+};
+
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(foundersSchema) }}
+      />
       <Nav />
       <main className="pt-[72px]">
 

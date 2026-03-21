@@ -15,6 +15,7 @@ import ConversionSection from "@/app/components/ConversionSection";
 import FAQ from "@/app/components/FAQ";
 import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
+import LocationContext from "@/app/components/LocationContext";
 import { ukLocations, priorityLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
 export const dynamicParams = true;
@@ -44,6 +45,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
       <Nav />
       <main>
         <LocationHero location={loc.name} headline="Career Change to Personal Trainer in {location}.|Quit the job you hate. Build the career you want." />
+        <LocationContext locationSlug={loc.slug} locationName={loc.name} region={loc.region} />
         <PainPoints />
         <Reframe />
         <FounderStory />

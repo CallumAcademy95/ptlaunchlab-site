@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
 import Nav from "./components/Nav";
-
-export const metadata: Metadata = {
-  alternates: {
-    canonical: "https://ptlaunchlab.co.uk",
-  },
-};
 import Hero from "./components/Hero";
 import PainPoints from "./components/PainPoints";
 import Reframe from "./components/Reframe";
@@ -22,9 +16,82 @@ import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
 
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk",
+  },
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is the Level 3 PT qualification recognised by gyms and insurers?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. The NCFE Level 2 & 3 qualification from PT Launch Lab is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym and insurance provider will accept it.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long does it take to become a qualified personal trainer?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Most students complete the NCFE Level 2 & 3 Personal Trainer qualification in 4–8 weeks studying part-time. The course is 100% online and self-paced, so you study around your current job.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How much does the PT Launch Lab course cost?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The course costs £1,399 for full payment (saving £200) or £599 deposit followed by 5 monthly payments of £200. Finance is also available via Payl8r over 12–18 months.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I study for a personal trainer qualification while working full-time?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes — this is the most common situation our students are in. The course is 100% online with no fixed class times. Most students study in evenings and weekends and qualify in 8–12 weeks.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is the guaranteed gym interview?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "On completion of your qualification, PT Launch Lab makes direct introductions to gym employers in our network who are actively hiring PTs. These are warm introductions — not job board listings. Our founders have hired 500+ PTs and use those relationships to get you in front of the right people.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How much can I earn as a personal trainer in the UK?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "A PT working in a gym on an employed basis typically earns £20,000–£28,000 to start. Self-employed PTs who build their own client base regularly earn £35,000–£50,000+. PT Launch Lab's business training is specifically designed to accelerate you to the upper range.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "When can I start the PT Launch Lab course?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Immediately. As soon as you enrol you get full access to the course and your personal tutor is introduced within 24 hours. There is no waiting for a cohort start date.",
+      },
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Nav />
       <main>
         <Hero />
