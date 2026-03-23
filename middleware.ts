@@ -13,22 +13,32 @@ import type { NextRequest } from "next/server";
 
 // Map old first-path-segment → new first-path-segment
 const SLUG_REDIRECTS: Record<string, string> = {
-  "personal-trainer-courses":                "level-3-personal-trainer-course",
-  "personal-training-courses":               "level-3-personal-trainer-course",
-  "personal-trainer-course":                 "personal-trainer-course-with-business-support",
-  "flexible-personal-trainer-course-uk":     "flexible-personal-trainer-course",
-  "best-online-personal-trainer-course-uk":  "best-online-personal-trainer-course",
-  "pt-course-payment-plan-uk":               "pt-course-payment-plan",
-  "pt-courses":                              "pt-course",
-  "online-personal-trainer":                 "online-personal-training-course",
-  "ncfe-level-3-personal-training-course":   "ncfe-level-3-pt-qualification",
-  "become-a-qualified-personal-trainer-uk":  "become-a-qualified-personal-trainer",
+  // Old site URL patterns
+  "personal-trainer-courses":                    "level-3-personal-trainer-course",
+  "personal-training-courses":                   "level-3-personal-trainer-course",
+  "personal-trainer-course":                     "personal-trainer-course-with-business-support",
+  "flexible-personal-trainer-course-uk":         "flexible-personal-trainer-course",
+  "best-online-personal-trainer-course-uk":      "best-online-personal-trainer-course",
+  "pt-course-payment-plan-uk":                   "pt-course-payment-plan",
+  "pt-courses":                                  "pt-course",
+  "online-personal-trainer":                     "online-personal-training-course",
+  "ncfe-level-3-personal-training-course":       "ncfe-level-3-pt-qualification",
+  "become-a-qualified-personal-trainer-uk":      "become-a-qualified-personal-trainer",
+  // Old URL variants without an app directory
+  "quit-9-5-become-a-personal-trainer":          "personal-trainer-course-with-business-support",
+  "how-to-become-an-online-personal-trainer":    "how-to-become-a-personal-trainer",
+  "how-to-become-a-personal-trainer-uk-online":  "how-to-become-a-personal-trainer",
+  "change-career-to-fitness-uk":                 "career-change-personal-trainer",
+  "online-pt-qualification":                     "online-pt-qualification-uk",
+  "personal-trainer-courses-for-career-change":  "career-change-personal-trainer",
+  "start-your-own-personal-training-business-uk": "start-your-own-personal-training-business",
+  "pt-courses-that-include-business-training":   "pt-courses-with-business-training",
+  "personal-training-course-business-support":   "personal-training-course-with-business-support",
 };
 
 // Base routes that exist only as /[slug]/[location] with no root page.tsx
-const BASE_ONLY_REDIRECTS: Record<string, string> = {
-  "quit-9-5-become-a-personal-trainer": "/personal-trainer-course-with-business-support",
-};
+// (kept for any legacy references — main redirects now handled in SLUG_REDIRECTS)
+const BASE_ONLY_REDIRECTS: Record<string, string> = {};
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

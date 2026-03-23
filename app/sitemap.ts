@@ -56,14 +56,22 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/self-employed-personal-trainer-uk`,   priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
 ];
 
+// Only routes that have an actual root page.tsx (not just [location] sub-routes)
+const routesWithRootPage = new Set([
+  "best-personal-trainer-course-uk",
+  "personal-trainer-course-with-business-support",
+]);
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Keyword root pages (no location)
-  const keywordRoots: MetadataRoute.Sitemap = keywordRoutes.map((route) => ({
-    url: `${BASE}/${route}`,
-    priority: 0.8,
-    changeFrequency: "monthly" as const,
-    lastModified: TODAY,
-  }));
+  // Keyword root pages — only include if a root page.tsx actually exists
+  const keywordRoots: MetadataRoute.Sitemap = keywordRoutes
+    .filter((route) => routesWithRootPage.has(route))
+    .map((route) => ({
+      url: `${BASE}/${route}`,
+      priority: 0.8,
+      changeFrequency: "monthly" as const,
+      lastModified: TODAY,
+    }));
 
   // All keyword + location combinations
   const locationPages: MetadataRoute.Sitemap = keywordRoutes.flatMap((route) =>
