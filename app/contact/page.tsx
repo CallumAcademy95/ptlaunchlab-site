@@ -164,7 +164,7 @@ export default function ContactPage() {
             <p className="text-[#8CA3BF] text-sm mb-6">Looking for something specific?</p>
             <div className="flex flex-wrap justify-center gap-4">
               <a href="/courses" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">View the Course</a>
-              <a href="/book-call" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Book a Free Call</a>
+              <a href="/book-call" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Discover Your Pathway</a>
               <a href="/quiz" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Take the Free Quiz</a>
               <a href="/enrol" className="px-5 py-2.5 rounded-full border border-[#3B82F6]/40 text-[#8CA3BF] text-sm hover:border-[#F5C518] hover:text-[#F5C518] transition-all">Enrol Now</a>
             </div>

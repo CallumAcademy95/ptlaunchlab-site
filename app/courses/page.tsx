@@ -192,7 +192,7 @@ export default function CoursesPage() {
               </a>
               <a href="/book-call"
                 className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-base hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
-                Book a Free Call
+                Discover Your Pathway
               </a>
             </div>
           </div>
@@ -373,7 +373,7 @@ export default function CoursesPage() {
               </a>
               <a href="/book-call"
                 className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
-                Book a Free Call
+                Discover Your Pathway
               </a>
             </div>
           </div>

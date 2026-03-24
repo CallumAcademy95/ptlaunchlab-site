@@ -19,7 +19,7 @@ export default function StickyMobileCTA() {
         href="/book-call"
         className="flex-1 text-center py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
       >
-        Book a Free Call →
+        Discover Your Pathway →
       </a>
       <a
         href="/enrol"

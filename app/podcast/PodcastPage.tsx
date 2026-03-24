@@ -182,7 +182,7 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                 href="/book-call"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
               >
-                Book a Free Call →
+                Discover Your Pathway →
               </a>
               <a
                 href="/courses"

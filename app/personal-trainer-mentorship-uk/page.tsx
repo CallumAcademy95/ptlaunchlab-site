@@ -46,7 +46,7 @@ export default function Page() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>
-                  <a href="/book-call" className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">Book a Free Call</a>
+                  <a href="/book-call" className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">Discover Your Pathway</a>
                 </div>
                 <div className="flex flex-wrap gap-3 text-blue-200/70 text-xs">
                   <span>⭐ 5-Star Rated</span><span className="opacity-40">·</span>

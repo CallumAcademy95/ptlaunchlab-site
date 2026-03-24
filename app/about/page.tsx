@@ -144,7 +144,7 @@ export default function AboutPage() {
                 </a>
                 <a href="/book-call"
                   className="px-7 py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-sm hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
-                  Book a Free Call
+                  Discover Your Pathway
                 </a>
               </div>
             </div>
@@ -272,7 +272,7 @@ export default function AboutPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/book-call"
                 className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
-                Book a Free Call →
+                Discover Your Pathway →
               </a>
               <a href="/courses"
                 className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
