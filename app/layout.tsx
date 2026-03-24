@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
+import Chatbot from "./components/Chatbot";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -96,6 +97,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
           strategy="afterInteractive"
         />
         {children}
+        <Chatbot />
         <Analytics />
         {/* 3. Google Analytics 4 — loads after consent is established */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-90W2KGSL55" strategy="afterInteractive" />
