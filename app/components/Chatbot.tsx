@@ -1,32 +1,40 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-type Message = { role: "user" | "assistant"; content: string; actions?: string[] };
+type Message =
+  | { role: "user"; content: string }
+  | { role: "assistant"; blocks: string[]; actions: string[] };
 
-const OPENER = "Hey! I'm here to help with any questions about PT Launch Lab — the course, pricing, how it works, anything. What would you like to know?";
-
-const ACTION_CONFIG: Record<string, { label: string; href: string; icon: string }> = {
-  quiz:      { label: "Take the Quiz",          href: "/quiz",       icon: "✦" },
-  call:      { label: "Talk to the Team",        href: "/book-call",  icon: "📞" },
-  whatsapp:  { label: "WhatsApp us",             href: "https://wa.me/447822012186", icon: "💬" },
+const OPENER: Message = {
+  role: "assistant",
+  blocks: ["Hey! I'm here to help with any questions about PT Launch Lab — the course, pricing, how it works, anything. What would you like to know?"],
+  actions: [],
 };
 
-function parseMessage(raw: string): { text: string; actions: string[] } {
+const ACTION_CONFIG: Record<string, { label: string; href: string; icon: string }> = {
+  quiz:     { label: "Take the Quiz",   href: "/quiz",                      icon: "✦" },
+  call:     { label: "Talk to the Team", href: "/book-call",                icon: "📞" },
+  whatsapp: { label: "WhatsApp us",     href: "https://wa.me/447822012186", icon: "💬" },
+};
+
+function parseRaw(raw: string): { blocks: string[]; actions: string[] } {
   const actionRegex = /\[ACTION:(quiz|call|whatsapp)\]/g;
   const actions: string[] = [];
   let match;
   while ((match = actionRegex.exec(raw)) !== null) {
     if (!actions.includes(match[1])) actions.push(match[1]);
   }
-  const text = raw.replace(/\[ACTION:(quiz|call|whatsapp)\]/g, "").trim();
-  return { text, actions };
+  const cleaned = raw.replace(/\[ACTION:(quiz|call|whatsapp)\]/g, "").trim();
+  const blocks = cleaned
+    .split(/\[BREAK\]/)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  return { blocks: blocks.length ? blocks : [""], actions };
 }
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: OPENER },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([OPENER]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -39,7 +47,13 @@ export default function Chatbot() {
     const text = input.trim();
     if (!text || loading) return;
 
-    const apiMessages = messages.map(m => ({ role: m.role, content: m.content }));
+    // Build API-safe history from current messages
+    const apiMessages = messages.map((m) =>
+      m.role === "user"
+        ? { role: "user" as const, content: m.content }
+        : { role: "assistant" as const, content: m.blocks.join(" ") }
+    );
+
     const next: Message[] = [...messages, { role: "user", content: text }];
     setMessages(next);
     setInput("");
@@ -53,7 +67,7 @@ export default function Chatbot() {
       });
 
       if (!res.ok || !res.body) {
-        setMessages([...next, { role: "assistant", content: "Sorry, something went wrong. You can book a free call or WhatsApp us directly.", actions: ["call", "whatsapp"] }]);
+        setMessages([...next, { role: "assistant", blocks: ["Sorry, something went wrong. You can reach us directly below."], actions: ["call", "whatsapp"] }]);
         setLoading(false);
         return;
       }
@@ -62,17 +76,17 @@ export default function Chatbot() {
       const decoder = new TextDecoder();
       let raw = "";
 
-      setMessages([...next, { role: "assistant", content: "", actions: [] }]);
+      setMessages([...next, { role: "assistant", blocks: [""], actions: [] }]);
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         raw += decoder.decode(value, { stream: true });
-        const { text: parsed, actions } = parseMessage(raw);
-        setMessages([...next, { role: "assistant", content: parsed, actions }]);
+        const { blocks, actions } = parseRaw(raw);
+        setMessages([...next, { role: "assistant", blocks, actions }]);
       }
     } catch {
-      setMessages([...next, { role: "assistant", content: "Sorry, something went wrong. You can book a free call or WhatsApp us directly.", actions: ["call", "whatsapp"] }]);
+      setMessages([...next, { role: "assistant", blocks: ["Sorry, something went wrong. You can reach us directly below."], actions: ["call", "whatsapp"] }]);
     }
 
     setLoading(false);
@@ -120,51 +134,65 @@ export default function Chatbot() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
-                <div
-                  className="max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
-                  style={
-                    m.role === "user"
-                      ? { background: "#F5C518", color: "#072B4A", borderBottomRightRadius: "4px" }
-                      : { background: "#0D3559", color: "#CBD5E1", border: "1px solid rgba(59,130,246,0.2)", borderBottomLeftRadius: "4px" }
-                  }
-                >
-                  {m.content || (
-                    <span className="flex gap-1 items-center h-4">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "150ms" }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "300ms" }} />
-                    </span>
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1.5">
+            {messages.map((m, i) => {
+              if (m.role === "user") {
+                return (
+                  <div key={i} className="flex justify-end">
+                    <div
+                      className="max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
+                      style={{ background: "#F5C518", color: "#072B4A", borderBottomRightRadius: "4px" }}
+                    >
+                      {m.content}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={i} className="flex flex-col items-start gap-1.5">
+                  {m.blocks.map((block, bi) => (
+                    <div
+                      key={bi}
+                      className="max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
+                      style={{ background: "#0D3559", color: "#CBD5E1", border: "1px solid rgba(59,130,246,0.2)", borderBottomLeftRadius: bi === m.blocks.length - 1 ? "4px" : "16px" }}
+                    >
+                      {block || (
+                        <span className="flex gap-1 items-center h-4">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#8CA3BF] animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </span>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Action buttons */}
+                  {m.actions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {m.actions.map((action) => {
+                        const cfg = ACTION_CONFIG[action];
+                        if (!cfg) return null;
+                        const isExternal = cfg.href.startsWith("http");
+                        return (
+                          <a
+                            key={action}
+                            href={cfg.href}
+                            target={isExternal ? "_blank" : undefined}
+                            rel={isExternal ? "noopener noreferrer" : undefined}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:brightness-110"
+                            style={{ background: "#F5C518", color: "#072B4A" }}
+                          >
+                            <span>{cfg.icon}</span>
+                            {cfg.label}
+                          </a>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
-
-                {/* Action buttons */}
-                {m.role === "assistant" && m.actions && m.actions.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2 max-w-[85%]">
-                    {m.actions.map((action) => {
-                      const cfg = ACTION_CONFIG[action];
-                      if (!cfg) return null;
-                      const isExternal = cfg.href.startsWith("http");
-                      return (
-                        <a
-                          key={action}
-                          href={cfg.href}
-                          target={isExternal ? "_blank" : undefined}
-                          rel={isExternal ? "noopener noreferrer" : undefined}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:brightness-110"
-                          style={{ background: "#F5C518", color: "#072B4A" }}
-                        >
-                          <span>{cfg.icon}</span>
-                          {cfg.label}
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
             <div ref={bottomRef} />
           </div>
 
