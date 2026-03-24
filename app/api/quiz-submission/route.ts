@@ -46,6 +46,16 @@ export async function POST(request: NextRequest) {
       console.warn('[quiz-submission] QUIZ_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
 
+    // Add to nurture sequence starting day 7 (after Miles' warmup emails finish)
+    const emailServerUrl = process.env.EMAIL_SERVER_URL;
+    if (emailServerUrl) {
+      fetch(`${emailServerUrl}/leads/new`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, source: 'quiz', quizResult: resultLabels[result] ?? result }),
+      }).catch(err => console.error('[quiz] email server error:', err));
+    }
+
     // Trigger Claude warming email sequence (non-blocking)
     const baseUrl = request.nextUrl.origin;
     fetch(`${baseUrl}/api/send-warmup-email`, {

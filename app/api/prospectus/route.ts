@@ -37,6 +37,16 @@ export async function POST(request: NextRequest) {
       console.warn('[prospectus] PROSPECTUS_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
 
+    // Add to email nurture sequence (non-blocking)
+    const emailServerUrl = process.env.EMAIL_SERVER_URL;
+    if (emailServerUrl) {
+      fetch(`${emailServerUrl}/leads/new`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, source: 'prospectus' }),
+      }).catch(err => console.error('[prospectus] email server error:', err));
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('[prospectus]', err);
