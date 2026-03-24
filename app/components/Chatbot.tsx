@@ -1,9 +1,26 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-type Message = { role: "user" | "assistant"; content: string };
+type Message = { role: "user" | "assistant"; content: string; actions?: string[] };
 
 const OPENER = "Hey! I'm here to help with any questions about PT Launch Lab — the course, pricing, how it works, anything. What would you like to know?";
+
+const ACTION_CONFIG: Record<string, { label: string; href: string; icon: string }> = {
+  quiz:      { label: "Take the Quiz",          href: "/quiz",       icon: "✦" },
+  call:      { label: "Talk to the Team",        href: "/book-call",  icon: "📞" },
+  whatsapp:  { label: "WhatsApp us",             href: "https://wa.me/447822012186", icon: "💬" },
+};
+
+function parseMessage(raw: string): { text: string; actions: string[] } {
+  const actionRegex = /\[ACTION:(quiz|call|whatsapp)\]/g;
+  const actions: string[] = [];
+  let match;
+  while ((match = actionRegex.exec(raw)) !== null) {
+    if (!actions.includes(match[1])) actions.push(match[1]);
+  }
+  const text = raw.replace(/\[ACTION:(quiz|call|whatsapp)\]/g, "").trim();
+  return { text, actions };
+}
 
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
@@ -22,30 +39,40 @@ export default function Chatbot() {
     const text = input.trim();
     if (!text || loading) return;
 
+    const apiMessages = messages.map(m => ({ role: m.role, content: m.content }));
     const next: Message[] = [...messages, { role: "user", content: text }];
     setMessages(next);
     setInput("");
     setLoading(true);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: next }),
-    });
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...apiMessages, { role: "user", content: text }] }),
+      });
 
-    if (!res.body) { setLoading(false); return; }
+      if (!res.ok || !res.body) {
+        setMessages([...next, { role: "assistant", content: "Sorry, something went wrong. You can book a free call or WhatsApp us directly.", actions: ["call", "whatsapp"] }]);
+        setLoading(false);
+        return;
+      }
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let reply = "";
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let raw = "";
 
-    setMessages([...next, { role: "assistant", content: "" }]);
+      setMessages([...next, { role: "assistant", content: "", actions: [] }]);
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      reply += decoder.decode(value, { stream: true });
-      setMessages([...next, { role: "assistant", content: reply }]);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        raw += decoder.decode(value, { stream: true });
+        const { text: parsed, actions } = parseMessage(raw);
+        setMessages([...next, { role: "assistant", content: parsed, actions }]);
+      }
+    } catch {
+      setMessages([...next, { role: "assistant", content: "Sorry, something went wrong. You can book a free call or WhatsApp us directly.", actions: ["call", "whatsapp"] }]);
     }
 
     setLoading(false);
@@ -76,10 +103,10 @@ export default function Chatbot() {
       {open && (
         <div
           className="fixed bottom-24 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] flex flex-col rounded-2xl overflow-hidden shadow-2xl"
-          style={{ height: "460px", background: "#072B4A", border: "1px solid rgba(59,130,246,0.25)" }}
+          style={{ height: "480px", background: "#072B4A", border: "1px solid rgba(59,130,246,0.25)" }}
         >
           {/* Header */}
-          <div className="px-5 py-4 flex items-center gap-3" style={{ background: "#0D3559", borderBottom: "1px solid rgba(59,130,246,0.2)" }}>
+          <div className="px-5 py-4 flex items-center gap-3 shrink-0" style={{ background: "#0D3559", borderBottom: "1px solid rgba(59,130,246,0.2)" }}>
             <div className="w-9 h-9 rounded-full bg-[#F5C518] flex items-center justify-center shrink-0">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#072B4A">
                 <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
@@ -95,7 +122,7 @@ export default function Chatbot() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
                 <div
                   className="max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
                   style={
@@ -112,13 +139,37 @@ export default function Chatbot() {
                     </span>
                   )}
                 </div>
+
+                {/* Action buttons */}
+                {m.role === "assistant" && m.actions && m.actions.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2 max-w-[85%]">
+                    {m.actions.map((action) => {
+                      const cfg = ACTION_CONFIG[action];
+                      if (!cfg) return null;
+                      const isExternal = cfg.href.startsWith("http");
+                      return (
+                        <a
+                          key={action}
+                          href={cfg.href}
+                          target={isExternal ? "_blank" : undefined}
+                          rel={isExternal ? "noopener noreferrer" : undefined}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:brightness-110"
+                          style={{ background: "#F5C518", color: "#072B4A" }}
+                        >
+                          <span>{cfg.icon}</span>
+                          {cfg.label}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={bottomRef} />
           </div>
 
           {/* Input */}
-          <div className="px-3 py-3" style={{ borderTop: "1px solid rgba(59,130,246,0.2)", background: "#0D3559" }}>
+          <div className="px-3 py-3 shrink-0" style={{ borderTop: "1px solid rgba(59,130,246,0.2)", background: "#0D3559" }}>
             <div className="flex gap-2 items-center bg-[#072B4A] rounded-xl px-3 py-2" style={{ border: "1px solid rgba(59,130,246,0.25)" }}>
               <input
                 className="flex-1 bg-transparent text-white text-sm outline-none placeholder:text-[#8CA3BF]"
@@ -133,8 +184,9 @@ export default function Chatbot() {
                 disabled={loading || !input.trim()}
                 className="w-8 h-8 rounded-lg bg-[#F5C518] flex items-center justify-center shrink-0 disabled:opacity-40 hover:brightness-110 transition-all"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#072B4A">
-                  <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="#072B4A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#072B4A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
               </button>
             </div>
