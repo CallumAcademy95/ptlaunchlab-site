@@ -54,7 +54,7 @@ Write Email 1 of 3 in a nurture sequence. This email:
 - Acknowledges what they said in the quiz and their motivations and fears
 - Reinforces why the ${path.title} path is right for them specifically
 - Briefly explains what PT Launch Lab does and why it's different (mentorship plus qualification plus guaranteed gym interviews, built by PTs who've done £500K independently)
-- Has two CTAs at the end: first, watch the free 90 Day PT Plan on YouTube (${VIDEO_URL}), second, book a free strategy call (${CALL_URL})
+- End with a natural sentence directing them to the two buttons below the email: one to watch the free 90 Day PT Plan on YouTube, one to book a free strategy call. Do not write out any URLs. Just reference them naturally as "the buttons below" or "the links below".
 - Ends with a personal sign-off from Miles
 
 IMPORTANT WRITING RULES:
@@ -74,8 +74,7 @@ Body: plain paragraphs separated by blank lines. No HTML. No dashes of any kind.
 This email lands on Day 2. It should:
 - Open with a short story about a real client who was in the same position as ${firstName} (similar fears: ${path.fear}) and how it worked out for them. Make the story feel real and specific. Give the person a name, a before and after.
 - Connect the story back to ${firstName}'s situation naturally
-- Remind them the free 90 Day PT Plan video is on YouTube: ${VIDEO_URL}
-- Also include the book a call link: ${CALL_URL}
+- End by directing them to the two buttons below the email: the free 90 Day PT Plan video and the book a call option. Do not write out any URLs. Reference them as "the links below" or "the buttons below".
 - No hard sell
 
 IMPORTANT WRITING RULES:
@@ -96,7 +95,7 @@ This email lands on Day 4. It is the direct ask. It should:
 - Be honest: the call is 15 minutes, it is free, there is no pressure to do anything
 - Tell them exactly what happens on the call: we look at where they are, where they want to be, and whether we are the right fit to help. If we are not, we will say so.
 - Address the most likely objection for their path (${path.fear}) directly and briefly
-- Two CTAs: watch the YouTube video first if they haven't (${VIDEO_URL}), then book the call (${CALL_URL})
+- End by pointing them to the two buttons below the email: the free 90 Day PT Plan video and the strategy call. Do not write out any URLs. Just say something like "both links are below".
 - If they are not ready that is fine but don't let uncertainty make the decision for them
 - Sign off from Miles
 
@@ -121,11 +120,14 @@ Body: plain paragraphs separated by blank lines. No HTML. No dashes of any kind.
   const text = (response.content[0] as any).text;
   const json = JSON.parse(text.match(/\{[\s\S]*\}/)?.[0] || '{}');
 
-  // Strip any remaining dashes Claude might have snuck in
+  // Strip any remaining dashes or raw URLs Claude might have snuck in
   const cleanBody = (json.body as string)
-    .replace(/\u2014/g, ' ')   // em dash
-    .replace(/\u2013/g, ' ')   // en dash
-    .replace(/ - /g, ' ')      // spaced hyphen
+    .replace(/\u2014/g, ' ')               // em dash
+    .replace(/\u2013/g, ' ')               // en dash
+    .replace(/ - /g, ' ')                  // spaced hyphen
+    .replace(/https?:\/\/\S+/g, '')        // raw URLs — buttons handle these
+    .replace(/\s{2,}/g, ' ')               // collapse double spaces left behind
+    .trim()
 
   // Convert plain text body to simple HTML with CTA buttons
   const html = `
