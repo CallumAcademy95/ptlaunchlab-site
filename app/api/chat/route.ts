@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const rateLimiter = createRateLimiter(20, 60_000); // 20 requests per minute per IP
 
 const SYSTEM_PROMPT = `You are a friendly advisor for PT Launch Lab — a UK online personal trainer qualification. Think of yourself as a helpful mate who knows the course inside out, not a salesperson.
 
@@ -50,7 +53,21 @@ Finance is available too if you need to spread it further.
 Never mid-message. Never explain the tags.`;
 
 export async function POST(req: Request) {
+  if (!rateLimiter(getIP(req))) {
+    return new Response("Too many requests", { status: 429 });
+  }
+
   const { messages } = await req.json();
+
+  // Validate message structure to prevent API abuse
+  if (!Array.isArray(messages) || messages.length > 30) {
+    return new Response("Bad request", { status: 400 });
+  }
+  for (const msg of messages) {
+    if (typeof msg?.content !== "string" || msg.content.length > 2000) {
+      return new Response("Bad request", { status: 400 });
+    }
+  }
 
   const stream = await client.messages.stream({
     model: "claude-haiku-4-5-20251001",

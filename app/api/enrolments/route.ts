@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -7,7 +8,12 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID;
 const GA4_API_SECRET = process.env.GA4_API_SECRET;
 
+const rateLimiter = createRateLimiter(3, 60_000); // 3 submissions per minute per IP
+
 export async function POST(req: NextRequest) {
+  if (!rateLimiter(getIP(req))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   try {
     const body = await req.json();
     const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename } = body;

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
 // Forwards quiz leads to Zapier → Google Sheets
 // ─────────────────────────────────────────────────────────────────────────────
+
+const rateLimiter = createRateLimiter(5, 60_000); // 5 submissions per minute per IP
 
 const resultLabels: Record<string, string> = {
   onFloor:          'On-Floor PT Path',
@@ -13,6 +16,10 @@ const resultLabels: Record<string, string> = {
 };
 
 export async function POST(request: NextRequest) {
+  if (!rateLimiter(getIP(request))) {
+    return NextResponse.json({ success: false, error: 'Too many requests.' }, { status: 429 });
+  }
+
   try {
     const body = await request.json();
     const { name, phone, email, result, answers } = body;

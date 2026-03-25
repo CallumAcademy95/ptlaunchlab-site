@@ -114,7 +114,8 @@ export default function TermsPage() {
           content: (
             <>
               {p("The PT Launch Lab programme leads to the NCFE Level 2 Certificate in Gym Instructing and Level 3 Certificate in Personal Training. These qualifications are regulated by Ofqual and recognised by CIMSPA and REPs.")}
-              {p("Qualification registration is subject to the learner providing a valid National Insurance number and meeting the entry requirements. PT Launch Lab acts as the approved centre for NCFE registration.")}
+              {p("PT Launch Lab is the business mentorship and education provider for this programme. The NCFE-accredited delivery centre is Ultimate Shred Academy (NCFE Centre Number: 9002788). Ultimate Shred Academy and PT Launch Lab share the same directors and operate under the same organisation. Learner registrations with NCFE are processed through Ultimate Shred Academy as the approved centre.")}
+              {p("Qualification registration is subject to the learner providing a valid National Insurance number and meeting the entry requirements.")}
               {p("Certificates are issued by NCFE upon successful completion of all required assessments and coursework. PT Launch Lab does not guarantee the outcome of any assessment.")}
             </>
           ),

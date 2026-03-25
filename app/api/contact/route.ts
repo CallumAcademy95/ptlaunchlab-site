@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/contact
 // Forwards contact form submissions to Zapier → Google Sheets
 // ─────────────────────────────────────────────────────────────────────────────
 
+const rateLimiter = createRateLimiter(5, 60_000); // 5 submissions per minute per IP
+
 export async function POST(request: NextRequest) {
+  if (!rateLimiter(getIP(request))) {
+    return NextResponse.json({ success: false, error: 'Too many requests.' }, { status: 429 });
+  }
   try {
     const body = await request.json();
     const { name, email, phone, message } = body;

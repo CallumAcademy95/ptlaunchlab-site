@@ -54,8 +54,11 @@ export default function Footer() {
 
         {/* Bottom row */}
         <div className="border-t border-[#3B82F6]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[#4A6280] text-xs">
-          <p>© 2026 PT Launch Lab. All rights reserved.</p>
-          <div className="flex gap-5">
+          <div className="flex flex-col gap-1 text-center sm:text-left">
+            <p>© 2026 PT Launch Lab. All rights reserved.</p>
+            <p>PT Launch Lab is the business mentorship provider. NCFE qualifications are delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.</p>
+          </div>
+          <div className="flex gap-5 shrink-0">
             <a href="/terms" className="hover:text-white transition-colors">Terms & Conditions</a>
             <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
           </div>
