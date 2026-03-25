@@ -20,6 +20,7 @@ import LocationContext from "@/app/components/LocationContext";
 import { priorityLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
 export const dynamicParams = true;
+export const revalidate = false;
 
 export async function generateStaticParams() {
   return priorityLocations.map((l) => ({ location: l.slug }));
