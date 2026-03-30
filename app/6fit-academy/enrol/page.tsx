@@ -16,10 +16,10 @@ const SIXFIT_PARTNER = {
     "6FITPTDISCOUNT": {
       label: "6fit Member Discount",
       discountAmount: 200,
-      fullPrice: 1199,
-      depositPrice: 399,
+      fullPrice: 1399,
+      depositPrice: 599,
       fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/28E14h8UM4563Ym6MqfEk0a",
+      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
     },
   },
 };
