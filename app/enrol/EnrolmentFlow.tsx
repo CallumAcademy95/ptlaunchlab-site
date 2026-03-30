@@ -511,6 +511,13 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
           {/* ═══════════════════════════════════════════════════════════════ */}
           {step === 2 && (
             <div className="space-y-6">
+              {partner?.gymReferral ? (
+                // Referral source is known — no need to ask, just confirm visually
+                <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl px-5 py-4 flex items-center gap-3">
+                  <span className="text-[#F5C518] text-sm">✔</span>
+                  <p className="text-[#8CA3BF] text-sm">Referred by <span className="text-white font-semibold">{partner.gymReferral}</span></p>
+                </div>
+              ) : (
               <Card title="How You Found Us">
                 <Field label="How did you hear about PT Launch Lab?" required error={errors.heardAbout}>
                   <select value={learning.heardAbout} onChange={e => setLn({ ...learning, heardAbout: e.target.value })} className={sel}>
@@ -519,6 +526,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   </select>
                 </Field>
               </Card>
+              )}
 
               <Card title="Qualifications">
                 <Field label="Highest qualification achieved" required error={errors.highestQualification}>
