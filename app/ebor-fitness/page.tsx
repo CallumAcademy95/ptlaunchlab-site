@@ -33,18 +33,19 @@ const config: GymConfig = {
 
   // ── Why this gym (4 stat boxes)
   stats: [
-    { value: "York", label: "City Centre Location" },
-    { value: "5★",   label: "Member Rated" },
-    { value: "Pro",  label: "Premium Equipment" },
-    { value: "L2+3", label: "PT Qualification" },
+    { value: "2006", label: "Est. by competitive bodybuilders" },
+    { value: "🔨",   label: "Official Hammer Strength Center" },
+    { value: "24/7", label: "Open all day, every day" },
+    { value: "Pro",  label: "Athletes, footballers & fighters" },
   ],
 
   // ── Why this gym (bullet list)
   gymHighlights: [
-    "Based in the heart of York — one of the UK's most sought-after cities",
-    "Premium facilities on Hospital Fields Road",
-    "A professional coaching environment with high standards",
-    "Strong local member community — perfect for building a PT client base",
+    "Official Hammer Strength Center — one of only a few elite gyms in the UK",
+    "Founded by Mr Universe 2013 & NABBA Pro Stuart Garrington",
+    "Preferred by professional footballers, England cricketers and MMA fighters",
+    "24 hours / 7 days a week — train on your schedule",
+    "World-class equipment and an unmatched training environment in York",
   ],
 
   // ── SEO
