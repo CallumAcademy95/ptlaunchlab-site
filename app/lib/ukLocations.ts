@@ -493,46 +493,37 @@ export const ukLocations: UKLocation[] = [
 // Priority locations for static generation (keyword campaign targets + major UK cities)
 // All other locations still work via dynamicParams = true (rendered on demand)
 export const priorityLocations = ukLocations.filter(l => [
-  // Yorkshire
+  // Yorkshire (core market — keep all)
   "leeds", "bradford", "wakefield", "huddersfield", "halifax", "pontefract",
   "normanton", "castleford", "dewsbury", "batley", "morley", "ossett",
-  "horsforth", "shipley", "bingley", "keighley", "guiseley", "yeadon",
-  "otley", "ilkley", "wetherby", "hebden-bridge", "todmorden", "elland",
+  "horsforth", "shipley", "bingley", "keighley", "hebden-bridge",
   "brighouse", "sowerby-bridge", "heckmondwike", "cleckheaton", "holmfirth",
-  "knottingley", "featherstone", "goole", "pocklington",
+  "knottingley", "featherstone",
   // East Yorkshire
-  "hull", "kingston-upon-hull", "east-hull", "west-hull", "beverley",
-  "hornsea", "withernsea", "willerby", "anlaby", "hessle", "market-weighton",
-  "brough", "driffield", "bridlington",
+  "hull", "beverley", "hessle", "bridlington", "driffield", "goole",
   // South/North Yorkshire
   "sheffield", "rotherham", "barnsley", "doncaster", "york", "harrogate",
   "scarborough",
-  // North West
-  "manchester", "liverpool", "bolton", "wigan", "warrington", "rochdale",
-  "blackpool", "burnley", "lancaster", "preston", "salford", "stockport",
-  // Scotland
-  "glasgow", "edinburgh", "aberdeen", "dundee", "inverness", "stirling",
-  "perth", "livingston", "falkirk", "motherwell", "paisley", "kilmarnock",
-  "scotland",
-  // Wales
-  "cardiff", "swansea", "newport", "wrexham", "bridgend", "carmarthen",
-  "aberystwyth", "rhyl", "llandudno", "bangor", "bangor-wales", "merthyr-tydfil",
-  "wales",
-  // Midlands
-  "birmingham", "coventry", "nottingham", "derby", "leicester", "northampton",
-  "stoke-on-trent", "wolverhampton", "loughborough", "midlands",
-  // South East
-  "london", "brighton", "maidstone", "crawley", "oxford", "guildford",
-  "central-london",
-  // South West
-  "bristol", "exeter", "plymouth", "bath", "cheltenham", "gloucester",
-  "swindon", "torquay", "yeovil", "south-west-england",
+  // North West (major cities only)
+  "manchester", "liverpool", "bolton", "wigan", "warrington",
+  "blackpool", "preston", "salford", "stockport",
+  // Scotland (major cities only)
+  "glasgow", "edinburgh", "aberdeen", "dundee", "inverness", "scotland",
+  // Wales (major cities only)
+  "cardiff", "swansea", "newport", "wrexham", "wales",
+  // Midlands (major cities only)
+  "birmingham", "coventry", "nottingham", "derby", "leicester",
+  "stoke-on-trent", "wolverhampton", "midlands",
+  // South East (major cities only)
+  "london", "brighton", "oxford", "guildford", "central-london",
+  // South West (major cities only)
+  "bristol", "exeter", "plymouth", "bath", "cheltenham", "south-west-england",
   // East England
   "cambridge", "norwich", "ipswich", "peterborough", "luton", "milton-keynes",
   // North East
-  "newcastle-upon-tyne", "sunderland", "middlesbrough", "gateshead", "durham",
+  "newcastle-upon-tyne", "sunderland", "middlesbrough", "durham",
   // Other keyword targets
-  "southampton", "chester", "telford", "shrewsbury",
+  "southampton", "chester",
   // Regions
   "yorkshire", "east-yorkshire", "west-yorkshire", "north-west-england",
 ].includes(l.slug));

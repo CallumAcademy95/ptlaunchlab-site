@@ -43,6 +43,16 @@ const BASE_ONLY_REDIRECTS: Record<string, string> = {};
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Redirect .vercel.app domain to canonical domain to prevent duplicate content
+  // and avoid separate ISR cache entries being generated for the preview URL
+  const host = request.headers.get("host") ?? "";
+  if (host.includes("vercel.app")) {
+    const url = request.nextUrl.clone();
+    url.host = "ptlaunchlab.co.uk";
+    url.protocol = "https:";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
   // Redirect base-only routes that have no root page.tsx (exact match, no location)
   const exactSlug = pathname.replace(/^\//, "").toLowerCase();
   const baseRedirect = BASE_ONLY_REDIRECTS[exactSlug];
