@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename } = body;
+    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename, gymReferral, promoCode, discountApplied } = body;
 
     if (!l?.fullName || !l?.email) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
       gcse_maths:            ln.gcseMaths   || "N/A",
       gcse_ict:              ln.gcseICT     || "N/A",
       employment_status:     ln.employmentStatus,
+      gym_referral:          gymReferral      || "",
+      promo_code:            promoCode        || "",
+      discount_applied:      discountApplied  ? `£${discountApplied}` : "",
       signature_type:        a.signatureType,
       signed_at:             new Date(a.signedAt).toLocaleString("en-GB", { timeZone: "Europe/London" }),
       details_accurate:      a.checkboxes.detailsAccurate      ? "Yes" : "No",

@@ -18,8 +18,8 @@ const SIXFIT_PARTNER = {
       discountAmount: 200,
       fullPrice: 1199,
       depositPrice: 399,
-      fullStripeLink:    "REPLACE_WITH_6FIT_FULL_PAYMENT_STRIPE_LINK",
-      depositStripeLink: "REPLACE_WITH_6FIT_DEPOSIT_STRIPE_LINK",
+      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
+      depositStripeLink: "https://buy.stripe.com/28E14h8UM4563Ym6MqfEk0a",
     },
   },
 };
