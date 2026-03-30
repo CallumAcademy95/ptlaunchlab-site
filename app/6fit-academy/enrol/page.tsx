@@ -3,15 +3,13 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | 6fit PT Academy",
-  description:
-    "Enrol in the 6fit PT Academy and claim your £200 exclusive discount. Level 2 & 3 Personal Training qualification with mentorship included.",
-  robots: { index: false }, // Partner enrol pages excluded from index
+  description: "Claim your £200 6fit member discount and start your Level 2 & 3 PT qualification today.",
+  robots: { index: false },
 };
 
 // ─── 6fit partner config ──────────────────────────────────────────────────────
-// TODO: Once you have created the £1,199 full-payment Stripe link and the
-//       £399 deposit Stripe link for the discounted 6fit pricing, replace
-//       the placeholder strings below with the real Stripe URLs.
+// TODO: Replace placeholder Stripe links with real discounted payment links
+// once created in your Stripe dashboard (£1,199 full / £399 deposit).
 const SIXFIT_PARTNER = {
   gymReferral: "6fit Gyms",
   promoCodes: {
@@ -20,12 +18,50 @@ const SIXFIT_PARTNER = {
       discountAmount: 200,
       fullPrice: 1199,
       depositPrice: 399,
-      fullStripeLink:    "REPLACE_WITH_6FIT_FULL_PAYMENT_STRIPE_LINK",    // TODO
-      depositStripeLink: "REPLACE_WITH_6FIT_DEPOSIT_STRIPE_LINK",         // TODO
+      fullStripeLink:    "REPLACE_WITH_6FIT_FULL_PAYMENT_STRIPE_LINK",
+      depositStripeLink: "REPLACE_WITH_6FIT_DEPOSIT_STRIPE_LINK",
     },
   },
 };
 
 export default function SixFitEnrolPage() {
-  return <EnrolmentFlow partner={SIXFIT_PARTNER} />;
+  return (
+    <div className="min-h-screen bg-[#061F36]">
+      {/* Branded top bar — replaces Nav */}
+      <div className="bg-black border-b border-white/10 px-6 py-4">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://6fitgyms.co.uk/wp-content/uploads/2022/12/6fit_FF-02.png"
+              alt="6fit Gyms"
+              width={36}
+              height={36}
+              className="rounded-lg"
+            />
+            <div>
+              <p className="text-white font-black text-sm uppercase leading-none">6fit PT Academy</p>
+              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+            </div>
+          </div>
+          <div className="bg-[#ed0000] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+            £200 Off Applied
+          </div>
+        </div>
+      </div>
+
+      {/* Enrolment flow — referral pre-set, promo available */}
+      <EnrolmentFlow partner={SIXFIT_PARTNER} standalone />
+
+      {/* Minimal footer */}
+      <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">
+        <p className="text-[#4A6280] text-xs">
+          PT Launch Lab · NCFE Accredited Centre No. 9002788 ·{" "}
+          <a href="/terms" className="hover:text-[#8CA3BF] transition-colors">Terms</a>
+          {" "}·{" "}
+          <a href="/privacy" className="hover:text-[#8CA3BF] transition-colors">Privacy</a>
+        </p>
+      </div>
+    </div>
+  );
 }

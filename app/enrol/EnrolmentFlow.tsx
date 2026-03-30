@@ -153,7 +153,7 @@ function Check({ checked, onChange, error, children }: {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function EnrolmentFlow({ partner }: { partner?: PartnerConfig }) {
+export default function EnrolmentFlow({ partner, standalone }: { partner?: PartnerConfig; standalone?: boolean }) {
   const [step, setStep]         = useState<Step>(1);
   const [learner, setL]         = useState<LearnerDetails>(blankLearner);
   const [learning, setLn]       = useState<LearningDetails>({
@@ -379,8 +379,8 @@ export default function EnrolmentFlow({ partner }: { partner?: PartnerConfig }) 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <>
-      <Nav />
-      <main className="pt-[72px] min-h-screen bg-[#061F36]">
+      {!standalone && <Nav />}
+      <main className={`${standalone ? "" : "pt-[72px]"} min-h-screen bg-[#061F36]`}>
         <div className="max-w-2xl mx-auto px-5 py-16">
 
           {/* Page header */}
@@ -841,7 +841,7 @@ export default function EnrolmentFlow({ partner }: { partner?: PartnerConfig }) 
 
         </div>
       </main>
-      <Footer />
+      {!standalone && <Footer />}
     </>
   );
 }
