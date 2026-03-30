@@ -6,7 +6,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
 // ─── CONFIGURATION — replace these placeholders before going live ─────────────
-const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/bJecMZ4Ew6de52q4EifEk09";
+const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const TERMS_URL                 = "/terms";
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";       // TODO: Support email
@@ -760,7 +760,9 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                     <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,599</p>
                   )}
                   <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> {activePromo ? `Save £${(1599 - activePromo.fullPrice).toLocaleString()}` : "Save £200"}</li>
+                    {activePromo && (
+                      <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Save £{(1599 - activePromo.fullPrice).toLocaleString()}</li>
+                    )}
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Immediate course access</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> One single payment</li>
                   </ul>
