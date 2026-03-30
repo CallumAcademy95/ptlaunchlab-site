@@ -13,6 +13,20 @@ const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";       // TODO: Suppo
 const SUPPORT_PHONE             = "01977 365001";
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Partner config (passed in from gym-specific enrol pages) ─────────────────
+export interface PartnerConfig {
+  gymReferral: string;          // e.g. "6fit Gyms"
+  promoCodes: Record<string, { // key = code (uppercase), value = discount config
+    label: string;              // e.g. "6fit Member Discount"
+    discountAmount: number;     // e.g. 200
+    fullPrice: number;          // discounted full price e.g. 1199
+    depositPrice: number;       // discounted deposit e.g. 399
+    fullStripeLink: string;     // Stripe link for discounted full payment
+    depositStripeLink: string;  // Stripe link for discounted deposit
+  }>;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface LearnerDetails {
   title: string; fullName: string; dateOfBirth: string; gender: string;
@@ -139,15 +153,21 @@ function Check({ checked, onChange, error, children }: {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function EnrolmentFlow() {
+export default function EnrolmentFlow({ partner }: { partner?: PartnerConfig }) {
   const [step, setStep]         = useState<Step>(1);
   const [learner, setL]         = useState<LearnerDetails>(blankLearner);
-  const [learning, setLn]       = useState<LearningDetails>(blankLearning);
+  const [learning, setLn]       = useState<LearningDetails>({
+    ...blankLearning,
+    heardAbout: partner?.gymReferral ? `${partner.gymReferral} (Gym Referral)` : "",
+  });
   const [agreement, setA]       = useState<AgreementState>(blankAgreement);
   const [errors, setErrors]     = useState<Record<string, string>>({});
   const [signMode, setSignMode] = useState<"drawn" | "typed">("drawn");
   const [submitting, setSubmitting] = useState(false);
   const [typedSig, setTypedSig] = useState("");
+  const [promoInput, setPromoInput]   = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError]   = useState("");
   const canvasRef               = useRef<HTMLCanvasElement>(null);
   const isDrawing               = useRef(false);
   const lastPos                 = useRef<{ x: number; y: number } | null>(null);
@@ -221,6 +241,18 @@ export default function EnrolmentFlow() {
     if (signMode === "typed") return typedSig.trim();
     return canvasRef.current?.toDataURL("image/png") ?? "";
   }
+
+  // ─── Promo code ────────────────────────────────────────────────────────────
+  function applyPromo() {
+    const code = promoInput.trim().toUpperCase();
+    if (partner?.promoCodes[code]) {
+      setAppliedPromo(code);
+      setPromoError("");
+    } else {
+      setPromoError("Invalid promo code — please check and try again.");
+    }
+  }
+  const activePromo = appliedPromo ? partner?.promoCodes[appliedPromo] : null;
 
   // ─── Validation ────────────────────────────────────────────────────────────
   function v1() {
@@ -302,6 +334,8 @@ export default function EnrolmentFlow() {
       paymentChoice: type,
       submittedAt: new Date().toISOString(),
       source: "website-enrolment-flow-v1",
+      ...(partner?.gymReferral  && { gymReferral: partner.gymReferral }),
+      ...(appliedPromo           && { promoCode: appliedPromo, discountApplied: activePromo?.discountAmount }),
     };
 
     // Persist locally as backup
@@ -334,8 +368,10 @@ export default function EnrolmentFlow() {
       console.warn("Enrolment API call failed — continuing to payment.");
     }
 
-    trackEvent('enrol_complete', { payment_type: type });
-    window.location.href = type === "full" ? FULL_PAYMENT_STRIPE_LINK : DEPOSIT_STRIPE_LINK;
+    trackEvent('enrol_complete', { payment_type: type, promo: appliedPromo ?? undefined });
+    const fullLink    = activePromo?.fullStripeLink    ?? FULL_PAYMENT_STRIPE_LINK;
+    const depositLink = activePromo?.depositStripeLink ?? DEPOSIT_STRIPE_LINK;
+    window.location.href = type === "full" ? fullLink : depositLink;
   }
 
   const firstName = learner.fullName.split(" ")[0];
@@ -659,6 +695,44 @@ export default function EnrolmentFlow() {
                 </p>
               </div>
 
+              {/* Promo code — only shown if partner config has promoCodes */}
+              {partner?.promoCodes && (
+                <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-xl p-4">
+                  {appliedPromo && activePromo ? (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[#F5C518] font-bold text-sm">
+                          ✓ {activePromo.label} applied — £{activePromo.discountAmount} off
+                        </p>
+                        <p className="text-[#8CA3BF] text-xs mt-0.5">Discount reflected in prices below</p>
+                      </div>
+                      <button onClick={() => { setAppliedPromo(null); setPromoInput(""); }} className="text-[#3A5A7C] text-xs hover:text-[#8CA3BF] transition-colors">
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-[#8CA3BF] text-sm mb-2 font-semibold">Have a promo code?</p>
+                      <div className="flex gap-2">
+                        <input
+                          value={promoInput}
+                          onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                          placeholder="Enter code"
+                          className="flex-1 bg-[#061F36] border border-[#1A3A5C] rounded-lg px-3 py-2 text-white placeholder-[#2A4A6C] text-sm focus:outline-none focus:border-[#F5C518]/50 transition-colors uppercase"
+                        />
+                        <button
+                          onClick={applyPromo}
+                          className="px-4 py-2 rounded-lg bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Payment options */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full payment */}
@@ -666,14 +740,21 @@ export default function EnrolmentFlow() {
                   className="bg-[#0A2A44] border-2 border-[#F5C518]/50 hover:border-[#F5C518] hover:bg-[#F5C518]/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                   <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
                   <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
-                  <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,399</p>
+                  {activePromo ? (
+                    <div className="mb-3">
+                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£1,399</p>
+                      <p className="text-[#F5C518] text-4xl font-bold leading-none">£{activePromo.fullPrice.toLocaleString()}</p>
+                    </div>
+                  ) : (
+                    <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,399</p>
+                  )}
                   <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Save £200</li>
+                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> {activePromo ? `Save £${200 + activePromo.discountAmount}` : "Save £200"}</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Immediate course access</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> One single payment</li>
                   </ul>
                   <div className="w-full py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                    {submitting ? "Preparing your documents…" : "Pay £1,399 →"}
+                    {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.fullPrice.toLocaleString() : "1,399"} →`}
                   </div>
                 </button>
 
@@ -682,7 +763,14 @@ export default function EnrolmentFlow() {
                   className="bg-[#0A2A44] border-2 border-[#1A3A5C] hover:border-[#F5C518]/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                   <p className="text-[#8CA3BF] text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
                   <p className="text-white font-bold text-2xl mb-1">Deposit Plan</p>
-                  <p className="text-[#F5C518] text-4xl font-bold mb-1">£599</p>
+                  {activePromo ? (
+                    <div className="mb-1">
+                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£599</p>
+                      <p className="text-[#F5C518] text-4xl font-bold leading-none">£{activePromo.depositPrice}</p>
+                    </div>
+                  ) : (
+                    <p className="text-[#F5C518] text-4xl font-bold mb-1">£599</p>
+                  )}
                   <p className="text-[#8CA3BF] text-xs mb-3">then £200 × 5 monthly payments</p>
                   <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Start today with a deposit</li>
@@ -690,7 +778,7 @@ export default function EnrolmentFlow() {
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Full access from day one</li>
                   </ul>
                   <div className="w-full py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-bold text-sm text-center group-hover:bg-[#F5C518]/10 transition-all">
-                    {submitting ? "Preparing your documents…" : "Pay £599 Deposit →"}
+                    {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.depositPrice : "599"} Deposit →`}
                   </div>
                 </button>
               </div>
