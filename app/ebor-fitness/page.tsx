@@ -10,7 +10,7 @@ const config: GymConfig = {
 
   // ── Branding
   primaryColor: "#3a4a3c",
-  heroBg: "#3a4a3c",
+  heroBg: "#111111",
 
   // ── Hero copy
   heroHeadline: [
