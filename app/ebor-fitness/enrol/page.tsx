@@ -18,8 +18,8 @@ const PARTNER: PartnerConfig = {
       discountAmount: 200,
       fullPrice: 1399,
       depositPrice: 599,
-      fullStripeLink:    "REPLACE_WITH_STRIPE_FULL_LINK",
-      depositStripeLink: "REPLACE_WITH_STRIPE_DEPOSIT_LINK",
+      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
+      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
     },
   },
 };

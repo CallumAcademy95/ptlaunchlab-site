@@ -28,8 +28,8 @@ const config: GymConfig = {
   depositPrice: 599,
 
   // ── Stripe (add links once created in Stripe dashboard)
-  stripeFullLink:    "REPLACE_WITH_STRIPE_FULL_LINK",
-  stripeDepositLink: "REPLACE_WITH_STRIPE_DEPOSIT_LINK",
+  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
+  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 
   // ── Why this gym (4 stat boxes)
   stats: [
