@@ -45,7 +45,7 @@ export default function SixFitEnrolPage() {
             </div>
           </div>
           <div className="bg-[#ed0000] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            £200 Off Applied
+            6FITPTDISCOUNT
           </div>
         </div>
       </div>

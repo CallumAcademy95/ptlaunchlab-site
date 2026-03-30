@@ -259,7 +259,7 @@ export default function SixFitAcademyPage() {
               style={{ color: R }}>
               Apply Now →
             </a>
-            <p className="text-white/50 text-xs">Use code <span className="text-white font-bold">6FITPTDISCOUNT</span> at checkout</p>
+            <p className="text-white/50 text-xs">Enter code <span className="text-white font-bold">6FITPTDISCOUNT</span> at Stripe checkout to apply your £200 discount</p>
           </div>
         </section>
 

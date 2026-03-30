@@ -704,7 +704,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                         <p className="text-[#F5C518] font-bold text-sm">
                           ✓ {activePromo.label} applied — £{activePromo.discountAmount} off
                         </p>
-                        <p className="text-[#8CA3BF] text-xs mt-0.5">Discount reflected in prices below</p>
+                        <p className="text-[#8CA3BF] text-xs mt-0.5">Enter this code at Stripe checkout to apply your discount</p>
                       </div>
                       <button onClick={() => { setAppliedPromo(null); setPromoInput(""); }} className="text-[#3A5A7C] text-xs hover:text-[#8CA3BF] transition-colors">
                         Remove
