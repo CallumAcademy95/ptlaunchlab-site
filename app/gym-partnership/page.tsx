@@ -1,644 +1,386 @@
-"use client";
-import { useState } from "react";
+import type { Metadata } from "next";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
+import PartnershipForm from "./PartnershipForm";
 
-const checkItems = (items: string[], color: string = "text-[#F5C518]") =>
-  items.map((item) => (
-    <li key={item} className="flex items-start gap-3 text-sm">
-      <span className={`${color} font-bold mt-0.5 shrink-0`}>✔</span>
-      <span className="text-white">{item}</span>
-    </li>
-  ));
+export const metadata: Metadata = {
+  title: "Gym Partnership Programme | PT Launch Lab — Earn £500 Per Learner",
+  description:
+    "Turn your gym into its own white-label PT academy. Earn £500 per learner, build a steady pipeline of qualified PTs, and increase rental income — with zero admin.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/gym-partnership",
+  },
+  openGraph: {
+    title: "Gym Partnership Programme | PT Launch Lab",
+    description:
+      "Earn £500 per learner. Get your own white-label PT academy. We handle education, compliance & mentorship — you keep the revenue.",
+    url: "https://ptlaunchlab.co.uk/gym-partnership",
+  },
+};
 
-const crossItems = (items: string[]) =>
-  items.map((item) => (
-    <li key={item} className="flex items-start gap-3 text-sm">
-      <span className="text-red-400 font-bold mt-0.5 shrink-0">✗</span>
-      <span className="text-[#8CA3BF]">{item}</span>
-    </li>
-  ));
+const partnershipSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "PT Launch Lab Gym Partnership Programme",
+  description:
+    "A white-label personal trainer academy programme for commercial gyms. Partner gyms earn £500 per learner, receive a branded PT academy, and build a consistent pipeline of qualified personal trainers.",
+  provider: {
+    "@type": "Organization",
+    name: "PT Launch Lab",
+    url: "https://ptlaunchlab.co.uk",
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "United Kingdom",
+  },
+  offers: {
+    "@type": "Offer",
+    description: "£500 referral fee per learner enrolled through your gym",
+    price: "0",
+    priceCurrency: "GBP",
+    eligibleCustomerType: "https://schema.org/Business",
+  },
+};
 
-function ApplicationForm() {
-  const [form, setForm] = useState({
-    gymName: "", name: "", email: "", phone: "", location: "", gymSize: "",
-  });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/gym-partnership", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      setStatus(data.success ? "success" : "error");
-    } catch {
-      setStatus("error");
-    }
-  };
-
-  if (status === "success") {
-    return (
-      <div className="text-center py-10">
-        <div className="text-5xl mb-4">🎉</div>
-        <h3 className="text-2xl font-bold text-white mb-3">Application Received</h3>
-        <p className="text-[#8CA3BF] max-w-md mx-auto">
-          We&apos;ll review your application and be in touch within 24 hours to discuss your gym&apos;s partnership opportunity.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Gym Name <span className="text-[#F5C518]">*</span>
-          </label>
-          <input
-            name="gymName"
-            value={form.gymName}
-            onChange={handleChange}
-            required
-            placeholder="e.g. Iron Wolf Gym"
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Your Name <span className="text-[#F5C518]">*</span>
-          </label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            placeholder="First & last name"
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Email <span className="text-[#F5C518]">*</span>
-          </label>
-          <input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            placeholder="you@yourgym.com"
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Phone <span className="text-[#F5C518]">*</span>
-          </label>
-          <input
-            name="phone"
-            type="tel"
-            value={form.phone}
-            onChange={handleChange}
-            required
-            placeholder="07700 000000"
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Gym Location / Town <span className="text-[#F5C518]">*</span>
-          </label>
-          <input
-            name="location"
-            value={form.location}
-            onChange={handleChange}
-            required
-            placeholder="e.g. Leeds, Yorkshire"
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors"
-          />
-        </div>
-        <div>
-          <label className="block text-[#8CA3BF] text-xs font-semibold mb-1.5 uppercase tracking-wide">
-            Approximate Membership Size
-          </label>
-          <select
-            name="gymSize"
-            value={form.gymSize}
-            onChange={handleChange}
-            className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors appearance-none"
-          >
-            <option value="">Select size (optional)</option>
-            <option value="Under 100">Under 100 members</option>
-            <option value="100–300">100–300 members</option>
-            <option value="300–600">300–600 members</option>
-            <option value="600–1000">600–1,000 members</option>
-            <option value="1000+">1,000+ members</option>
-          </select>
-        </div>
-      </div>
-
-      {status === "error" && (
-        <p className="text-red-400 text-sm text-center">Something went wrong. Please try again or email us directly.</p>
-      )}
-
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-      >
-        {status === "loading" ? "Submitting..." : "Apply to Secure Your Area Now →"}
-      </button>
-      <p className="text-[#4A6280] text-xs text-center">
-        We only take one partner gym per area. Applications reviewed within 24 hours.
-      </p>
-    </form>
-  );
-}
+const STEPS = [
+  { n: "01", title: "Join the Partnership", body: "Apply below — we review your gym and confirm your area." },
+  { n: "02", title: "We Build Your Academy", body: "Your white-label PT academy is set up with your branding, logo and link." },
+  { n: "03", title: "Promote It In Your Gym", body: "Display your QR code and link on-site and across your socials." },
+  { n: "04", title: "Earn Front & Back End", body: "£500 per enrolment upfront. PT rent and membership long-term." },
+];
 
 export default function GymPartnershipPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(partnershipSchema) }}
+      />
       <Nav />
       <main className="pt-[72px]">
 
-        {/* ── HERO ── */}
-        <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden">
-          <div className="absolute -left-48 top-20 w-[600px] h-[600px] rounded-full bg-[#F5C518] opacity-[0.07] blur-3xl pointer-events-none" />
-          <div className="absolute -right-32 top-40 w-[500px] h-[500px] rounded-full bg-[#60A5FA] opacity-[0.10] blur-3xl pointer-events-none" />
+        {/* ── HERO ──────────────────────────────────── */}
+        <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden">
+          <div className="absolute -left-64 top-0 w-[700px] h-[700px] rounded-full bg-[#F5C518] opacity-[0.06] blur-3xl pointer-events-none" />
+          <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-[#60A5FA] opacity-[0.08] blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-4xl mx-auto px-6 py-16 md:py-24 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-6">
-              <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">
-                Gym Partnership Programme · PT Launch Lab
-              </span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.1] mb-6">
-              Turn Your Gym Into
-              <br />
-              <span className="text-[#F5C518]">Its Own PT Academy</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white font-semibold mb-4">
-              Earn £500 Per Learner — Without Doing Any Teaching, Admin, Or Courses
-            </p>
-
-            <p className="text-blue-100/70 text-base md:text-lg mb-4 max-w-2xl mx-auto">
-              Never worry about recruiting personal trainers again.
-              Never run PT courses yourself. Never waste time interviewing unqualified applicants.
-            </p>
-
-            <p className="text-white font-semibold text-base md:text-lg mb-10">
-              We build, run, and manage your fully white-label PT academy inside your gym.<br />
-              You earn upfront cash + long-term rental income.
-            </p>
-
-            {/* Trust bar */}
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-blue-100/80 mb-10">
-              {[
-                "£500 per learner paid to your gym",
-                "Fully white-label branded academy",
-                "We handle all education & compliance",
-                "You get qualified PTs ready to work",
-                "No cost, no staff, no hassle",
-              ].map((item) => (
-                <span key={item} className="flex items-center gap-1.5">
-                  <span className="text-[#F5C518]">✔</span> {item}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="#apply"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30"
-              >
-                Apply to Secure Your Area →
-              </a>
-              <a
-                href="#how-it-works"
-                className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all"
-              >
-                See How It Works
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE PROBLEM ── */}
-        <section className="bg-[#0D3559] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3 text-center">The Problem</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-              You know that thing where…
-            </h2>
-            <p className="text-[#8CA3BF] text-center mb-12 max-w-xl mx-auto">Most gyms struggle to keep a steady pipeline of good trainers.</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              <div className="bg-[#072B4A] rounded-2xl p-6 border border-[#3B82F6]/15">
-                <ul className="space-y-3">
-                  {checkItems([
-                    "You need more PTs but no one good applies",
-                    "PT quality is inconsistent",
-                    "You waste hours interviewing people who aren't ready",
-                    "Floor space sits empty with no rental income",
-                    "Running your own course is too much work",
-                    "You don't want the risk or compliance",
-                  ])}
-                </ul>
-              </div>
-              <div className="bg-[#072B4A] rounded-2xl p-6 border border-[#3B82F6]/15 flex flex-col justify-between">
-                <div>
-                  <p className="text-white font-semibold mb-4">So you either…</p>
-                  <ul className="space-y-3 mb-8">
-                    {crossItems([
-                      "Recruit constantly",
-                      "Accept low quality",
-                      "Lose rental income",
-                      "Or do nothing",
-                    ])}
-                  </ul>
-                </div>
-                <div className="border-t border-[#3B82F6]/20 pt-6">
-                  <p className="text-[#F5C518] font-bold text-xl">We fix that.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── THE SOLUTION ── */}
-        <section className="bg-[#072B4A] py-16 md:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[400px] rounded-full bg-[#F5C518] opacity-[0.04] blur-3xl" />
-          </div>
-          <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">The Solution</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              The PT Launch Lab Gym Partnership
-            </h2>
-            <p className="text-[#8CA3BF] text-lg mb-10 max-w-2xl mx-auto">
-              We build your gym its own white-label PT academy. You promote it inside your gym. We handle everything else.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-              {[
-                { title: "You earn on the front end", body: "£500 per learner, paid to your gym" },
-                { title: "You earn on the back end", body: "PT rent, membership & coaching revenue" },
-                { title: "You get a constant supply", body: "Qualified PTs who already know your gym" },
-              ].map((c) => (
-                <div key={c.title} className="bg-[#0D3559] border border-[#F5C518]/20 rounded-2xl p-6 text-center">
-                  <p className="text-[#F5C518] font-bold text-base mb-2">{c.title}</p>
-                  <p className="text-[#8CA3BF] text-sm">{c.body}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-white font-bold text-xl">And it costs you nothing.</p>
-          </div>
-        </section>
-
-        {/* ── HOW YOU MAKE MONEY ── */}
-        <section className="bg-[#0D3559] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3 text-center">Revenue</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-              How You Make Money
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Front end */}
-              <div className="bg-[#072B4A] border-2 border-[#F5C518]/60 rounded-2xl p-8 shadow-xl shadow-[#F5C518]/10">
-                <div className="text-3xl mb-4">💰</div>
-                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">Front End</p>
-                <h3 className="text-white text-2xl font-bold mb-2">You get paid</h3>
-                <p className="text-[#F5C518] text-4xl font-bold mb-4">£500</p>
-                <p className="text-[#8CA3BF] text-sm mb-6">per learner who enrols through your gym</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "Paid directly to the gym",
-                    "No teaching required",
-                    "No work required",
-                  ])}
-                </ul>
+          <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 w-full">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518] animate-pulse" />
+                <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">Gym Partnership Programme</span>
               </div>
 
-              {/* Back end */}
-              <div className="bg-[#072B4A] border-2 border-[#3B82F6]/60 rounded-2xl p-8 shadow-xl shadow-[#3B82F6]/10">
-                <div className="text-3xl mb-4">📈</div>
-                <p className="text-[#3B82F6] text-xs font-bold tracking-widest uppercase mb-3">Back End</p>
-                <h3 className="text-white text-2xl font-bold mb-4">They qualify. They stay.</h3>
-                <p className="text-[#8CA3BF] text-sm mb-6">Every learner becomes a qualified PT who needs somewhere to work — and they already know your gym.</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "PT rent",
-                    "PT membership",
-                    "Long-term retention",
-                    "More coaching revenue in your club",
-                  ])}
-                </ul>
-                <p className="text-white font-semibold text-sm mt-6 pt-6 border-t border-[#3B82F6]/20">
-                  Short term cash + long term income.<br />
-                  Exactly how a gym partnership should work.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.05] mb-6">
+                Turn Your Gym Into<br />
+                <span className="text-[#F5C518]">Its Own PT Academy</span>
+              </h1>
 
-        {/* ── WHITE LABEL ── */}
-        <section className="bg-[#072B4A] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3 text-center">Your Brand</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-              Fully White-Label Academy
-            </h2>
-            <p className="text-[#8CA3BF] text-center mb-12 text-lg">
-              Your gym gets its own academy. Not ours. <span className="text-white font-bold">Yours.</span>
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/15">
-                <p className="text-[#8CA3BF] text-sm mb-4">Your gym gets:</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "Your branding",
-                    "Your logo",
-                    "Your link / QR code",
-                    "Your academy page",
-                    "Your messaging",
-                  ])}
-                </ul>
-                <div className="mt-6 pt-6 border-t border-[#3B82F6]/20">
-                  <p className="text-[#8CA3BF] text-sm mb-2">To members it looks like:</p>
-                  <p className="text-[#F5C518] font-bold text-lg">&ldquo;[Your Gym Name] PT Academy&rdquo;</p>
-                </div>
-              </div>
-
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/15">
-                <p className="text-white font-bold mb-4">We run everything behind the scenes:</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "Education",
-                    "Mentorship",
-                    "Assessments",
-                    "Compliance",
-                    "Certification",
-                    "Support",
-                  ])}
-                </ul>
-                <div className="mt-6 pt-6 border-t border-[#3B82F6]/20">
-                  <p className="text-white font-semibold text-sm">
-                    You keep the authority.<br />
-                    <span className="text-[#F5C518]">We do the work.</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── ZERO ADMIN ── */}
-        <section className="bg-[#0D3559] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">Zero Admin</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              You Do NOT Have To Do Any Of This
-            </h2>
-            <p className="text-[#8CA3BF] mb-12 max-w-xl mx-auto">
-              This is designed to scale without extra staff. Your role = gym partner only.
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              {[
-                "Teach courses",
-                "Hire tutors",
-                "Do paperwork",
-                "Handle compliance",
-                "Deal with qualifications",
-                "Manage students",
-                "Build course material",
-                "Any admin at all",
-              ].map((item) => (
-                <div key={item} className="bg-[#072B4A] border border-red-400/20 rounded-xl p-4 text-center">
-                  <span className="text-red-400 text-xl block mb-1">✗</span>
-                  <span className="text-[#8CA3BF] text-xs font-medium">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── NEVER RECRUIT AGAIN ── */}
-        <section className="bg-[#072B4A] py-16 md:py-24 relative overflow-hidden">
-          <div className="absolute -right-32 top-0 w-[400px] h-[400px] rounded-full bg-[#3B82F6] opacity-[0.06] blur-3xl pointer-events-none" />
-          <div className="relative z-10 max-w-4xl mx-auto px-6">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3 text-center">The Pipeline</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12">
-              Never Worry About Recruiting Again
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20">
-                <p className="text-[#F5C518] font-bold mb-4">Imagine your gym always has:</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "New PTs coming through every month",
-                    "Qualified trainers ready to start",
-                    "People who already know your gym",
-                    "Trainers trained the way YOU want",
-                  ])}
-                </ul>
-              </div>
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/20">
-                <p className="text-[#8CA3BF] font-semibold mb-4">No more:</p>
-                <ul className="space-y-3">
-                  {crossItems([
-                    "Job ads",
-                    "Random CVs",
-                    "Bad PTs",
-                    "Empty floor space",
-                  ])}
-                </ul>
-                <div className="mt-6 pt-6 border-t border-[#3B82F6]/20">
-                  <p className="text-white font-bold text-lg">Just a pipeline. Every month.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── WHO THIS IS FOR ── */}
-        <section className="bg-[#0D3559] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">Ideal Fit</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Who This Is For</h2>
-            <p className="text-[#8CA3BF] mb-12">This partnership works best for commercial gyms with PT floor space.</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#F5C518]/20">
-                <p className="text-[#F5C518] font-bold mb-4">This is ideal if you:</p>
-                <ul className="space-y-3">
-                  {checkItems([
-                    "Run a commercial gym",
-                    "Want more PT rental income",
-                    "Want better trainers",
-                    "Don't want to run courses yourself",
-                    "Want new revenue streams",
-                    "Want your own PT academy",
-                  ])}
-                </ul>
-              </div>
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#3B82F6]/20 flex flex-col justify-between">
-                <div>
-                  <p className="text-[#8CA3BF] font-semibold mb-4">Not suitable for:</p>
-                  <ul className="space-y-3">
-                    {crossItems([
-                      "Small studios with no PT space",
-                      "Gyms not open to renting to PTs",
-                    ])}
-                  </ul>
-                </div>
-                <div className="mt-8 pt-6 border-t border-[#3B82F6]/20">
-                  <p className="text-white font-semibold text-sm">
-                    We only take <span className="text-[#F5C518] font-bold">one partner gym per area</span> to protect exclusivity. Areas fill up fast.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── WHY PT LAUNCH LAB ── */}
-        <section className="bg-[#072B4A] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3 text-center">Why Us</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-              Why Gyms Partner With PT Launch Lab
-            </h2>
-            <p className="text-[#8CA3BF] text-center mb-12 max-w-2xl mx-auto">
-              We are not just course providers. We are gym owners. We&apos;ve hired hundreds of PTs. We know what gyms actually need. Our system is built for gyms, not colleges.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
-              {[
-                { icon: "🎓", text: "Online Level 2 & 3 qualifications" },
-                { icon: "🤝", text: "Mentorship included" },
-                { icon: "🏋️", text: "Gym placement pathway" },
-                { icon: "✅", text: "Industry recognised (NCFE & Ofqual)" },
-                { icon: "🏢", text: "Built with gym partners in mind" },
-                { icon: "📋", text: "Full compliance managed by us" },
-              ].map((item) => (
-                <div key={item.text} className="bg-[#0D3559] rounded-xl p-5 border border-[#3B82F6]/15 flex items-center gap-4">
-                  <span className="text-2xl shrink-0">{item.icon}</span>
-                  <span className="text-white text-sm font-medium">{item.text}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20 text-center">
-              <p className="text-white text-lg font-semibold mb-2">
-                This is why gyms partner with us.
+              <p className="text-xl text-blue-100/80 leading-relaxed mb-10 max-w-xl">
+                We build, run, and manage a fully white-label PT academy inside your gym.
+                You earn <strong className="text-white">£500 per learner</strong> upfront — plus long-term PT rental income.
+                Zero teaching. Zero admin. Zero cost.
               </p>
-              <p className="text-[#8CA3BF]">
-                Not because we sell courses. Because we solve recruitment.
-              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="#apply" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">
+                  Apply to Secure Your Area →
+                </a>
+                <a href="#how-it-works" className="px-8 py-4 rounded-full border border-white/30 text-white font-medium text-base hover:bg-white/10 transition-all text-center">
+                  See How It Works
+                </a>
+              </div>
             </div>
           </div>
-        </section>
 
-        {/* ── HOW IT WORKS ── */}
-        <section id="how-it-works" className="bg-[#0D3559] py-16 md:py-24">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">The Process</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
-            <p className="text-[#8CA3BF] mb-12">Simple. Scalable. No extra work.</p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {/* Stat strip */}
+          <div className="absolute bottom-0 left-0 right-0 bg-[#061F36]/80 backdrop-blur-sm border-t border-white/10">
+            <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
-                { step: "1", label: "Your gym joins the partnership" },
-                { step: "2", label: "We create your white-label academy" },
-                { step: "3", label: "You display QR / link in gym & on socials" },
-                { step: "4", label: "People enrol through your academy" },
-                { step: "5", label: "You get £500 per learner" },
-                { step: "6", label: "They complete the qualification" },
-                { step: "7", label: "They work in your gym" },
-                { step: "8", label: "You earn rent long term" },
+                { value: "£500", label: "Per learner" },
+                { value: "0", label: "Admin for you" },
+                { value: "1", label: "Partner per area" },
+                { value: "100%", label: "White-label branded" },
               ].map((s) => (
-                <div key={s.step} className="bg-[#072B4A] rounded-xl p-5 border border-[#3B82F6]/15 text-left">
-                  <div className="w-8 h-8 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm flex items-center justify-center mb-3">
-                    {s.step}
-                  </div>
-                  <p className="text-white text-sm font-medium">{s.label}</p>
+                <div key={s.label}>
+                  <p className="text-[#F5C518] font-bold text-2xl leading-none">{s.value}</p>
+                  <p className="text-[#8CA3BF] text-xs mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── STRONG CLOSE ── */}
-        <section className="bg-[#061F36] py-12 md:py-16 border-y border-[#3B82F6]/15">
-          <div className="max-w-2xl mx-auto px-6 text-center">
-            <p className="text-white text-xl md:text-2xl font-bold mb-2">
-              Most gyms don&apos;t have a recruitment problem.
-            </p>
-            <p className="text-white text-xl md:text-2xl font-bold mb-2">
-              They have a <span className="text-[#F5C518]">pipeline problem.</span>
-            </p>
-            <p className="text-[#8CA3BF] text-lg mt-4">
-              Fix the pipeline once. And you never need to recruit again.
-            </p>
+        {/* ── PROBLEM / SOLUTION ────────────────────── */}
+        <section className="bg-[#0D3559] py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Problem */}
+              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#3B82F6]/15">
+                <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-6">The Problem</p>
+                <h2 className="text-2xl font-bold text-white mb-6 leading-snug">
+                  Most gyms can&apos;t keep a steady pipeline of good PTs
+                </h2>
+                <ul className="space-y-3">
+                  {[
+                    "No one good applies for PT roles",
+                    "PT quality is inconsistent",
+                    "Floor space sits empty without rental income",
+                    "Running your own course is too much work",
+                    "Hours wasted interviewing unqualified people",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-sm">
+                      <span className="text-red-400 mt-0.5 shrink-0">✗</span>
+                      <span className="text-[#8CA3BF]">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Solution */}
+              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#F5C518]/25">
+                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-6">The Solution</p>
+                <h2 className="text-2xl font-bold text-white mb-6 leading-snug">
+                  A PT academy running inside your gym — fully managed by us
+                </h2>
+                <ul className="space-y-3">
+                  {[
+                    "Your own white-label branded academy",
+                    "We handle all education, compliance & mentorship",
+                    "Qualified PTs ready to work in your gym",
+                    "£500 per learner paid to your gym",
+                    "Zero teaching, zero admin, zero cost",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-sm">
+                      <span className="text-[#F5C518] mt-0.5 shrink-0">✔</span>
+                      <span className="text-white">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ── APPLICATION FORM ── */}
-        <section id="apply" className="bg-[#072B4A] py-16 md:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[700px] h-[400px] rounded-full bg-[#F5C518] opacity-[0.05] blur-3xl" />
+        {/* ── REVENUE ───────────────────────────────── */}
+        <section className="bg-[#072B4A] py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-14">
+              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">Revenue</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-white">Two ways you earn</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#0D3559] rounded-2xl p-10 border-2 border-[#F5C518]/50 shadow-xl shadow-[#F5C518]/5">
+                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-4">Front End</p>
+                <p className="text-[#F5C518] text-7xl font-bold leading-none mb-2">£500</p>
+                <p className="text-white font-semibold text-lg mb-6">per learner who enrols through your gym</p>
+                <ul className="space-y-2 text-sm">
+                  {["Paid directly to your gym", "No teaching required", "No extra work required"].map((i) => (
+                    <li key={i} className="flex items-center gap-2 text-[#8CA3BF]">
+                      <span className="text-[#F5C518]">✔</span> {i}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-[#0D3559] rounded-2xl p-10 border-2 border-[#3B82F6]/40 shadow-xl shadow-[#3B82F6]/5">
+                <p className="text-[#3B82F6] text-xs font-bold tracking-widest uppercase mb-4">Back End</p>
+                <p className="text-white text-3xl font-bold leading-snug mb-2">They qualify.<br />They stay.</p>
+                <p className="text-[#8CA3BF] text-sm mb-6">Every learner becomes a qualified PT who already knows your gym — and needs somewhere to work.</p>
+                <ul className="space-y-2 text-sm">
+                  {["PT floor rent", "PT membership fees", "Long-term trainer retention", "More coaching revenue in-club"].map((i) => (
+                    <li key={i} className="flex items-center gap-2 text-[#8CA3BF]">
+                      <span className="text-[#3B82F6]">✔</span> {i}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
-          <div className="relative z-10 max-w-2xl mx-auto px-6">
-            <div className="text-center mb-10">
-              <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">Applications Open</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                Become a PT Launch Lab Partner Gym
-              </h2>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-blue-100/70 mb-4">
+        </section>
+
+        {/* ── HOW IT WORKS ──────────────────────────── */}
+        <section id="how-it-works" className="bg-[#0D3559] py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-14">
+              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">The Process</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">How it works</h2>
+              <p className="text-[#8CA3BF]">Simple. Scalable. No extra staff.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+              {STEPS.map((s) => (
+                <div key={s.n} className="bg-[#072B4A] rounded-2xl p-6 border border-[#3B82F6]/15 relative">
+                  <p className="text-[#F5C518]/20 text-6xl font-black leading-none absolute top-4 right-5 select-none">{s.n}</p>
+                  <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">{s.n}</p>
+                  <p className="text-white font-bold text-base mb-2">{s.title}</p>
+                  <p className="text-[#8CA3BF] text-sm leading-relaxed">{s.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── WHAT YOU GET ──────────────────────────── */}
+        <section className="bg-[#072B4A] py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-14">
+              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">What&apos;s Included</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">Everything done for you</h2>
+              <p className="text-[#8CA3BF] max-w-lg mx-auto">Your academy is fully branded, fully managed, and fully compliant — we handle it all.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* White label */}
+              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20">
+                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-5">Your Brand</p>
+                <h3 className="text-white text-xl font-bold mb-2">Your academy, your name</h3>
+                <p className="text-[#8CA3BF] text-sm mb-6">To your members it looks exactly like <span className="text-white font-semibold">&ldquo;[Your Gym] PT Academy&rdquo;</span> — not ours.</p>
+                <ul className="space-y-2">
+                  {["Your logo and branding", "Your custom link & QR code", "Your academy landing page", "Your messaging to members"].map((i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm">
+                      <span className="text-[#F5C518]">✔</span><span className="text-white">{i}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Zero admin */}
+              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/20">
+                <p className="text-[#3B82F6] text-xs font-bold tracking-widest uppercase mb-5">We Handle Everything</p>
+                <h3 className="text-white text-xl font-bold mb-2">You do none of this</h3>
+                <p className="text-[#8CA3BF] text-sm mb-6">Your only role is gym partner. Everything else is on us.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {["Teaching", "Compliance", "Tutors", "Assessments", "Paperwork", "Certification", "Student support", "Course material"].map((i) => (
+                    <div key={i} className="flex items-center gap-2 bg-[#072B4A] rounded-lg px-3 py-2 text-xs">
+                      <span className="text-red-400">✗</span>
+                      <span className="text-[#8CA3BF]">{i}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Why us bar */}
+            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/15">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
                 {[
-                  "Get your own academy",
-                  "Earn £500 per learner",
-                  "Build a PT pipeline",
-                  "Increase rental income",
-                  "Without extra staff",
-                ].map((item) => (
-                  <span key={item} className="flex items-center gap-1.5">
-                    <span className="text-[#F5C518]">✔</span> {item}
-                  </span>
+                  { icon: "🏋️", title: "Built by gym owners", body: "We've hired 500+ PTs. We know what gyms actually need." },
+                  { icon: "🎓", title: "NCFE & Ofqual regulated", body: "Industry-recognised Level 2 & 3 qualifications. Fully compliant." },
+                  { icon: "🤝", title: "Not courses. Recruitment.", body: "We solve your pipeline problem — not just sell qualifications." },
+                ].map((c) => (
+                  <div key={c.title}>
+                    <div className="text-3xl mb-3">{c.icon}</div>
+                    <p className="text-white font-bold text-sm mb-1">{c.title}</p>
+                    <p className="text-[#8CA3BF] text-xs leading-relaxed">{c.body}</p>
+                  </div>
                 ))}
               </div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-400/30 mt-2">
-                <span className="text-red-400 text-xs font-bold">⚠ ONE PARTNER PER AREA</span>
-                <span className="text-[#8CA3BF] text-xs">— Secure yours before it&apos;s taken</span>
-              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── WHO IT'S FOR ──────────────────────────── */}
+        <section className="bg-[#0D3559] py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-14">
+              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">Ideal Fit</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-white">Is this for you?</h2>
             </div>
 
-            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20 shadow-2xl shadow-[#F5C518]/5">
-              <ApplicationForm />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#F5C518]/25">
+                <p className="text-[#F5C518] font-bold text-base mb-5">✔ Great fit if you…</p>
+                <ul className="space-y-3">
+                  {[
+                    "Run a commercial gym with PT floor space",
+                    "Want a new revenue stream without extra staff",
+                    "Struggle to find and keep quality PTs",
+                    "Want better, pre-vetted trainers on your floor",
+                    "Want your own branded PT academy",
+                    "Don't want to deal with education or compliance",
+                  ].map((i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      <span className="text-[#F5C518] mt-0.5 shrink-0">✔</span>
+                      <span className="text-white">{i}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#3B82F6]/20 flex flex-col justify-between">
+                <div>
+                  <p className="text-[#8CA3BF] font-bold text-base mb-5">✗ Not a fit if you…</p>
+                  <ul className="space-y-3">
+                    {[
+                      "Run a small studio with no PT floor space",
+                      "Don't rent space to self-employed PTs",
+                    ].map((i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm">
+                        <span className="text-red-400 mt-0.5 shrink-0">✗</span>
+                        <span className="text-[#8CA3BF]">{i}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-10 pt-6 border-t border-[#3B82F6]/20">
+                  <p className="text-white font-semibold text-sm">
+                    We take <span className="text-[#F5C518] font-bold">one partner gym per area</span> to protect exclusivity.{" "}
+                    <span className="text-[#8CA3BF]">Areas close as applications come in.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── PIPELINE CLOSE ────────────────────────── */}
+        <section className="bg-[#061F36] py-14 border-y border-[#3B82F6]/10">
+          <div className="max-w-2xl mx-auto px-6 text-center">
+            <p className="text-3xl md:text-4xl font-bold text-white leading-snug mb-4">
+              Most gyms don&apos;t have a recruitment problem.
+              <br />
+              They have a <span className="text-[#F5C518]">pipeline problem.</span>
+            </p>
+            <p className="text-[#8CA3BF] text-lg">Fix the pipeline once. Never recruit again.</p>
+          </div>
+        </section>
+
+        {/* ── APPLICATION FORM ──────────────────────── */}
+        <section id="apply" className="bg-[#072B4A] py-20 md:py-28 relative overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-[600px] h-[600px] rounded-full bg-[#F5C518] opacity-[0.04] blur-3xl" />
+          </div>
+
+          <div className="relative z-10 max-w-xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-400/25 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                <span className="text-red-400 text-xs font-bold tracking-wide uppercase">One partner per area</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                Apply to Become a Partner Gym
+              </h2>
+              <p className="text-[#8CA3BF] text-sm">
+                Earn £500 per learner · Your own PT academy · Zero admin
+              </p>
+            </div>
+
+            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20 shadow-2xl">
+              <PartnershipForm />
             </div>
 
             <p className="text-center text-[#4A6280] text-sm mt-6">
               Prefer to talk first?{" "}
-              <a href="/book-call" className="text-[#F5C518] hover:underline font-semibold">
-                Book a partnership call →
+              <a
+                href="https://calendly.com/ptlaunchlab-info/information-call"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#F5C518] hover:underline font-semibold"
+              >
+                Book a 15-min partnership call →
               </a>
             </p>
           </div>
