@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Nav from "@/app/components/Nav";
-import Footer from "@/app/components/Footer";
 
 export const metadata: Metadata = {
   title: "6fit PT Academy | Become a Qualified Personal Trainer at 6fit Gyms",
@@ -24,8 +22,7 @@ function Check({ children }: { children: React.ReactNode }) {
 export default function SixFitAcademyPage() {
   return (
     <>
-      <Nav />
-      <main className="pt-[72px] bg-white">
+      <main className="bg-white">
 
         {/* ── HERO ── */}
         <section className="relative bg-black overflow-hidden">
@@ -266,8 +263,15 @@ export default function SixFitAcademyPage() {
           </div>
         </section>
 
-      </main>
-      <Footer />
+      {/* Minimal footer */}
+      <footer className="bg-black border-t border-white/10 py-6 px-6 text-center">
+        <p className="text-white/30 text-xs">
+          Powered by PT Launch Lab · NCFE Accredited Centre No. 9002788 ·{" "}
+          <a href="/terms" className="hover:text-white/50 transition-colors">Terms</a>
+          {" "}·{" "}
+          <a href="/privacy" className="hover:text-white/50 transition-colors">Privacy</a>
+        </p>
+      </footer>
     </>
   );
 }
