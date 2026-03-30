@@ -5,12 +5,11 @@ import Image from "next/image";
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const links = [
-    { label: "Home",     href: "/" },
-    { label: "Course",   href: "/courses" },
-    { label: "For Gyms", href: "/gym-partnership" },
-    { label: "Podcast",  href: "/podcast" },
-    { label: "About",    href: "/about" },
-    { label: "Contact",  href: "/contact" },
+    { label: "Home",    href: "/" },
+    { label: "Course",  href: "/courses" },
+    { label: "Podcast", href: "/podcast" },
+    { label: "About",   href: "/about" },
+    { label: "Contact", href: "/contact" },
   ];
 
   return (
@@ -43,8 +42,12 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <a href="https://ptlaunchlab.merve.online/login" target="_blank" rel="noopener noreferrer" className="text-[#8CA3BF] hover:text-white text-xs transition-colors">
-            Existing Students
+          <a
+            href="/gym-partnership"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F5C518]/10 border border-[#F5C518]/40 text-[#F5C518] text-sm font-semibold hover:bg-[#F5C518]/20 transition-all"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518]" />
+            Partner Your Gym
           </a>
         </div>
 
@@ -84,6 +87,13 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
+          <a
+            href="/gym-partnership"
+            className="flex items-center gap-2 py-1 text-[#F5C518] font-semibold"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518]" />
+            Partner Your Gym
+          </a>
           <div className="flex flex-col gap-3 pt-4 border-t border-[#3B82F6]/20">
             <a href="/book-call" className="text-center px-5 py-3 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
               Discover Your Pathway
