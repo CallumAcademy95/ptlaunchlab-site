@@ -20,8 +20,12 @@ const config: GymConfig = {
   logoUrl: "https://example.com/logo.png",   // gym logo URL
 
   // ── Branding
-  primaryColor: "#000000",                   // gym primary brand colour (hex)
-  heroBg: "#000000",                         // hero background (usually black or dark brand colour)
+  primaryColor: "#000000",                   // gym primary brand colour (hex) — used for buttons, checks, accents
+  heroBg: "#000000",                         // hero background — MUST contrast with primaryColor
+                                             // ⚠️ if primaryColor is dark, set heroBg to "#111111" (black)
+                                             // ⚠️ if primaryColor is light/bright, heroBg can match the brand colour
+                                             // e.g. 6fit: primaryColor #ed0000 (red) on heroBg #000000 (black) ✓
+                                             // e.g. Ebor: primaryColor #3a4a3c (green) on heroBg #111111 (black) ✓
 
   // ── Hero copy
   heroHeadline: [
