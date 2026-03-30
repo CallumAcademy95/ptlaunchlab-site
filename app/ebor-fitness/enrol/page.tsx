@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const PRIMARY = "#116dff";
+const PRIMARY = "#1a1a1a";
 
 const PARTNER: PartnerConfig = {
   gymReferral: "Ebor Fitness",
