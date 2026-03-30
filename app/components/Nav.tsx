@@ -5,11 +5,12 @@ import Image from "next/image";
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const links = [
-    { label: "Home",    href: "/" },
-    { label: "Course",  href: "/courses" },
-    { label: "Podcast", href: "/podcast" },
-    { label: "About",   href: "/about" },
-    { label: "Contact", href: "/contact" },
+    { label: "Home",     href: "/" },
+    { label: "Course",   href: "/courses" },
+    { label: "For Gyms", href: "/gym-partnership" },
+    { label: "Podcast",  href: "/podcast" },
+    { label: "About",    href: "/about" },
+    { label: "Contact",  href: "/contact" },
   ];
 
   return (

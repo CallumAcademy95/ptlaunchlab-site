@@ -83,7 +83,7 @@ export default function GymPartners() {
         </div>
 
         {/* Accreditation logos */}
-        <div className="flex flex-wrap items-center justify-center gap-10">
+        <div className="flex flex-wrap items-center justify-center gap-10 mb-14">
           {accreditations.map((p) => (
             <div
               key={p.name}
@@ -92,6 +92,20 @@ export default function GymPartners() {
               <Image src={p.src} alt={p.name} fill className="object-contain" />
             </div>
           ))}
+        </div>
+
+        {/* Gym partnership CTA */}
+        <div className="border-t border-[#3B82F6]/15 pt-12">
+          <p className="text-white font-bold text-xl md:text-2xl mb-2">Own a gym?</p>
+          <p className="text-[#8CA3BF] text-sm mb-6 max-w-md mx-auto">
+            Earn £500 per learner and build your own white-label PT academy — without doing any teaching, admin, or courses.
+          </p>
+          <a
+            href="/gym-partnership"
+            className="inline-block px-8 py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+          >
+            Gym Partnership Programme →
+          </a>
         </div>
       </div>
     </section>
