@@ -368,7 +368,7 @@ export default function EnrolmentFlow({ partner }: { partner?: PartnerConfig }) 
       console.warn("Enrolment API call failed — continuing to payment.");
     }
 
-    trackEvent('enrol_complete', { payment_type: type, promo: appliedPromo ?? undefined });
+    trackEvent('enrol_complete', { payment_type: type, ...(appliedPromo && { promo: appliedPromo }) });
     const fullLink    = activePromo?.fullStripeLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? DEPOSIT_STRIPE_LINK;
     window.location.href = type === "full" ? fullLink : depositLink;
