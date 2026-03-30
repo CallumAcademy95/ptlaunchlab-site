@@ -60,11 +60,11 @@ export default function GymPartnershipPage() {
       <main className="pt-[72px]">
 
         {/* ── HERO ──────────────────────────────────── */}
-        <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden">
+        <section className="relative flex flex-col bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden">
           <div className="absolute -left-64 top-0 w-[700px] h-[700px] rounded-full bg-[#F5C518] opacity-[0.06] blur-3xl pointer-events-none" />
           <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-[#60A5FA] opacity-[0.08] blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 w-full">
+          <div className="relative z-10 max-w-5xl mx-auto px-6 pt-16 pb-14 md:pt-24 md:pb-20 w-full">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-8">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518] animate-pulse" />
@@ -93,8 +93,8 @@ export default function GymPartnershipPage() {
             </div>
           </div>
 
-          {/* Stat strip */}
-          <div className="absolute bottom-0 left-0 right-0 bg-[#061F36]/80 backdrop-blur-sm border-t border-white/10">
+          {/* Stat strip — flows naturally below content, no overlap */}
+          <div className="relative z-10 bg-[#061F36]/80 backdrop-blur-sm border-t border-white/10">
             <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: "£500", label: "Per learner" },
