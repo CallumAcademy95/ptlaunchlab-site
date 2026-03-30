@@ -334,6 +334,9 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       paymentChoice: type,
       submittedAt: new Date().toISOString(),
       source: "website-enrolment-flow-v1",
+      amountPaid: type === "full"
+        ? (activePromo ? activePromo.fullPrice : 1599)
+        : (activePromo ? activePromo.depositPrice : 599),
       ...(partner?.gymReferral  && { gymReferral: partner.gymReferral }),
       ...(appliedPromo           && { promoCode: appliedPromo, discountApplied: activePromo?.discountAmount }),
     };
@@ -750,19 +753,19 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                   {activePromo ? (
                     <div className="mb-3">
-                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£1,399</p>
+                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£1,599</p>
                       <p className="text-[#F5C518] text-4xl font-bold leading-none">£{activePromo.fullPrice.toLocaleString()}</p>
                     </div>
                   ) : (
-                    <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,399</p>
+                    <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,599</p>
                   )}
                   <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> {activePromo ? `Save £${200 + activePromo.discountAmount}` : "Save £200"}</li>
+                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> {activePromo ? `Save £${(1599 - activePromo.fullPrice).toLocaleString()}` : "Save £200"}</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Immediate course access</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> One single payment</li>
                   </ul>
                   <div className="w-full py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                    {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.fullPrice.toLocaleString() : "1,399"} →`}
+                    {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.fullPrice.toLocaleString() : "1,599"} →`}
                   </div>
                 </button>
 
@@ -779,7 +782,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   ) : (
                     <p className="text-[#F5C518] text-4xl font-bold mb-1">£599</p>
                   )}
-                  <p className="text-[#8CA3BF] text-xs mb-3">then £200 × 5 monthly payments</p>
+                  <p className="text-[#8CA3BF] text-xs mb-3">then £200 × {activePromo ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200) : 5} monthly payments</p>
                   <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Start today with a deposit</li>
                     <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Monthly payments to follow</li>

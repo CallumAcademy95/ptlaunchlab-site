@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename, gymReferral, promoCode, discountApplied } = body;
+    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename, gymReferral, promoCode, discountApplied, amountPaid } = body;
 
     if (!l?.fullName || !l?.email) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
     });
 
     const paymentLabel = paymentChoice === "full"
-      ? "Full Payment — £1,399"
-      : "Deposit Plan — £599 + 5×£200";
+      ? `Full Payment — £${amountPaid ?? "1,599"}`
+      : `Deposit Plan — £${amountPaid ?? "599"} deposit`;
 
     // ── Zapier → Google Sheets ─────────────────────────────────────────────
     const zapierPayload = {
@@ -283,7 +283,7 @@ export async function POST(req: NextRequest) {
             name: "enrolment_complete",
             params: {
               payment_type: paymentChoice,
-              value: paymentChoice === "full" ? 1399 : 599,
+              value: amountPaid ?? (paymentChoice === "full" ? 1599 : 599),
               currency: "GBP",
               learner_name: l.fullName,
             },
