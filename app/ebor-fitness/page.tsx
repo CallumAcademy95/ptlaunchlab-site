@@ -9,8 +9,8 @@ const config: GymConfig = {
   logoAlt: "Ebor Fitness York",
 
   // ── Branding
-  primaryColor: "#1a1a1a",
-  heroBg: "#111111",
+  primaryColor: "#3a4a3c",
+  heroBg: "#3a4a3c",
 
   // ── Hero copy
   heroHeadline: [
