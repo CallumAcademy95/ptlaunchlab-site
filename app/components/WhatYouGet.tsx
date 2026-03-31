@@ -32,7 +32,7 @@ const features = [
   {
     icon: "💳",
     title: "Flexible Payment Options",
-    body: "Pay in full for £1,399, or spread the cost with our deposit plan — £599 upfront then 5 × £200. We'd rather you get started and build a career than let money be the thing that holds you back.",
+    body: "Pay in full for £1,599, or spread the cost with our deposit plan — £599 upfront then 5 × £200. We'd rather you get started and build a career than let money be the thing that holds you back.",
     badge: null,
   },
 ];

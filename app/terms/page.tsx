@@ -58,7 +58,7 @@ export default function TermsPage() {
             <>
               {p("The following payment options are available at the time of enrolment:")}
               {ul([
-                "Full Payment: £1,399 — single payment, immediate access",
+                "Full Payment: £1,599 — single payment, immediate access",
                 "Deposit Plan: £599 deposit followed by 5 monthly payments of £200 (total £1,599)",
                 "Finance: available via Payl8r over 12–18 months — contact us for details",
               ])}

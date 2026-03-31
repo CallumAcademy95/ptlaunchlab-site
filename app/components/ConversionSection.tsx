@@ -50,7 +50,7 @@ export default function ConversionSection() {
             >
               Reserve Your Place With a Deposit →
             </a>
-            <p className="text-[#4A6280] text-xs text-center">Total course fee: £1,399. Start immediately.</p>
+            <p className="text-[#4A6280] text-xs text-center">Total course fee: £1,599. Start immediately.</p>
           </div>
 
           {/* Right — Pay in Full */}
@@ -61,7 +61,7 @@ export default function ConversionSection() {
               </span>
             </div>
             <h3 className="text-white text-2xl font-bold mb-2">Pay in Full</h3>
-            <p className="text-[#F5C518] font-bold text-lg mb-4">£1,399 — everything included</p>
+            <p className="text-[#F5C518] font-bold text-lg mb-4">£1,599 — everything included</p>
             <p className="text-[#8CA3BF] text-[15px] leading-relaxed mb-7">
               One payment. Immediate access to everything — your tutor, your qualification content, your business training, and your guaranteed interview pipeline. No instalments, no additional fees.
             </p>
