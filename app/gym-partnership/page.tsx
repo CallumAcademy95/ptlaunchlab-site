@@ -89,6 +89,14 @@ export default function GymPartnershipPage() {
                 <a href="#how-it-works" className="px-8 py-4 rounded-full border border-white/30 text-white font-medium text-base hover:bg-white/10 transition-all text-center">
                   See How It Works
                 </a>
+                <a
+                  href="/gym-partner-prospectus.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 rounded-full border border-[#F5C518]/40 text-[#F5C518] font-medium text-base hover:bg-[#F5C518]/10 transition-all text-center flex items-center justify-center gap-2"
+                >
+                  ↓ Download Prospectus
+                </a>
               </div>
             </div>
           </div>
@@ -345,6 +353,24 @@ export default function GymPartnershipPage() {
               They have a <span className="text-[#F5C518]">pipeline problem.</span>
             </p>
             <p className="text-[#8CA3BF] text-lg">Fix the pipeline once. Never recruit again.</p>
+          </div>
+        </section>
+
+        {/* ── PROSPECTUS DOWNLOAD ───────────────────── */}
+        <section className="bg-[#061F36] py-10 border-y border-[#3B82F6]/10">
+          <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-white font-bold text-lg">Want to read through it first?</p>
+              <p className="text-[#8CA3BF] text-sm">Download the full partnership prospectus — everything you need to know in one document.</p>
+            </div>
+            <a
+              href="/gym-partner-prospectus.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 px-8 py-4 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-all flex items-center gap-2"
+            >
+              ↓ Download Prospectus PDF
+            </a>
           </div>
         </section>
 
