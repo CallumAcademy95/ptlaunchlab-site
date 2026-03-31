@@ -490,43 +490,100 @@ export const ukLocations: UKLocation[] = [
   { slug: "north-west-england",  name: "North West England", region: "North West",         nearestCity: "Manchester" },
 ]
 
-// Priority locations for static generation (keyword campaign targets + major UK cities)
-// All other locations still work via dynamicParams = true (rendered on demand)
-export const priorityLocations = ukLocations.filter(l => [
-  // Yorkshire (core market — keep all)
-  "leeds", "bradford", "wakefield", "huddersfield", "halifax", "pontefract",
-  "normanton", "castleford", "dewsbury", "batley", "morley", "ossett",
-  "horsforth", "shipley", "bingley", "keighley", "hebden-bridge",
-  "brighouse", "sowerby-bridge", "heckmondwike", "cleckheaton", "holmfirth",
-  "knottingley", "featherstone",
-  // East Yorkshire
-  "hull", "beverley", "hessle", "bridlington", "driffield", "goole",
-  // South/North Yorkshire
-  "sheffield", "rotherham", "barnsley", "doncaster", "york", "harrogate",
-  "scarborough",
-  // North West (major cities only)
-  "manchester", "liverpool", "bolton", "wigan", "warrington",
-  "blackpool", "preston", "salford", "stockport",
-  // Scotland (major cities only)
-  "glasgow", "edinburgh", "aberdeen", "dundee", "inverness", "scotland",
-  // Wales (major cities only)
-  "cardiff", "swansea", "newport", "wrexham", "wales",
-  // Midlands (major cities only)
-  "birmingham", "coventry", "nottingham", "derby", "leicester",
-  "stoke-on-trent", "wolverhampton", "midlands",
-  // South East (major cities only)
-  "london", "brighton", "oxford", "guildford", "central-london",
-  // South West (major cities only)
-  "bristol", "exeter", "plymouth", "bath", "cheltenham", "south-west-england",
-  // East England
-  "cambridge", "norwich", "ipswich", "peterborough", "luton", "milton-keynes",
+// ── Hub & Spoke ───────────────────────────────────────────────────────────────
+// Hub pages are pre-built at deploy time (~30 slugs × 31 routes = ~930 pages).
+// All other locations redirect to their nearest hub via middleware (zero extra builds).
+// Previously: ~80 priority locations × 31 routes = ~2,480 pages — 62% reduction.
+
+export const hubSlugs = [
+  // Yorkshire hubs (core market — full coverage)
+  "leeds", "bradford", "wakefield", "huddersfield", "halifax",
+  "sheffield", "barnsley", "doncaster", "york", "harrogate", "hull",
+  // National hubs
+  "manchester", "liverpool", "birmingham", "london", "bristol",
+  "newcastle-upon-tyne", "edinburgh", "glasgow", "cardiff", "belfast",
+  // Secondary hubs (meaningful search volume)
+  "nottingham", "leicester", "brighton", "southampton",
+  // Broad region pages
+  "yorkshire", "west-yorkshire", "scotland", "wales", "midlands", "north-west-england",
+]
+
+export const hubLocations = ukLocations.filter(l => hubSlugs.includes(l.slug))
+
+// Keep priorityLocations as an alias so existing imports don't break
+export const priorityLocations = hubLocations
+
+// Maps nearestCity name → hub slug for middleware redirects
+export const CITY_TO_HUB: Record<string, string> = {
+  // Yorkshire
+  "Leeds": "leeds", "Bradford": "bradford", "Wakefield": "wakefield",
+  "Huddersfield": "huddersfield", "Halifax": "halifax",
+  "Sheffield": "sheffield", "Rotherham": "sheffield",
+  "Barnsley": "barnsley", "Doncaster": "doncaster",
+  "York": "york", "Harrogate": "harrogate",
+  "Scarborough": "york", "Skipton": "bradford",
+  "Northallerton": "york",
+  "Hull": "hull", "Goole": "hull",
+  // North West
+  "Manchester": "manchester", "Liverpool": "liverpool",
+  "Bolton": "manchester", "Wigan": "manchester",
+  "Preston": "manchester", "Blackpool": "manchester",
+  "Blackburn": "manchester", "Burnley": "manchester",
+  "Lancaster": "manchester", "Chester": "manchester",
+  "Warrington": "manchester", "Carlisle": "newcastle-upon-tyne",
+  "Barrow-in-Furness": "manchester",
   // North East
-  "newcastle-upon-tyne", "sunderland", "middlesbrough", "durham",
-  // Other keyword targets
-  "southampton", "chester",
-  // Regions
-  "yorkshire", "east-yorkshire", "west-yorkshire", "north-west-england",
-].includes(l.slug));
+  "Newcastle": "newcastle-upon-tyne", "Sunderland": "newcastle-upon-tyne",
+  "Durham": "newcastle-upon-tyne", "Darlington": "newcastle-upon-tyne",
+  "Middlesbrough": "newcastle-upon-tyne",
+  // Midlands
+  "Birmingham": "birmingham", "Coventry": "birmingham",
+  "Wolverhampton": "birmingham", "Stoke-on-Trent": "birmingham",
+  "Shrewsbury": "birmingham", "Worcester": "birmingham",
+  "Hereford": "birmingham", "Stafford": "birmingham",
+  "Nottingham": "nottingham", "Derby": "nottingham",
+  "Leicester": "leicester", "Lincoln": "nottingham",
+  "Northampton": "birmingham",
+  // East of England
+  "Cambridge": "london", "Peterborough": "london",
+  "Norwich": "london", "Ipswich": "london",
+  "Colchester": "london", "Chelmsford": "london",
+  "Watford": "london", "Luton": "london", "Bedford": "london",
+  // London & South East
+  "London": "london", "Brighton": "brighton",
+  "Guildford": "london", "Maidstone": "london",
+  "Canterbury": "london", "Southampton": "southampton",
+  "Portsmouth": "southampton", "Reading": "london",
+  "Oxford": "london", "Milton Keynes": "london",
+  // South West
+  "Bristol": "bristol", "Exeter": "bristol",
+  "Plymouth": "bristol", "Bournemouth": "southampton",
+  "Truro": "bristol", "Salisbury": "southampton",
+  "Gloucester": "bristol", "Cheltenham": "bristol",
+  // Scotland
+  "Glasgow": "glasgow", "Edinburgh": "edinburgh",
+  "Aberdeen": "edinburgh", "Dundee": "edinburgh",
+  "Inverness": "edinburgh", "Stirling": "glasgow",
+  "Perth": "edinburgh", "Dumfries": "glasgow",
+  // Wales
+  "Cardiff": "cardiff", "Swansea": "cardiff",
+  "Newport": "cardiff", "Wrexham": "cardiff",
+  "Aberystwyth": "cardiff", "Bangor": "cardiff",
+  // Northern Ireland
+  "Belfast": "belfast", "Derry": "belfast",
+  "Enniskillen": "belfast",
+}
+
+/**
+ * Returns the hub slug to redirect to, or null if the slug is already a hub.
+ * Used by middleware to send spoke locations to their nearest hub page.
+ */
+export function getHubForLocation(slug: string): string | null {
+  if (hubSlugs.includes(slug)) return null
+  const loc = ukLocations.find(l => l.slug === slug)
+  if (!loc) return null
+  return CITY_TO_HUB[loc.nearestCity] ?? "leeds"
+}
 
 export function getLocationBySlug(slug: string): UKLocation | undefined {
   return ukLocations.find((l) => l.slug === slug)

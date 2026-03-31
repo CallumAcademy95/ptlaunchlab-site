@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { hubSlugs, getHubForLocation } from "./app/lib/ukLocations";
 
 /**
  * Redirect old site location URLs to the new structure.
@@ -39,6 +40,44 @@ const SLUG_REDIRECTS: Record<string, string> = {
 // Base routes that exist only as /[slug]/[location] with no root page.tsx
 // (kept for any legacy references — main redirects now handled in SLUG_REDIRECTS)
 const BASE_ONLY_REDIRECTS: Record<string, string> = {};
+
+// All route bases that use the [location] dynamic segment.
+// When a request comes in for a non-hub location, it is 301-redirected to the
+// nearest hub page — avoiding builds for ~420 spoke locations while keeping
+// their URLs functional for any inbound links.
+const LOCATION_ROUTE_BASES = new Set([
+  "accredited-personal-trainer-course",
+  "become-a-personal-trainer-online",
+  "become-a-qualified-personal-trainer",
+  "best-online-personal-trainer-course",
+  "best-personal-trainer-course-uk",
+  "career-change-personal-trainer",
+  "fast-track-personal-trainer-course",
+  "flexible-personal-trainer-course",
+  "gym-floor-personal-trainer",
+  "how-to-become-a-personal-trainer",
+  "hybrid-personal-trainer",
+  "level-2-3-personal-training",
+  "level-3-gym-instructing-and-personal-training-diploma",
+  "level-3-personal-trainer-course",
+  "ncfe-level-3-pt-qualification",
+  "ofqual-regulated-personal-trainer-course",
+  "online-coaching-course",
+  "online-personal-training-course",
+  "online-pt-qualification-uk",
+  "personal-trainer-certification",
+  "personal-trainer-course-with-business-support",
+  "personal-trainer-courses-online-uk",
+  "personal-trainer-diploma",
+  "personal-trainer-qualification-recognised-by-uk-gyms",
+  "personal-training-course-with-business-support",
+  "personal-training-course-with-mentorship",
+  "pt-course",
+  "pt-course-payment-plan",
+  "pt-courses-with-business-training",
+  "quit-9-5-become-a-personal-trainer",
+  "start-your-own-personal-training-business",
+]);
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -82,6 +121,23 @@ export function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `/level-3-personal-trainer-course/${slug}`;
     return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // Hub & Spoke: redirect non-hub location slugs to their nearest hub page.
+  // e.g. /pt-course/morley → /pt-course/leeds
+  // Only applies to known location route bases, not gym partner pages (/6fit-academy/enrol etc.)
+  const locationMatch = pathname.match(/^\/([a-z][a-z0-9-]+)\/([a-z][a-z0-9-]+)$/);
+  if (locationMatch) {
+    const routeBase = locationMatch[1];
+    const locationSlug = locationMatch[2];
+    if (LOCATION_ROUTE_BASES.has(routeBase) && !hubSlugs.includes(locationSlug)) {
+      const hubSlug = getHubForLocation(locationSlug);
+      if (hubSlug) {
+        const url = request.nextUrl.clone();
+        url.pathname = `/${routeBase}/${hubSlug}`;
+        return NextResponse.redirect(url, { status: 301 });
+      }
+    }
   }
 
   return NextResponse.next();

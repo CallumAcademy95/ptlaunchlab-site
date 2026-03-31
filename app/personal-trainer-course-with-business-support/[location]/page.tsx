@@ -17,13 +17,13 @@ import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
 import StickyMobileCTA from "@/app/components/StickyMobileCTA";
 import LocationContext from "@/app/components/LocationContext";
-import { priorityLocations, getLocationBySlug } from "@/app/lib/ukLocations";
+import { hubLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 export const revalidate = false;
 
 export async function generateStaticParams() {
-  return priorityLocations.map((l) => ({ location: l.slug }));
+  return hubLocations.map((l) => ({ location: l.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }) {
