@@ -273,6 +273,24 @@ export async function POST(req: NextRequest) {
       console.warn("[enrolments] RESEND_API_KEY not set — skipping emails.");
     }
 
+    // ── Zapier → Google Drive ─────────────────────────────────────────────
+    const enrolmentZapierWebhook = process.env.ENROLMENT_PDF_ZAPIER_WEBHOOK_URL;
+    if (enrolmentZapierWebhook && pdfBase64 && pdfFilename) {
+      fetch(enrolmentZapierWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name:      l.fullName,
+          email:          l.email,
+          payment_choice: paymentLabel,
+          submitted_at:   submittedDate,
+          gym_referral:   gymReferral || "",
+          pdf_filename:   pdfFilename,
+          pdf_base64:     pdfBase64,
+        }),
+      }).catch((err) => console.error("[enrolments] Zapier webhook error:", err));
+    }
+
     // ── GA4 server-side conversion event ──────────────────────────────────
     if (GA4_MEASUREMENT_ID && GA4_API_SECRET) {
       fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {

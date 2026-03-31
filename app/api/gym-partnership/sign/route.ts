@@ -175,6 +175,26 @@ export async function POST(req: NextRequest) {
       console.warn("[gym-partnership/sign] RESEND_API_KEY not set — skipping emails.");
     }
 
+    // ── Zapier → Google Drive ─────────────────────────────────────────────
+    const gymZapierWebhook = process.env.GYM_PARTNERSHIP_SIGN_ZAPIER_WEBHOOK_URL;
+    if (gymZapierWebhook) {
+      fetch(gymZapierWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gym_name:           gymName,
+          company_number:     companyNumber,
+          registered_address: registeredAddress,
+          rep_name:           repName,
+          rep_position:       repPosition,
+          rep_email:          repEmail,
+          signed_at:          signedDate,
+          pdf_filename:       pdfFilename,
+          pdf_base64:         pdfBase64,
+        }),
+      }).catch((err) => console.error("[gym-partnership/sign] Zapier webhook error:", err));
+    }
+
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[gym-partnership/sign]", err);
