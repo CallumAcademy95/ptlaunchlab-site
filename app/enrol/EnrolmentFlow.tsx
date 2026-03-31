@@ -344,28 +344,23 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     // Persist locally as backup
     try { localStorage.setItem("ptll_enrolment_pending", JSON.stringify(record)); } catch (_) {}
 
-    // Generate PDF once — attach to email AND trigger browser download
-    let pdfBase64: string | undefined;
-    let pdfFilename: string | undefined;
+    // Trigger client-side PDF download for learner's own records
     try {
       const pdf = await generateEnrolmentPDFBase64(record);
-      pdfBase64 = pdf.base64;
-      pdfFilename = pdf.filename;
-      // Trigger download from the base64 we already have (avoids building twice)
       const link = document.createElement("a");
-      link.href = `data:application/pdf;base64,${pdfBase64}`;
-      link.download = pdfFilename;
+      link.href = `data:application/pdf;base64,${pdf.base64}`;
+      link.download = pdf.filename;
       link.click();
     } catch (_) {
-      console.warn("PDF generation failed — continuing to payment.");
+      console.warn("Client PDF download failed — continuing to payment.");
     }
 
-    // Send to server (Zapier + Resend emails with PDF attached)
+    // Send raw form data to server — server generates the authoritative PDF
     try {
       await fetch("/api/enrolments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...record, pdfBase64, pdfFilename }),
+        body: JSON.stringify(record),
       });
     } catch (_) {
       console.warn("Enrolment API call failed — continuing to payment.");

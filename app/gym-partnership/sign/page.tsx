@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
-import { generatePartnershipAgreementPDFBase64 } from "@/app/lib/generatePartnershipAgreementPDF";
 
 // ─── Agreement text (mirrors PDF content) ────────────────────────────────────
 const AGREEMENT_CLAUSES = [
@@ -285,18 +284,6 @@ export default function GymPartnershipSignPage() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      const { base64, filename } = await generatePartnershipAgreementPDFBase64({
-        gymName: details.gymName,
-        companyNumber: details.companyNumber,
-        registeredAddress: details.registeredAddress,
-        repName: details.repName,
-        repPosition: details.repPosition,
-        repEmail: details.repEmail,
-        gymSignature: sig,
-        gymSignatureType: signMode,
-        signedAt: signedAt.current,
-      });
-
       const res = await fetch("/api/gym-partnership/sign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -307,10 +294,10 @@ export default function GymPartnershipSignPage() {
           repName: details.repName,
           repPosition: details.repPosition,
           repEmail: details.repEmail,
+          gymSignature: sig,
+          gymSignatureType: signMode,
           signatureType: signMode,
           signedAt: signedAt.current,
-          pdfBase64: base64,
-          pdfFilename: filename,
         }),
       });
 

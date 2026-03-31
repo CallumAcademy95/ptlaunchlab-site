@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { generateEnrolmentPDFServer } from "@/app/lib/server/generateEnrolmentPDF.server";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, pdfBase64, pdfFilename, gymReferral, promoCode, discountApplied, amountPaid } = body;
+    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, gymReferral, promoCode, discountApplied, amountPaid } = body;
 
     if (!l?.fullName || !l?.email) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -246,10 +247,22 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`;
 
-    // ── Build PDF attachment if provided ──────────────────────────────────
-    const pdfAttachment = pdfBase64 && pdfFilename
-      ? [{ filename: pdfFilename, content: Buffer.from(pdfBase64, "base64") }]
-      : undefined;
+    // ── Generate PDF server-side ──────────────────────────────────────────
+    let pdfAttachment: { filename: string; content: Buffer }[] | undefined;
+    let pdfFilename = "";
+    let pdfBase64   = "";
+    try {
+      const { buffer, filename } = await generateEnrolmentPDFServer({
+        learnerDetails: l, learningDetails: ln, agreement: a,
+        paymentChoice, submittedAt,
+        gymReferral, promoCode, discountApplied, amountPaid,
+      });
+      pdfFilename   = filename;
+      pdfBase64     = buffer.toString("base64");
+      pdfAttachment = [{ filename, content: buffer }];
+    } catch (pdfErr) {
+      console.error("[enrolments] PDF generation failed:", pdfErr);
+    }
 
     // ── Send emails ───────────────────────────────────────────────────────
     if (process.env.RESEND_API_KEY) {

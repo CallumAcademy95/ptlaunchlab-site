@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
+    "@types/pdfkit": "^0.17.5",
     "@vercel/analytics": "^2.0.1",
     "googleapis": "^171.4.0",
     "jspdf": "^2.5.1",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
+    "pdfkit": "^0.18.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.4"

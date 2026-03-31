@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -18,20 +19,26 @@ export async function POST(req: NextRequest) {
       gymName, companyNumber, registeredAddress,
       repName, repPosition, repEmail,
       signatureType, signedAt,
-      pdfBase64, pdfFilename,
     } = body;
 
-    if (!gymName || !repName || !repEmail || !pdfBase64 || !pdfFilename) {
+    if (!gymName || !repName || !repEmail) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
+
+    // ── Generate PDF server-side ──────────────────────────────────────────
+    const { buffer: pdfBuffer, filename: pdfFilename } = await generatePartnershipAgreementPDFServer({
+      gymName, companyNumber, registeredAddress,
+      repName, repPosition, repEmail,
+      gymSignature: body.gymSignature ?? "",
+      gymSignatureType: body.gymSignatureType ?? "typed",
+      signedAt,
+    });
+    const pdfBase64 = pdfBuffer.toString("base64");
+    const pdfAttachment = [{ filename: pdfFilename, content: pdfBuffer }];
 
     const signedDate = new Date(signedAt).toLocaleDateString("en-GB", {
       day: "numeric", month: "long", year: "numeric",
     });
-
-    const pdfAttachment = [
-      { filename: pdfFilename, content: Buffer.from(pdfBase64, "base64") },
-    ];
 
     const dataRow = (label: string, value: string) =>
       `<tr>
