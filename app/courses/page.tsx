@@ -27,7 +27,7 @@ const courseSchema = {
     {
       "@type": "Offer",
       name: "Full Payment",
-      price: "1399",
+      price: "1599",
       priceCurrency: "GBP",
       url: "https://ptlaunchlab.co.uk/enrol",
     },
@@ -133,8 +133,8 @@ const stories = [
 const pricing = [
   {
     title: "Full Payment",
-    price: "£1,399",
-    saving: "Save £200",
+    price: "£1,599",
+    saving: "Most popular",
     features: ["Level 2 & 3 qualification", "Personal tutor throughout", "Business training built in", "Guaranteed gym interviews", "Mentorship from Callum, Miles & Ryan"],
     recommended: true,
   },
