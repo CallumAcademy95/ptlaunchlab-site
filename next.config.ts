@@ -54,6 +54,7 @@ const CSP = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["pdfkit"],
   async headers() {
     return [
       {
