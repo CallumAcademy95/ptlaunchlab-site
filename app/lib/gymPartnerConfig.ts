@@ -27,6 +27,10 @@ export interface GymConfig {
   stripeFullLink: string;
   stripeDepositLink: string;
 
+  // ── Positioning section overrides (defaults to "award-winning gym" copy)
+  positioningSubline?: string;  // under "This Is The X PT Academy" heading
+  whyThisGymHeading?: string;   // h2 above the stats strip
+
   // ── Why this gym (stats strip)
   stats: { value: string; label: string }[];
 

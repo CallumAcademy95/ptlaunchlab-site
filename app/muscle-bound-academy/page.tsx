@@ -10,7 +10,7 @@ const config: GymConfig = {
   heroHeadline: [
     "Become a Qualified",
     "Personal Trainer",
-    "At Bradford's\nBiggest Gym",
+    "At Muscle Bound Gym",
   ],
   heroSubline: "Train. Qualify. Earn.",
   location: "Bradford & Huddersfield",
@@ -18,6 +18,8 @@ const config: GymConfig = {
   discountAmount: 200,
   fullPrice: 1399,
   depositPrice: 599,
+  positioningSubline: "Built inside Muscle Bound Gym, by people who actually hire PTs.",
+  whyThisGymHeading: "Learn Inside Muscle Bound Gym",
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
   stats: [
