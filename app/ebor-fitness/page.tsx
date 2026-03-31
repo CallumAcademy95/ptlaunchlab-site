@@ -27,6 +27,8 @@ const config: GymConfig = {
   fullPrice: 1399,
   depositPrice: 599,
 
+  positioningSubline: "Built inside one of York's most established gyms, by people who actually hire PTs.",
+  whyThisGymHeading: "Learn Inside Ebor Fitness",
   // ── Stripe (add links once created in Stripe dashboard)
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",

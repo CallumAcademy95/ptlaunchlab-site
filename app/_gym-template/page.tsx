@@ -41,6 +41,10 @@ const config: GymConfig = {
   fullPrice: 1399,                           // standard is 1599 minus discount
   depositPrice: 599,
 
+  // ── Positioning section — write gym-specific copy (no generic claims)
+  positioningSubline: "Built inside [GYM NAME], by people who actually hire PTs.",
+  whyThisGymHeading: "Learn Inside [GYM NAME]",
+
   // ── Stripe (create payment links in Stripe dashboard first)
   stripeFullLink:    "REPLACE_WITH_STRIPE_FULL_LINK",
   stripeDepositLink: "REPLACE_WITH_STRIPE_DEPOSIT_LINK",

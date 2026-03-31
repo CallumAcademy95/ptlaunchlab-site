@@ -102,7 +102,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <h2 className="text-3xl md:text-5xl font-black text-white uppercase leading-tight mb-4">
               This Is The {c.gymName} PT Academy
             </h2>
-            <p className="text-white/70 text-base mb-10">{c.positioningSubline ?? "Built inside an award-winning gym, by people who actually hire PTs."}</p>
+            <p className="text-white/70 text-base mb-10">{c.positioningSubline}</p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
               {[{ icon: "🎓", label: "Get Qualified" }, { icon: "👥", label: "Get Clients" }, { icon: "💰", label: "Make Money" }, { icon: "🏋️", label: "Build a Career" }].map(card => (
@@ -146,7 +146,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
         <section className="bg-black py-16 md:py-24">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-white uppercase mb-3">
-              {c.whyThisGymHeading ?? "Learn Inside An Award-Winning Gym"}
+              {c.whyThisGymHeading}
             </h2>
             <p className="text-white/50 mb-10">Not a classroom. Not just videos.</p>
 
