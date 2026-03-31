@@ -359,7 +359,7 @@ export async function generatePartnershipAgreementPDFBase64(
 
   addFooter();
 
-  const base64 = doc.output("datauristring");
+  const base64 = doc.output("datauristring").split(",")[1];
   const gymSlug = data.gymName.toLowerCase().replace(/\s+/g, "-");
   const filename = `ptll-partnership-agreement-${gymSlug}-${new Date(data.signedAt).toISOString().slice(0, 10)}.pdf`;
 
