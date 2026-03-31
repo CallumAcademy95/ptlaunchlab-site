@@ -4,7 +4,6 @@ import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
-const BCC_EMAIL    = "submissions@albacomanagement.co.uk";
 
 const rateLimiter = createRateLimiter(3, 60_000);
 
@@ -158,7 +157,7 @@ export async function POST(req: NextRequest) {
         resend.emails.send({
           from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
           to: ADMIN_EMAIL,
-          bcc: BCC_EMAIL,
+
           subject: `Gym Partnership Signed: ${gymName} — ${repName}`,
           html: adminHtml,
           attachments: pdfAttachment,
