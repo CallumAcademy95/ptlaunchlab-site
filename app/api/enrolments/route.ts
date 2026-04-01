@@ -299,7 +299,7 @@ export async function POST(req: NextRequest) {
           submitted_at:   submittedDate,
           gym_referral:   gymReferral || "",
           pdf_filename:   pdfFilename,
-          pdf_base64:     `data:application/pdf;base64,${pdfBase64}`,
+          pdf_base64:     pdfBase64,
         }),
       }).catch((err) => console.error("[enrolments] Zapier webhook error:", err));
     }

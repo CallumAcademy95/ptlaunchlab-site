@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
           rep_email:          repEmail,
           signed_at:          signedDate,
           pdf_filename:       pdfFilename,
-          pdf_base64:         `data:application/pdf;base64,${pdfBase64}`,
+          pdf_base64:         pdfBase64,
         }),
       }).catch((err) => console.error("[gym-partnership/sign] Zapier webhook error:", err));
     }
