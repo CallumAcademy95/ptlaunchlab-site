@@ -31,6 +31,7 @@ export interface GymConfig {
   // ── Positioning section — required, gym-specific copy
   positioningSubline: string;   // under "This Is The X PT Academy" heading
   whyThisGymHeading: string;    // h2 above the stats strip
+  gymIntro?: string;            // optional line under "Not a classroom. Not just videos."
 
   // ── Why this gym (stats strip)
   stats: { value: string; label: string }[];

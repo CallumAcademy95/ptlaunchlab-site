@@ -28,25 +28,27 @@ const config: GymConfig = {
 
   positioningSubline: "Built inside one of York's most established gyms, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside Ebor Fitness",
+  gymIntro: "Learn in a real gym, with real members, in a proper training environment.",
   // ── Stripe (add links once created in Stripe dashboard)
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
 
   // ── Why this gym (4 stat boxes)
   stats: [
-    { value: "2006", label: "Est. by competitive bodybuilders" },
-    { value: "🔨",   label: "Official Hammer Strength Center" },
-    { value: "24/7", label: "Open all day, every day" },
-    { value: "Pro",  label: "Athletes, footballers & fighters" },
+    { value: "2006", label: "Family-run since" },
+    { value: "24/7", label: "Train, learn & build experience" },
+    { value: "All",  label: "Levels — beginners to athletes" },
+    { value: "★",    label: "Clean, professional environment" },
   ],
 
   // ── Why this gym (bullet list)
   gymHighlights: [
-    "Official Hammer Strength Center — one of only a few elite gyms in the UK",
-    "Founded by Mr Universe 2013 & NABBA Pro Stuart Garrington",
-    "Preferred by professional footballers, England cricketers and MMA fighters",
-    "24 hours / 7 days a week — train on your schedule",
-    "World-class equipment and an unmatched training environment in York",
+    "Learn and qualify in a gym that reflects the standard you should be coaching at",
+    "Train on high-quality equipment you'll actually use as a coach",
+    "Be part of a supportive and respectful community",
+    "Gain real exposure to a wide range of members",
+    "Build confidence on the gym floor, not just in a classroom",
+    "24/7 access so you can develop your skills around your schedule",
   ],
 
   // ── SEO

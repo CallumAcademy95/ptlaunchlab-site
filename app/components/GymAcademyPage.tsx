@@ -157,7 +157,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <h2 className="text-3xl md:text-4xl font-black text-white uppercase mb-3">
               {c.whyThisGymHeading}
             </h2>
-            <p className="text-white/50 mb-10">Not a classroom. Not just videos.</p>
+            <p className="text-white/50 mb-3">Not a classroom. Not just videos.</p>
+            {c.gymIntro && <p className="text-white/70 text-base mb-10">{c.gymIntro}</p>}
+            {!c.gymIntro && <div className="mb-10" />}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {c.stats.map((s, i) => (
