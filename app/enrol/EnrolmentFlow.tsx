@@ -247,7 +247,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   // ─── Promo code ────────────────────────────────────────────────────────────
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
-    if (partner?.promoCodes[code]) {
+    if (partner?.promoCodes?.[code]) {
       setAppliedPromo(code);
       setPromoError("");
     } else {
