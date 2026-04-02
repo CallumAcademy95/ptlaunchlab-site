@@ -254,7 +254,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       setPromoError("Invalid promo code — please check and try again.");
     }
   }
-  const activePromo = appliedPromo ? partner?.promoCodes[appliedPromo] : null;
+  const activePromo = appliedPromo ? partner?.promoCodes?.[appliedPromo] : null;
 
   // ─── Validation ────────────────────────────────────────────────────────────
   function v1() {
