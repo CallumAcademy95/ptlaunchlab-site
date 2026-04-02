@@ -15,14 +15,16 @@ const SUPPORT_PHONE             = "01977 365001";
 
 // ─── Partner config (passed in from gym-specific enrol pages) ─────────────────
 export interface PartnerConfig {
-  gymReferral: string;          // e.g. "6fit Gyms"
-  promoCodes: Record<string, { // key = code (uppercase), value = discount config
-    label: string;              // e.g. "6fit Member Discount"
-    discountAmount: number;     // e.g. 200
-    fullPrice: number;          // discounted full price e.g. 1199
-    depositPrice: number;       // discounted deposit e.g. 399
-    fullStripeLink: string;     // Stripe link for discounted full payment
-    depositStripeLink: string;  // Stripe link for discounted deposit
+  gymReferral: string;           // e.g. "6fit Gyms"
+  stripeFullLink?: string;       // default full-price Stripe link (no promo needed)
+  stripeDepositLink?: string;    // default deposit Stripe link (no promo needed)
+  promoCodes?: Record<string, { // key = code (uppercase), value = discount config
+    label: string;               // e.g. "6fit Member Discount"
+    discountAmount: number;      // e.g. 200
+    fullPrice: number;           // discounted full price e.g. 1199
+    depositPrice: number;        // discounted deposit e.g. 399
+    fullStripeLink: string;      // Stripe link for discounted full payment
+    depositStripeLink: string;   // Stripe link for discounted deposit
   }>;
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -367,8 +369,8 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     }
 
     trackEvent('enrol_complete', { payment_type: type, ...(appliedPromo && { promo: appliedPromo }) });
-    const fullLink    = activePromo?.fullStripeLink    ?? FULL_PAYMENT_STRIPE_LINK;
-    const depositLink = activePromo?.depositStripeLink ?? DEPOSIT_STRIPE_LINK;
+    const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
+    const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
     window.location.href = type === "full" ? fullLink : depositLink;
   }
 

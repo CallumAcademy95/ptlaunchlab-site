@@ -18,10 +18,11 @@ export interface GymConfig {
   location?: string;         // e.g. "Bradford's best gym"
 
   // ── Discount
-  promoCode: string;         // e.g. "6FITPTDISCOUNT"
-  discountAmount: number;    // e.g. 200
-  fullPrice: number;         // Discounted full price e.g. 1399
-  depositPrice: number;      // Discounted deposit e.g. 599
+  showDiscount?: boolean;    // defaults to true — set false to hide all discount UI
+  promoCode?: string;        // e.g. "6FITPTDISCOUNT"
+  discountAmount?: number;   // e.g. 200
+  fullPrice: number;         // Full price (discounted if showDiscount true, else standard)
+  depositPrice: number;      // Deposit price
 
   // ── Stripe
   stripeFullLink: string;

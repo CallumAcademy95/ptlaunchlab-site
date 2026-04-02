@@ -9,8 +9,8 @@ const config: GymConfig = {
   logoAlt: "Ebor Fitness York",
 
   // ── Branding
-  primaryColor: "#3a4a3c",
-  heroBg: "#111111",
+  primaryColor: "#222222",
+  heroBg: "#000000",
 
   // ── Hero copy
   heroHeadline: [
@@ -22,16 +22,15 @@ const config: GymConfig = {
   location: "York",
 
   // ── Discount
-  promoCode: "EBORPTDISCOUNT",
-  discountAmount: 200,
-  fullPrice: 1399,
+  showDiscount: false,
+  fullPrice: 1599,
   depositPrice: 599,
 
   positioningSubline: "Built inside one of York's most established gyms, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside Ebor Fitness",
   // ── Stripe (add links once created in Stripe dashboard)
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
+  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
+  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
 
   // ── Why this gym (4 stat boxes)
   stats: [
@@ -53,7 +52,7 @@ const config: GymConfig = {
   // ── SEO
   metaTitle: "Ebor Fitness PT Academy | Become a Qualified Personal Trainer in York",
   metaDescription:
-    "Train, qualify, and earn at Ebor Fitness in York. Get £200 off your Level 2 & 3 PT qualification exclusively through Ebor Fitness. Mentorship included. Interview opportunities at Ebor.",
+    "Train, qualify, and earn at Ebor Fitness in York. Level 2 & 3 PT qualification through York's premier gym. Mentorship included. Interview opportunities at Ebor Fitness.",
   canonicalPath: "/ebor-fitness",
 };
 

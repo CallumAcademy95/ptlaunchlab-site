@@ -4,24 +4,14 @@ import type { PartnerConfig } from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | Ebor Fitness PT Academy",
-  description: "Claim your £200 Ebor Fitness discount and start your Level 2 & 3 PT qualification today.",
+  description: "Start your Level 2 & 3 PT qualification at Ebor Fitness in York. Mentorship included.",
   robots: { index: false },
 };
 
-const PRIMARY = "#3a4a3c";
-
 const PARTNER: PartnerConfig = {
   gymReferral: "Ebor Fitness",
-  promoCodes: {
-    "EBORPTDISCOUNT": {
-      label: "Ebor Fitness Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-    },
-  },
+  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
+  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 };
 
 export default function EborFitnessEnrolPage() {
@@ -29,22 +19,17 @@ export default function EborFitnessEnrolPage() {
     <div className="min-h-screen bg-[#061F36]">
       {/* Branded top bar */}
       <div className="bg-black border-b border-white/10 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://static.wixstatic.com/media/b2edc7_5ca945ff5059428e8e2646f8debf33d8~mv2.jpg"
-              alt="Ebor Fitness"
-              width={36} height={36}
-              className="rounded-lg object-cover"
-            />
-            <div>
-              <p className="text-white font-black text-sm uppercase leading-none">Ebor Fitness PT Academy</p>
-              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
-            </div>
-          </div>
-          <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide" style={{ backgroundColor: PRIMARY }}>
-            EBORPTDISCOUNT
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://static.wixstatic.com/media/b2edc7_5ca945ff5059428e8e2646f8debf33d8~mv2.jpg"
+            alt="Ebor Fitness"
+            width={36} height={36}
+            className="rounded-lg object-cover"
+          />
+          <div>
+            <p className="text-white font-black text-sm uppercase leading-none">Ebor Fitness PT Academy</p>
+            <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
           </div>
         </div>
       </div>
