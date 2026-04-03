@@ -55,6 +55,14 @@ const CSP = [
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit"],
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "static.wixstatic.com" },
+      { protocol: "https", hostname: "www.muscleboundgymuk.co.uk" },
+      { protocol: "https", hostname: "6fitgyms.co.uk" },
+      { protocol: "https", hostname: "i.ytimg.com" },
+    ],
+  },
   async headers() {
     return [
       {

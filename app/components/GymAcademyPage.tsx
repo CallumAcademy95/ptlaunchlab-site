@@ -31,7 +31,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 src={c.logoUrl}
                 alt={c.logoAlt ?? c.gymName}
                 width={52} height={52}
-                className="rounded-xl" unoptimized
+                className="rounded-xl"
               />
               <div>
                 <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Powered by PT Launch Lab</p>

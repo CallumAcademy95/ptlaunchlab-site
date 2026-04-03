@@ -19,7 +19,7 @@ import StickyMobileCTA from "@/app/components/StickyMobileCTA";
 import LocationContext from "@/app/components/LocationContext";
 import { hubLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 export const revalidate = false;
 
 export async function generateStaticParams() {

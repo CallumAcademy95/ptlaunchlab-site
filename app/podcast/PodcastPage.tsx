@@ -125,7 +125,6 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                       alt={ep.title}
                       fill
                       className="object-cover"
-                      unoptimized
                     />
                     {/* Play overlay */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
