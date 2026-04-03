@@ -25,7 +25,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
         {/* ── HERO ── */}
         <section className="relative overflow-hidden" style={{ backgroundColor: bg }}>
           <div className="absolute inset-0 opacity-25 pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at 80% 50%, ${c.primaryColor}, transparent 55%)` }} />
+            style={{ background: `radial-gradient(ellipse at 80% 50%, ${dark}, transparent 55%)` }} />
 
           <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-24">
             <div className="flex items-center gap-3 mb-8">
@@ -53,7 +53,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             )}
 
             {showDiscount && (
-              <div className="inline-flex items-center gap-3 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: c.primaryColor }}>
+              <div className="inline-flex items-center gap-3 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
                 <span className="text-white font-black text-xl uppercase tracking-wide">£{c.discountAmount} OFF</span>
                 <span className="text-white/80 text-sm">exclusively for {c.gymName} members</span>
               </div>
@@ -101,14 +101,14 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
             <div className="bg-black rounded-2xl px-8 py-5 text-center">
               <p className="text-white font-black text-lg uppercase tracking-wide">
-                That&apos;s exactly why <span style={{ color: c.primaryColor }}>this exists.</span>
+                That&apos;s exactly why <span style={{ color: dark }}>this exists.</span>
               </p>
             </div>
           </div>
         </section>
 
         {/* ── POSITIONING ── */}
-        <section className="py-16 md:py-20" style={{ backgroundColor: c.primaryColor }}>
+        <section className="py-16 md:py-20" style={{ backgroundColor: sectionBg }}>
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-5xl font-black text-white uppercase leading-tight mb-4">
               This Is The {c.gymName} PT Academy
@@ -189,19 +189,19 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               <div className="bg-black rounded-3xl p-10 md:p-14 text-center">
                 <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4">Exclusive {c.gymName} Offer</p>
                 <h2 className="text-5xl md:text-7xl font-black text-white uppercase leading-none mb-2">£{c.discountAmount}</h2>
-                <h3 className="text-2xl font-black uppercase mb-6" style={{ color: c.primaryColor }}>Off Your Course</h3>
+                <h3 className="text-2xl font-black uppercase mb-6" style={{ color: dark }}>Off Your Course</h3>
                 <p className="text-white/60 text-sm mb-8">Only available when you join through {c.gymName}.</p>
                 <div className="grid grid-cols-3 gap-3 mb-8">
                   {["Save instantly", "Secure your place", "Start immediately"].map(i => (
                     <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
-                      <span style={{ color: c.primaryColor }} className="block font-bold text-base mb-1">✔</span>
+                      <span style={{ color: dark }} className="block font-bold text-base mb-1">✔</span>
                       <span className="text-white/70 text-xs">{i}</span>
                     </div>
                   ))}
                 </div>
                 <a href={enrolPath}
-                  className="inline-block px-10 py-4 rounded-full font-black text-white uppercase text-base hover:opacity-90 transition-all"
-                  style={{ backgroundColor: c.primaryColor }}>
+                  className="inline-block px-10 py-4 rounded-full font-black uppercase text-base hover:opacity-90 transition-all"
+                  style={{ backgroundColor: dark, color: bg }}>
                   Claim Your £{c.discountAmount} Discount Now →
                 </a>
               </div>
@@ -292,7 +292,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
         </section>
 
         {/* ── FINAL CTA ── */}
-        <section className="py-16 md:py-20" style={{ backgroundColor: c.primaryColor }}>
+        <section className="py-16 md:py-20" style={{ backgroundColor: sectionBg }}>
           <div className="max-w-2xl mx-auto px-6 text-center">
             <h2 className="text-4xl md:text-5xl font-black text-white uppercase leading-tight mb-3">
               Start Your PT Journey Today
