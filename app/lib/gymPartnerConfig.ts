@@ -9,7 +9,9 @@ export interface GymConfig {
   logoAlt?: string;          // Alt text (defaults to gymName)
 
   // ── Branding
-  primaryColor: string;      // e.g. "#ed0000"
+  primaryColor: string;      // Accent for light backgrounds (buttons, check marks on white sections)
+  darkAccent?: string;       // Accent for dark backgrounds (hero text, dark-section checks). Defaults to primaryColor
+  sectionBg?: string;        // Full-bleed section backgrounds (defaults to primaryColor)
   heroBg?: string;           // Hero background color (defaults to "#000000")
 
   // ── Hero copy

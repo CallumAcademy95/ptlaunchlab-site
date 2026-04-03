@@ -12,6 +12,8 @@ function Check({ children, color }: { children: React.ReactNode; color: string }
 
 export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
   const bg = c.heroBg ?? "#000000";
+  const sectionBg = c.sectionBg ?? c.primaryColor;
+  const dark = c.darkAccent ?? c.primaryColor;
   const enrolPath = `${c.canonicalPath}/enrol`;
   const monthlyPayments = Math.round((c.fullPrice - c.depositPrice) / 200);
   const showDiscount = c.showDiscount !== false;
@@ -43,7 +45,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               {c.heroHeadline.slice(0, -1).map((line, i) => (
                 <span key={i}>{line}<br /></span>
               ))}
-              <span style={{ color: c.primaryColor }}>{c.heroHeadline[c.heroHeadline.length - 1]}</span>
+              <span style={{ color: dark }}>{c.heroHeadline[c.heroHeadline.length - 1]}</span>
             </h1>
 
             {c.heroSubline && (
@@ -66,14 +68,14 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 `Interview Opportunities At ${c.gymName}`,
               ].map(i => (
                 <li key={i} className="flex items-center gap-2 text-white/80 text-sm font-medium">
-                  <span style={{ color: c.primaryColor }}>✔</span> {i}
+                  <span style={{ color: dark }}>✔</span> {i}
                 </li>
               ))}
             </ul>
 
             <a href={enrolPath}
-              className="inline-block px-10 py-4 rounded-full font-black text-white uppercase tracking-wide text-base hover:opacity-90 transition-all shadow-xl"
-              style={{ backgroundColor: c.primaryColor }}>
+              className="inline-block px-10 py-4 rounded-full font-black uppercase tracking-wide text-base hover:opacity-90 transition-all shadow-xl"
+              style={{ backgroundColor: dark, color: bg }}>
               {showDiscount ? `Claim Your £${c.discountAmount} Discount →` : "Enrol Now →"}
             </a>
           </div>
@@ -164,7 +166,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {c.stats.map((s, i) => (
                 <div key={s.label} className="bg-white/10 border border-white/10 rounded-2xl p-5 text-center">
-                  <p className="font-black text-2xl" style={{ color: i === 0 ? c.primaryColor : "white" }}>{s.value}</p>
+                  <p className="font-black text-2xl" style={{ color: i === 0 ? dark : "white" }}>{s.value}</p>
                   <p className="text-white/50 text-xs mt-1">{s.label}</p>
                 </div>
               ))}
@@ -173,7 +175,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <ul className="space-y-3 text-left max-w-lg mx-auto">
               {c.gymHighlights.map(i => (
                 <li key={i} className="flex items-start gap-3 text-sm text-white/70">
-                  <span style={{ color: c.primaryColor }} className="shrink-0 font-bold">✔</span>{i}
+                  <span style={{ color: dark }} className="shrink-0 font-bold">✔</span>{i}
                 </li>
               ))}
             </ul>
@@ -244,7 +246,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-10">How It Works</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-0">
-              {[`Apply through ${c.gymName}`, `Get your £${c.discountAmount} discount`, "Start your course", "Get qualified", `Work at ${c.gymName}`].map((step, i) => (
+              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Work at ${c.gymName}`].map((step, i) => (
                 <div key={step} className="flex sm:flex-col items-center gap-2 sm:gap-0 flex-1">
                   <div className="flex sm:flex-col items-center sm:mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0" style={{ backgroundColor: c.primaryColor }}>
