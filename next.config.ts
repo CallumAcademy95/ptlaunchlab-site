@@ -59,13 +59,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         has: [{ type: "host", value: "ultimateshredacademy.com" }],
-        destination: "https://www.ptlaunchlab.co.uk/:path*",
+        destination: "https://www.ptlaunchlab.co.uk/",
         permanent: true,
       },
       {
         source: "/:path*",
         has: [{ type: "host", value: "www.ultimateshredacademy.com" }],
-        destination: "https://www.ptlaunchlab.co.uk/:path*",
+        destination: "https://www.ptlaunchlab.co.uk/",
         permanent: true,
       },
     ];
