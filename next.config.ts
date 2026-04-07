@@ -54,6 +54,22 @@ const CSP = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "ultimateshredacademy.com" }],
+        destination: "https://www.ptlaunchlab.co.uk/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.ultimateshredacademy.com" }],
+        destination: "https://www.ptlaunchlab.co.uk/:path*",
+        permanent: true,
+      },
+    ];
+  },
   serverExternalPackages: ["pdfkit"],
   images: {
     remotePatterns: [
