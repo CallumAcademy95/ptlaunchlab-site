@@ -1,40 +1,19 @@
 import type { MetadataRoute } from "next";
-import { ukLocations } from "./lib/ukLocations";
+import { hubLocations } from "./lib/ukLocations";
 
 const BASE = "https://ptlaunchlab.co.uk";
 
-// All keyword route slugs that have a [location] sub-route
+// Tier-1 keyword routes only — genuinely distinct search intent.
+// Lower-priority variants are excluded to preserve crawl budget and avoid
+// near-duplicate content diluting indexing of these core pages.
 const keywordRoutes = [
   "level-3-personal-trainer-course",
-  "personal-trainer-certification",
-  "accredited-personal-trainer-course",
-  "personal-trainer-diploma",
-  "ncfe-level-3-pt-qualification",
-  "ofqual-regulated-personal-trainer-course",
-  "best-online-personal-trainer-course",
-  "best-personal-trainer-course-uk",
-  "online-personal-training-course",
-  "online-pt-qualification-uk",
-  "online-coaching-course",
-  "flexible-personal-trainer-course",
-  "fast-track-personal-trainer-course",
-  "level-2-3-personal-training",
-  "level-3-gym-instructing-and-personal-training-diploma",
-  "personal-trainer-courses-online-uk",
   "personal-trainer-course-with-business-support",
-  "personal-training-course-with-business-support",
-  "personal-training-course-with-mentorship",
-  "pt-courses-with-business-training",
-  "pt-course-payment-plan",
-  "become-a-qualified-personal-trainer",
-  "become-a-personal-trainer-online",
-  "start-your-own-personal-training-business",
-  "quit-9-5-become-a-personal-trainer",
-  "career-change-personal-trainer",
   "how-to-become-a-personal-trainer",
-  "gym-floor-personal-trainer",
-  "hybrid-personal-trainer",
-  "personal-trainer-qualification-recognised-by-uk-gyms",
+  "career-change-personal-trainer",
+  "online-pt-qualification-uk",
+  "ncfe-level-3-pt-qualification",
+  "quit-9-5-become-a-personal-trainer",
 ];
 
 const TODAY = new Date().toISOString().split("T")[0];
@@ -58,7 +37,6 @@ const staticPages: MetadataRoute.Sitemap = [
 
 // Only routes that have an actual root page.tsx (not just [location] sub-routes)
 const routesWithRootPage = new Set([
-  "best-personal-trainer-course-uk",
   "personal-trainer-course-with-business-support",
 ]);
 
@@ -73,9 +51,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: TODAY,
     }));
 
-  // All keyword + location combinations
+  // Hub locations only — non-hub slugs 301 to their nearest hub, so listing
+  // them in the sitemap just wastes crawl budget on redirect chains.
   const locationPages: MetadataRoute.Sitemap = keywordRoutes.flatMap((route) =>
-    ukLocations.map((loc) => ({
+    hubLocations.map((loc) => ({
       url: `${BASE}/${route}/${loc.slug}`,
       priority: 0.6,
       changeFrequency: "monthly" as const,

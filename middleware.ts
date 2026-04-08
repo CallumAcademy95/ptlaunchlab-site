@@ -26,7 +26,8 @@ const SLUG_REDIRECTS: Record<string, string> = {
   "ncfe-level-3-personal-training-course":       "ncfe-level-3-pt-qualification",
   "become-a-qualified-personal-trainer-uk":      "become-a-qualified-personal-trainer",
   // Old URL variants without an app directory
-  "quit-9-5-become-a-personal-trainer":          "personal-trainer-course-with-business-support",
+  // NOTE: quit-9-5-become-a-personal-trainer is intentionally NOT redirected here
+  // — it has real pages at /quit-9-5-become-a-personal-trainer/[hub-location]
   "how-to-become-an-online-personal-trainer":    "how-to-become-a-personal-trainer",
   "how-to-become-a-personal-trainer-uk-online":  "how-to-become-a-personal-trainer",
   "change-career-to-fitness-uk":                 "career-change-personal-trainer",
@@ -37,9 +38,39 @@ const SLUG_REDIRECTS: Record<string, string> = {
   "personal-training-course-business-support":   "personal-training-course-with-business-support",
 };
 
-// Base routes that exist only as /[slug]/[location] with no root page.tsx
-// (kept for any legacy references — main redirects now handled in SLUG_REDIRECTS)
-const BASE_ONLY_REDIRECTS: Record<string, string> = {};
+// Base routes that exist only as /[slug]/[location] with no root page.tsx.
+// Visiting without a location slug would 404 — redirect to the main course page.
+const BASE_ONLY_REDIRECTS: Record<string, string> = {
+  "accredited-personal-trainer-course":                  "/personal-trainer-course-with-business-support",
+  "become-a-personal-trainer-online":                    "/personal-trainer-course-with-business-support",
+  "become-a-qualified-personal-trainer":                 "/personal-trainer-course-with-business-support",
+  "best-online-personal-trainer-course":                 "/personal-trainer-course-with-business-support",
+  "career-change-personal-trainer":                      "/personal-trainer-course-with-business-support",
+  "fast-track-personal-trainer-course":                  "/personal-trainer-course-with-business-support",
+  "flexible-personal-trainer-course":                    "/personal-trainer-course-with-business-support",
+  "gym-floor-personal-trainer":                          "/personal-trainer-course-with-business-support",
+  "how-to-become-a-personal-trainer":                    "/personal-trainer-course-with-business-support",
+  "hybrid-personal-trainer":                             "/personal-trainer-course-with-business-support",
+  "level-2-3-personal-training":                         "/personal-trainer-course-with-business-support",
+  "level-3-gym-instructing-and-personal-training-diploma": "/personal-trainer-course-with-business-support",
+  "level-3-personal-trainer-course":                     "/personal-trainer-course-with-business-support",
+  "ncfe-level-3-pt-qualification":                       "/personal-trainer-course-with-business-support",
+  "ofqual-regulated-personal-trainer-course":            "/personal-trainer-course-with-business-support",
+  "online-coaching-course":                              "/personal-trainer-course-with-business-support",
+  "online-personal-training-course":                     "/personal-trainer-course-with-business-support",
+  "online-pt-qualification-uk":                          "/personal-trainer-course-with-business-support",
+  "personal-trainer-certification":                      "/personal-trainer-course-with-business-support",
+  "personal-trainer-courses-online-uk":                  "/personal-trainer-course-with-business-support",
+  "personal-trainer-diploma":                            "/personal-trainer-course-with-business-support",
+  "personal-trainer-qualification-recognised-by-uk-gyms": "/personal-trainer-course-with-business-support",
+  "personal-training-course-with-business-support":      "/personal-trainer-course-with-business-support",
+  "personal-training-course-with-mentorship":            "/personal-trainer-course-with-business-support",
+  "pt-course":                                           "/personal-trainer-course-with-business-support",
+  "pt-course-payment-plan":                              "/personal-trainer-course-with-business-support",
+  "pt-courses-with-business-training":                   "/personal-trainer-course-with-business-support",
+  "quit-9-5-become-a-personal-trainer":                  "/personal-trainer-course-with-business-support",
+  "start-your-own-personal-training-business":           "/personal-trainer-course-with-business-support",
+};
 
 // All route bases that use the [location] dynamic segment.
 // When a request comes in for a non-hub location, it is 301-redirected to the
