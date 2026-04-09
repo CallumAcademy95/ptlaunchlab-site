@@ -4,7 +4,7 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 const config: GymConfig = {
   gymName: "Ministry of Fitness",
-  logoUrl: "https://mofgym.co.uk/wp-content/uploads/2020/08/cropped-Ministry-Logo-new-final-05.png",
+  logoUrl: "/logos/mof.png",
   primaryColor: "#00cc33",
   sectionBg: "#007a1f",
   heroBg: "#000000",

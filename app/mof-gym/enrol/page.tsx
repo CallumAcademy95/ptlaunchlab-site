@@ -30,7 +30,7 @@ export default function MofGymEnrolPage() {
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://mofgym.co.uk/wp-content/uploads/2020/08/cropped-Ministry-Logo-new-final-05.png"
+              src="/logos/mof.png"
               alt="Ministry of Fitness"
               width={36}
               height={36}
