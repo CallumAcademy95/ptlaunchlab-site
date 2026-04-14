@@ -137,7 +137,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               {[
                 { icon: "🎓", title: "Full PT Qualification", body: "Study 100% online around your current job.", items: ["Level 2 Gym Instructor", "Level 3 Personal Trainer", "Industry recognised & Ofqual regulated"] },
                 { icon: "🧠", title: "Mentorship Included", body: "This is where most courses fail — we don't leave you on your own.", items: ["Support throughout your qualification", "Real-world advice from industry pros", "How to actually succeed as a PT"] },
-                { icon: "🏋️", title: "Gym Pathway", body: `Not just qualified — given a pathway into ${c.gymName}.`, items: [`Interview opportunities at ${c.gymName}`, "Learn how gyms actually work", "Build confidence on the gym floor"] },
+                { icon: "🏋️", title: "Gym Pathway", body: `Not just qualified — a real route to working at ${c.gymName} as a self-employed PT. Interview opportunities available on completion. This is an independent contractor arrangement, not a salaried position.`, items: [`Interview opportunities at ${c.gymName}`, "Learn how gyms actually work", "Build confidence on the gym floor"] },
                 { icon: "💰", title: "How You Make Money", body: "Income, not just certificates.", items: ["1-1 PT sessions", "Online coaching", "Hybrid coaching models"] },
               ].map(card => (
                 <div key={card.title} className="bg-gray-50 border border-gray-100 rounded-2xl p-7">
@@ -246,7 +246,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-10">How It Works</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-0">
-              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Work at ${c.gymName}`].map((step, i) => (
+              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Interview at ${c.gymName}`].map((step, i) => (
                 <div key={step} className="flex sm:flex-col items-center gap-2 sm:gap-0 flex-1">
                   <div className="flex sm:flex-col items-center sm:mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0" style={{ backgroundColor: c.primaryColor }}>
@@ -314,6 +314,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
       </main>
 
       <footer className="bg-black border-t border-white/10 py-6 px-6 text-center">
+        <p className="text-white/30 text-xs mb-2">
+          {c.gymName} is a gym partner of PT Launch Lab. All training, qualifications, and learning are delivered solely by PT Launch Lab — not by {c.gymName}. Any gym pathway or interview opportunity is subject to availability and is not a guarantee of employment. Self-employed PT arrangements involve independent contractor status, not PAYE employment.
+        </p>
         <p className="text-white/30 text-xs">
           Powered by PT Launch Lab · NCFE Accredited Centre No. 9002788 ·{" "}
           <a href="/terms" className="hover:text-white/50 transition-colors">Terms</a>
