@@ -5,15 +5,15 @@ import { generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
-// ─── CONFIGURATION — replace these placeholders before going live ─────────────
+// â"€â"€â"€ CONFIGURATION — replace these placeholders before going live â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const TERMS_URL                 = "/terms";
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";       // TODO: Support email
 const SUPPORT_PHONE             = "01977 365001";
-// ─────────────────────────────────────────────────────────────────────────────
+// â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-// ─── Partner config (passed in from gym-specific enrol pages) ─────────────────
+// â"€â"€â"€ Partner config (passed in from gym-specific enrol pages) â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 export interface PartnerConfig {
   gymReferral: string;           // e.g. "6fit Gyms"
   stripeFullLink?: string;       // default full-price Stripe link (no promo needed)
@@ -27,9 +27,9 @@ export interface PartnerConfig {
     depositStripeLink: string;   // Stripe link for discounted deposit
   }>;
 }
-// ─────────────────────────────────────────────────────────────────────────────
+// â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â"€â"€â"€ Types â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 interface LearnerDetails {
   title: string; fullName: string; dateOfBirth: string; gender: string;
   nationalInsurance: string; mobile: string; email: string;
@@ -62,7 +62,7 @@ const blankAgreement: AgreementState = {
 
 type Step = 1 | 2 | 3 | 4;
 
-// ─── Progress Bar ─────────────────────────────────────────────────────────────
+// â"€â"€â"€ Progress Bar â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 const STEPS = [
   { num: 1, label: "Details" },
   { num: 2, label: "Learning Info" },
@@ -74,9 +74,9 @@ function ProgressBar({ step }: { step: Step }) {
   return (
     <div className="w-full mb-12">
       <div className="flex items-start justify-between relative">
-        <div className="absolute top-4 left-0 right-0 h-0.5 bg-[#1A3A5C]" />
+        <div className="absolute top-4 left-0 right-0 h-0.5 bg-white/10" />
         <div
-          className="absolute top-4 left-0 h-0.5 bg-[#F5C518] transition-all duration-500 ease-out"
+          className="absolute top-4 left-0 h-0.5 bg-gold transition-all duration-500 ease-out"
           style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }}
         />
         {STEPS.map((s) => {
@@ -85,14 +85,16 @@ function ProgressBar({ step }: { step: Step }) {
           return (
             <div key={s.num} className="relative flex flex-col items-center z-10 flex-1 first:items-start last:items-end">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                done    ? "bg-[#F5C518] text-[#072B4A]" :
-                active  ? "bg-[#F5C518] text-[#072B4A] ring-4 ring-[#F5C518]/25" :
-                          "bg-[#0A2A44] border-2 border-[#1A3A5C] text-[#3A5A7C]"
+                done    ? "bg-gold text-deep" :
+                active  ? "bg-gold text-deep ring-4 ring-gold/25" :
+                          "bg-deep border-2 border-white/10 text-faint"
               }`}>
-                {done ? "✓" : s.num}
+                {done ? (
+                  <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                ) : s.num}
               </div>
               <span className={`mt-2 text-[10px] font-bold tracking-wider uppercase ${
-                active ? "text-[#F5C518]" : done ? "text-[#F5C518]/60" : "text-[#3A5A7C]"
+                active ? "text-gold" : done ? "text-gold/60" : "text-faint"
               }`}>
                 {s.label}
               </span>
@@ -104,57 +106,57 @@ function ProgressBar({ step }: { step: Step }) {
   );
 }
 
-// ─── Shared field wrapper ─────────────────────────────────────────────────────
+// â"€â"€â"€ Shared field wrapper â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 function Field({ label, error, required, hint, children }: {
   label: string; error?: string; required?: boolean; hint?: string; children: React.ReactNode;
 }) {
   return (
     <div>
-      <label className="text-[#8CA3BF] text-sm mb-1.5 flex items-center gap-1">
+      <label className="text-soft text-sm mb-1.5 flex items-center gap-1">
         {label}
-        {required && <span className="text-[#F5C518] text-xs">*</span>}
+        {required && <span className="text-gold text-xs">*</span>}
       </label>
       {children}
-      {hint && !error && <p className="text-[#3A5A7C] text-xs mt-1">{hint}</p>}
+      {hint && !error && <p className="text-faint text-xs mt-1">{hint}</p>}
       {error && <p className="text-red-400 text-xs mt-1">⚠ {error}</p>}
     </div>
   );
 }
 
-const input = "w-full bg-[#061F36] border border-[#1A3A5C] rounded-xl px-4 py-3 text-white placeholder-[#2A4A6C] focus:outline-none focus:border-[#F5C518]/50 transition-colors text-sm";
+const input = "w-full bg-deep border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/[0.15] focus:outline-none focus:border-gold/50 transition-colors text-sm";
 const sel   = input + " cursor-pointer";
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl p-6 space-y-4">
-      <h2 className="text-white font-bold text-lg pb-2 border-b border-[#1A3A5C]">{title}</h2>
+    <div className="bg-deep border border-white/10 rounded-2xl p-6 space-y-4">
+      <h2 className="text-white font-bold text-lg pb-2 border-b border-white/10">{title}</h2>
       {children}
     </div>
   );
 }
 
-// ─── Checkbox row ─────────────────────────────────────────────────────────────
+// â"€â"€â"€ Checkbox row â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 function Check({ checked, onChange, error, children }: {
   checked: boolean; onChange: (v: boolean) => void; error?: boolean; children: React.ReactNode;
 }) {
   return (
     <label className={`flex items-start gap-3 cursor-pointer p-4 rounded-xl border transition-all ${
-      checked ? "border-[#F5C518]/40 bg-[#F5C518]/5" :
+      checked ? "border-gold/40 bg-gold/5" :
       error   ? "border-red-500/40 bg-red-500/5" :
-                "border-[#1A3A5C] hover:border-[#2A4A6C]"
+                "border-white/10 hover:border-white/[0.15]"
     }`}>
       <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border-2 transition-all ${
-        checked ? "bg-[#F5C518] border-[#F5C518]" : "border-[#2A4A6C]"
+        checked ? "bg-gold border-gold" : "border-white/[0.15]"
       }`}>
-        {checked && <span className="text-[#072B4A] text-xs font-bold leading-none">✓</span>}
+        {checked && <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5 text-deep"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
       </div>
       <input type="checkbox" className="sr-only" checked={checked} onChange={e => onChange(e.target.checked)} />
-      <span className="text-[#8CA3BF] text-sm leading-relaxed">{children}</span>
+      <span className="text-soft text-sm leading-relaxed">{children}</span>
     </label>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// â"€â"€â"€ Main Component â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 export default function EnrolmentFlow({ partner, standalone }: { partner?: PartnerConfig; standalone?: boolean }) {
   const [step, setStep]         = useState<Step>(1);
   const [learner, setL]         = useState<LearnerDetails>(blankLearner);
@@ -174,7 +176,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   const isDrawing               = useRef(false);
   const lastPos                 = useRef<{ x: number; y: number } | null>(null);
 
-  // ─── Canvas signature ──────────────────────────────────────────────────────
+  // â"€â"€â"€ Canvas signature â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   useEffect(() => {
     if (step !== 3 || signMode !== "drawn") return;
     const canvas = canvasRef.current;
@@ -244,7 +246,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     return canvasRef.current?.toDataURL("image/png") ?? "";
   }
 
-  // ─── Promo code ────────────────────────────────────────────────────────────
+  // â"€â"€â"€ Promo code â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
     if (partner?.promoCodes?.[code]) {
@@ -256,7 +258,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }
   const activePromo = appliedPromo ? partner?.promoCodes?.[appliedPromo] : null;
 
-  // ─── Validation ────────────────────────────────────────────────────────────
+  // â"€â"€â"€ Validation â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   function v1() {
     const e: Record<string, string> = {};
     if (!learner.title)                         e.title = "Required";
@@ -293,7 +295,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     return e;
   }
 
-  // ─── Navigation ────────────────────────────────────────────────────────────
+  // â"€â"€â"€ Navigation â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   function next() {
     const errs = step === 1 ? v1() : step === 2 ? v2() : step === 3 ? v3() : {};
     if (Object.keys(errs).length) {
@@ -313,7 +315,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // ─── Payment ───────────────────────────────────────────────────────────────
+  // â"€â"€â"€ Payment â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   async function pay(type: "full" | "deposit") {
     if (submitting) return;
     setSubmitting(true);
@@ -376,25 +378,25 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
 
   const firstName = learner.fullName.split(" ")[0];
 
-  // ─── Render ────────────────────────────────────────────────────────────────
+  // â"€â"€â"€ Render â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   return (
     <>
       {!standalone && <Nav />}
-      <main className={`${standalone ? "" : "pt-[72px]"} min-h-screen bg-[#061F36]`}>
+      <main className={`${standalone ? "" : "pt-[72px]"} min-h-screen bg-deep`}>
         <div className="max-w-2xl mx-auto px-5 py-16">
 
           {/* Page header */}
           <div className="text-center mb-10">
-            <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">
+            <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">
               PT Launch Lab — Enrolment
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+            <h1 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-3">
               {step === 1 && "Your Details"}
               {step === 2 && "Learning Information"}
               {step === 3 && "Agree & Sign"}
               {step === 4 && `You're almost in, ${firstName || "almost there"}.`}
             </h1>
-            <p className="text-[#8CA3BF] text-sm">
+            <p className="text-soft text-sm">
               {step === 1 && "Step 1 of 4 — Personal details. Takes about 2 minutes."}
               {step === 2 && "Step 2 of 4 — A few background questions for your learner record."}
               {step === 3 && "Step 3 of 4 — Review your learner agreement and add your signature."}
@@ -414,9 +416,9 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {/* STEP 1 — Learner Details                                       */}
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {step === 1 && (
             <div className="space-y-6">
               <Card title="Personal Information">
@@ -506,16 +508,16 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {/* STEP 2 — Learning Information                                  */}
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {step === 2 && (
             <div className="space-y-6">
               {partner?.gymReferral ? (
                 // Referral source is known — no need to ask, just confirm visually
-                <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl px-5 py-4 flex items-center gap-3">
-                  <span className="text-[#F5C518] text-sm">✔</span>
-                  <p className="text-[#8CA3BF] text-sm">Referred by <span className="text-white font-semibold">{partner.gymReferral}</span></p>
+                <div className="bg-deep border border-white/10 rounded-2xl px-5 py-4 flex items-center gap-3">
+                  <span className="text-gold text-sm">✓</span>
+                  <p className="text-soft text-sm">Referred by <span className="text-white font-semibold">{partner.gymReferral}</span></p>
                 </div>
               ) : (
               <Card title="How You Found Us">
@@ -536,7 +538,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   </select>
                 </Field>
 
-                <p className="text-[#8CA3BF] text-xs">GCSE grades — leave blank if not applicable</p>
+                <p className="text-soft text-xs">GCSE grades — leave blank if not applicable</p>
                 <div className="grid grid-cols-3 gap-3">
                   {([
                     { key: "gcseEnglish", label: "English" },
@@ -564,34 +566,34 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {/* STEP 3 — Agreement & Signature                                 */}
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {step === 3 && (
             <div className="space-y-6">
-              <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl p-6">
+              <div className="bg-deep border border-white/10 rounded-2xl p-6">
                 <h2 className="text-white font-bold text-xl mb-2">Learner Agreement</h2>
-                <p className="text-[#8CA3BF] text-sm leading-relaxed mb-6">
+                <p className="text-soft text-sm leading-relaxed mb-6">
                   Please read the following carefully. This confirms your commitment and your understanding of key terms before you proceed to payment.
                 </p>
 
                 {/* Refund terms */}
                 <div className="space-y-3 mb-6">
-                  <div className="bg-[#061F36] border border-[#1A3A5C] rounded-xl p-5">
-                    <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">
+                  <div className="bg-deep border border-white/10 rounded-xl p-5">
+                    <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">
                       Full Payment — Refund Terms
                     </p>
-                    <ul className="text-[#8CA3BF] text-sm space-y-2 leading-relaxed">
+                    <ul className="text-soft text-sm space-y-2 leading-relaxed">
                       <li>• You are eligible for a full refund if you cancel within 14 days of payment (the cooling off period).</li>
                       <li>• After the 14-day cooling off period, refunds are not normally available for a change of mind.</li>
                       <li>• Your statutory rights under applicable UK law are not affected by this agreement.</li>
                     </ul>
                   </div>
-                  <div className="bg-[#061F36] border border-[#1A3A5C] rounded-xl p-5">
-                    <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">
+                  <div className="bg-deep border border-white/10 rounded-xl p-5">
+                    <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">
                       Deposit & Monthly Payments — Refund Terms
                     </p>
-                    <ul className="text-[#8CA3BF] text-sm space-y-2 leading-relaxed">
+                    <ul className="text-soft text-sm space-y-2 leading-relaxed">
                       <li>• You are eligible for a full refund of your deposit if you cancel within 14 days of payment (the cooling off period).</li>
                       <li>• After the 14-day cooling off period, your deposit is not normally refundable for a change of mind.</li>
                       <li>• Your statutory rights under applicable UK law are not affected by this agreement.</li>
@@ -616,7 +618,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   <Check checked={agreement.termsAgreed} onChange={v => setA({ ...agreement, termsAgreed: v })} error={!!errors.termsAgreed}>
                     I have read and agree to the{" "}
                     <a href={TERMS_URL} target="_blank" rel="noopener noreferrer"
-                      className="text-[#F5C518] hover:underline"
+                      className="text-gold hover:underline"
                       onClick={e => e.stopPropagation()}>
                       PT Launch Lab Terms and Conditions
                     </a>.
@@ -626,9 +628,9 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
               </div>
 
               {/* Signature */}
-              <div className={`bg-[#0A2A44] border rounded-2xl p-6 ${errors.signature ? "border-red-500/40" : "border-[#1A3A5C]"}`}>
+              <div className={`bg-deep border rounded-2xl p-6 ${errors.signature ? "border-red-500/40" : "border-white/10"}`}>
                 <h2 className="text-white font-bold text-lg mb-1">Your Signature</h2>
-                <p className="text-[#8CA3BF] text-sm mb-5 leading-relaxed">
+                <p className="text-soft text-sm mb-5 leading-relaxed">
                   Sign below to confirm your agreement. You can draw your signature or type your full name.
                 </p>
 
@@ -639,30 +641,30 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                       onClick={() => { setSignMode(m); clearCanvas(); setTypedSig(""); }}
                       className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all ${
                         signMode === m
-                          ? "bg-[#F5C518] text-[#072B4A]"
-                          : "border border-[#2A4A6C] text-[#3A5A7C] hover:border-[#F5C518]/40 hover:text-[#F5C518]"
+                          ? "bg-gold text-deep"
+                          : "border border-white/[0.15] text-faint hover:border-gold/40 hover:text-gold"
                       }`}>
-                      {m === "drawn" ? "✏ Draw Signature" : "⌨ Type Name"}
+                      {m === "drawn" ? "Draw Signature" : "Type Name"}
                     </button>
                   ))}
                 </div>
 
                 {signMode === "drawn" ? (
                   <div>
-                    <div className="relative border-2 border-dashed border-[#2A4A6C] rounded-xl overflow-hidden bg-[#061F36]">
+                    <div className="relative border-2 border-dashed border-white/[0.15] rounded-xl overflow-hidden bg-deep">
                       <canvas
                         ref={canvasRef}
                         width={600}
                         height={160}
                         className="w-full touch-none cursor-crosshair block"
                       />
-                      <p className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[#2A4A6C] text-xs pointer-events-none select-none">
+                      <p className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white/[0.15] text-xs pointer-events-none select-none">
                         Draw your signature here
                       </p>
                     </div>
                     <button type="button" onClick={clearCanvas}
-                      className="mt-2 text-xs text-[#3A5A7C] hover:text-[#F5C518] transition-colors">
-                      ↺ Clear and start again
+                      className="mt-2 text-xs text-faint hover:text-gold transition-colors">
+                      â†º Clear and start again
                     </button>
                   </div>
                 ) : (
@@ -675,7 +677,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                       className={input + " text-xl font-light italic"}
                       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
                     />
-                    <p className="text-[#3A5A7C] text-xs mt-2">
+                    <p className="text-faint text-xs mt-2">
                       By typing your name you confirm it acts as your electronic signature.
                     </p>
                   </div>
@@ -685,52 +687,52 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   <p className="text-red-400 text-xs mt-3">⚠ {errors.signature}</p>
                 )}
 
-                <p className="text-[#3A5A7C] text-xs mt-4 pt-4 border-t border-[#1A3A5C]">
+                <p className="text-faint text-xs mt-4 pt-4 border-t border-white/10">
                   Date of signature: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                 </p>
               </div>
             </div>
           )}
 
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {/* STEP 4 — Payment Choice                                        */}
-          {/* ═══════════════════════════════════════════════════════════════ */}
+          {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
           {step === 4 && (
             <div className="space-y-5">
-              <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl p-5 text-center">
-                <p className="text-[#8CA3BF] text-sm leading-relaxed">
+              <div className="bg-deep border border-white/10 rounded-2xl p-5 text-center">
+                <p className="text-soft text-sm leading-relaxed">
                   Once your payment is completed you&apos;ll automatically receive a welcome email with your course access links and onboarding information. You can start the same day.
                 </p>
               </div>
 
               {/* Promo code — only shown if partner config has promoCodes */}
               {partner?.promoCodes && (
-                <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-xl p-4">
+                <div className="bg-deep border border-white/10 rounded-xl p-4">
                   {appliedPromo && activePromo ? (
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[#F5C518] font-bold text-sm">
+                        <p className="text-gold font-bold text-sm">
                           ✓ {activePromo.label} applied — £{activePromo.discountAmount} off
                         </p>
-                        <p className="text-[#8CA3BF] text-xs mt-0.5">Enter this code at Stripe checkout to apply your discount</p>
+                        <p className="text-soft text-xs mt-0.5">Enter this code at Stripe checkout to apply your discount</p>
                       </div>
-                      <button onClick={() => { setAppliedPromo(null); setPromoInput(""); }} className="text-[#3A5A7C] text-xs hover:text-[#8CA3BF] transition-colors">
+                      <button onClick={() => { setAppliedPromo(null); setPromoInput(""); }} className="text-faint text-xs hover:text-soft transition-colors">
                         Remove
                       </button>
                     </div>
                   ) : (
                     <div>
-                      <p className="text-[#8CA3BF] text-sm mb-2 font-semibold">Have a promo code?</p>
+                      <p className="text-soft text-sm mb-2 font-semibold">Have a promo code?</p>
                       <div className="flex gap-2">
                         <input
                           value={promoInput}
                           onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
                           placeholder="Enter code"
-                          className="flex-1 bg-[#061F36] border border-[#1A3A5C] rounded-lg px-3 py-2 text-white placeholder-[#2A4A6C] text-sm focus:outline-none focus:border-[#F5C518]/50 transition-colors uppercase"
+                          className="flex-1 bg-deep border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/[0.15] text-sm focus:outline-none focus:border-gold/50 transition-colors uppercase"
                         />
                         <button
                           onClick={applyPromo}
-                          className="px-4 py-2 rounded-lg bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
+                          className="px-4 py-2 rounded-lg bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
                         >
                           Apply
                         </button>
@@ -745,87 +747,87 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full payment */}
                 <button onClick={() => pay("full")} disabled={submitting}
-                  className="bg-[#0A2A44] border-2 border-[#F5C518]/50 hover:border-[#F5C518] hover:bg-[#F5C518]/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                  <p className="text-[#F5C518] text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
+                  className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                  <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
                   <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                   {activePromo ? (
                     <div className="mb-3">
-                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£1,599</p>
-                      <p className="text-[#F5C518] text-4xl font-bold leading-none">£{activePromo.fullPrice.toLocaleString()}</p>
+                      <p className="text-faint text-2xl font-bold line-through leading-none">£1,599</p>
+                      <p className="text-gold text-4xl font-bold leading-none">£{activePromo.fullPrice.toLocaleString()}</p>
                     </div>
                   ) : (
-                    <p className="text-[#F5C518] text-4xl font-bold mb-3">£1,599</p>
+                    <p className="text-gold text-4xl font-bold mb-3">£1,599</p>
                   )}
-                  <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
+                  <ul className="text-soft text-xs space-y-1.5 mb-6">
                     {activePromo && (
-                      <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Save £{(1599 - activePromo.fullPrice).toLocaleString()}</li>
+                      <li className="flex items-center gap-2"><span className="text-gold">✓</span> Save £{(1599 - activePromo.fullPrice).toLocaleString()}</li>
                     )}
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Immediate course access</li>
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> One single payment</li>
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Immediate course access</li>
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> One single payment</li>
                   </ul>
-                  <div className="w-full py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                  <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
                     {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.fullPrice.toLocaleString() : "1,599"} →`}
                   </div>
                 </button>
 
                 {/* Deposit plan */}
                 <button onClick={() => pay("deposit")} disabled={submitting}
-                  className="bg-[#0A2A44] border-2 border-[#1A3A5C] hover:border-[#F5C518]/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                  <p className="text-[#8CA3BF] text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
+                  className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                  <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
                   <p className="text-white font-bold text-2xl mb-1">Deposit Plan</p>
                   {activePromo ? (
                     <div className="mb-1">
-                      <p className="text-[#3A5A7C] text-2xl font-bold line-through leading-none">£599</p>
-                      <p className="text-[#F5C518] text-4xl font-bold leading-none">£{activePromo.depositPrice}</p>
+                      <p className="text-faint text-2xl font-bold line-through leading-none">£599</p>
+                      <p className="text-gold text-4xl font-bold leading-none">£{activePromo.depositPrice}</p>
                     </div>
                   ) : (
-                    <p className="text-[#F5C518] text-4xl font-bold mb-1">£599</p>
+                    <p className="text-gold text-4xl font-bold mb-1">£599</p>
                   )}
-                  <p className="text-[#8CA3BF] text-xs mb-3">then £200 × {activePromo ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200) : 5} monthly payments</p>
-                  <ul className="text-[#8CA3BF] text-xs space-y-1.5 mb-6">
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Start today with a deposit</li>
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Monthly payments to follow</li>
-                    <li className="flex items-center gap-2"><span className="text-[#F5C518]">✓</span> Full access from day one</li>
+                  <p className="text-soft text-xs mb-3">then £200 Ã— {activePromo ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200) : 5} monthly payments</p>
+                  <ul className="text-soft text-xs space-y-1.5 mb-6">
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Start today with a deposit</li>
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments to follow</li>
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full access from day one</li>
                   </ul>
-                  <div className="w-full py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-bold text-sm text-center group-hover:bg-[#F5C518]/10 transition-all">
+                  <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
                     {submitting ? "Preparing your documents…" : `Pay £${activePromo ? activePromo.depositPrice : "599"} Deposit →`}
                   </div>
                 </button>
               </div>
 
               {/* Finance */}
-              <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-xl p-4 text-center">
-                <p className="text-[#8CA3BF] text-sm">
+              <div className="bg-deep border border-white/10 rounded-xl p-4 text-center">
+                <p className="text-soft text-sm">
                   Finance available via Payl8r over 12–18 months.{" "}
-                  <a href="/book-call" className="text-[#F5C518] hover:underline">Book a free call</a>
+                  <a href="/book-call" className="text-gold hover:underline">Book a free call</a>
                   {" "}and we&apos;ll walk you through it.
                 </p>
               </div>
 
               {/* Support */}
-              <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl p-6 text-center">
+              <div className="bg-deep border border-white/10 rounded-2xl p-6 text-center">
                 <p className="text-white font-bold mb-2">Need help before you continue?</p>
-                <p className="text-[#8CA3BF] text-sm mb-5">
+                <p className="text-soft text-sm mb-5">
                   If you have any questions before choosing your payment option, the team is here.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4 text-sm">
-                  <a href={`mailto:${SUPPORT_EMAIL}`} className="text-[#F5C518] hover:underline">
-                    📧 {SUPPORT_EMAIL}
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="text-gold hover:underline">
+                    ðŸ"§ {SUPPORT_EMAIL}
                   </a>
-                  <span className="hidden sm:inline text-[#1A3A5C]">·</span>
-                  <a href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`} className="text-[#F5C518] hover:underline">
-                    📞 {SUPPORT_PHONE}
+                  <span className="hidden sm:inline text-white/10">Â·</span>
+                  <a href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`} className="text-gold hover:underline">
+                    ðŸ"ž {SUPPORT_PHONE}
                   </a>
                 </div>
                 <a href="/book-call"
-                  className="inline-block px-6 py-2.5 rounded-full border border-[#F5C518] text-[#F5C518] text-sm font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all">
+                  className="inline-block px-6 py-2.5 rounded-full border border-gold text-gold text-sm font-semibold hover:bg-gold hover:text-deep transition-all">
                   Talk to the Team
                 </a>
               </div>
 
               <div className="text-center pt-2">
-                <button onClick={back} className="text-[#3A5A7C] text-sm hover:text-[#8CA3BF] transition-colors">
-                  ← Back to agreement
+                <button onClick={back} className="text-faint text-sm hover:text-soft transition-colors">
+                  â† Back to agreement
                 </button>
               </div>
             </div>
@@ -833,17 +835,17 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
 
           {/* Step navigation */}
           {step < 4 && (
-            <div className="flex items-center justify-between mt-10 pt-6 border-t border-[#1A3A5C]">
+            <div className="flex items-center justify-between mt-10 pt-6 border-t border-white/10">
               {step > 1 ? (
                 <button onClick={back}
-                  className="px-6 py-3 rounded-full border border-[#1A3A5C] text-[#8CA3BF] text-sm font-semibold hover:border-[#F5C518]/40 hover:text-[#F5C518] transition-all">
-                  ← Back
+                  className="px-6 py-3 rounded-full border border-white/10 text-soft text-sm font-semibold hover:border-gold/40 hover:text-gold transition-all">
+                  â† Back
                 </button>
               ) : (
                 <div />
               )}
               <button onClick={next}
-                className="px-8 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20">
+                className="px-8 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-gold/20">
                 {step === 3 ? "Confirm & Choose Payment →" : "Continue →"}
               </button>
             </div>
@@ -855,3 +857,6 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     </>
   );
 }
+
+
+

@@ -49,6 +49,47 @@ const STEPS = [
   { n: "04", title: "Earn Front & Back End", body: "£500 per enrolment upfront. PT rent and membership long-term." },
 ];
 
+function CheckIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 14 14" fill="none" className={`${className} text-gold shrink-0 mt-0.5`}>
+      <path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CrossIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 14 14" fill="none" className={`${className} text-red-400 shrink-0 mt-0.5`}>
+      <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function GymOwnerIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="w-6 h-6 text-gold">
+      <path d="M6 12h12M4 8v8M20 8v8M2 9v6M22 9v6" />
+    </svg>
+  );
+}
+
+function AwardIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-gold">
+      <circle cx="12" cy="8" r="6" /><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+    </svg>
+  );
+}
+
+function NetworkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-gold">
+      <circle cx="12" cy="5" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="19" cy="19" r="2" />
+      <path d="M12 7v4m0 0-5.5 6M12 11l5.5 6" />
+    </svg>
+  );
+}
+
 export default function GymPartnershipPage() {
   return (
     <>
@@ -60,40 +101,44 @@ export default function GymPartnershipPage() {
       <main className="pt-[72px]">
 
         {/* ── HERO ──────────────────────────────────── */}
-        <section className="relative flex flex-col bg-gradient-to-br from-[#0E5FA0] via-[#0A4A80] to-[#072B4A] overflow-hidden">
-          <div className="absolute -left-64 top-0 w-[700px] h-[700px] rounded-full bg-[#F5C518] opacity-[0.06] blur-3xl pointer-events-none" />
-          <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-[#60A5FA] opacity-[0.08] blur-3xl pointer-events-none" />
+        <section className="relative flex flex-col bg-base overflow-hidden">
+          <div className="absolute -left-64 top-0 w-[700px] h-[700px] rounded-full bg-gold opacity-[0.05] blur-3xl pointer-events-none" />
+          <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-blue opacity-[0.06] blur-3xl pointer-events-none" />
+          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <line x1="0" y1="0" x2="45%" y2="100%" stroke="#F5C518" strokeWidth="1" />
+            <line x1="15%" y1="0" x2="60%" y2="100%" stroke="#F5C518" strokeWidth="0.5" />
+          </svg>
 
           <div className="relative z-10 max-w-5xl mx-auto px-6 pt-16 pb-14 md:pt-24 md:pb-20 w-full">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#F5C518]/40 bg-white/10 backdrop-blur-sm mb-8">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518] animate-pulse" />
-                <span className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase">Gym Partnership Programme</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-gold/30 bg-surface mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+                <span className="text-gold text-xs font-semibold tracking-widest uppercase">Gym Partnership Programme</span>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-[1.05] mb-6">
+              <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl text-white leading-none tracking-tight mb-6">
                 Turn Your Gym Into<br />
-                <span className="text-[#F5C518]">Its Own PT Academy</span>
+                <span className="text-gold">Its Own PT Academy</span>
               </h1>
 
-              <p className="text-xl text-blue-100/80 leading-relaxed mb-10 max-w-xl">
+              <p className="text-xl text-soft/70 leading-relaxed mb-10 max-w-xl">
                 We build, run, and manage a fully white-label PT academy inside your gym.
                 You earn <strong className="text-white">£500 per learner</strong> upfront — plus long-term PT rental income.
                 Zero teaching. Zero admin. Zero cost.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="#apply" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">
+                <a href="#apply" className="px-8 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30 text-center">
                   Apply to Secure Your Area →
                 </a>
-                <a href="#how-it-works" className="px-8 py-4 rounded-full border border-white/30 text-white font-medium text-base hover:bg-white/10 transition-all text-center">
+                <a href="#how-it-works" className="px-8 py-4 rounded-full border border-white/20 text-white font-medium text-base hover:bg-white/10 transition-all text-center">
                   See How It Works
                 </a>
                 <a
                   href="/gym-partner-prospectus.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-8 py-4 rounded-full border border-[#F5C518]/40 text-[#F5C518] font-medium text-base hover:bg-[#F5C518]/10 transition-all text-center flex items-center justify-center gap-2"
+                  className="px-8 py-4 rounded-full border border-gold/40 text-gold font-medium text-base hover:bg-gold/10 transition-all text-center flex items-center justify-center gap-2"
                 >
                   ↓ Download Prospectus
                 </a>
@@ -101,8 +146,8 @@ export default function GymPartnershipPage() {
             </div>
           </div>
 
-          {/* Stat strip — flows naturally below content, no overlap */}
-          <div className="relative z-10 bg-[#061F36]/80 backdrop-blur-sm border-t border-white/10">
+          {/* Stat strip */}
+          <div className="relative z-10 bg-deep/80 backdrop-blur-sm border-t border-white/[0.06]">
             <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
                 { value: "£500", label: "Per learner" },
@@ -111,8 +156,8 @@ export default function GymPartnershipPage() {
                 { value: "100%", label: "White-label branded" },
               ].map((s) => (
                 <div key={s.label}>
-                  <p className="text-[#F5C518] font-bold text-2xl leading-none">{s.value}</p>
-                  <p className="text-[#8CA3BF] text-xs mt-1">{s.label}</p>
+                  <p className="font-display font-extrabold text-gold text-2xl leading-none">{s.value}</p>
+                  <p className="text-soft/50 text-xs mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -120,14 +165,14 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── PROBLEM / SOLUTION ────────────────────── */}
-        <section className="bg-[#0D3559] py-20 md:py-28">
+        <section className="bg-surface py-20 md:py-28">
           <div className="max-w-5xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
               {/* Problem */}
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#3B82F6]/15">
-                <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-6">The Problem</p>
-                <h2 className="text-2xl font-bold text-white mb-6 leading-snug">
+              <div className="bg-card rounded-2xl p-8 border border-white/[0.07]">
+                <p className="text-faint text-xs font-bold tracking-widest uppercase mb-6">The Problem</p>
+                <h2 className="font-display font-extrabold text-2xl text-white leading-tight tracking-tight mb-6">
                   Most gyms can&apos;t keep a steady pipeline of good PTs
                 </h2>
                 <ul className="space-y-3">
@@ -139,17 +184,17 @@ export default function GymPartnershipPage() {
                     "Hours wasted interviewing unqualified people",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm">
-                      <span className="text-red-400 mt-0.5 shrink-0">✗</span>
-                      <span className="text-[#8CA3BF]">{item}</span>
+                      <CrossIcon />
+                      <span className="text-soft/60">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Solution */}
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#F5C518]/25">
-                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-6">The Solution</p>
-                <h2 className="text-2xl font-bold text-white mb-6 leading-snug">
+              <div className="bg-card rounded-2xl p-8 border border-gold/25">
+                <p className="text-gold text-xs font-bold tracking-widest uppercase mb-6">The Solution</p>
+                <h2 className="font-display font-extrabold text-2xl text-white leading-tight tracking-tight mb-6">
                   A PT academy running inside your gym — fully managed by us
                 </h2>
                 <ul className="space-y-3">
@@ -161,7 +206,7 @@ export default function GymPartnershipPage() {
                     "Zero teaching, zero admin, zero cost",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm">
-                      <span className="text-[#F5C518] mt-0.5 shrink-0">✔</span>
+                      <CheckIcon />
                       <span className="text-white">{item}</span>
                     </li>
                   ))}
@@ -172,35 +217,38 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── REVENUE ───────────────────────────────── */}
-        <section className="bg-[#072B4A] py-20 md:py-28">
+        <section className="bg-base py-20 md:py-28">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14">
-              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">Revenue</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white">Two ways you earn</h2>
+              <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">Revenue</p>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight">Two ways you earn</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[#0D3559] rounded-2xl p-10 border-2 border-[#F5C518]/50 shadow-xl shadow-[#F5C518]/5">
-                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-4">Front End</p>
-                <p className="text-[#F5C518] text-7xl font-bold leading-none mb-2">£500</p>
+              <div className="bg-card rounded-2xl p-10 border-2 border-gold/40 shadow-xl shadow-gold/5">
+                <p className="text-gold text-xs font-bold tracking-widest uppercase mb-4">Front End</p>
+                <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">£500</p>
                 <p className="text-white font-semibold text-lg mb-6">per learner who enrols through your gym</p>
                 <ul className="space-y-2 text-sm">
                   {["Paid directly to your gym", "No teaching required", "No extra work required"].map((i) => (
-                    <li key={i} className="flex items-center gap-2 text-[#8CA3BF]">
-                      <span className="text-[#F5C518]">✔</span> {i}
+                    <li key={i} className="flex items-center gap-2 text-soft/60">
+                      <CheckIcon />{i}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-[#0D3559] rounded-2xl p-10 border-2 border-[#3B82F6]/40 shadow-xl shadow-[#3B82F6]/5">
-                <p className="text-[#3B82F6] text-xs font-bold tracking-widest uppercase mb-4">Back End</p>
-                <p className="text-white text-3xl font-bold leading-snug mb-2">They qualify.<br />They stay.</p>
-                <p className="text-[#8CA3BF] text-sm mb-6">Every learner becomes a qualified PT who already knows your gym — and needs somewhere to work.</p>
+              <div className="bg-card rounded-2xl p-10 border-2 border-blue/30 shadow-xl shadow-blue/5">
+                <p className="text-blue text-xs font-bold tracking-widest uppercase mb-4">Back End</p>
+                <p className="font-display font-extrabold text-white text-3xl leading-snug mb-2">They qualify.<br />They stay.</p>
+                <p className="text-soft/60 text-sm mb-6">Every learner becomes a qualified PT who already knows your gym — and needs somewhere to work.</p>
                 <ul className="space-y-2 text-sm">
                   {["PT floor rent", "PT membership fees", "Long-term trainer retention", "More coaching revenue in-club"].map((i) => (
-                    <li key={i} className="flex items-center gap-2 text-[#8CA3BF]">
-                      <span className="text-[#3B82F6]">✔</span> {i}
+                    <li key={i} className="flex items-center gap-2 text-soft/60">
+                      <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5 text-blue shrink-0 mt-0.5">
+                        <path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      {i}
                     </li>
                   ))}
                 </ul>
@@ -210,21 +258,21 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── HOW IT WORKS ──────────────────────────── */}
-        <section id="how-it-works" className="bg-[#0D3559] py-20 md:py-28">
+        <section id="how-it-works" className="bg-surface py-20 md:py-28">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14">
-              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">The Process</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">How it works</h2>
-              <p className="text-[#8CA3BF]">Simple. Scalable. No extra staff.</p>
+              <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">The Process</p>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-3">How it works</h2>
+              <p className="text-soft/60">Simple. Scalable. No extra staff.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
               {STEPS.map((s) => (
-                <div key={s.n} className="bg-[#072B4A] rounded-2xl p-6 border border-[#3B82F6]/15 relative">
-                  <p className="text-[#F5C518]/20 text-6xl font-black leading-none absolute top-4 right-5 select-none">{s.n}</p>
-                  <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">{s.n}</p>
+                <div key={s.n} className="bg-card rounded-2xl p-6 border border-white/[0.07] relative">
+                  <p className="text-gold/10 text-6xl font-black leading-none absolute top-4 right-5 select-none">{s.n}</p>
+                  <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">{s.n}</p>
                   <p className="text-white font-bold text-base mb-2">{s.title}</p>
-                  <p className="text-[#8CA3BF] text-sm leading-relaxed">{s.body}</p>
+                  <p className="text-soft/60 text-sm leading-relaxed">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -232,39 +280,39 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── WHAT YOU GET ──────────────────────────── */}
-        <section className="bg-[#072B4A] py-20 md:py-28">
+        <section className="bg-base py-20 md:py-28">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14">
-              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">What&apos;s Included</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-3">Everything done for you</h2>
-              <p className="text-[#8CA3BF] max-w-lg mx-auto">Your academy is fully branded, fully managed, and fully compliant — we handle it all.</p>
+              <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">What&apos;s Included</p>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-3">Everything done for you</h2>
+              <p className="text-soft/60 max-w-lg mx-auto">Your academy is fully branded, fully managed, and fully compliant — we handle it all.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* White label */}
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20">
-                <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-5">Your Brand</p>
+              <div className="bg-card rounded-2xl p-8 border border-gold/20">
+                <p className="text-gold text-xs font-bold tracking-widest uppercase mb-5">Your Brand</p>
                 <h3 className="text-white text-xl font-bold mb-2">Your academy, your name</h3>
-                <p className="text-[#8CA3BF] text-sm mb-6">To your members it looks exactly like <span className="text-white font-semibold">&ldquo;[Your Gym] PT Academy&rdquo;</span> — not ours.</p>
+                <p className="text-soft/60 text-sm mb-6">To your members it looks exactly like <span className="text-white font-semibold">&ldquo;[Your Gym] PT Academy&rdquo;</span> — not ours.</p>
                 <ul className="space-y-2">
                   {["Your logo and branding", "Your custom link & QR code", "Your academy landing page", "Your messaging to members"].map((i) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
-                      <span className="text-[#F5C518]">✔</span><span className="text-white">{i}</span>
+                      <CheckIcon /><span className="text-white">{i}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Zero admin */}
-              <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/20">
-                <p className="text-[#3B82F6] text-xs font-bold tracking-widest uppercase mb-5">We Handle Everything</p>
+              <div className="bg-card rounded-2xl p-8 border border-blue/20">
+                <p className="text-blue text-xs font-bold tracking-widest uppercase mb-5">We Handle Everything</p>
                 <h3 className="text-white text-xl font-bold mb-2">You do none of this</h3>
-                <p className="text-[#8CA3BF] text-sm mb-6">Your only role is gym partner. Everything else is on us.</p>
+                <p className="text-soft/60 text-sm mb-6">Your only role is gym partner. Everything else is on us.</p>
                 <div className="grid grid-cols-2 gap-2">
                   {["Teaching", "Compliance", "Tutors", "Assessments", "Paperwork", "Certification", "Student support", "Course material"].map((i) => (
-                    <div key={i} className="flex items-center gap-2 bg-[#072B4A] rounded-lg px-3 py-2 text-xs">
-                      <span className="text-red-400">✗</span>
-                      <span className="text-[#8CA3BF]">{i}</span>
+                    <div key={i} className="flex items-center gap-2 bg-deep/50 rounded-lg px-3 py-2 text-xs">
+                      <CrossIcon />
+                      <span className="text-soft/60">{i}</span>
                     </div>
                   ))}
                 </div>
@@ -272,17 +320,19 @@ export default function GymPartnershipPage() {
             </div>
 
             {/* Why us bar */}
-            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#3B82F6]/15">
+            <div className="bg-card rounded-2xl p-8 border border-white/[0.07]">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
                 {[
-                  { icon: "🏋️", title: "Built by gym owners", body: "We've hired 500+ PTs. We know what gyms actually need." },
-                  { icon: "🎓", title: "NCFE & Ofqual regulated", body: "Industry-recognised Level 2 & 3 qualifications. Fully compliant." },
-                  { icon: "🤝", title: "Not courses. Recruitment.", body: "We solve your pipeline problem — not just sell qualifications." },
+                  { icon: <GymOwnerIcon />, title: "Built by gym owners", body: "We've hired 500+ PTs. We know what gyms actually need." },
+                  { icon: <AwardIcon />, title: "NCFE & Ofqual regulated", body: "Industry-recognised Level 2 & 3 qualifications. Fully compliant." },
+                  { icon: <NetworkIcon />, title: "Not courses. Recruitment.", body: "We solve your pipeline problem — not just sell qualifications." },
                 ].map((c) => (
                   <div key={c.title}>
-                    <div className="text-3xl mb-3">{c.icon}</div>
+                    <div className="w-11 h-11 rounded-xl bg-gold/10 border border-gold/20 flex items-center justify-center mx-auto mb-3">
+                      {c.icon}
+                    </div>
                     <p className="text-white font-bold text-sm mb-1">{c.title}</p>
-                    <p className="text-[#8CA3BF] text-xs leading-relaxed">{c.body}</p>
+                    <p className="text-soft/60 text-xs leading-relaxed">{c.body}</p>
                   </div>
                 ))}
               </div>
@@ -291,16 +341,19 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── WHO IT'S FOR ──────────────────────────── */}
-        <section className="bg-[#0D3559] py-20 md:py-28">
+        <section className="bg-surface py-20 md:py-28">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14">
-              <p className="text-[#4A6280] text-xs font-bold tracking-widest uppercase mb-3">Ideal Fit</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-white">Is this for you?</h2>
+              <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">Ideal Fit</p>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight">Is this for you?</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#F5C518]/25">
-                <p className="text-[#F5C518] font-bold text-base mb-5">✔ Great fit if you…</p>
+              <div className="bg-card rounded-2xl p-8 border border-gold/25">
+                <div className="flex items-center gap-2 mb-5">
+                  <CheckIcon className="w-4 h-4" />
+                  <p className="text-gold font-bold text-base">Great fit if you…</p>
+                </div>
                 <ul className="space-y-3">
                   {[
                     "Run a commercial gym with PT floor space",
@@ -311,32 +364,35 @@ export default function GymPartnershipPage() {
                     "Don't want to deal with education or compliance",
                   ].map((i) => (
                     <li key={i} className="flex items-start gap-3 text-sm">
-                      <span className="text-[#F5C518] mt-0.5 shrink-0">✔</span>
+                      <CheckIcon />
                       <span className="text-white">{i}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-[#072B4A] rounded-2xl p-8 border border-[#3B82F6]/20 flex flex-col justify-between">
+              <div className="bg-card rounded-2xl p-8 border border-white/[0.07] flex flex-col justify-between">
                 <div>
-                  <p className="text-[#8CA3BF] font-bold text-base mb-5">✗ Not a fit if you…</p>
+                  <div className="flex items-center gap-2 mb-5">
+                    <CrossIcon />
+                    <p className="text-soft/60 font-bold text-base">Not a fit if you…</p>
+                  </div>
                   <ul className="space-y-3">
                     {[
                       "Run a small studio with no PT floor space",
                       "Don't rent space to self-employed PTs",
                     ].map((i) => (
                       <li key={i} className="flex items-start gap-3 text-sm">
-                        <span className="text-red-400 mt-0.5 shrink-0">✗</span>
-                        <span className="text-[#8CA3BF]">{i}</span>
+                        <CrossIcon />
+                        <span className="text-soft/60">{i}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className="mt-10 pt-6 border-t border-[#3B82F6]/20">
+                <div className="mt-10 pt-6 border-t border-white/[0.06]">
                   <p className="text-white font-semibold text-sm">
-                    We take <span className="text-[#F5C518] font-bold">one partner gym per area</span> to protect exclusivity.{" "}
-                    <span className="text-[#8CA3BF]">Areas close as applications come in.</span>
+                    We take <span className="text-gold font-bold">one partner gym per area</span> to protect exclusivity.{" "}
+                    <span className="text-soft/60">Areas close as applications come in.</span>
                   </p>
                 </div>
               </div>
@@ -345,29 +401,29 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── PIPELINE CLOSE ────────────────────────── */}
-        <section className="bg-[#061F36] py-14 border-y border-[#3B82F6]/10">
+        <section className="bg-deep py-14 border-y border-white/[0.06]">
           <div className="max-w-2xl mx-auto px-6 text-center">
-            <p className="text-3xl md:text-4xl font-bold text-white leading-snug mb-4">
+            <p className="font-display font-extrabold text-3xl md:text-4xl text-white leading-tight tracking-tight mb-4">
               Most gyms don&apos;t have a recruitment problem.
               <br />
-              They have a <span className="text-[#F5C518]">pipeline problem.</span>
+              They have a <span className="text-gold">pipeline problem.</span>
             </p>
-            <p className="text-[#8CA3BF] text-lg">Fix the pipeline once. Never recruit again.</p>
+            <p className="text-soft/60 text-lg">Fix the pipeline once. Never recruit again.</p>
           </div>
         </section>
 
         {/* ── PROSPECTUS DOWNLOAD ───────────────────── */}
-        <section className="bg-[#061F36] py-10 border-y border-[#3B82F6]/10">
+        <section className="bg-deep py-10 border-b border-white/[0.06]">
           <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <p className="text-white font-bold text-lg">Want to read through it first?</p>
-              <p className="text-[#8CA3BF] text-sm">Download the full partnership prospectus — everything you need to know in one document.</p>
+              <p className="text-soft/60 text-sm">Download the full partnership prospectus — everything you need to know in one document.</p>
             </div>
             <a
               href="/gym-partner-prospectus.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 px-8 py-4 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-all flex items-center gap-2"
+              className="shrink-0 px-8 py-4 rounded-full bg-white/[0.07] border border-white/[0.12] text-white font-semibold text-sm hover:bg-white/[0.12] transition-all flex items-center gap-2"
             >
               ↓ Download Prospectus PDF
             </a>
@@ -375,9 +431,9 @@ export default function GymPartnershipPage() {
         </section>
 
         {/* ── APPLICATION FORM ──────────────────────── */}
-        <section id="apply" className="bg-[#072B4A] py-20 md:py-28 relative overflow-hidden">
+        <section id="apply" className="bg-base py-20 md:py-28 relative overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[600px] rounded-full bg-[#F5C518] opacity-[0.04] blur-3xl" />
+            <div className="w-[600px] h-[600px] rounded-full bg-gold opacity-[0.04] blur-3xl" />
           </div>
 
           <div className="relative z-10 max-w-xl mx-auto px-6">
@@ -386,25 +442,25 @@ export default function GymPartnershipPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                 <span className="text-red-400 text-xs font-bold tracking-wide uppercase">One partner per area</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-3">
                 Apply to Become a Partner Gym
               </h2>
-              <p className="text-[#8CA3BF] text-sm">
+              <p className="text-soft/60 text-sm">
                 Earn £500 per learner · Your own PT academy · Zero admin
               </p>
             </div>
 
-            <div className="bg-[#0D3559] rounded-2xl p-8 border border-[#F5C518]/20 shadow-2xl">
+            <div className="bg-card rounded-2xl p-8 border border-gold/20 shadow-2xl">
               <PartnershipForm />
             </div>
 
-            <p className="text-center text-[#4A6280] text-sm mt-6">
+            <p className="text-center text-faint text-sm mt-6">
               Prefer to talk first?{" "}
               <a
                 href="https://calendly.com/ptlaunchlab-info/information-call"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#F5C518] hover:underline font-semibold"
+                className="text-gold hover:underline font-semibold"
               >
                 Book a 15-min partnership call →
               </a>
