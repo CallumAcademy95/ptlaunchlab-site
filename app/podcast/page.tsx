@@ -10,6 +10,30 @@ export const metadata = {
 
 const episodes: Episode[] = [
   {
+    id: "l5SsHmySSEs",
+    ep: 31,
+    title: "Royal Marines & Afghanistan to Personal Trainer — The Truth About This Industry",
+    desc: "From Royal Marines service and deployment in Afghanistan to building a career as a personal trainer — an honest look at military-to-fitness transitions and the realities of this industry.",
+    date: "2026-04",
+    category: "transformation",
+  },
+  {
+    id: "vnsAYYOpshg",
+    ep: 30,
+    title: "From Council Estate to Stage with Dizzee Rascal — Now I'm a Personal Trainer",
+    desc: "A remarkable journey — from council estate roots and performing on stage with Dizzee Rascal, to qualifying as a personal trainer and building a fitness career.",
+    date: "2026-04",
+    category: "transformation",
+  },
+  {
+    id: "n4h2p1eE_Qw",
+    ep: 29,
+    title: "What 90% of Blood Tests Reveal (Even When You Feel Fine)",
+    desc: "The health markers hiding in plain sight — what routine blood tests reveal about underlying issues, and why personal trainers need to understand the bigger health picture.",
+    date: "2026-04",
+    category: "industry",
+  },
+  {
     id: "Z6eogOvRtw0",
     ep: 28,
     title: "From ICU Nurse to Fitness Business: Maria's Career Change",

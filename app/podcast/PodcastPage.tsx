@@ -33,26 +33,26 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
       <main className="pt-[72px]">
 
         {/* HERO */}
-        <section className="bg-[#072B4A] py-20 px-6 relative overflow-hidden">
-          <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-[#F5C518] opacity-[0.04] blur-3xl pointer-events-none" />
-          <div className="absolute -right-32 bottom-0 w-[400px] h-[400px] rounded-full bg-[#3B82F6] opacity-[0.05] blur-3xl pointer-events-none" />
+        <section className="bg-base py-20 px-6 relative overflow-hidden">
+          <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-gold opacity-[0.04] blur-3xl pointer-events-none" />
+          <div className="absolute -right-32 bottom-0 w-[400px] h-[400px] rounded-full bg-blue opacity-[0.05] blur-3xl pointer-events-none" />
           <div className="relative max-w-4xl mx-auto text-center">
-            <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-4">
               The Podcast
             </p>
-            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-6">
               Real stories. Real{" "}
-              <span className="text-[#F5C518]">Yorkshire honesty.</span>
+              <span className="text-gold">Yorkshire honesty.</span>
             </h1>
-            <p className="text-xl text-[#8CA3BF] leading-relaxed max-w-2xl mx-auto mb-8">
-              Every week Callum, Miles and Ryan sit down with people who've built careers in fitness — transformation stories, PT business building, and the honest side of the industry.
+            <p className="text-xl text-soft/60 leading-relaxed max-w-2xl mx-auto mb-8">
+              Every week Callum, Miles and Ryan sit down with people who&apos;ve built careers in fitness — transformation stories, PT business building, and the honest side of the industry.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="https://www.youtube.com/@ptlaunchlab"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
@@ -63,7 +63,7 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                 href="https://www.instagram.com/ptlaunchlab"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold text-sm hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all"
               >
                 Follow on Instagram
               </a>
@@ -72,7 +72,7 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
         </section>
 
         {/* STATS BAR */}
-        <section className="bg-[#0D3559] border-y border-[#3B82F6]/15 py-6 px-6">
+        <section className="bg-surface border-y border-blue/15 py-6 px-6">
           <div className="max-w-4xl mx-auto grid grid-cols-3 gap-4 text-center">
             {[
               { value: `${episodes.length}+`, label: "Episodes" },
@@ -80,15 +80,15 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
               { value: "YouTube", label: "Watch free" },
             ].map((s) => (
               <div key={s.label}>
-                <p className="text-[#F5C518] text-2xl font-bold">{s.value}</p>
-                <p className="text-[#8CA3BF] text-xs mt-1">{s.label}</p>
+                <p className="text-gold text-2xl font-bold">{s.value}</p>
+                <p className="text-soft/60 text-xs mt-1">{s.label}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* EPISODES */}
-        <section className="bg-[#072B4A] py-16 px-6">
+        <section className="bg-base py-16 px-6">
           <div className="max-w-6xl mx-auto">
 
             {/* Filter tabs */}
@@ -99,8 +99,8 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                   onClick={() => setActive(cat.key)}
                   className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
                     active === cat.key
-                      ? "bg-[#F5C518] text-[#072B4A]"
-                      : "border border-[#3B82F6]/30 text-[#8CA3BF] hover:border-[#F5C518]/40 hover:text-white"
+                      ? "bg-gold text-deep"
+                      : "border border-blue/30 text-soft/60 hover:border-gold/40 hover:text-white"
                   }`}
                 >
                   {cat.label}
@@ -116,10 +116,10 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                   href={`https://www.youtube.com/watch?v=${ep.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group bg-[#0D3559] border border-[#3B82F6]/20 rounded-2xl overflow-hidden hover:border-[#F5C518]/40 transition-all hover:-translate-y-0.5"
+                  className="group bg-card border border-white/[0.07] rounded-2xl overflow-hidden hover:border-gold/40 transition-all hover:-translate-y-0.5"
                 >
                   {/* Thumbnail */}
-                  <div className="relative w-full aspect-video bg-[#072B4A]">
+                  <div className="relative w-full aspect-video bg-base">
                     <Image
                       src={`https://i.ytimg.com/vi/${ep.id}/hqdefault.jpg`}
                       alt={ep.title}
@@ -128,33 +128,33 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
                     />
                     {/* Play overlay */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-14 h-14 rounded-full bg-[#F5C518] flex items-center justify-center">
-                        <svg className="w-6 h-6 text-[#072B4A] ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="w-14 h-14 rounded-full bg-gold flex items-center justify-center">
+                        <svg className="w-6 h-6 text-deep ml-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
                     </div>
                     {/* Episode badge */}
                     {ep.ep && (
-                      <span className="absolute top-3 left-3 bg-[#F5C518] text-[#072B4A] text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="absolute top-3 left-3 bg-gold text-deep text-xs font-bold px-2.5 py-1 rounded-full">
                         EP.{ep.ep}
                       </span>
                     )}
                     {/* Category badge */}
-                    <span className="absolute top-3 right-3 bg-[#072B4A]/80 text-[#8CA3BF] text-xs px-2.5 py-1 rounded-full capitalize">
+                    <span className="absolute top-3 right-3 bg-deep/80 text-soft/60 text-xs px-2.5 py-1 rounded-full capitalize">
                       {ep.category === "transformation" ? "Story" : ep.category === "business" ? "Business" : "Interview"}
                     </span>
                   </div>
 
                   {/* Content */}
                   <div className="p-5">
-                    <h2 className="text-white font-bold text-sm leading-snug mb-2 group-hover:text-[#F5C518] transition-colors line-clamp-2">
+                    <h2 className="text-white font-bold text-sm leading-snug mb-2 group-hover:text-gold transition-colors line-clamp-2">
                       {ep.title}
                     </h2>
-                    <p className="text-[#8CA3BF] text-xs leading-relaxed line-clamp-2 mb-4">
+                    <p className="text-soft/60 text-xs leading-relaxed line-clamp-2 mb-4">
                       {ep.desc}
                     </p>
-                    <span className="inline-flex items-center gap-1.5 text-[#F5C518] text-xs font-semibold">
+                    <span className="inline-flex items-center gap-1.5 text-gold text-xs font-semibold">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                       </svg>
@@ -168,24 +168,24 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
         </section>
 
         {/* CTA */}
-        <section className="bg-[#0D3559] py-20 px-6 text-center border-t border-[#3B82F6]/15">
+        <section className="bg-surface py-20 px-6 text-center border-t border-blue/15">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-4">
               Ready to write your own story?
             </h2>
-            <p className="text-[#8CA3BF] text-lg mb-8">
+            <p className="text-soft/60 text-lg mb-8">
               Every person on this podcast started where you are now. Book a free call and find out if PT Launch Lab is the right next step for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/book-call"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+                className="px-8 py-4 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/20"
               >
                 Discover Your Pathway →
               </a>
               <a
                 href="/courses"
-                className="px-8 py-4 rounded-full border border-[#F5C518] text-[#F5C518] font-semibold hover:bg-[#F5C518] hover:text-[#072B4A] transition-all"
+                className="px-8 py-4 rounded-full border border-gold text-gold font-semibold hover:bg-gold hover:text-deep transition-all"
               >
                 View the Course
               </a>
