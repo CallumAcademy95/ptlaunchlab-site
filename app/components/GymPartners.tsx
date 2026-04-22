@@ -3,12 +3,11 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const gymPartners = [
-  { name: "Leodis 24/7 Gym",  src: "/logos/leodis-gym.png",      dark: false },
-  { name: "Iron Wolf Gym",     src: "/logos/iron-wolf-gym.png",   dark: false },
-  { name: "1079 Fitness",      src: "/logos/1079-fitness.png",    dark: false },
-  { name: "Ultimate Shred",    src: "/logos/ultimate-shred.png",  dark: true  },
-  { name: "6FitGym",           src: "/logos/6fit-gym.png",        dark: true  },
-  { name: "Muscle Bound Gym",  src: "/logos/muscle-bound-gym.png", dark: true },
+  { name: "Leodis 24/7 Gym",  src: "/logos/leodis-gym.png",     dark: false },
+  { name: "Iron Wolf Gym",     src: "/logos/iron-wolf-gym.png",  dark: false },
+  { name: "1079 Fitness",      src: "/logos/1079-fitness.png",   dark: false },
+  { name: "Ultimate Shred",    src: "/logos/ultimate-shred.png", dark: true  },
+  { name: "6FitGym",           src: "/logos/6fit-gym.png",       dark: true  },
 ];
 
 const accreditations = [
