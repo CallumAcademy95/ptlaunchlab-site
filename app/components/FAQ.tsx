@@ -40,40 +40,47 @@ export default function FAQ() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section className="bg-[#0D3559] py-24">
+    <section className="bg-surface py-24">
       <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-          Honest answers to the questions
-          <br />everyone asks before enrolling.
+        <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">
+          FAQs
+        </p>
+        <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white text-center leading-none tracking-tight mb-4">
+          Honest answers.
+          <br />
+          <span className="text-gold">No waffle.</span>
         </h2>
-        <p className="text-[#8CA3BF] text-center text-base mb-12 max-w-xl mx-auto">
-          If you have a question that isn&apos;t here, <a href="/book-call" className="text-[#F5C518] hover:underline">book a free call</a> — we&apos;ll give you a straight answer.
+        <p className="text-soft/60 text-center text-base mb-12 max-w-xl mx-auto">
+          If you have a question that isn&apos;t here,{" "}
+          <a href="/book-call" className="text-gold hover:underline">book a free call</a>{" "}
+          — we&apos;ll give you a straight answer.
         </p>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="bg-[#072B4A] border border-[#3B82F6]/20 rounded-xl overflow-hidden"
+              className="bg-card border border-white/[0.07] rounded-xl overflow-hidden"
             >
               <button
-                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-[#0D3559] transition-colors"
+                className="w-full flex items-center justify-between px-6 py-5 text-left hover:bg-white/[0.03] transition-colors"
                 onClick={() => setOpen(open === i ? null : i)}
               >
-                <span className="text-white font-semibold text-[15px] pr-4">{faq.q}</span>
+                <span className="text-white font-semibold text-[15px] pr-4 leading-snug">{faq.q}</span>
                 <span
-                  className={`text-[#F5C518] text-xl font-bold shrink-0 transition-transform duration-300 ${
-                    open === i ? "rotate-90" : ""
-                  }`}
+                  className={`text-gold shrink-0 transition-transform duration-300 ${open === i ? "rotate-45" : ""}`}
                 >
-                  ›
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="w-5 h-5">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
                 </span>
               </button>
-              {open === i && (
-                <div className="px-6 pb-6">
-                  <p className="text-[#8CA3BF] text-[15px] leading-relaxed">{faq.a}</p>
-                </div>
-              )}
+              <div
+                className="overflow-hidden transition-all duration-300 ease-in-out"
+                style={{ maxHeight: open === i ? "500px" : "0px" }}
+              >
+                <p className="px-6 pb-6 text-soft/70 text-[15px] leading-relaxed">{faq.a}</p>
+              </div>
             </div>
           ))}
         </div>

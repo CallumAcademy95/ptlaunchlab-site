@@ -1,52 +1,75 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-navy-dark:  #0A0E1A;
-  --color-navy-light: #141B2D;
+  /* Unified color system — 4 background tiers + accents */
+  --color-deep:    #070D1B;
+  --color-base:    #081729;
+  --color-surface: #0C1F3A;
+  --color-card:    #102342;
+  --color-gold:    #F5C518;
+  --color-blue:    #3B82F6;
+  --color-soft:    #94A3B8;
+  --color-faint:   #4D6580;
+
+  /* Legacy aliases — keep for other pages */
+  --color-navy-dark:  #070D1B;
+  --color-navy-light: #102342;
   --color-yellow:     #F5C518;
   --color-blue-light: #3B82F6;
-  --color-muted:      #9CA3AF;
-  --color-dim:        #6B7280;
-  --font-sans: var(--font-poppins);
+  --color-muted:      #94A3B8;
+  --color-dim:        #4D6580;
+
+  /* Fonts */
+  --font-sans:    var(--font-poppins);
+  --font-display: var(--font-barlow);
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background: #0A0E1A;
+  background: #070D1B;
   color: #ffffff;
   font-family: var(--font-poppins), sans-serif;
 }
 
-* {
-  box-sizing: border-box;
+/* Subtle grain texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Fade-in-up animation */
+* { box-sizing: border-box; }
+
+/* Animations */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out both;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-
-.animate-delay-100 { animation-delay: 0.1s; }
-.animate-delay-200 { animation-delay: 0.2s; }
-.animate-delay-300 { animation-delay: 0.3s; }
-.animate-delay-400 { animation-delay: 0.4s; }
-
-/* Auto-scrolling marquee strip */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
 @keyframes scrollX {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.animate-scroll-x {
-  animation: scrollX 40s linear infinite;
-}
-.animate-scroll-x:hover {
-  animation-play-state: paused;
-}
+
+.animate-fade-in-up { animation: fadeInUp 0.55s ease-out both; }
+.animate-fade-in    { animation: fadeIn 0.55s ease-out both; }
+.animate-scale-in   { animation: scaleIn 0.55s ease-out both; }
+.animate-delay-100  { animation-delay: 0.10s; }
+.animate-delay-200  { animation-delay: 0.20s; }
+.animate-delay-300  { animation-delay: 0.30s; }
+.animate-delay-400  { animation-delay: 0.40s; }
+.animate-delay-500  { animation-delay: 0.50s; }
+.animate-scroll-x   { animation: scrollX 40s linear infinite; }
+.animate-scroll-x:hover { animation-play-state: paused; }

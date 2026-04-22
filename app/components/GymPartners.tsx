@@ -2,17 +2,15 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-// Gym partner logos
 const gymPartners = [
-  { name: "Leodis 24/7 Gym", src: "/logos/leodis-gym.png",     dark: false },
-  { name: "Iron Wolf Gym",    src: "/logos/iron-wolf-gym.png",  dark: false },
-  { name: "1079 Fitness",     src: "/logos/1079-fitness.png",   dark: false },
-  { name: "Ultimate Shred",   src: "/logos/ultimate-shred.png", dark: true  },
-  { name: "6FitGym",          src: "/logos/6fit-gym.png",       dark: true  },
-  { name: "Muscle Bound Gym", src: "/logos/muscle-bound-gym.png", dark: true },
+  { name: "Leodis 24/7 Gym",  src: "/logos/leodis-gym.png",      dark: false },
+  { name: "Iron Wolf Gym",     src: "/logos/iron-wolf-gym.png",   dark: false },
+  { name: "1079 Fitness",      src: "/logos/1079-fitness.png",    dark: false },
+  { name: "Ultimate Shred",    src: "/logos/ultimate-shred.png",  dark: true  },
+  { name: "6FitGym",           src: "/logos/6fit-gym.png",        dark: true  },
+  { name: "Muscle Bound Gym",  src: "/logos/muscle-bound-gym.png", dark: true },
 ];
 
-// Accreditation logos
 const accreditations = [
   { name: "NCFE", src: "/logos/ncfe.png", dark: false },
 ];
@@ -28,15 +26,17 @@ export default function GymPartners() {
   }, []);
 
   return (
-    <section className="bg-[#0D3559] py-16 border-t border-[#3B82F6]/15">
+    <section className="bg-base py-16 border-t border-white/[0.05]">
       <div className="max-w-6xl mx-auto px-6 text-center">
-        <p className="text-[#4A6280] text-xs font-semibold tracking-widest uppercase mb-3">
+        <p className="text-faint text-[11px] font-semibold tracking-widest uppercase mb-3">
           Partners &amp; Accreditations
         </p>
-        <h2 className="text-white text-xl md:text-2xl font-bold mb-2">
-          Backed by industry. Trusted by gyms.
+        <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-2">
+          Backed by industry.
+          <br />
+          <span className="text-gold">Trusted by gyms.</span>
         </h2>
-        <p className="text-[#8CA3BF] text-sm mb-12 max-w-xl mx-auto">
+        <p className="text-soft/60 text-sm mb-12 max-w-xl mx-auto">
           Our qualification is fully accredited and our graduates are welcomed into
           6 partner gyms across the UK.
         </p>
@@ -58,7 +58,7 @@ export default function GymPartners() {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-[#F5C518] w-5" : "bg-[#3B82F6]/30 w-1.5"}`}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-gold w-5" : "bg-white/20 w-1.5"}`}
               />
             ))}
           </div>
@@ -69,7 +69,7 @@ export default function GymPartners() {
           {gymPartners.map((p) => (
             <div
               key={p.name}
-              className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className="relative w-52 h-28 opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
               <Image src={p.src} alt={p.name} fill className="object-contain" />
             </div>
@@ -78,9 +78,9 @@ export default function GymPartners() {
 
         {/* Divider */}
         <div className="flex items-center gap-4 max-w-xs mx-auto mb-10">
-          <div className="flex-1 h-px bg-[#3B82F6]/20" />
-          <span className="text-[#4A6280] text-xs tracking-widest uppercase">Accredited by</span>
-          <div className="flex-1 h-px bg-[#3B82F6]/20" />
+          <div className="flex-1 h-px bg-white/[0.07]" />
+          <span className="text-faint text-[10px] tracking-widest uppercase">Accredited by</span>
+          <div className="flex-1 h-px bg-white/[0.07]" />
         </div>
 
         {/* Accreditation logos */}
@@ -88,7 +88,7 @@ export default function GymPartners() {
           {accreditations.map((p) => (
             <div
               key={p.name}
-              className="relative w-56 h-32 opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+              className="relative w-52 h-28 opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105"
             >
               <Image src={p.src} alt={p.name} fill className="object-contain" />
             </div>
@@ -96,14 +96,14 @@ export default function GymPartners() {
         </div>
 
         {/* Gym partnership CTA */}
-        <div className="border-t border-[#3B82F6]/15 pt-12">
+        <div className="border-t border-white/[0.06] pt-12">
           <p className="text-white font-bold text-xl md:text-2xl mb-2">Own a gym?</p>
-          <p className="text-[#8CA3BF] text-sm mb-6 max-w-md mx-auto">
+          <p className="text-soft/60 text-sm mb-6 max-w-md mx-auto">
             Earn £500 per learner and build your own white-label PT academy — without doing any teaching, admin, or courses.
           </p>
           <a
             href="/gym-partnership"
-            className="inline-block px-8 py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20"
+            className="inline-block px-8 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all shadow-xl shadow-gold/20"
           >
             Gym Partnership Programme →
           </a>

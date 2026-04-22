@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Barlow_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import Chatbot from "./components/Chatbot";
@@ -9,6 +9,13 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow",
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
   display: "swap",
 });
 
@@ -50,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head />
-      <body className={`${poppins.variable} antialiased`}>
+      <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
         {/* Organization JSON-LD schema */}
         <script
           type="application/ld+json"
@@ -83,14 +90,14 @@ export default function RootLayout({
             }),
           }}
         />
-        {/* 1. Consent Mode v2 defaults — true inline script, runs synchronously before any async scripts */}
+        {/* 1. Consent Mode v2 defaults */}
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
         <script dangerouslySetInnerHTML={{ __html: `
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted',wait_for_update:2000});
 gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
         `}} />
-        {/* 2. CookieYes — reads consent defaults above, updates them on user choice */}
+        {/* 2. CookieYes */}
         <Script
           id="cookieyes"
           src="https://cdn-cookieyes.com/client_data/04abe099864c49fd5daf17ec/script.js"
@@ -99,7 +106,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
         {children}
         <Chatbot />
         <Analytics />
-        {/* 3. Google Analytics 4 — loads after consent is established */}
+        {/* 3. Google Analytics 4 */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-90W2KGSL55" strategy="afterInteractive" />
         <Script id="ga4-init" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];
@@ -107,7 +114,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
           gtag('js', new Date());
           gtag('config', 'G-90W2KGSL55', { anonymize_ip: true });
         `}</Script>
-        {/* 5. Microsoft Clarity */}
+        {/* 4. Microsoft Clarity */}
         <Script id="microsoft-clarity" strategy="afterInteractive">{`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -115,7 +122,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "w0qwj7lviw");
         `}</Script>
-        {/* 4. Meta Pixel — fires after consent via CookieYes */}
+        {/* 5. Meta Pixel */}
         <Script id="meta-pixel" strategy="afterInteractive">{`
           !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
