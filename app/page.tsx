@@ -32,7 +32,7 @@ const faqSchema = {
       name: "Is the Level 3 PT qualification recognised by gyms and insurers?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes. The NCFE Level 2 & 3 qualification from PT Launch Lab is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym and insurance provider will accept it.",
+        text: "Yes. The NCFE Level 2 & 3 qualification from PT Launch Lab is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. NCFE is the qualification name UK gym managers ask for by default on their job listings — PureGym, David Lloyd, Nuffield Health, JD Gyms, and independents. Other UK academies offer their own self-branded certifications or use Focus Awards; NCFE Level 3 is the one gym managers recognise on a CV without explanation.",
       },
     },
     {
@@ -48,7 +48,15 @@ const faqSchema = {
       name: "How much does the PT Launch Lab course cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The course costs £1,599 for full payment or £599 deposit followed by 5 monthly payments of £200. Finance is also available via Payl8r over 12–18 months.",
+        text: "The course costs £1,599 for full payment, or £599 deposit followed by 5 monthly payments of £200. Finance is also available via Payl8r over 12–18 months. The £1,599 is the total cost — it includes our £500 business mentorship community, your personal tutor, the full NCFE Level 3 qualification, and access to our gym-partnership interview pipeline. Nothing is bolted on as a paid upgrade.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What's included in the £1,599 course fee?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The full NCFE Level 2 & 3 Personal Trainer qualification (Ofqual regulated, CIMSPA recognised), a personal tutor assigned within 24 hours of enrolment, our £500 Skool business mentorship community at no extra cost, business training built into the curriculum, and guaranteed warm-introduction interviews to UK gym employers in our network. Most UK PT academies charge £1,200–£2,800 for the qualification alone and price mentorship as a separate £500–£3,000 product. We bundle the lot.",
       },
     },
     {

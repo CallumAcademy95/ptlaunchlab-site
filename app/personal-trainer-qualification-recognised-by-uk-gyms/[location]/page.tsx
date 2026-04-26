@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   if (!loc) return {};
   return {
     title: `Personal Trainer Qualification Recognised by UK Gyms in ${loc.name} | PT Launch Lab`,
-    description: `Get a personal trainer qualification recognised by UK gyms, studied from ${loc.name}. NCFE & Ofqual accredited, accepted by major UK gym chains. Qualify in 12–16 weeks.`,
+    description: `NCFE Level 3 — the qualification name UK gym managers ask for by default. Studied from ${loc.name}, accepted by PureGym, David Lloyd, Nuffield, JD Gyms and independents. £1,599 includes our £500 business mentorship community.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/personal-trainer-qualification-recognised-by-uk-gyms/${location}` },
   };
 }

@@ -16,8 +16,9 @@ import Footer from "@/app/components/Footer";
 import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
-  title: "Best Personal Trainer Course UK | PT Launch Lab",
-  description: "Looking for the best personal trainer course in the UK? PT Launch Lab combines an NCFE & Ofqual accredited Level 3 qualification with real business mentorship. 100% online. Study at your pace.",
+  title: "Best Personal Trainer Course UK | PT Launch Lab — £1,599 Bundled Everything",
+  description: "Looking for the best UK PT course? PT Launch Lab bundles NCFE Level 3 (the qualification UK gym managers ask for by name), our £500 business mentorship community, a personal tutor, and guaranteed gym interviews — all for £1,599. Most UK academies sell mentorship separately for £500–£3,000.",
+  alternates: { canonical: "https://ptlaunchlab.co.uk/best-personal-trainer-course-uk" },
 };
 
 export default function Page() {
@@ -39,10 +40,10 @@ export default function Page() {
                   <span className="text-[#F5C518]">A career launchpad.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4">
-                  PT Launch Lab was built because most PT courses produce qualified trainers who still don't know how to get clients.
+                  PT Launch Lab was built because most PT courses produce qualified trainers who still don&apos;t know how to get clients.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  We fix that. NCFE & Ofqual accredited Level 3 qualification, 100% online, with real business mentorship baked in — not bolted on. Qualify in 12–16 weeks and come out ready to earn, not just ready to sit an exam.
+                  We fix that. NCFE Level 3 — the qualification UK gym managers ask for by name — plus our £500 business mentorship community, a personal tutor, and guaranteed gym interviews, all bundled into the £1,599 fee. Most UK academies charge for mentorship separately, or skip it entirely. We don&apos;t. Qualify in 12–16 weeks and come out ready to earn.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>

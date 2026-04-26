@@ -17,7 +17,10 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
   title: "Personal Trainer Course with Business Support | PT Launch Lab",
-  description: "The only PT course that includes real business mentorship as standard. Learn how to qualify, get clients, and build a self-employed career — not just pass an exam. PT Launch Lab.",
+  description: "NCFE Level 3 PT qualification with our £500 business mentorship community bundled in at no extra cost. Most UK PT academies skip the business piece or charge £500–£3,000 separately for it. We bundle the lot for £1,599.",
+  alternates: {
+    canonical: "https://ptlaunchlab.co.uk/personal-trainer-course-with-business-support",
+  },
 };
 
 export default function Page() {
@@ -39,10 +42,10 @@ export default function Page() {
                   <span className="text-[#F5C518]">Build a business too.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4">
-                  Most PT courses teach you the exam. PT Launch Lab teaches you the exam and how to actually earn from it.
+                  Most PT courses teach you the exam. PT Launch Lab teaches you the exam and how to actually build a business from it.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  Business mentorship is built into the course from day one — not an optional add-on, not a upsell. You'll learn client acquisition, pricing, and how to build a self-employed income alongside your Level 3 qualification.
+                  Our £500 business mentorship community is bundled into the £1,599 course fee — not an optional add-on, not an upsell. Client acquisition, pricing, marketing, and a self-employed PT business — built into the course alongside your NCFE Level 3 qualification. Most UK academies sell mentorship separately for £500–£3,000, or skip it entirely.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>
@@ -50,7 +53,7 @@ export default function Page() {
                 </div>
                 <div className="flex flex-wrap gap-3 text-blue-200/70 text-xs">
                   <span>⭐ 5-Star Rated</span><span className="opacity-40">·</span>
-                  <span>Business Support Included</span><span className="opacity-40">·</span>
+                  <span>£500 Mentorship Bundled</span><span className="opacity-40">·</span>
                   <span>500+ PTs Hired</span><span className="opacity-40">·</span>
                   <span>NCFE & Ofqual Regulated</span>
                 </div>

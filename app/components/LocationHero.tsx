@@ -48,7 +48,7 @@ export default function LocationHero({ location, headline }: { location: string;
 
             {/* Sub */}
             <p className="text-base text-blue-100/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              Not just theory — real mentorship, from people who&apos;ve built it themselves. From your first lesson right through to your first paying client.
+              The NCFE Level 3 qualification UK gym managers ask for by name — plus our £500 business mentorship community, included free with the £1,599 course fee. Most UK academies sell mentorship separately. We bundle it.
             </p>
 
             {/* CTA buttons */}
@@ -76,13 +76,13 @@ export default function LocationHero({ location, headline }: { location: string;
             <div className="flex flex-wrap gap-3 md:gap-5 text-blue-200/70 text-xs animate-fade-in-up animate-delay-300">
               <span>⭐ 5-Star Rated</span>
               <span className="hidden sm:inline opacity-40">·</span>
+              <span>£500 Mentorship Included</span>
+              <span className="hidden sm:inline opacity-40">·</span>
               <span>Guaranteed Gym Interviews</span>
               <span className="hidden sm:inline opacity-40">·</span>
               <span>500+ PTs Hired</span>
               <span className="hidden sm:inline opacity-40">·</span>
               <span>NCFE &amp; Ofqual Regulated</span>
-              <span className="hidden sm:inline opacity-40">·</span>
-              <span>Study Around Your Job</span>
             </div>
           </div>
 

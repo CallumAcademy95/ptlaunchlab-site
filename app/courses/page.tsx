@@ -4,7 +4,7 @@ import ProspectusButton from "../components/ProspectusButton";
 
 export const metadata = {
   title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
-  description: "NCFE Level 2 & 3 Personal Training qualification — fast-track, Ofqual regulated, done around your job. Mentorship, gym interviews and business training included.",
+  description: "NCFE Level 2 & 3 PT qualification — the one UK gym managers ask for by name. £1,599 includes our £500 business mentorship community at no extra cost. Fast-track, Ofqual regulated, done around your job.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/courses",
   },
@@ -15,7 +15,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    "100% online NCFE Level 2 & 3 PT qualification with business training, personal mentorship, and guaranteed gym interviews. Qualify in 4–8 weeks.",
+    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm-introduction gym interviews — all bundled, no paid upgrades. Qualify in 4–8 weeks.",
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -118,7 +118,7 @@ const curriculum = [
 
 const method = [
   { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 4–8 weeks." },
-  { num: "02", title: "Mentorship", body: "Direct access to Callum, Miles and Ryan. Not a helpdesk — the people who've actually done it." },
+  { num: "02", title: "Mentorship", body: "Our £500 business mentorship Skool community — included free with the £1,599 fee. Direct access to Callum, Miles and Ryan. Not a helpdesk — the people who've actually done it." },
   { num: "03", title: "Gym Placement", body: "Guaranteed interviews with our partner gyms. We've hired 500+ PTs — we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
   { num: "05", title: "Online Coaching", body: "Expand beyond the gym. Build an income stream that scales without a ceiling." },
@@ -135,20 +135,20 @@ const pricing = [
     title: "Full Payment",
     price: "£1,599",
     saving: "Most popular",
-    features: ["Level 2 & 3 qualification", "Personal tutor throughout", "Business training built in", "Guaranteed gym interviews", "Mentorship from Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
     recommended: true,
   },
   {
     title: "Deposit Plan",
     price: "£599",
     saving: "then £200 × 5 months",
-    features: ["Level 2 & 3 qualification", "Personal tutor throughout", "Business training built in", "Guaranteed gym interviews", "Mentorship from Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
     recommended: false,
   },
 ];
 
 const faqs = [
-  { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. Every gym and insurance provider will accept it." },
+  { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. NCFE is the qualification name UK gym managers ask for by default — PureGym, David Lloyd, Nuffield, JD Gyms, independents. Some UK academies use Focus Awards or self-branded certifications; NCFE is the one that doesn't need explaining on a CV." },
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
   { q: "How long does it take?", a: "Most students complete in 4–8 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
   { q: "What is the guaranteed gym interview?", a: "Once you qualify, we actively connect you with our partner gyms for interviews. This isn't a vague promise — it's built into the course. We've hired 500+ PTs ourselves and we know exactly what gyms look for." },
@@ -267,7 +267,7 @@ export default function CoursesPage() {
                 Why NCFE sets<br />the standard.
               </h2>
               <p className="text-soft/70 text-lg leading-relaxed mb-6">
-                The awarding body matters. NCFE (founded 1848) is listed on the Ofqual Register — the official UK government standard for qualifications. Every gym, insurer, and employer recognises it.
+                The awarding body matters. NCFE (founded 1848) is listed on the Ofqual Register — the official UK government standard for qualifications. It&apos;s the qualification name UK gym managers ask for by default on their job listings — not a self-branded cert, not Focus Awards, not an in-house badge. When a gym scans 50 CVs, they look for NCFE Level 3 first.
               </p>
               <ul className="space-y-3">
                 {["Listed on the Ofqual Register", "Recognised by CIMSPA and REPs", "Legal to work in any UK gym", "Credits transfer to Level 4 specialist courses"].map((item) => (

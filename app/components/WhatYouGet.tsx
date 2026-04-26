@@ -46,7 +46,7 @@ const features = [
   {
     Icon: AwardIcon,
     title: "NCFE Level 3 PT Qualification",
-    body: "Fully accredited, Ofqual-regulated, and CIMSPA-recognised — accepted by every major gym group in the UK. PureGym, David Lloyd, Nuffield, JD Gyms, independents. This is the real thing, not a shortcut.",
+    body: "Fully accredited, Ofqual-regulated, and CIMSPA-recognised — accepted by every major gym group in the UK. PureGym, David Lloyd, Nuffield, JD Gyms, independents. Other UK academies use Focus Awards or their own in-house brand — when a gym manager scans 50 CVs, they look for NCFE Level 3 first.",
     badge: null,
   },
   {
@@ -57,9 +57,9 @@ const features = [
   },
   {
     Icon: ChartIcon,
-    title: "Business Training Built In",
-    body: "How to get clients. How to price yourself. How to market your services and build a PT income that grows month on month. This is what separates PTs who thrive from PTs who quietly quit six months after qualifying.",
-    badge: null,
+    title: "£500 Business Mentorship — Included",
+    body: "Our private Skool community is a £500 standalone product, bundled into the course at no extra cost. How to get your first clients. How to price yourself. How to build a sustainable self-employed PT business — taught by people who've actually done it. Most UK courses charge for this separately, or skip it entirely.",
+    badge: "£500 Included",
   },
   {
     Icon: HandshakeIcon,

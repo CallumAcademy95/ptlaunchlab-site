@@ -57,7 +57,7 @@ export default function FinalCTA() {
 
         <div className="w-12 h-px bg-white/[0.1] mx-auto mb-6" />
         <p className="text-faint text-xs tracking-wide">
-          NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Personal Tutor Included · Guaranteed Gym Interviews · Study in 8–16 Weeks
+          NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · £500 Mentorship Included · Personal Tutor · Guaranteed Gym Interviews · 8–16 Weeks
         </p>
       </div>
     </section>

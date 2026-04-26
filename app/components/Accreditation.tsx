@@ -17,9 +17,8 @@ export default function Accreditation() {
           <br />
           <span className="text-gold">Industry recognised.</span>
         </h2>
-        <p className="text-soft/65 text-base mb-12 max-w-lg mx-auto">
-          Your qualification is regulated by Ofqual and accepted by every gym and insurance
-          provider in the UK.
+        <p className="text-soft/65 text-base mb-12 max-w-xl mx-auto">
+          NCFE Level 3 — Ofqual regulated and accepted by every major gym group in the UK. The qualification name UK gym managers ask for by default — not a self-branded cert, not Focus Awards, not an in-house badge.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">

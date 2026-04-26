@@ -4,7 +4,7 @@ import { useState } from "react";
 const faqs = [
   {
     q: "Is the Level 3 qualification actually recognised? I've seen cheap courses that don't seem legitimate.",
-    a: "Yes — and this is the right question to ask. Our qualification is delivered through NCFE, regulated by Ofqual (the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. That means it's accepted by every major gym group in the UK — PureGym, David Lloyd, Nuffield Health, JD Gyms, and independent operators alike. If a gym asks to see your qualification, ours passes every check.",
+    a: "Yes — and this is the right question to ask. Our qualification is delivered through NCFE, regulated by Ofqual (the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. NCFE is the qualification name UK gym managers ask for by default on their job listings — PureGym, David Lloyd, Nuffield Health, JD Gyms, and independent operators alike. Some UK academies use Focus Awards or their own self-branded certifications. NCFE Level 3 is the one a gym manager recognises on a CV without you needing to explain it.",
   },
   {
     q: "What exactly are the \"guaranteed gym interviews\"? That sounds too good to be true.",
@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     q: "Why should I choose PT Launch Lab over a cheaper course?",
-    a: "If price is the only factor, cheaper courses exist. But here's the honest comparison: most cheaper courses give you the content to pass the exam, and nothing else. No personal tutor. No business training. No job support. You qualify, then you're on your own. PT Launch Lab costs more because it includes the things that actually determine whether you succeed: a tutor who knows your name, business training built into the curriculum, and guaranteed interview introductions. The difference in cost pays for itself within the first month of employment.",
+    a: "If price is the only factor, cheaper courses exist. Here's the honest comparison: most cheaper courses give you the content to pass the exam, and nothing else. No personal tutor. No business mentorship. No job pipeline. You qualify, then you're on your own. At £1,599 PT Launch Lab sits in the middle of the UK market on price — but the bundle is unmatched: the NCFE Level 3 qualification UK gyms ask for by default, a personal tutor assigned to you within 24 hours, our £500 business mentorship community included at no extra cost, and warm-introduction interviews to gyms our team has hired from. Most UK academies charge £500–£3,000 separately for the mentorship piece, or skip it entirely. We bundle everything into the £1,599 — nothing is sold as a paid upgrade.",
   },
   {
     q: "I'm in my 30s or 40s — am I too old to start this?",

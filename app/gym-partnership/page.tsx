@@ -4,16 +4,16 @@ import Footer from "@/app/components/Footer";
 import PartnershipForm from "./PartnershipForm";
 
 export const metadata: Metadata = {
-  title: "Gym Partnership Programme | PT Launch Lab — Earn £500 Per Learner",
+  title: "Gym Partnership Programme | PT Launch Lab — A New Annual Revenue Stream",
   description:
-    "Turn your gym into its own white-label PT academy. Earn £500 per learner, build a steady pipeline of qualified PTs, and increase rental income — with zero admin.",
+    "Turn your gym into its own white-label PT academy. £500 per learner upfront plus annual PT rental and membership income — a recurring revenue stream that compounds year-on-year, with zero admin.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/gym-partnership",
   },
   openGraph: {
     title: "Gym Partnership Programme | PT Launch Lab",
     description:
-      "Earn £500 per learner. Get your own white-label PT academy. We handle education, compliance & mentorship — you keep the revenue.",
+      "Add a new annual revenue stream to your gym. £500 per learner upfront plus PT rental and retention income. We handle education, compliance & mentorship — you keep the revenue.",
     url: "https://ptlaunchlab.co.uk/gym-partnership",
   },
 };
@@ -117,14 +117,15 @@ export default function GymPartnershipPage() {
               </div>
 
               <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl text-white leading-none tracking-tight mb-6">
-                Turn Your Gym Into<br />
-                <span className="text-gold">Its Own PT Academy</span>
+                Add a New Annual<br />
+                <span className="text-gold">Revenue Stream</span><br />
+                <span className="text-white">to Your Gym.</span>
               </h1>
 
               <p className="text-xl text-soft/70 leading-relaxed mb-10 max-w-xl">
                 We build, run, and manage a fully white-label PT academy inside your gym.
-                You earn <strong className="text-white">£500 per learner</strong> upfront — plus long-term PT rental income.
-                Zero teaching. Zero admin. Zero cost.
+                <strong className="text-white"> £500 per learner upfront</strong>, plus PT rental and membership income that builds year on year.
+                Zero teaching. Zero admin. Zero cost to you.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">

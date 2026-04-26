@@ -17,7 +17,8 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
   title: "Self-Employed Personal Trainer UK | Build Your Own PT Business | PT Launch Lab",
-  description: "Want to go self-employed as a personal trainer in the UK? PT Launch Lab trains you to qualify and build your own PT business — not just get a gym job. 100% online, start anytime.",
+  description: "Go self-employed as a UK personal trainer with NCFE Level 3 + our £500 business mentorship community bundled in for £1,599. The mentorship piece — pricing, client acquisition, marketing — most UK academies sell separately or skip. We bundle it.",
+  alternates: { canonical: "https://ptlaunchlab.co.uk/self-employed-personal-trainer-uk" },
 };
 
 export default function Page() {

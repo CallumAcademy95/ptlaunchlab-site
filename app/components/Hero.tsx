@@ -47,7 +47,7 @@ export default function Hero() {
 
             {/* Sub */}
             <p className="text-[15px] text-soft/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              An 8–16 week online Level 3 qualification with business training and guaranteed gym interviews built in. Because a certificate on its own doesn&apos;t pay your rent.
+              An 8–16 week online Level 3 qualification with business training, guaranteed gym interviews, and our <span className="text-white font-semibold">£500 business mentorship community — included free</span>. The bit other UK courses charge for separately, or skip entirely.
             </p>
 
             {/* CTA buttons */}
@@ -75,11 +75,13 @@ export default function Hero() {
             <div className="flex flex-wrap gap-3 md:gap-5 text-soft/60 text-xs animate-fade-in-up animate-delay-300">
               <span>✓ NCFE &amp; Ofqual Regulated</span>
               <span className="hidden sm:inline opacity-30">·</span>
+              <span>✓ £500 Mentorship Included Free</span>
+              <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ Guaranteed Gym Interviews</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>✓ Personal Tutor From Day One</span>
+              <span>✓ Yorkshire Workshops Available</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ Study Around Your Current Job</span>
             </div>

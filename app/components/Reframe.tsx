@@ -1,5 +1,6 @@
 const futures = [
   "A fully recognised Level 3 PT qualification — NCFE, Ofqual-regulated, CIMSPA-approved",
+  "Lifetime access to our £500 business mentorship community — included free, not a paid add-on",
   "A real understanding of the business of being a PT: pricing, client retention, marketing yourself",
   "Guaranteed gym interviews lined up for when you graduate",
   "A personal tutor who's guided you through every unit",

@@ -71,13 +71,13 @@ export default function ConversionSection() {
             <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-1">Pay in Full</h3>
             <p className="text-gold font-bold text-lg mb-4">£1,599 — everything included</p>
             <p className="text-soft/65 text-[15px] leading-relaxed mb-7">
-              One payment. Immediate access to everything — your tutor, your qualification content, your business training, and your guaranteed interview pipeline. No instalments, no additional fees.
+              One payment. Immediate access to everything — your tutor, your NCFE qualification, our £500 business mentorship community, and your guaranteed interview pipeline. No instalments, no additional fees.
             </p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
                 "One payment, fully covered",
                 "Full course access from day one",
-                "Personal tutor, business training, guaranteed interviews",
+                "Personal tutor + £500 mentorship community + guaranteed interviews",
                 "Best value — no additional fees",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-sm">
