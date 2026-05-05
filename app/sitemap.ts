@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { hubLocations } from "./lib/ukLocations";
+import { episodesIndex } from "./podcast/transcripts/_index";
 
 const BASE = "https://ptlaunchlab.co.uk";
 
@@ -49,5 +50,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  return [...staticPages, ...locationPages];
+  // Per-episode podcast pages — full transcripts on each, deep crawlable
+  // resources for AI-search citation.
+  const podcastEpisodes: MetadataRoute.Sitemap = episodesIndex.map((e) => ({
+    url: `${BASE}/podcast/${e.slug}`,
+    priority: 0.6,
+    changeFrequency: "yearly" as const,
+    lastModified: e.date,
+  }));
+
+  return [...staticPages, ...locationPages, ...podcastEpisodes];
 }

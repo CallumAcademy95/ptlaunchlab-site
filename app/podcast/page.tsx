@@ -31,6 +31,7 @@ export const metadata = {
 const episodes: Episode[] = [
   {
     id: "vUaye0j8p34",
+    slug: "ridge-holland-on-big-e-rugby-league-and-life-after-wwe",
     ep: 33,
     title: "Ridge Holland on Big E, Rugby League & Life After WWE",
     desc: "Ridge Holland on his journey from rugby league to WWE — wrestling Big E, the highs and lows of pro wrestling, and what life looks like after the ring.",
@@ -39,6 +40,7 @@ const episodes: Episode[] = [
   },
   {
     id: "-ZHxWBvBYrw",
+    slug: "why-in-person-personal-training-will-be-ai-proof-sohail-rashid",
     ep: 32,
     title: "Why In-Person Personal Training Will Be AI-Proof — Sohail Rashid",
     desc: "Sohail Rashid on why in-person personal training is one of the most AI-proof careers in fitness, the GLP-1 (Ozempic) boom, and what it means for the future of the industry.",
@@ -47,6 +49,7 @@ const episodes: Episode[] = [
   },
   {
     id: "l5SsHmySSEs",
+    slug: "royal-marines-and-afghanistan-to-personal-trainer-the-truth-about-this-industry",
     ep: 31,
     title: "Royal Marines & Afghanistan to Personal Trainer — The Truth About This Industry",
     desc: "From Royal Marines service and deployment in Afghanistan to building a career as a personal trainer — an honest look at military-to-fitness transitions and the realities of this industry.",
@@ -55,6 +58,7 @@ const episodes: Episode[] = [
   },
   {
     id: "vnsAYYOpshg",
+    slug: "from-council-estate-to-stage-with-dizzee-rascal-now-im-a-personal-trainer",
     ep: 30,
     title: "From Council Estate to Stage with Dizzee Rascal — Now I'm a Personal Trainer",
     desc: "A remarkable journey — from council estate roots and performing on stage with Dizzee Rascal, to qualifying as a personal trainer and building a fitness career.",
@@ -63,6 +67,7 @@ const episodes: Episode[] = [
   },
   {
     id: "n4h2p1eE_Qw",
+    slug: "what-90-of-blood-tests-reveal-even-when-you-feel-fine",
     ep: 29,
     title: "What 90% of Blood Tests Reveal (Even When You Feel Fine)",
     desc: "The health markers hiding in plain sight — what routine blood tests reveal about underlying issues, and why personal trainers need to understand the bigger health picture.",
@@ -71,6 +76,7 @@ const episodes: Episode[] = [
   },
   {
     id: "Z6eogOvRtw0",
+    slug: "from-icu-nurse-to-fitness-business-marias-career-change",
     ep: 28,
     title: "From ICU Nurse to Fitness Business: Maria's Career Change",
     desc: "Nurse prescriber Maria shares how she transitioned from intensive care to building a biohacking fitness business.",
@@ -79,6 +85,7 @@ const episodes: Episode[] = [
   },
   {
     id: "bpESntFMy0w",
+    slug: "from-addiction-to-full-time-boxing-coach-pembos-story",
     ep: 27,
     title: "From Addiction to Full-Time Boxing Coach: Pembo's Story",
     desc: "Raw conversation on transformation — from army and addiction to community boxing coach and fitness business owner.",
@@ -87,6 +94,7 @@ const episodes: Episode[] = [
   },
   {
     id: "tgDP_hoObwM",
+    slug: "building-a-martial-arts-gym-from-scratch-ty-harrison",
     ep: 26,
     title: "Building a Martial Arts Gym from Scratch — Ty Harrison",
     desc: "Ty Harrison on the story behind Sengoku Martial Arts, growing kids and adults programmes, and family-first culture.",
@@ -95,6 +103,7 @@ const episodes: Episode[] = [
   },
   {
     id: "C8t9nC2HxOM",
+    slug: "world-class-dancer-to-yoga-studio-owner-lauras-story",
     ep: 25,
     title: "World-Class Dancer to Yoga Studio Owner: Laura's Story",
     desc: "Laura's transition from world-class competitive dancer to launching Vibe Yoga in Pontefract.",
@@ -103,6 +112,7 @@ const episodes: Episode[] = [
   },
   {
     id: "agtjiOXMKOg",
+    slug: "from-46-stone-to-qualified-personal-trainer-jack-atkinson",
     ep: 24,
     title: "From 46 Stone to Qualified Personal Trainer — Jack Atkinson",
     desc: "Jack Atkinson's raw, powerful journey battling food addiction and rebuilding confidence to qualify as a personal trainer.",
@@ -111,6 +121,7 @@ const episodes: Episode[] = [
   },
   {
     id: "70EkHHRizj8",
+    slug: "the-reality-of-running-multiple-fitness-businesses",
     ep: 23,
     title: "The Reality of Running Multiple Fitness Businesses",
     desc: "Callum and Ryan on shutting down businesses, launching new ventures, and the real rollercoaster of fitness entrepreneurship.",
@@ -119,6 +130,7 @@ const episodes: Episode[] = [
   },
   {
     id: "4jITjBvGXXU",
+    slug: "british-powerlifting-champion-to-bodybuilding-burnout-sam-hincks",
     ep: 22,
     title: "British Powerlifting Champion to Bodybuilding Burnout — Sam Hincks",
     desc: "Decorated powerlifter and former British & World Champion Sam Hincks on pressure, burnout, and personal evolution in fitness.",
@@ -127,6 +139,7 @@ const episodes: Episode[] = [
   },
   {
     id: "NrV3eqA3S5Q",
+    slug: "what-most-pts-get-wrong-about-movement-kim-tomlin",
     ep: 21,
     title: "What Most PTs Get Wrong About Movement — Kim Tomlin",
     desc: "Biomechanics coach Kim Tomlin on movement, training for health vs aesthetics, and what most personal trainers miss.",
@@ -135,6 +148,7 @@ const episodes: Episode[] = [
   },
   {
     id: "oQhgsNsLd-8",
+    slug: "how-max-clark-opened-his-own-boxing-gym-at-18",
     ep: 20,
     title: "How Max Clark Opened His Own Boxing Gym at 18",
     desc: "From footballer to dedicated boxer — how Max Clark opened Clark's Boxing Academy in Normanton at just 18 years old.",
@@ -143,6 +157,7 @@ const episodes: Episode[] = [
   },
   {
     id: "gfA-LCPXpBM",
+    slug: "super-league-debut-to-heart-surgery-kiels-story",
     ep: 19,
     title: "Super League Debut to Heart Surgery — Kiel's Story",
     desc: "Kiel opens up about adversity at every stage — Super League debut, heart surgery, and a pancreatic diagnosis. A story of resilience.",
@@ -151,6 +166,7 @@ const episodes: Episode[] = [
   },
   {
     id: "8477A4T4HBQ",
+    slug: "how-to-scale-your-pt-business-online-with-miles",
     ep: 16,
     title: "How to Scale Your PT Business Online — with Miles",
     desc: "How to become an online personal trainer, find your niche, and real industry insights from Miles, a seasoned fitness professional.",
@@ -159,6 +175,7 @@ const episodes: Episode[] = [
   },
   {
     id: "4r_4ZegftMY",
+    slug: "from-addiction-to-personal-trainer-marcus-mean-and-clean",
     ep: 15,
     title: "From Addiction to Personal Trainer — Marcus, Mean and Clean",
     desc: "Marcus's raw and honest journey through addiction, recovery, and how he built Mean and Clean around his transformation.",
@@ -167,6 +184,7 @@ const episodes: Episode[] = [
   },
   {
     id: "d8PxJsyje-o",
+    slug: "3-things-i-wish-i-knew-before-becoming-a-personal-trainer-luke-mccarthy",
     ep: 14,
     title: "3 Things I Wish I Knew Before Becoming a Personal Trainer — Luke McCarthy",
     desc: "Luke McCarthy, Head Hybrid Coach at BoFitFam, on the hard lessons from his fitness career and what he'd do differently.",
@@ -175,6 +193,7 @@ const episodes: Episode[] = [
   },
   {
     id: "IDkRUIeXU4E",
+    slug: "how-personal-training-made-me-a-better-racing-driver-zak-meakin",
     ep: 13,
     title: "How Personal Training Made Me a Better Racing Driver — Zak Meakin",
     desc: "How Zak Meakin bridged motorsport and fitness, and what personal training gave him as a competitive racing driver.",
@@ -183,6 +202,7 @@ const episodes: Episode[] = [
   },
   {
     id: "pAm1jvDKRM0",
+    slug: "how-gemma-left-her-corporate-job-to-become-a-personal-trainer",
     ep: 12,
     title: "How Gemma Left Her Corporate Job to Become a Personal Trainer",
     desc: "Gemma from Saddleworth on leaving a stable corporate career and building a PT business from scratch.",
@@ -191,6 +211,7 @@ const episodes: Episode[] = [
   },
   {
     id: "ZlZxHBwliIk",
+    slug: "how-running-saved-me-from-addiction-matty-bell",
     ep: 11,
     title: "How Running Saved Me from Addiction — Matty Bell",
     desc: "Matty Bell on how running became his recovery tool, and how PT Launch Lab helped him channel that into a career in fitness.",
@@ -199,6 +220,7 @@ const episodes: Episode[] = [
   },
   {
     id: "S9zcs6P5mn8",
+    slug: "why-i-shut-down-my-500k-online-pt-business-the-honest-story",
     ep: 10,
     title: "Why I Shut Down My £500K Online PT Business — The Honest Story",
     desc: "Callum and Ryan on Shred Lifestyle — what it was, why it worked, and why they chose to shut it down at its peak.",
@@ -207,6 +229,7 @@ const episodes: Episode[] = [
   },
   {
     id: "I1Yrhd9GZZU",
+    slug: "how-we-scaled-pt-launch-lab-courses-with-sam-merve-edtech",
     ep: 9,
     title: "How We Scaled PT Launch Lab Courses — with Sam, Merve EdTech",
     desc: "Sam from Merve EdTech on the intersection of education technology and fitness, and how it changed PT Launch Lab's course delivery.",
@@ -215,6 +238,7 @@ const episodes: Episode[] = [
   },
   {
     id: "t8yzdFTxZss",
+    slug: "what-puregym-looks-for-when-hiring-personal-trainers-mac-livock",
     ep: 8,
     title: "What PureGym Looks for When Hiring Personal Trainers — Mac Livock",
     desc: "PureGym Regional Manager Mac Livock on career growth, what makes a great PT, and what gym employers actually look for.",
@@ -223,6 +247,7 @@ const episodes: Episode[] = [
   },
   {
     id: "brMSj4dfdBE",
+    slug: "is-becoming-a-personal-trainer-still-worth-it-the-honest-answer",
     ep: 7,
     title: "Is Becoming a Personal Trainer Still Worth It? The Honest Answer",
     desc: "Callum and Ryan tackle the question head-on — is the PT market saturated, can you make a real living, and is the career still worth it?",
@@ -231,6 +256,7 @@ const episodes: Episode[] = [
   },
   {
     id: "1HK7woXEWhI",
+    slug: "how-i-built-an-online-pt-business-to-500k-ryans-full-story",
     ep: 6,
     title: "How I Built an Online PT Business to £500K — Ryan's Full Story",
     desc: "Ryan goes back to the beginning — how he built an online PT business from nothing to £500K, and what he'd do differently.",
@@ -239,6 +265,7 @@ const episodes: Episode[] = [
   },
   {
     id: "0rhp9fkBFsU",
+    slug: "sick-of-the-9-5-how-to-build-a-fitness-career-you-actually-want",
     ep: null,
     title: "Sick of the 9–5? How to Build a Fitness Career You Actually Want",
     desc: "How to become an online personal trainer with full mentorship — and why escaping the rat race through fitness is more achievable than you think.",
@@ -247,6 +274,7 @@ const episodes: Episode[] = [
   },
   {
     id: "CDR39D_Esg8",
+    slug: "good-clients-vs-nightmare-clients-what-every-pt-needs-to-know",
     ep: null,
     title: "Good Clients vs Nightmare Clients — What Every PT Needs to Know",
     desc: "Callum and Ryan break down the difference between great clients and difficult ones — and how to attract the right people from day one.",
@@ -255,6 +283,7 @@ const episodes: Episode[] = [
   },
   {
     id: "gqp9Grs1rF0",
+    slug: "will-ai-replace-personal-trainers-the-honest-answer",
     ep: null,
     title: "Will AI Replace Personal Trainers? The Honest Answer",
     desc: "A genuine look at AI in personal training — where it helps, where it falls short, and why the human element will never be replaced.",
@@ -263,6 +292,7 @@ const episodes: Episode[] = [
   },
   {
     id: "LlPK2PzCrRA",
+    slug: "the-brutal-reality-of-a-personal-trainers-working-hours",
     ep: null,
     title: "The Brutal Reality of a Personal Trainer's Working Hours",
     desc: "The unsociable hours, the grind, and the reality of being a PT that nobody talks about — honest takes from people who've lived it.",
@@ -271,6 +301,7 @@ const episodes: Episode[] = [
   },
   {
     id: "of0Zf6Jscgo",
+    slug: "why-most-fitness-influencers-are-lying-to-you",
     ep: null,
     title: "Why Most Fitness Influencers Are Lying to You",
     desc: "Callum and Ryan on the problem with fitness influencer culture — and how to pick real role models when you're building a PT career.",
