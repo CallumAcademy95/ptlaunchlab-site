@@ -1,8 +1,11 @@
 import PodcastPage, { type Episode } from "./PodcastPage";
 
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
+const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
 const RSS_FEED_URL = "https://feeds.buzzsprout.com/2615411.rss";
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@ptlaunchlab";
+const PODCAST_INDEX_URL = "https://podcastindex.org/podcast/7846674";
+const PODCHASER_URL = "https://www.podchaser.com/podcasts/pt-launch-lab-podcast-6471336";
 
 export const metadata = {
   title: "The PT Launch Lab Podcast — Real Stories from the Fitness Industry",
@@ -25,6 +28,22 @@ export const metadata = {
 };
 
 const episodes: Episode[] = [
+  {
+    id: "vUaye0j8p34",
+    ep: 33,
+    title: "Ridge Holland on Big E, Rugby League & Life After WWE",
+    desc: "Ridge Holland on his journey from rugby league to WWE — wrestling Big E, the highs and lows of pro wrestling, and what life looks like after the ring.",
+    date: "2026-05",
+    category: "industry",
+  },
+  {
+    id: "-ZHxWBvBYrw",
+    ep: 32,
+    title: "Why In-Person Personal Training Will Be AI-Proof — Sohail Rashid",
+    desc: "Sohail Rashid on why in-person personal training is one of the most AI-proof careers in fitness, the GLP-1 (Ozempic) boom, and what it means for the future of the industry.",
+    date: "2026-04",
+    category: "business",
+  },
   {
     id: "l5SsHmySSEs",
     ep: 31,
@@ -286,7 +305,10 @@ const podcastSeriesSchema = {
   },
   sameAs: [
     SPOTIFY_SHOW_URL,
+    APPLE_PODCAST_URL,
     YOUTUBE_CHANNEL_URL,
+    PODCAST_INDEX_URL,
+    PODCHASER_URL,
   ],
 };
 
@@ -345,6 +367,7 @@ export default function Page() {
       <PodcastPage
         episodes={episodes}
         spotifyUrl={SPOTIFY_SHOW_URL}
+        appleUrl={APPLE_PODCAST_URL}
         youtubeUrl={YOUTUBE_CHANNEL_URL}
         rssUrl={RSS_FEED_URL}
       />

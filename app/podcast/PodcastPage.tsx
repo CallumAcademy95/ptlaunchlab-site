@@ -24,11 +24,12 @@ const CATEGORIES = [
 type Props = {
   episodes: Episode[];
   spotifyUrl: string;
+  appleUrl: string;
   youtubeUrl: string;
   rssUrl: string;
 };
 
-export default function PodcastPage({ episodes, spotifyUrl, youtubeUrl, rssUrl }: Props) {
+export default function PodcastPage({ episodes, spotifyUrl, appleUrl, youtubeUrl, rssUrl }: Props) {
   const [active, setActive] = useState("all");
 
   const filtered =
@@ -88,15 +89,18 @@ export default function PodcastPage({ episodes, spotifyUrl, youtubeUrl, rssUrl }
                 </svg>
                 YouTube
               </a>
-              <span
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-blue/30 text-soft/60 font-semibold text-sm cursor-default"
-                title="Coming soon to Apple Podcasts"
+              <a
+                href={appleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Listen on Apple Podcasts"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#822CEC] to-[#D444F1] text-white font-bold text-sm hover:brightness-110 transition-all"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5a3 3 0 110 6 3 3 0 010-6zM6.7 17.4c0-3.5 5.3-3.5 5.3-3.5s5.3 0 5.3 3.5c0 1-1 1.6-2.5 1.6-1 0-1.7-.5-2.8-.5s-1.8.5-2.8.5c-1.5 0-2.5-.6-2.5-1.6z" />
                 </svg>
-                Apple Podcasts (soon)
-              </span>
+                Apple Podcasts
+              </a>
               <a
                 href={rssUrl}
                 target="_blank"
