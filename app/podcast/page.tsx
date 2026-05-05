@@ -1,10 +1,26 @@
 import PodcastPage, { type Episode } from "./PodcastPage";
 
+const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
+const RSS_FEED_URL = "https://feeds.buzzsprout.com/2615411.rss";
+const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@ptlaunchlab";
+
 export const metadata = {
   title: "The PT Launch Lab Podcast — Real Stories from the Fitness Industry",
-  description: "Watch every episode of the PT Launch Lab podcast. Real stories from personal trainers, gym owners and career changers. New episode every week on YouTube.",
+  description:
+    "Listen to the PT Launch Lab podcast on Spotify, YouTube and Apple Podcasts. Real stories from personal trainers, gym owners and career changers. New episode every week.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/podcast",
+    types: {
+      "application/rss+xml": RSS_FEED_URL,
+    },
+  },
+  openGraph: {
+    title: "The PT Launch Lab Podcast",
+    description:
+      "Real stories from personal trainers, gym owners and career changers. Watch on YouTube, listen on Spotify.",
+    url: "https://ptlaunchlab.co.uk/podcast",
+    type: "website",
+    images: [{ url: "/podcast-thumbnail.jpg" }],
   },
 };
 
@@ -243,23 +259,69 @@ const episodes: Episode[] = [
   },
 ];
 
-const podcastSchema = {
+const podcastSeriesSchema = {
+  "@context": "https://schema.org",
+  "@type": "PodcastSeries",
+  name: "The PT Launch Lab Podcast",
+  alternateName: "PT Launch Lab Podcast",
+  description:
+    "Real stories from personal trainers, gym owners and career changers in the UK fitness industry. Hosted by Callum Brown, Ryan Robinson and Miles. Career-change journeys, PT business building, and the honest side of the industry.",
+  url: "https://ptlaunchlab.co.uk/podcast",
+  webFeed: RSS_FEED_URL,
+  image: "https://ptlaunchlab.co.uk/podcast-thumbnail.jpg",
+  inLanguage: "en-GB",
+  numberOfEpisodes: episodes.length,
+  author: [
+    { "@type": "Person", name: "Callum Brown" },
+    { "@type": "Person", name: "Ryan Robinson" },
+  ],
+  publisher: {
+    "@type": "Organization",
+    name: "PT Launch Lab",
+    url: "https://ptlaunchlab.co.uk",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://ptlaunchlab.co.uk/logo.png",
+    },
+  },
+  sameAs: [
+    SPOTIFY_SHOW_URL,
+    YOUTUBE_CHANNEL_URL,
+  ],
+};
+
+const episodeListSchema = {
   "@context": "https://schema.org",
   "@type": "ItemList",
   name: "PT Launch Lab Podcast Episodes",
-  description: "Real stories from personal trainers, gym owners and career changers. New episode every week.",
+  description:
+    "Real stories from personal trainers, gym owners and career changers. New episode every week.",
   url: "https://ptlaunchlab.co.uk/podcast",
   itemListElement: episodes.map((ep, i) => ({
     "@type": "ListItem",
     position: i + 1,
     item: {
-      "@type": "VideoObject",
+      "@type": "PodcastEpisode",
       name: ep.title,
       description: ep.desc,
-      thumbnailUrl: `https://i.ytimg.com/vi/${ep.id}/hqdefault.jpg`,
-      uploadDate: `${ep.date}-01`,
       url: `https://www.youtube.com/watch?v=${ep.id}`,
-      embedUrl: `https://www.youtube.com/embed/${ep.id}`,
+      datePublished: `${ep.date}-01`,
+      ...(ep.ep ? { episodeNumber: ep.ep } : {}),
+      partOfSeries: {
+        "@type": "PodcastSeries",
+        name: "The PT Launch Lab Podcast",
+        url: "https://ptlaunchlab.co.uk/podcast",
+        webFeed: RSS_FEED_URL,
+      },
+      associatedMedia: {
+        "@type": "VideoObject",
+        name: ep.title,
+        description: ep.desc,
+        thumbnailUrl: `https://i.ytimg.com/vi/${ep.id}/hqdefault.jpg`,
+        uploadDate: `${ep.date}-01`,
+        contentUrl: `https://www.youtube.com/watch?v=${ep.id}`,
+        embedUrl: `https://www.youtube.com/embed/${ep.id}`,
+      },
       publisher: {
         "@type": "Organization",
         name: "PT Launch Lab",
@@ -274,9 +336,18 @@ export default function Page() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastSeriesSchema) }}
       />
-      <PodcastPage episodes={episodes} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(episodeListSchema) }}
+      />
+      <PodcastPage
+        episodes={episodes}
+        spotifyUrl={SPOTIFY_SHOW_URL}
+        youtubeUrl={YOUTUBE_CHANNEL_URL}
+        rssUrl={RSS_FEED_URL}
+      />
     </>
   );
 }

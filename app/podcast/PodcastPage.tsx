@@ -21,7 +21,14 @@ const CATEGORIES = [
   { key: "industry", label: "Industry Interviews" },
 ];
 
-export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
+type Props = {
+  episodes: Episode[];
+  spotifyUrl: string;
+  youtubeUrl: string;
+  rssUrl: string;
+};
+
+export default function PodcastPage({ episodes, spotifyUrl, youtubeUrl, rssUrl }: Props) {
   const [active, setActive] = useState("all");
 
   const filtered =
@@ -45,19 +52,71 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
               <span className="text-gold">Yorkshire honesty.</span>
             </h1>
             <p className="text-xl text-soft/60 leading-relaxed max-w-2xl mx-auto mb-8">
-              Every week Callum, Miles and Ryan sit down with people who&apos;ve built careers in fitness — transformation stories, PT business building, and the honest side of the industry.
+              Every week Callum, Miles and Ryan sit down with people who&apos;ve built careers in fitness — transformation stories, PT business building, and the honest side of the industry. <span className="text-white">Watch on YouTube or listen on Spotify.</span>
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            {/* LISTEN ON */}
+            <p className="text-soft/60 text-xs font-semibold tracking-widest uppercase mb-4">
+              Listen / Watch
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center mb-6">
               <a
-                href="https://www.youtube.com/@ptlaunchlab"
+                href={spotifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
+                aria-label="Listen on Spotify"
+                className="inline-flex items-center hover:brightness-110 transition-all"
+              >
+                {/* Official Spotify "Listen on" badge — must not be modified per Spotify brand guidelines */}
+                <Image
+                  src="/spotify-badges/listen-wht-grn.svg"
+                  alt="Listen on Spotify"
+                  width={165}
+                  height={40}
+                  unoptimized
+                />
+              </a>
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Watch on YouTube"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#FF0000] text-white font-bold text-sm hover:brightness-110 transition-all"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                 </svg>
-                Subscribe on YouTube
+                YouTube
+              </a>
+              <span
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-blue/30 text-soft/60 font-semibold text-sm cursor-default"
+                title="Coming soon to Apple Podcasts"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5a3 3 0 110 6 3 3 0 010-6zM6.7 17.4c0-3.5 5.3-3.5 5.3-3.5s5.3 0 5.3 3.5c0 1-1 1.6-2.5 1.6-1 0-1.7-.5-2.8-.5s-1.8.5-2.8.5c-1.5 0-2.5-.6-2.5-1.6z" />
+                </svg>
+                Apple Podcasts (soon)
+              </span>
+              <a
+                href={rssUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="RSS feed"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gold/40 text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20A2.18 2.18 0 0 1 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1Z" />
+                </svg>
+                RSS
+              </a>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+              <a
+                href="/quiz"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
+              >
+                Take the 60-Second Quiz →
               </a>
               <a
                 href="https://www.instagram.com/ptlaunchlab"
@@ -77,7 +136,7 @@ export default function PodcastPage({ episodes }: { episodes: Episode[] }) {
             {[
               { value: `${episodes.length}+`, label: "Episodes" },
               { value: "Weekly", label: "New episodes" },
-              { value: "YouTube", label: "Watch free" },
+              { value: "Spotify + YouTube", label: "Listen or watch" },
             ].map((s) => (
               <div key={s.label}>
                 <p className="text-gold text-2xl font-bold">{s.value}</p>
