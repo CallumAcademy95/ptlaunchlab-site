@@ -199,8 +199,14 @@ export default function CoursesPage() {
             <p className="text-xl text-white font-semibold mb-4">
               Most PT courses teach theory. We build personal trainers gyms actually want to hire.
             </p>
-            <p className="text-lg text-soft/70 max-w-2xl mx-auto mb-10">
+            <p className="text-lg text-soft/70 max-w-2xl mx-auto mb-6">
               NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, guaranteed gym interviews, and a complete business launchpad included.
+            </p>
+            <p className="text-sm text-soft/60 max-w-2xl mx-auto mb-10">
+              New to UK PT courses?{" "}
+              <a href="/online-personal-trainer-course-uk" className="text-gold hover:underline font-semibold">
+                Read our honest comparison of 10 UK providers →
+              </a>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/enrol"

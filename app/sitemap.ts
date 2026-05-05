@@ -29,6 +29,7 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/personal-trainer-course-near-me`,     priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/self-employed-personal-trainer-uk`,   priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/best-personal-trainer-course-uk`,     priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
+  { url: `${BASE}/online-personal-trainer-course-uk`,   priority: 0.9,  changeFrequency: "monthly", lastModified: TODAY },
   // Gym partnership landing pages
   { url: `${BASE}/6fit-academy`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/muscle-bound-academy`,                priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
