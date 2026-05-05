@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Personal Training Course With Business Support in ${loc.name} | PT Launch Lab`,
     description: `Study a personal training course with business support near ${loc.name}. NCFE Level 3, 100% online, with real mentorship so you can go self-employed from day one.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/personal-training-course-with-business-support/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

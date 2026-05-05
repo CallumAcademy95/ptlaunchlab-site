@@ -1,6 +1,7 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ProspectusButton from "../components/ProspectusButton";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 export const metadata = {
   title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
@@ -51,7 +52,7 @@ const courseSchema = {
   aggregateRating: {
     "@type": "AggregateRating",
     ratingValue: "5.0",
-    reviewCount: "17",
+    reviewCount: "3",
     bestRating: "5",
     worstRating: "1",
   },
@@ -59,18 +60,21 @@ const courseSchema = {
     {
       "@type": "Review",
       author: { "@type": "Person", name: "Gemma" },
+      datePublished: "2025-09-12",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody: "Left a corporate career to build her own independent PT business. Now coaching full-time on her own terms. The business training and mentorship made all the difference.",
     },
     {
       "@type": "Review",
-      author: { "@type": "Person", name: "Matty" },
+      author: { "@type": "Person", name: "Matty Bell" },
+      datePublished: "2025-09-06",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody: "Turned a personal journey through adversity into a running and coaching brand that's still growing. PT Launch Lab gave me the foundation and the confidence to do it.",
     },
     {
       "@type": "Review",
-      author: { "@type": "Person", name: "Mac" },
+      author: { "@type": "Person", name: "Mac Livock" },
+      datePublished: "2025-08-08",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody: "Started as a trainee and rose to manager at PureGym. The guaranteed gym interviews and mentorship got me in the door — I did the rest.",
     },
@@ -170,6 +174,7 @@ export default function CoursesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
       />
+      <Breadcrumbs trail={[{ name: "Courses", url: "https://ptlaunchlab.co.uk/courses" }]} />
       <Nav />
       <main className="pt-[72px]">
 

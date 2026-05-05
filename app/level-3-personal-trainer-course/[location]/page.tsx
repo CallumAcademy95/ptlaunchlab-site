@@ -17,6 +17,7 @@ import FinalCTA from "@/app/components/FinalCTA";
 import Footer from "@/app/components/Footer";
 import StickyMobileCTA from "@/app/components/StickyMobileCTA";
 import LocationContext from "@/app/components/LocationContext";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { ukLocations, hubLocations, getLocationBySlug } from "@/app/lib/ukLocations";
 
 export const dynamicParams = false;
@@ -44,6 +45,13 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
 
   return (
     <>
+      <Breadcrumbs
+        trail={[
+          { name: "Courses", url: "https://ptlaunchlab.co.uk/courses" },
+          { name: "Level 3 Personal Trainer Course", url: "https://ptlaunchlab.co.uk/level-3-personal-trainer-course" },
+          { name: loc.name, url: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
+        ]}
+      />
       <Nav />
       <main>
         <LocationHero location={loc.name} headline="Level 3 Personal Trainer Course in {location}.|NCFE & Ofqual accredited. Qualify in 12–16 weeks." />

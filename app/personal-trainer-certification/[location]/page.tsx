@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Personal Trainer Certification in ${loc.name} | Ofqual Level 3 | PT Launch Lab`,
     description: `Get your personal trainer certification from ${loc.name}. Ofqual Level 3 recognised, 100% online, with business mentorship. Start earning in 12–16 weeks.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/personal-trainer-certification/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

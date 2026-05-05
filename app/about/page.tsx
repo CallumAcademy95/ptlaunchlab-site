@@ -2,6 +2,7 @@ import Image from "next/image";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import FounderTabs from "../components/FounderTabs";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 export const metadata = {
   title: "About PT Launch Lab — PT Academy Founded by Gym Owners",
@@ -153,6 +154,7 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(foundersSchema) }}
       />
+      <Breadcrumbs trail={[{ name: "About", url: "https://ptlaunchlab.co.uk/about" }]} />
       <Nav />
       <main className="pt-[72px]">
 

@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Fast Track Personal Trainer Course in ${loc.name} | Qualify in 12 Weeks | PT Launch Lab`,
     description: `Fast track your personal trainer qualification from ${loc.name}. PT Launch Lab's online Level 3 PT course lets you qualify in as little as 12 weeks — study around your job, start anytime.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/fast-track-personal-trainer-course/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

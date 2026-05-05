@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `PT Courses That Include Business Training in ${loc.name} | PT Launch Lab`,
     description: `Find PT courses that include business training near ${loc.name}. Our Level 3 course includes real business mentorship so you can build a client base from day one.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/pt-courses-with-business-training/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

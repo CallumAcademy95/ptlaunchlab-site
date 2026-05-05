@@ -1,4 +1,5 @@
 import PodcastPage, { type Episode } from "./PodcastPage";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
 const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
@@ -364,6 +365,7 @@ export default function Page() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(episodeListSchema) }}
       />
+      <Breadcrumbs trail={[{ name: "Podcast", url: "https://ptlaunchlab.co.uk/podcast" }]} />
       <PodcastPage
         episodes={episodes}
         spotifyUrl={SPOTIFY_SHOW_URL}

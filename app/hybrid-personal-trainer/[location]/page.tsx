@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Hybrid Personal Trainer Course in ${loc.name} | PT Launch Lab`,
     description: `Want to be a hybrid PT near ${loc.name}? Train clients in person and online. PT Launch Lab's Level 3 PT qualification teaches you how to build a hybrid coaching business from scratch.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/hybrid-personal-trainer/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

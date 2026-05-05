@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "./EnrolmentFlow";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Launch Lab",
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function EnrolPage() {
-  return <EnrolmentFlow />;
+  return (
+    <>
+      <Breadcrumbs trail={[{ name: "Enrol", url: "https://ptlaunchlab.co.uk/enrol" }]} />
+      <EnrolmentFlow />
+    </>
+  );
 }

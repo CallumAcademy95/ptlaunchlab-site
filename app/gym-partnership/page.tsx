@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
 
 export const metadata: Metadata = {
@@ -97,6 +98,7 @@ export default function GymPartnershipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(partnershipSchema) }}
       />
+      <Breadcrumbs trail={[{ name: "Gym Partnership", url: "https://ptlaunchlab.co.uk/gym-partnership" }]} />
       <Nav />
       <main className="pt-[72px]">
 

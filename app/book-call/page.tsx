@@ -1,4 +1,5 @@
 import BookCallPage from "./BookCallPage";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 export const metadata = {
   title: "Book a Free 15-Minute Call — Talk to a PT Expert | PT Launch Lab",
@@ -9,5 +10,10 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <BookCallPage />;
+  return (
+    <>
+      <Breadcrumbs trail={[{ name: "Book a Call", url: "https://ptlaunchlab.co.uk/book-call" }]} />
+      <BookCallPage />
+    </>
+  );
 }

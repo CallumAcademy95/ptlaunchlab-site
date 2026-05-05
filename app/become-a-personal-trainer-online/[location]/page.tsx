@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   return {
     title: `Become a Personal Trainer Online in ${loc.name} | Study 100% Online | PT Launch Lab`,
     description: `Become a personal trainer online from ${loc.name}. Study 100% online, gain your NCFE Level 3, and get business mentorship to launch your PT career. Qualify in 12–16 weeks.`,
-    alternates: { canonical: `https://ptlaunchlab.co.uk/become-a-personal-trainer-online/${location}` },
+    alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
 

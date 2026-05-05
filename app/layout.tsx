@@ -58,34 +58,108 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
-        {/* Organization JSON-LD schema */}
+        {/* Organization JSON-LD schema — graph with EducationalOrganization
+            (the brand/course provider) + LocalBusiness (the Pontefract HQ)
+            so Google can populate both knowledge panels and local SERPs. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "PT Launch Lab",
-              url: "https://ptlaunchlab.co.uk",
-              logo: "https://ptlaunchlab.co.uk/logo.png",
-              description:
-                "NCFE Level 3 Personal Trainer qualification, 100% online, built by gym owners. Ofqual regulated, CIMSPA recognised. Business mentorship and guaranteed gym interviews included.",
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: "Pontefract",
-                addressRegion: "West Yorkshire",
-                addressCountry: "GB",
-              },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "5.0",
-                reviewCount: "17",
-                bestRating: "5",
-                worstRating: "1",
-              },
-              sameAs: [
-                "https://www.youtube.com/@ptlaunchlab",
-                "https://www.instagram.com/ptlaunchlab",
+              "@graph": [
+                {
+                  "@type": "EducationalOrganization",
+                  "@id": "https://ptlaunchlab.co.uk/#org",
+                  name: "PT Launch Lab",
+                  alternateName: "PT Launch Lab Ltd",
+                  url: "https://ptlaunchlab.co.uk",
+                  logo: {
+                    "@type": "ImageObject",
+                    url: "https://ptlaunchlab.co.uk/logo.png",
+                    width: 512,
+                    height: 512,
+                  },
+                  image: "https://ptlaunchlab.co.uk/og-image.png",
+                  description:
+                    "NCFE Level 3 Personal Trainer qualification, 100% online, built by gym owners. Ofqual regulated, CIMSPA recognised. Business mentorship and guaranteed gym interviews included.",
+                  foundingDate: "2024",
+                  founders: [
+                    { "@type": "Person", name: "Callum Brown" },
+                    { "@type": "Person", name: "Ryan Robinson" },
+                  ],
+                  email: "info@ptlaunchlab.co.uk",
+                  telephone: "+44 7822 012186",
+                  address: {
+                    "@type": "PostalAddress",
+                    streetAddress: "Unit 3, Royals Business Park, King Street",
+                    addressLocality: "Pontefract",
+                    addressRegion: "West Yorkshire",
+                    postalCode: "WF8 4AH",
+                    addressCountry: "GB",
+                  },
+                  areaServed: {
+                    "@type": "Country",
+                    name: "United Kingdom",
+                  },
+                  hasCredential: {
+                    "@type": "EducationalOccupationalCredential",
+                    name: "NCFE Level 2 & 3 Personal Trainer Qualification",
+                    credentialCategory: "certificate",
+                    educationalLevel: "Level 3",
+                    recognizedBy: [
+                      { "@type": "Organization", name: "Ofqual" },
+                      { "@type": "Organization", name: "CIMSPA" },
+                      { "@type": "Organization", name: "NCFE" },
+                    ],
+                  },
+                  sameAs: [
+                    "https://www.youtube.com/@ptlaunchlab",
+                    "https://www.instagram.com/ptlaunchlab",
+                    "https://www.tiktok.com/@pt.launch.lab",
+                    "https://www.facebook.com/profile.php?id=61583011678458",
+                    "https://find-and-update.company-information.service.gov.uk/company/16596168",
+                  ],
+                },
+                {
+                  "@type": "LocalBusiness",
+                  "@id": "https://ptlaunchlab.co.uk/#localbusiness",
+                  name: "PT Launch Lab",
+                  url: "https://ptlaunchlab.co.uk",
+                  image: "https://ptlaunchlab.co.uk/og-image.png",
+                  telephone: "+44 7822 012186",
+                  email: "info@ptlaunchlab.co.uk",
+                  priceRange: "££",
+                  address: {
+                    "@type": "PostalAddress",
+                    streetAddress: "Unit 3, Royals Business Park, King Street",
+                    addressLocality: "Pontefract",
+                    addressRegion: "West Yorkshire",
+                    postalCode: "WF8 4AH",
+                    addressCountry: "GB",
+                  },
+                  geo: {
+                    "@type": "GeoCoordinates",
+                    latitude: 53.6917,
+                    longitude: -1.3104,
+                  },
+                  openingHoursSpecification: [
+                    {
+                      "@type": "OpeningHoursSpecification",
+                      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                      opens: "09:00",
+                      closes: "17:00",
+                    },
+                  ],
+                  parentOrganization: { "@id": "https://ptlaunchlab.co.uk/#org" },
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://ptlaunchlab.co.uk/#website",
+                  url: "https://ptlaunchlab.co.uk",
+                  name: "PT Launch Lab",
+                  publisher: { "@id": "https://ptlaunchlab.co.uk/#org" },
+                  inLanguage: "en-GB",
+                },
               ],
             }),
           }}
