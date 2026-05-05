@@ -327,7 +327,7 @@ const episodeListSchema = {
       name: ep.title,
       description: ep.desc,
       url: `https://www.youtube.com/watch?v=${ep.id}`,
-      datePublished: `${ep.date}-01`,
+      datePublished: `${ep.date}-01T12:00:00Z`,
       ...(ep.ep ? { episodeNumber: ep.ep } : {}),
       partOfSeries: {
         "@type": "PodcastSeries",
@@ -340,7 +340,7 @@ const episodeListSchema = {
         name: ep.title,
         description: ep.desc,
         thumbnailUrl: `https://i.ytimg.com/vi/${ep.id}/hqdefault.jpg`,
-        uploadDate: `${ep.date}-01`,
+        uploadDate: `${ep.date}-01T12:00:00Z`,
         contentUrl: `https://www.youtube.com/watch?v=${ep.id}`,
         embedUrl: `https://www.youtube.com/embed/${ep.id}`,
       },
