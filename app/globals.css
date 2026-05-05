@@ -45,18 +45,22 @@ body::after {
 
 * { box-sizing: border-box; }
 
-/* Animations */
+/* Animations — opacity:0 starting point removed so above-the-fold elements
+   (H1, hero text) are visible to LCP from frame 1. Mobile LCP was 11s+
+   because the H1 element itself was opacity:0 until the 0.55s animation
+   finished, pushing the LCP measurement back. Transforms still give the
+   subtle slide/zoom; pixels are paintable immediately. */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(16px); }
+  to   { transform: translateY(0); }
 }
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { transform: translateY(4px); }
+  to   { transform: translateY(0); }
 }
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+  from { transform: scale(0.97); }
+  to   { transform: scale(1); }
 }
 @keyframes scrollX {
   0%   { transform: translateX(0); }
