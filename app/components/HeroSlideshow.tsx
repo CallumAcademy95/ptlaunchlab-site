@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const SLIDES = [
-  { src: "/learner-1.png", name: "Learner" },
-  { src: "/learner-2.png", name: "Learner" },
-  { src: "/learner-3.png", name: "Learner" },
-  { src: "/learner-4.png", name: "Learner" },
+  { src: "/learner-1.webp", alt: "PT Launch Lab graduate holding their NCFE Level 3 personal trainer certificate" },
+  { src: "/learner-2.webp", alt: "PT Launch Lab graduate qualified through the NCFE Level 3 personal trainer course" },
+  { src: "/learner-3.webp", alt: "PT Launch Lab learner who completed the online Level 3 personal training qualification" },
+  { src: "/learner-4.webp", alt: "PT Launch Lab graduate working as a qualified personal trainer in the UK" },
 ];
 
 const INTERVAL = 4000;
@@ -66,10 +66,10 @@ export default function HeroSlideshow() {
             >
               <Image
                 src={SLIDES[prev].src}
-                alt="PT Launch Lab learner with certificate"
+                alt={SLIDES[prev].alt}
                 fill
+                sizes="(max-width: 1024px) 100vw, 400px"
                 className="object-cover object-center lg:object-top"
-                priority
               />
             </div>
           )}
@@ -81,8 +81,9 @@ export default function HeroSlideshow() {
           >
             <Image
               src={SLIDES[current].src}
-              alt="PT Launch Lab learner with certificate"
+              alt={SLIDES[current].alt}
               fill
+              sizes="(max-width: 1024px) 100vw, 400px"
               className="object-cover object-center lg:object-top"
               priority={current === 0}
             />

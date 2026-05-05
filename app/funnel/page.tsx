@@ -49,9 +49,9 @@ const founderStats = [
 ];
 
 const founders = [
-  { src: "/callum.jpg", name: "Callum", role: "Head of Education & Tutor" },
-  { src: "/miles.jpg",  name: "Miles",  role: "Business Mentor & Co-Founder" },
-  { src: "/ryan.jpg",   name: "Ryan",   role: "Operations & Co-Founder" },
+  { src: "/callum.webp", name: "Callum", role: "Head of Education & Tutor" },
+  { src: "/miles.webp",  name: "Miles",  role: "Business Mentor & Co-Founder" },
+  { src: "/ryan.webp",   name: "Ryan",   role: "Operations & Co-Founder" },
 ];
 
 const reviews = [

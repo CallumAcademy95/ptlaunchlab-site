@@ -1,9 +1,9 @@
 import Image from "next/image";
 
 const founders = [
-  { src: "/callum.jpg", name: "Callum" },
-  { src: "/miles.jpg",  name: "Miles"  },
-  { src: "/ryan.jpg",   name: "Ryan"   },
+  { src: "/callum.webp", name: "Callum", alt: "Callum Brown — co-founder of PT Launch Lab and Head of Education" },
+  { src: "/miles.webp",  name: "Miles",  alt: "Miles — co-founder of PT Launch Lab and Business Mentor" },
+  { src: "/ryan.webp",   name: "Ryan",   alt: "Ryan Robinson — co-founder of PT Launch Lab and Head of Operations" },
 ];
 
 const stats = [
@@ -42,7 +42,7 @@ export default function FounderStory() {
             {founders.map((f) => (
               <div key={f.name} className="flex flex-col items-center gap-2">
                 <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-gold/40 shadow-lg shadow-black/30">
-                  <Image src={f.src} alt={f.name} fill className="object-cover object-top" />
+                  <Image src={f.src} alt={f.alt} fill className="object-cover object-top" />
                 </div>
                 <span className="text-soft/60 text-xs font-medium">{f.name}</span>
               </div>

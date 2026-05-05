@@ -6,7 +6,7 @@ const founders = [
   {
     name: "Callum Brown",
     role: "Co-Founder & Educator",
-    photo: "/callum.jpg",
+    photo: "/callum.webp",
     story: [
       "Callum's path into fitness wasn't a straight line. He moved from job to job, trade to trade, before deciding that Personal Training was where he was meant to be. That experience of not quite fitting anywhere else is exactly what makes him understand the people PT Launch Lab is built for.",
       "On the gym floor, Callum built a strong, loyal client base from the ground up. He then moved into PT education, becoming a qualified educator in Personal Training qualifications and working closely with the UK's top student finance providers to understand how people fund their training.",
@@ -21,7 +21,7 @@ const founders = [
   {
     name: "Ryan Robinson",
     role: "Co-Founder & Mentor",
-    photo: "/ryan.jpg",
+    photo: "/ryan.webp",
     story: [
       "Ryan has 17 years on the gym floor and a career that most PTs only dream of. As a professional boxer, he built the kind of discipline and mental edge that translated directly into how he trains clients and runs a business.",
       "He founded Ultimate Shred, an online PT business that he scaled to over £500,000 in revenue as an independent personal trainer, without a gym brand behind him. Just the right systems, the right offer, and the drive to build something real.",
@@ -36,7 +36,7 @@ const founders = [
   {
     name: "Miles Halstead",
     role: "Co-Founder & Director",
-    photo: "/miles.jpg",
+    photo: "/miles.webp",
     story: [
       "Thirty years in the fitness industry gives you a perspective nobody can teach. Miles has seen this industry from every angle. From corporate management to owning his own chain of gyms, running large teams of Personal Trainers and coaches day in, day out.",
       "He's been on both sides of the hiring table hundreds of times. He knows what separates the PTs who build long careers from the ones who disappear after six months. He knows what gym owners actually want, what clients stay loyal to, and what no qualification on its own will ever teach you.",
