@@ -57,15 +57,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preload the first hero slide so the LCP image starts downloading
-            during HTML parse instead of waiting for the client component to
-            hydrate. Drops mobile LCP significantly. */}
+        {/* Preload first hero slide on desktop only — on mobile the image is
+            below the fold (single column, image follows the H1), so a
+            high-priority preload there steals bandwidth from CSS and pushes
+            FCP back. fetchPriority "high" removed for the same reason —
+            "auto" lets the browser balance against CSS/font requests. */}
         <link
           rel="preload"
           as="image"
           href="/learner-1.webp"
           type="image/webp"
-          fetchPriority="high"
+          media="(min-width: 1024px)"
         />
       </head>
       <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
