@@ -70,12 +70,37 @@ const articleSchema = {
   dateModified: `${TODAY}T12:00:00Z`,
   inLanguage: "en-GB",
   author: [
-    { "@type": "Person", name: "Callum Brown", jobTitle: "Co-founder, PT Launch Lab" },
-    { "@type": "Person", name: "Ryan Robinson", jobTitle: "Co-founder, PT Launch Lab" },
+    {
+      "@type": "Person",
+      name: "Callum Brown",
+      jobTitle: "Co-founder, PT Launch Lab",
+      url: "https://ptlaunchlab.co.uk/about",
+    },
+    {
+      "@type": "Person",
+      name: "Ryan Robinson",
+      jobTitle: "Co-founder, PT Launch Lab",
+      url: "https://ptlaunchlab.co.uk/about",
+    },
   ],
-  publisher: { "@id": "https://ptlaunchlab.co.uk/#org" },
+  publisher: {
+    "@type": "Organization",
+    name: "PT Launch Lab",
+    url: "https://ptlaunchlab.co.uk",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://ptlaunchlab.co.uk/logo.png",
+      width: 512,
+      height: 512,
+    },
+  },
   mainEntityOfPage: { "@type": "WebPage", "@id": PAGE_URL },
-  image: "https://ptlaunchlab.co.uk/og-image.png",
+  image: {
+    "@type": "ImageObject",
+    url: "https://ptlaunchlab.co.uk/og-image.png",
+    width: 1200,
+    height: 630,
+  },
 };
 
 const faqSchema = {

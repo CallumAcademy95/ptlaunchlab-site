@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Barlow_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
-import Chatbot from "./components/Chatbot";
+import Chatbot from "./components/ChatbotLazy";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -56,7 +56,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head />
+      <head>
+        {/* Preload the first hero slide so the LCP image starts downloading
+            during HTML parse instead of waiting for the client component to
+            hydrate. Drops mobile LCP significantly. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/learner-1.webp"
+          type="image/webp"
+          fetchPriority="high"
+        />
+      </head>
       <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
         {/* Organization JSON-LD schema — graph with EducationalOrganization
             (the brand/course provider) + LocalBusiness (the Pontefract HQ)
@@ -188,16 +199,19 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
           gtag('js', new Date());
           gtag('config', 'G-90W2KGSL55', { anonymize_ip: true });
         `}</Script>
-        {/* 4. Microsoft Clarity */}
-        <Script id="microsoft-clarity" strategy="afterInteractive">{`
+        {/* 4. Microsoft Clarity — deferred to lazyOnload (fires after window
+            load) to keep it off the critical path. Heatmap/session data is
+            non-critical for early page interactions. */}
+        <Script id="microsoft-clarity" strategy="lazyOnload">{`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "w0qwj7lviw");
         `}</Script>
-        {/* 5. Meta Pixel */}
-        <Script id="meta-pixel" strategy="afterInteractive">{`
+        {/* 5. Meta Pixel — deferred to lazyOnload. PageView still fires on
+            every load, just after the page is interactive. */}
+        <Script id="meta-pixel" strategy="lazyOnload">{`
           !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
           n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
