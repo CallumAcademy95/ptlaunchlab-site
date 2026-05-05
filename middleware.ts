@@ -123,6 +123,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 });
   }
 
+  // Old /blog and /blog/<slug> URLs from a previous site iteration. The blog
+  // never made it onto the new Next.js site — podcast pages with full
+  // transcripts cover similar topical ground, so forward all blog URLs to
+  // /podcast for any inbound link / cached SERP result.
+  if (pathname === "/blog" || pathname.startsWith("/blog/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/podcast";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
   // Redirect base-only routes that have no root page.tsx (exact match, no location)
   const exactSlug = pathname.replace(/^\//, "").toLowerCase();
   const baseRedirect = BASE_ONLY_REDIRECTS[exactSlug];

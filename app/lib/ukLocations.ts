@@ -577,11 +577,15 @@ export const CITY_TO_HUB: Record<string, string> = {
 /**
  * Returns the hub slug to redirect to, or null if the slug is already a hub.
  * Used by middleware to send spoke locations to their nearest hub page.
+ *
+ * For unknown slugs (cities not in ukLocations / regions like
+ * "south-east-england" not in hubSlugs), falls back to "leeds" rather than
+ * returning null — keeps any old inbound URL functional rather than 404'ing.
  */
 export function getHubForLocation(slug: string): string | null {
   if (hubSlugs.includes(slug)) return null
   const loc = ukLocations.find(l => l.slug === slug)
-  if (!loc) return null
+  if (!loc) return "leeds"
   return CITY_TO_HUB[loc.nearestCity] ?? "leeds"
 }
 
