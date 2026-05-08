@@ -1,11 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { ContentCard } from "./components/ContentCard";
 import { VideoPlaceholder } from "./components/VideoPlaceholder";
 import { StepCard } from "./components/StepCard";
 import { TestimonialCard } from "./components/TestimonialCard";
+import PhoneCallbackForm from "./components/PhoneCallbackForm";
 
 function CheckIcon() {
   return (
@@ -52,15 +53,17 @@ function StarIcon() {
 }
 
 export default function BookCallPage() {
+  const [tab, setTab] = useState<"phone" | "video">("phone");
+
   useEffect(() => {
+    if (tab !== "video") return;
+    const existing = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
+    if (existing) return;
     const script = document.createElement("script");
     script.src = "https://assets.calendly.com/assets/external/widget.js";
     script.async = true;
     document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  }, [tab]);
 
   return (
     <div className="min-h-screen bg-base">
@@ -151,45 +154,106 @@ export default function BookCallPage() {
         </div>
       </section>
 
-      {/* CALENDLY */}
+      {/* BOOKING — TABBED PHONE FORM (default) + VIDEO CALENDLY */}
       <section id="calendly-section" className="py-32 px-6 bg-surface">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <h2 className="font-display font-extrabold text-5xl md:text-6xl text-white text-center leading-none tracking-tight mb-6">
-            Book your free consultation call
+            Book your free call
           </h2>
-          <p className="text-xl text-soft/70 text-center mb-12 max-w-3xl mx-auto leading-relaxed">
-            Pick a time below that suits you. The call is relaxed, no pressure, and focused on helping you decide what&apos;s right for you.
+          <p className="text-xl text-soft/80 text-center mb-12 max-w-3xl mx-auto leading-relaxed">
+            Two ways to chat. Pick whichever feels right — both are free, both are no-pressure.
           </p>
 
-          <div className="mb-8 max-w-2xl mx-auto">
-            <div className="flex flex-col gap-4 mb-6">
-              <div className="flex items-center gap-3">
-                <ClockIcon />
-                <span className="text-soft/70">15–20 minute phone call</span>
+          {/* TAB SELECTOR */}
+          <div
+            role="tablist"
+            aria-label="Choose call type"
+            className="grid grid-cols-2 gap-2 p-1.5 mb-8 bg-card border border-white/10 rounded-2xl"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "phone"}
+              onClick={() => setTab("phone")}
+              className={`px-4 py-4 rounded-xl text-center transition-all ${
+                tab === "phone"
+                  ? "bg-gold text-deep shadow-md shadow-gold/20"
+                  : "bg-transparent text-white/80 hover:bg-white/5"
+              }`}
+            >
+              <span className="block font-bold text-base mb-0.5">Quick chat by phone</span>
+              <span className={`block text-xs ${tab === "phone" ? "text-deep/70" : "text-soft"}`}>
+                Recommended · just a few questions
+              </span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "video"}
+              onClick={() => setTab("video")}
+              className={`px-4 py-4 rounded-xl text-center transition-all ${
+                tab === "video"
+                  ? "bg-gold text-deep shadow-md shadow-gold/20"
+                  : "bg-transparent text-white/80 hover:bg-white/5"
+              }`}
+            >
+              <span className="block font-bold text-base mb-0.5">30-min video call</span>
+              <span className={`block text-xs ${tab === "video" ? "text-deep/70" : "text-soft"}`}>
+                For if you&apos;re seriously considering
+              </span>
+            </button>
+          </div>
+
+          {tab === "phone" && (
+            <div className="bg-card border border-white/10 rounded-2xl p-6 md:p-10">
+              <div className="mb-7 max-w-xl mx-auto">
+                <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-tight tracking-tight mb-3">
+                  Tell us when&apos;s good — we&apos;ll WhatsApp you to lock it in.
+                </h3>
+                <p className="text-white/75 text-center text-base leading-relaxed">
+                  No calendar to navigate. Drop your details below, and one of us will reach out to find a time that suits you.
+                </p>
               </div>
-              <div className="flex items-center gap-3">
-                <PhoneIcon />
-                <span className="text-soft/70">You&apos;ll speak directly with Callum, Miles or Ryan</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <TargetIcon />
-                <span className="text-soft/70">Focused on your goals and next steps</span>
+              <div className="max-w-xl mx-auto">
+                <PhoneCallbackForm />
               </div>
             </div>
-            <p className="text-center text-faint italic">No pressure. No obligation. Just a clear conversation.</p>
-          </div>
+          )}
 
-          <div className="bg-card border border-white/[0.07] rounded-2xl p-4">
-            <div
-              className="calendly-inline-widget rounded-xl overflow-hidden bg-white"
-              data-url="https://calendly.com/ptlaunchlab-info/free-consultation"
-              style={{ minWidth: "320px", height: "700px" }}
-            />
-          </div>
+          {tab === "video" && (
+            <>
+              <div className="mb-8 max-w-2xl mx-auto">
+                <div className="flex flex-col gap-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <ClockIcon />
+                    <span className="text-white/85">30-minute Google Meet call</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <PhoneIcon />
+                    <span className="text-white/85">You&apos;ll speak directly with Callum, Miles or Ryan</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <TargetIcon />
+                    <span className="text-white/85">Focused on your goals and next steps</span>
+                  </div>
+                </div>
+                <p className="text-center text-soft italic">No pressure. No obligation. Just a clear conversation.</p>
+              </div>
 
-          <p className="text-center text-faint text-sm mt-6">
-            If you need to, you can easily reschedule your call via Calendly.
-          </p>
+              <div className="bg-card border border-white/10 rounded-2xl p-4">
+                <div
+                  key="calendly-widget"
+                  className="calendly-inline-widget rounded-xl overflow-hidden bg-white"
+                  data-url="https://calendly.com/ptlaunchlab-info/free-consultation"
+                  style={{ minWidth: "320px", height: "700px" }}
+                />
+              </div>
+
+              <p className="text-center text-soft text-sm mt-6">
+                If you need to, you can easily reschedule your call via Calendly.
+              </p>
+            </>
+          )}
         </div>
       </section>
 
