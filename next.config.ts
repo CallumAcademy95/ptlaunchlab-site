@@ -23,6 +23,7 @@ const CONNECT_HOSTS = [
   "log.cookieyes.com",
   "vitals.vercel-insights.com", // Vercel Web Vitals
   "calendly.com",               // Calendly API
+  "hooks.zapier.com",           // Zapier catch hooks (form submissions)
 ].join(" ");
 
 const CSP = [
