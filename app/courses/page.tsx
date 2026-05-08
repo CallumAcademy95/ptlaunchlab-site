@@ -370,7 +370,7 @@ export default function CoursesPage() {
           <div className="max-w-5xl mx-auto">
             <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Honest answers</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
-              The 5 things people say to me<br />
+              The 5 things people say to us<br />
               <span className="text-gold">before they enrol.</span>
             </h2>
             <p className="text-soft/60 text-center text-base md:text-lg mb-14 max-w-2xl mx-auto">
@@ -407,22 +407,22 @@ export default function CoursesPage() {
             </p>
 
             {/* COMPETITOR COST ANCHOR */}
-            <div className="max-w-4xl mx-auto mb-16 rounded-2xl border border-white/[0.07] bg-card overflow-hidden">
-              <div className="grid grid-cols-3 bg-base/60 border-b border-white/[0.05]">
-                <div className="p-4 md:p-5 text-soft/50 text-[11px] font-semibold tracking-widest uppercase">What you actually need</div>
-                <div className="p-4 md:p-5 text-soft/50 text-[11px] font-semibold tracking-widest uppercase text-center">Typical UK PT academy</div>
-                <div className="p-4 md:p-5 text-gold text-[11px] font-semibold tracking-widest uppercase text-center">PT Launch Lab</div>
+            <div className="max-w-4xl mx-auto mb-16 rounded-2xl border border-white/15 bg-card overflow-hidden shadow-xl shadow-black/20">
+              <div className="grid grid-cols-3 bg-deep/70 border-b border-white/15">
+                <div className="p-4 md:p-5 text-white/90 text-[11px] font-bold tracking-widest uppercase">What you actually need</div>
+                <div className="p-4 md:p-5 text-white/90 text-[11px] font-bold tracking-widest uppercase text-center">Typical UK PT academy</div>
+                <div className="p-4 md:p-5 text-gold text-[11px] font-bold tracking-widest uppercase text-center">PT Launch Lab</div>
               </div>
               {compare.map((row, i) => (
-                <div key={row.what} className={`grid grid-cols-3 ${i < compare.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
+                <div key={row.what} className={`grid grid-cols-3 ${i < compare.length - 1 ? "border-b border-white/10" : ""}`}>
                   <div className="p-4 md:p-5 text-white text-sm md:text-base font-semibold">{row.what}</div>
-                  <div className="p-4 md:p-5 text-soft/60 text-sm md:text-base text-center">{row.typical}</div>
+                  <div className="p-4 md:p-5 text-white/80 text-sm md:text-base text-center">{row.typical}</div>
                   <div className="p-4 md:p-5 text-gold text-sm md:text-base text-center font-semibold">{row.us}</div>
                 </div>
               ))}
-              <div className="grid grid-cols-3 bg-deep/40 border-t-2 border-gold/30">
+              <div className="grid grid-cols-3 bg-deep/70 border-t-2 border-gold/40">
                 <div className="p-4 md:p-5 text-white text-sm md:text-base font-bold uppercase tracking-wide">Total</div>
-                <div className="p-4 md:p-5 text-soft/80 text-base md:text-lg text-center font-bold line-through decoration-soft/40">£1,900 – £6,400</div>
+                <div className="p-4 md:p-5 text-white/85 text-base md:text-lg text-center font-bold line-through decoration-white/50">£1,900 – £6,400</div>
                 <div className="p-4 md:p-5 text-gold text-base md:text-xl text-center font-display font-extrabold">£1,599</div>
               </div>
             </div>
