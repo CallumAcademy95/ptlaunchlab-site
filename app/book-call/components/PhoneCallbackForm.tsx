@@ -79,10 +79,17 @@ export default function PhoneCallbackForm() {
       if (!ZAPIER_HOOK) {
         throw new Error("Form endpoint not configured. Please WhatsApp us instead.");
       }
+      // Form-encoded body (not JSON) — keeps the request CORS-simple so
+      // the browser skips preflight, which Zapier's catch hook does not
+      // fully support. Zapier parses application/x-www-form-urlencoded
+      // identically to JSON for catch hooks.
+      const body = new URLSearchParams();
+      Object.entries(payload).forEach(([k, v]) => {
+        body.append(k, String(v ?? ""));
+      });
       const res = await fetch(ZAPIER_HOOK, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body,
       });
       if (!res.ok) {
         throw new Error("Submission failed");
