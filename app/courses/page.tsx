@@ -134,21 +134,63 @@ const stories = [
   { name: "Mac", body: "Started as a trainee and rose to manager at PureGym. Exactly the kind of outcome we build towards." },
 ];
 
+const objections = [
+  {
+    quote: "I'm probably too old to start over.",
+    answer:
+      "We've put learners through this in their late 40s and 50s. Clients want a coach who actually understands what it's like to be in their body — that's something you have more of at 40+ than at 22.",
+    link: { href: "/too-old-to-become-a-personal-trainer", label: "Read the full case for older learners →" },
+  },
+  {
+    quote: "What if I qualify and still can't get clients?",
+    answer:
+      "This is why the mentorship community is bundled, not a paid extra. Module 6 is the business launch system. Then you stay in the Skool community for life. Most courses qualify you and walk away — we stay until you've launched.",
+    link: null,
+  },
+  {
+    quote: "I'm worried I won't finish an online course.",
+    answer:
+      "You get a personal tutor introduced within 24 hours of enrolling. They check in, keep you accountable, and most learners finish in 4–8 weeks. The course is built to be done around a full-time job, not on top of it.",
+    link: null,
+  },
+  {
+    quote: "£1,599 is still a lot of money.",
+    answer:
+      "Spread over 6 months it's £266/month — less than most gym memberships plus a coffee a day. A working PT in the UK charges £30–50 per session. Once you're qualified and have 6–8 regular clients, the course pays itself back in around 60 days.",
+    link: null,
+  },
+  {
+    quote: "What if it's not the right fit for me?",
+    answer:
+      "Book a 15-minute call before you commit to anything. We'd rather tell you it isn't a fit than push you into something that doesn't work. No pressure, no script — just a real conversation.",
+    link: { href: "/book-call", label: "Book a free 15-min call →" },
+  },
+];
+
 const pricing = [
   {
-    title: "Full Payment",
+    title: "Pay In Full",
     price: "£1,599",
-    saving: "Most popular",
+    perDay: "£4.38 / day for a year",
+    saving: "For learners who want the simplest route in",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
     recommended: true,
   },
   {
     title: "Deposit Plan",
-    price: "£599",
-    saving: "then £200 × 5 months",
+    price: "£599 + £200 × 5",
+    perDay: "£1,599 total · £266 / month for 6 months",
+    saving: "Spread the cost while you study",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
     recommended: false,
   },
+];
+
+const compare = [
+  { what: "NCFE Level 2 & 3 qualification", typical: "£1,200 – £2,800", us: "Included" },
+  { what: "Business mentorship community", typical: "£500 – £3,000", us: "Included free" },
+  { what: "Personal tutor", typical: "£200 – £600 extra", us: "Included" },
+  { what: "Guaranteed gym interviews", typical: "On you to find them", us: "We introduce you" },
 ];
 
 const faqs = [
@@ -323,24 +365,79 @@ export default function CoursesPage() {
           </div>
         </section>
 
+        {/* OBJECTION DISARMER */}
+        <section className="bg-surface py-14 md:py-24 px-6 border-t border-white/[0.04]">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Honest answers</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              The 5 things people say to me<br />
+              <span className="text-gold">before they enrol.</span>
+            </h2>
+            <p className="text-soft/60 text-center text-base md:text-lg mb-14 max-w-2xl mx-auto">
+              No script, no spin. The real worries people raise on their first call — and what we actually say back.
+            </p>
+            <div className="space-y-4">
+              {objections.map((o, i) => (
+                <div key={i} className="bg-card border border-white/[0.07] rounded-2xl p-6 md:p-8 hover:border-gold/30 transition-all">
+                  <div className="flex items-start gap-4 mb-4">
+                    <span className="font-display font-extrabold text-gold/40 text-3xl md:text-4xl leading-none shrink-0">&ldquo;</span>
+                    <p className="text-white text-lg md:text-xl font-semibold leading-snug pt-1">{o.quote}</p>
+                  </div>
+                  <p className="text-soft/70 text-base leading-relaxed pl-0 md:pl-12">{o.answer}</p>
+                  {o.link && (
+                    <p className="pl-0 md:pl-12 mt-3">
+                      <a href={o.link.href} className="text-gold text-sm font-semibold hover:underline">
+                        {o.link.label}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* PRICING */}
         <section className="bg-surface py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
             <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Investment</p>
-            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">Simple, transparent pricing.</h2>
-            <p className="text-soft/60 text-center text-lg mb-16 max-w-xl mx-auto">
-              No hidden fees. Finance available. Pay in a way that works for you.
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">One fee. Everything bundled.</h2>
+            <p className="text-soft/60 text-center text-lg mb-12 max-w-2xl mx-auto">
+              Most UK PT academies sell the qualification, then upsell the mentorship. We bundle the lot — at a price that&apos;s lower than most academies charge for the qualification alone.
             </p>
+
+            {/* COMPETITOR COST ANCHOR */}
+            <div className="max-w-4xl mx-auto mb-16 rounded-2xl border border-white/[0.07] bg-card overflow-hidden">
+              <div className="grid grid-cols-3 bg-base/60 border-b border-white/[0.05]">
+                <div className="p-4 md:p-5 text-soft/50 text-[11px] font-semibold tracking-widest uppercase">What you actually need</div>
+                <div className="p-4 md:p-5 text-soft/50 text-[11px] font-semibold tracking-widest uppercase text-center">Typical UK PT academy</div>
+                <div className="p-4 md:p-5 text-gold text-[11px] font-semibold tracking-widest uppercase text-center">PT Launch Lab</div>
+              </div>
+              {compare.map((row, i) => (
+                <div key={row.what} className={`grid grid-cols-3 ${i < compare.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
+                  <div className="p-4 md:p-5 text-white text-sm md:text-base font-semibold">{row.what}</div>
+                  <div className="p-4 md:p-5 text-soft/60 text-sm md:text-base text-center">{row.typical}</div>
+                  <div className="p-4 md:p-5 text-gold text-sm md:text-base text-center font-semibold">{row.us}</div>
+                </div>
+              ))}
+              <div className="grid grid-cols-3 bg-deep/40 border-t-2 border-gold/30">
+                <div className="p-4 md:p-5 text-white text-sm md:text-base font-bold uppercase tracking-wide">Total</div>
+                <div className="p-4 md:p-5 text-soft/80 text-base md:text-lg text-center font-bold line-through decoration-soft/40">£1,900 – £6,400</div>
+                <div className="p-4 md:p-5 text-gold text-base md:text-xl text-center font-display font-extrabold">£1,599</div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {pricing.map((plan) => (
                 <div key={plan.title} className={`rounded-2xl p-8 border flex flex-col ${plan.recommended ? "bg-card border-gold/50 shadow-lg shadow-gold/10 relative" : "bg-card border-white/[0.07]"}`}>
                   {plan.recommended && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold text-deep px-5 py-1.5 rounded-full text-xs font-bold">
-                      Best Value
+                      Most popular
                     </div>
                   )}
                   <h3 className="text-white text-xl font-bold mb-2">{plan.title}</h3>
                   <p className="font-display font-extrabold text-gold text-4xl mb-1">{plan.price}</p>
+                  <p className="text-blue text-sm font-semibold mb-1">{plan.perDay}</p>
                   {plan.saving && <p className="text-soft/60 text-sm mb-6">{plan.saving}</p>}
                   {!plan.saving && <div className="mb-6" />}
                   <ul className="space-y-3 mb-8 flex-1">
@@ -359,7 +456,7 @@ export default function CoursesPage() {
               ))}
             </div>
             <p className="text-center text-faint text-sm mt-8">
-              Finance available via Payl8r over 12–18 months. <a href="/book-call" className="text-gold hover:underline">Book a free call</a> to discuss options.
+              Need longer to pay? Finance available via Payl8r over 12–18 months. <a href="/book-call" className="text-gold hover:underline">Book a free call</a> to walk through options.
             </p>
           </div>
         </section>

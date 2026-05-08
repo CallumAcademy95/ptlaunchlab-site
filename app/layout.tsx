@@ -3,6 +3,7 @@ import { Poppins, Barlow_Condensed } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import Chatbot from "./components/ChatbotLazy";
+import Tracking from "./components/Tracking";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -191,6 +192,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
           strategy="afterInteractive"
         />
         {children}
+        <Tracking />
         <Chatbot />
         <Analytics />
         {/* 3. Google Analytics 4 */}
