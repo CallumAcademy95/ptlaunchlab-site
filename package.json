@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
+    "@supabase/supabase-js": "^2.103.3",
     "@types/pdfkit": "^0.17.5",
     "@vercel/analytics": "^2.0.1",
     "googleapis": "^171.4.0",
