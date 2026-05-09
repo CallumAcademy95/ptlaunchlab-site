@@ -197,9 +197,13 @@ export default function WhatsAppInboxPage() {
   const selected = conversations.find((c) => c.phone === selectedPhone);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* SIDEBAR */}
-      <aside className="w-full sm:w-[340px] md:w-[380px] flex-shrink-0 bg-base border-r border-white/10 flex flex-col">
+    <div className="flex h-screen [height:100dvh] overflow-hidden">
+      {/* SIDEBAR — full width on mobile when no conversation selected; hidden on mobile when one is */}
+      <aside
+        className={`flex-shrink-0 bg-base border-r border-white/10 flex-col sm:flex sm:w-[340px] md:w-[380px] ${
+          selectedPhone ? "hidden w-full" : "flex w-full"
+        }`}
+      >
         <header className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
           <div>
             <p className="text-gold text-[10px] font-bold tracking-widest uppercase">
@@ -271,8 +275,12 @@ export default function WhatsAppInboxPage() {
         </div>
       </aside>
 
-      {/* THREAD + COMPOSE */}
-      <main className="flex-1 flex flex-col bg-surface min-w-0">
+      {/* THREAD + COMPOSE — hidden on mobile until a conversation is selected */}
+      <main
+        className={`flex-1 flex-col bg-surface min-w-0 sm:flex ${
+          selectedPhone ? "flex" : "hidden"
+        }`}
+      >
         {!selectedPhone && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center px-6 max-w-sm">
@@ -300,21 +308,30 @@ export default function WhatsAppInboxPage() {
 
         {selectedPhone && (
           <>
-            <header className="px-6 py-4 border-b border-white/10 bg-base flex items-center justify-between">
-              <div>
-                <h2 className="text-white font-bold text-base">
+            <header className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10 bg-base flex items-center gap-3">
+              <button
+                onClick={() => setSelectedPhone(null)}
+                aria-label="Back to conversations"
+                className="text-white hover:text-gold transition-colors sm:hidden flex-shrink-0 -ml-1 p-1"
+              >
+                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-white font-bold text-base truncate">
                   {selected?.contact_name || formatPhoneDisplay(selectedPhone)}
                 </h2>
-                <p className="text-soft text-xs">
+                <p className="text-soft text-xs truncate">
                   {selected?.contact_name && formatPhoneDisplay(selectedPhone)}
                 </p>
               </div>
-              <button
-                onClick={() => setSelectedPhone(null)}
-                className="text-soft hover:text-white text-sm transition-colors sm:hidden"
-              >
-                ← Back
-              </button>
             </header>
 
             <div
@@ -341,19 +358,22 @@ export default function WhatsAppInboxPage() {
 
             <form
               onSubmit={handleSend}
-              className="border-t border-white/10 bg-base px-4 py-3 flex items-end gap-3"
+              className="border-t border-white/10 bg-base px-3 sm:px-4 py-3 flex items-end gap-2 sm:gap-3"
+              style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
               <textarea
                 value={compose}
                 onChange={(e) => setCompose(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  // On mobile keyboards Enter often inserts a newline; only intercept
+                  // on devices likely to have a physical keyboard (no fine-pointer hint).
+                  if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(hover: hover)").matches) {
                     e.preventDefault();
                     handleSend(e as unknown as React.FormEvent);
                   }
                 }}
                 rows={1}
-                placeholder="Type a message…  (Enter to send, Shift+Enter for newline)"
+                placeholder="Type a message…"
                 className="flex-1 px-4 py-3 rounded-2xl bg-card border border-white/10 text-white placeholder:text-soft text-[15px] resize-none focus:border-gold/60 focus:outline-none max-h-32"
                 style={{ minHeight: "48px" }}
                 disabled={sending}
