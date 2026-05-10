@@ -22,6 +22,11 @@ type Message = {
   message_type: string | null;
   status: string | null;
   created_at: string;
+  media_id: string | null;
+  media_url: string | null;
+  media_filename: string | null;
+  media_mime_type: string | null;
+  media_caption: string | null;
 };
 
 const CONV_POLL_MS = 5000;
@@ -55,29 +60,170 @@ function formatPhoneDisplay(phone: string): string {
   return `+${phone}`;
 }
 
+function formatDateSeparator(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const dayMs = 24 * 60 * 60 * 1000;
+  if (dDay === today) return "Today";
+  if (dDay === today - dayMs) return "Yesterday";
+  if (dDay > today - 7 * dayMs) {
+    return d.toLocaleDateString("en-GB", { weekday: "long" });
+  }
+  if (d.getFullYear() === now.getFullYear()) {
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+  }
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function isSameDay(a: string, b: string): boolean {
+  const da = new Date(a);
+  const db = new Date(b);
+  return (
+    da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
+  );
+}
+
+function StatusTicks({ status }: { status: string | null }) {
+  // sent (single grey), delivered (double grey), read (double blue), failed (red !)
+  const s = (status || "sent").toLowerCase();
+  if (s === "failed") {
+    return (
+      <span className="inline-flex items-center" title="Failed to send">
+        <svg viewBox="0 0 16 16" className="w-4 h-4 text-red-500">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" />
+          <path d="M8 4v5M8 11.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      </span>
+    );
+  }
+  const isRead = s === "read";
+  const isDouble = isRead || s === "delivered";
+  const colorClass = isRead ? "text-blue" : "text-deep/50";
+  return (
+    <span
+      className={`inline-flex items-center ${colorClass}`}
+      title={s.charAt(0).toUpperCase() + s.slice(1)}
+    >
+      <svg viewBox="0 0 18 12" className="w-4 h-3" fill="none">
+        {/* first tick */}
+        <path
+          d="M1 6.5L4.5 10L11 2"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* second tick (only if delivered or read) */}
+        {isDouble && (
+          <path
+            d="M7 10L17 2"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )}
+      </svg>
+    </span>
+  );
+}
+
 function ChatBubble({ message }: { message: Message }) {
   const isOutbound = message.direction === "outbound";
+  const hasMedia = !!message.media_url || message.message_type === "image" || message.message_type === "document";
+  const isImage =
+    message.message_type === "image" ||
+    (message.media_mime_type && message.media_mime_type.startsWith("image/"));
+  const isDocument = message.message_type === "document";
+  const caption = message.media_caption || (hasMedia ? message.body : null);
+
   return (
-    <div className={`flex ${isOutbound ? "justify-end" : "justify-start"} mb-2`}>
+    <div className={`flex ${isOutbound ? "justify-end" : "justify-start"} mb-1.5`}>
       <div
-        className={`max-w-[78%] rounded-2xl px-4 py-2 shadow-sm ${
+        className={`max-w-[78%] rounded-2xl shadow-sm overflow-hidden ${
           isOutbound
             ? "bg-gold text-deep rounded-br-sm"
             : "bg-card text-white border border-white/10 rounded-bl-sm"
-        }`}
+        } ${hasMedia ? "p-1.5" : "px-3.5 py-2"}`}
       >
-        <p className="whitespace-pre-wrap text-[15px] leading-relaxed">
-          {message.body || `[${message.message_type || "non-text"} message]`}
-        </p>
-        <p
-          className={`text-[10px] mt-1 ${
-            isOutbound ? "text-deep/60" : "text-white/50"
-          }`}
-        >
-          {formatTime(message.created_at)}
-          {isOutbound && message.status ? ` · ${message.status}` : ""}
-        </p>
+        {/* Media preview */}
+        {hasMedia && isImage && message.media_url && (
+          <a
+            href={message.media_url}
+            target="_blank"
+            rel="noreferrer"
+            className="block rounded-xl overflow-hidden bg-black/10"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={message.media_url}
+              alt={message.media_filename || "Image"}
+              className="block w-full h-auto max-h-[420px] object-cover"
+              loading="lazy"
+            />
+          </a>
+        )}
+        {hasMedia && isImage && !message.media_url && (
+          <div className="rounded-xl bg-black/20 px-3 py-8 text-center text-xs opacity-70">
+            Image (still processing…)
+          </div>
+        )}
+        {hasMedia && isDocument && (
+          <a
+            href={message.media_url || "#"}
+            target="_blank"
+            rel="noreferrer"
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${
+              isOutbound ? "bg-deep/10" : "bg-white/5"
+            }`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 flex-shrink-0">
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
+              />
+              <path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
+            <span className="text-sm truncate">{message.media_filename || "Document"}</span>
+          </a>
+        )}
+
+        {/* Text or caption */}
+        <div className={hasMedia ? "px-2.5 pt-1.5 pb-1" : ""}>
+          {caption && (
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{caption}</p>
+          )}
+          {!hasMedia && !caption && (
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed italic opacity-70">
+              [{message.message_type || "non-text"} message]
+            </p>
+          )}
+          <div
+            className={`flex items-center gap-1 justify-end mt-0.5 -mb-0.5 ${
+              isOutbound ? "text-deep/55" : "text-white/45"
+            }`}
+          >
+            <span className="text-[10px] leading-none">{formatTime(message.created_at)}</span>
+            {isOutbound && <StatusTicks status={message.status} />}
+          </div>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function DateSeparator({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-center my-3">
+      <span className="px-3 py-1 rounded-full bg-deep/70 backdrop-blur-sm text-white/70 text-[11px] font-medium tracking-wide uppercase">
+        {label}
+      </span>
     </div>
   );
 }
@@ -91,8 +237,16 @@ export default function WhatsAppInboxPage() {
   const [error, setError] = useState<string | null>(null);
   const [convLoading, setConvLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [attachment, setAttachment] = useState<{
+    file: File;
+    previewUrl: string;
+    mediaId: string | null;
+    uploading: boolean;
+    error: string | null;
+  } | null>(null);
 
   const threadRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // ─── Conversations polling ────────────────────────────────────────────────
   const fetchConversations = useCallback(async () => {
@@ -150,19 +304,87 @@ export default function WhatsAppInboxPage() {
     }
   }, [messages]);
 
+  // ─── Attachment picker + upload ───────────────────────────────────────────
+  const handleAttachmentChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = ""; // reset so picking the same file again triggers onChange
+      if (!file) return;
+      if (file.size > 16 * 1024 * 1024) {
+        setError("File too large (max 16MB)");
+        return;
+      }
+      const previewUrl = file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : "";
+      setAttachment({ file, previewUrl, mediaId: null, uploading: true, error: null });
+
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/whatsapp-upload-media", { method: "POST", body: fd });
+        const data = await res.json();
+        if (!data.success) {
+          setAttachment((prev) =>
+            prev ? { ...prev, uploading: false, error: data.error || "Upload failed" } : null
+          );
+          return;
+        }
+        setAttachment((prev) =>
+          prev ? { ...prev, uploading: false, mediaId: data.media_id } : null
+        );
+      } catch (err) {
+        setAttachment((prev) =>
+          prev
+            ? {
+                ...prev,
+                uploading: false,
+                error: err instanceof Error ? err.message : "Upload failed",
+              }
+            : null
+        );
+      }
+    },
+    []
+  );
+
+  const clearAttachment = useCallback(() => {
+    setAttachment((prev) => {
+      if (prev?.previewUrl) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+  }, []);
+
   // ─── Send ─────────────────────────────────────────────────────────────────
   const handleSend = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!selectedPhone || !compose.trim() || sending) return;
+      if (!selectedPhone || sending) return;
+
+      const text = compose.trim();
+      const hasMedia = attachment && attachment.mediaId;
+      if (!text && !hasMedia) return;
+      if (attachment && attachment.uploading) return; // wait for upload to finish
+
       setSending(true);
       setError(null);
-      const text = compose.trim();
+
       try {
+        const payload: Record<string, unknown> = { phone: selectedPhone };
+        if (text) payload.message = text;
+        if (hasMedia && attachment) {
+          payload.media = {
+            media_id: attachment.mediaId,
+            type: attachment.file.type === "application/pdf" ? "document" : "image",
+            filename: attachment.file.name,
+            mime_type: attachment.file.type,
+          };
+        }
+
         const res = await fetch("/api/whatsapp-send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: selectedPhone, message: text }),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!data.success) {
@@ -171,7 +393,7 @@ export default function WhatsAppInboxPage() {
           return;
         }
         setCompose("");
-        // Refresh thread + conversation list immediately after send
+        clearAttachment();
         await Promise.all([fetchMessages(selectedPhone), fetchConversations()]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Send failed");
@@ -179,7 +401,7 @@ export default function WhatsAppInboxPage() {
         setSending(false);
       }
     },
-    [selectedPhone, compose, sending, fetchMessages, fetchConversations]
+    [selectedPhone, compose, sending, attachment, clearAttachment, fetchMessages, fetchConversations]
   );
 
   // ─── Filtered conversations by search ─────────────────────────────────────
@@ -338,16 +560,29 @@ export default function WhatsAppInboxPage() {
               ref={threadRef}
               className="flex-1 overflow-y-auto px-4 sm:px-6 py-4"
               style={{
-                backgroundImage:
-                  "radial-gradient(circle at 30% 20%, rgba(245,197,24,0.03), transparent 40%), radial-gradient(circle at 80% 80%, rgba(59,130,246,0.04), transparent 40%)",
+                // Subtle "doodle" wallpaper pattern (cheap inline SVG, no extra request).
+                // Plus a soft warm-gold + cool-blue radial wash to add depth.
+                backgroundColor: "#0C1F3A",
+                backgroundImage: [
+                  "radial-gradient(circle at 30% 15%, rgba(245,197,24,0.04), transparent 45%)",
+                  "radial-gradient(circle at 80% 85%, rgba(59,130,246,0.05), transparent 45%)",
+                  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.025' stroke-width='1'%3E%3Ccircle cx='20' cy='20' r='4'/%3E%3Cpath d='M40 60 q10 -10 20 0 t20 0'/%3E%3Cpath d='M70 30 l10 10 -10 10'/%3E%3Ccircle cx='100' cy='100' r='3'/%3E%3Cpath d='M10 90 l8 -8 8 8'/%3E%3C/g%3E%3C/svg%3E\")",
+                ].join(", "),
               }}
             >
               {messages.length === 0 && (
                 <p className="text-soft text-sm text-center py-12">No messages yet.</p>
               )}
-              {messages.map((m) => (
-                <ChatBubble key={m.id} message={m} />
-              ))}
+              {messages.map((m, i) => {
+                const prev = messages[i - 1];
+                const showDate = !prev || !isSameDay(prev.created_at, m.created_at);
+                return (
+                  <div key={m.id}>
+                    {showDate && <DateSeparator label={formatDateSeparator(m.created_at)} />}
+                    <ChatBubble message={m} />
+                  </div>
+                );
+              })}
             </div>
 
             {error && (
@@ -356,11 +591,88 @@ export default function WhatsAppInboxPage() {
               </div>
             )}
 
+            {/* Attachment preview strip — sits above the compose form when something is queued */}
+            {attachment && (
+              <div className="border-t border-white/10 bg-card px-3 sm:px-4 py-3 flex items-center gap-3">
+                {attachment.previewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={attachment.previewUrl}
+                    alt="Attachment preview"
+                    className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-lg bg-deep/60 flex items-center justify-center flex-shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold">
+                      <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinejoin="round"
+                      />
+                      <path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-sm truncate">{attachment.file.name}</p>
+                  <p className="text-soft text-xs">
+                    {attachment.uploading
+                      ? "Uploading…"
+                      : attachment.error
+                      ? `Error: ${attachment.error}`
+                      : attachment.mediaId
+                      ? "Ready to send"
+                      : "Pending"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={clearAttachment}
+                  aria-label="Remove attachment"
+                  className="text-soft hover:text-white p-2 -mr-1"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                    <path
+                      d="M18 6L6 18M6 6l12 12"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
+
             <form
               onSubmit={handleSend}
               className="border-t border-white/10 bg-base px-3 sm:px-4 py-3 flex items-end gap-2 sm:gap-3"
               style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                onChange={handleAttachmentChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="Attach file"
+                disabled={sending || (attachment && attachment.uploading) || false}
+                className="flex-shrink-0 p-2.5 rounded-full text-soft hover:text-gold hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+                  <path
+                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
               <textarea
                 value={compose}
                 onChange={(e) => setCompose(e.target.value)}
@@ -380,7 +692,11 @@ export default function WhatsAppInboxPage() {
               />
               <button
                 type="submit"
-                disabled={!compose.trim() || sending}
+                disabled={
+                  sending ||
+                  (!compose.trim() && !attachment?.mediaId) ||
+                  Boolean(attachment && attachment.uploading)
+                }
                 className="px-5 py-3 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
               >
                 {sending ? "Sending…" : "Send"}

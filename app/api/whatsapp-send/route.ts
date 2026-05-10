@@ -20,6 +20,17 @@ function normalisePhone(input: string): string {
   return digits;
 }
 
+type SendBody = {
+  phone?: string;
+  message?: string;
+  media?: {
+    media_id: string;
+    type: "image" | "document";
+    filename?: string;
+    mime_type?: string;
+  };
+};
+
 export async function POST(request: NextRequest) {
   if (!ACCESS_TOKEN) {
     return NextResponse.json(
@@ -28,7 +39,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { phone?: string; message?: string };
+  let body: SendBody;
   try {
     body = await request.json();
   } catch {
@@ -40,10 +51,17 @@ export async function POST(request: NextRequest) {
 
   const phoneRaw = (body.phone || "").trim();
   const message = (body.message || "").trim();
+  const media = body.media;
 
-  if (!phoneRaw || !message) {
+  if (!phoneRaw) {
     return NextResponse.json(
-      { success: false, error: "Phone and message are required." },
+      { success: false, error: "Phone is required." },
+      { status: 400 }
+    );
+  }
+  if (!media && !message) {
+    return NextResponse.json(
+      { success: false, error: "Either message text or media must be provided." },
       { status: 400 }
     );
   }
@@ -56,6 +74,47 @@ export async function POST(request: NextRequest) {
 
   const phone = normalisePhone(phoneRaw);
 
+  // Build the Cloud API payload — text vs media
+  let cloudApiBody: Record<string, unknown>;
+  let storedMessageType: string;
+  let storedBody: string | null;
+
+  if (media) {
+    storedMessageType = media.type; // "image" | "document"
+    storedBody = message || null; // caption (optional)
+    if (media.type === "image") {
+      cloudApiBody = {
+        messaging_product: "whatsapp",
+        to: phone,
+        type: "image",
+        image: {
+          id: media.media_id,
+          ...(message ? { caption: message } : {}),
+        },
+      };
+    } else {
+      cloudApiBody = {
+        messaging_product: "whatsapp",
+        to: phone,
+        type: "document",
+        document: {
+          id: media.media_id,
+          ...(media.filename ? { filename: media.filename } : {}),
+          ...(message ? { caption: message } : {}),
+        },
+      };
+    }
+  } else {
+    storedMessageType = "text";
+    storedBody = message;
+    cloudApiBody = {
+      messaging_product: "whatsapp",
+      to: phone,
+      type: "text",
+      text: { body: message },
+    };
+  }
+
   try {
     const apiRes = await fetch(
       `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
@@ -65,12 +124,7 @@ export async function POST(request: NextRequest) {
           Authorization: `Bearer ${ACCESS_TOKEN}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          to: phone,
-          type: "text",
-          text: { body: message },
-        }),
+        body: JSON.stringify(cloudApiBody),
       }
     );
 
@@ -96,10 +150,14 @@ export async function POST(request: NextRequest) {
         direction: "outbound",
         phone,
         contact_name: null,
-        body: message,
-        message_type: "text",
+        body: storedBody,
+        message_type: storedMessageType,
         meta_message_id: metaMessageId,
         status: "sent",
+        media_id: media?.media_id || null,
+        media_filename: media?.filename || null,
+        media_mime_type: media?.mime_type || null,
+        media_caption: media && message ? message : null,
       });
     } catch (err) {
       console.error("[whatsapp-send] Supabase insert failed:", err);
