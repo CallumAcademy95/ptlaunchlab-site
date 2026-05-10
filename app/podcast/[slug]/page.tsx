@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import MidContentCTA from "../../components/MidContentCTA";
 import { episodesIndex, getEpisodeIndex } from "../transcripts/_index";
 
 const RSS_FEED_URL = "https://feeds.buzzsprout.com/2615411.rss";
@@ -234,9 +235,33 @@ export default async function EpisodePage({
               </p>
             </div>
             <div className="prose-invert space-y-5 text-soft/85 text-base leading-relaxed">
-              {transcript.paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
+              {(() => {
+                // Inject the mid-content CTA after the paragraph nearest 50% of
+                // the transcript, but only on long-enough episodes (≥ 6 paras)
+                // so it doesn't hijack the first read on short clips.
+                const paras = transcript.paragraphs;
+                const mid = paras.length >= 6 ? Math.floor(paras.length / 2) : -1;
+                const elements: React.ReactNode[] = [];
+                paras.forEach((p, i) => {
+                  elements.push(<p key={`p-${i}`}>{p}</p>);
+                  if (i === mid) {
+                    elements.push(
+                      <MidContentCTA
+                        key="mid-cta"
+                        headline="Liked what you heard? See if you'd suit it."
+                        body={`This episode is one of ${episodesIndex.length} on the PT Launch Lab podcast — all hosted by gym owners who run the academy. Take the 60-second quiz to find out if becoming a personal trainer is right for you.`}
+                        ctaText="Take the 60-Second Quiz →"
+                        ctaHref="/quiz"
+                        secondary={{
+                          text: "Compare UK PT Courses",
+                          href: "/online-personal-trainer-course-uk",
+                        }}
+                      />
+                    );
+                  }
+                });
+                return elements;
+              })()}
             </div>
           </div>
         </section>

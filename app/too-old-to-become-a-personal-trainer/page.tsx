@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
+import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/too-old-to-become-a-personal-trainer";
 const TODAY = new Date().toISOString().split("T")[0];
@@ -149,6 +150,14 @@ export default function TooOldPage() {
                 ))}
               </div>
             </section>
+
+            <MidContentCTA
+              headline="If they did it at 40+, you can too."
+              body="The blocker isn't age — it's whether you have a structured route in. Take the 60-second quiz and we'll show you whether the NCFE Level 3 + mentorship path fits your situation."
+              ctaText="Take the 60-Second Quiz →"
+              ctaHref="/quiz"
+              secondary={{ text: "Talk to a real person first", href: "/book-call" }}
+            />
 
             <section>
               <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">What the UK data actually shows.</h2>

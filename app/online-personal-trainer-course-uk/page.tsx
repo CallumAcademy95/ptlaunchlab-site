@@ -4,6 +4,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
 import StickyMobileCTA from "../components/StickyMobileCTA";
+import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/online-personal-trainer-course-uk";
 const TODAY = new Date().toISOString().split("T")[0];
@@ -320,6 +321,16 @@ export default function OnlinePtCourseUkPage() {
               <p>
                 Two practical numbers to anchor on: if you're doing 6 hours a week, plan for around 10 weeks. If you can give it 10 hours a week, you'll be done inside 6.
               </p>
+            </div>
+
+            <div className="mt-10">
+              <MidContentCTA
+                headline="Ready to see if this is your path?"
+                body="The hardest decision is whether to start at all. Take the 60-second quiz — we'll tell you honestly which UK PT course best fits where you're at right now."
+                ctaText="Take the 60-Second Quiz →"
+                ctaHref="/quiz"
+                secondary={{ text: "See PT Launch Lab in detail", href: "/courses" }}
+              />
             </div>
           </div>
         </section>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
+import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/are-online-pt-qualifications-recognised-by-uk-gyms";
 const TODAY = new Date().toISOString().split("T")[0];
@@ -156,6 +157,14 @@ export default function RecognisedPage() {
               </div>
               <p className="text-soft/80 text-base leading-relaxed mt-6">The pattern across all chains: the question on hiring managers&apos; minds is &quot;can this person hold a conversation, look credible, and convert members&quot; — not &quot;did they study at home or in a classroom&quot;.</p>
             </section>
+
+            <MidContentCTA
+              headline="Want a course UK gyms actually recognise?"
+              body="PT Launch Lab's NCFE Level 3 is Ofqual-regulated and accepted across every chain on this page. Take the 60-second quiz to see if our route fits your situation."
+              ctaText="Take the 60-Second Quiz →"
+              ctaHref="/quiz"
+              secondary={{ text: "See the full course", href: "/courses" }}
+            />
 
             <section>
               <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">What insurers require.</h2>

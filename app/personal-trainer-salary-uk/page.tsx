@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
+import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/personal-trainer-salary-uk";
 const TODAY = new Date().toISOString().split("T")[0];
@@ -139,6 +140,14 @@ export default function SalaryPage() {
               </div>
               <p className="text-soft/80 text-base leading-relaxed mt-6">A practical rule from the podcast: <strong className="text-white">&quot;20, 25 quid really nowadays is probably your base rate, and sticking at that&quot;</strong> (Mac, EP8). Anyone undercharging below £20/hour outside London is structurally unable to scale.</p>
             </section>
+
+            <MidContentCTA
+              headline="What's a realistic salary for you?"
+              body="The numbers above depend on your training, your business systems, and the route you take in. Take the 60-second quiz and we'll show you which PT path gets to which income tier fastest."
+              ctaText="Take the 60-Second Quiz →"
+              ctaHref="/quiz"
+              secondary={{ text: "Compare UK PT Courses", href: "/online-personal-trainer-course-uk" }}
+            />
 
             <section>
               <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">
