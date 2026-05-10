@@ -453,9 +453,25 @@ export default function WhatsAppInboxPage() {
             </p>
             <h1 className="text-white font-bold text-lg">WhatsApp Inbox</h1>
           </div>
-          <a href="/" className="text-soft text-xs hover:text-gold transition-colors">
-            ← Site
-          </a>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await fetch("/api/admin-logout", { method: "POST" });
+                } finally {
+                  window.location.href = "/admin/login";
+                }
+              }}
+              className="text-soft text-xs hover:text-gold transition-colors"
+              aria-label="Sign out"
+            >
+              Sign out
+            </button>
+            <a href="/" className="text-soft text-xs hover:text-gold transition-colors">
+              ← Site
+            </a>
+          </div>
         </header>
 
         <div className="px-4 py-3 border-b border-white/10">

@@ -1,6 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { hubSlugs, getHubForLocation } from "./app/lib/ukLocations";
+import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "./app/lib/admin-auth";
+
+// Paths that require a valid admin auth cookie.
+// Webhook is intentionally excluded — Meta hits it without our cookie and
+// has its own verify token defence.
+function isProtectedAdminPath(pathname: string): boolean {
+  if (pathname === "/admin/login") return false;
+  if (pathname.startsWith("/admin/")) return true;
+  if (pathname === "/admin") return true;
+  // Protected WhatsApp API endpoints (everything except the webhook + login + logout)
+  if (pathname === "/api/whatsapp-send") return true;
+  if (pathname === "/api/whatsapp-conversations") return true;
+  if (pathname === "/api/whatsapp-messages") return true;
+  if (pathname === "/api/whatsapp-upload-media") return true;
+  return false;
+}
 
 /**
  * Redirect old site location URLs to the new structure.
@@ -110,7 +126,7 @@ const LOCATION_ROUTE_BASES = new Set([
   "start-your-own-personal-training-business",
 ]);
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Redirect .vercel.app domain to canonical domain to prevent duplicate content
@@ -121,6 +137,26 @@ export function middleware(request: NextRequest) {
     url.host = "ptlaunchlab.co.uk";
     url.protocol = "https:";
     return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // ─── Admin auth gate ─────────────────────────────────────────────────
+  if (isProtectedAdminPath(pathname)) {
+    const cookie = request.cookies.get(ADMIN_AUTH_COOKIE);
+    const ok = await verifyAuthCookieValue(cookie?.value);
+    if (!ok) {
+      // For API routes return 401 JSON; for pages redirect to login with `next` param
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json(
+          { success: false, error: "Unauthenticated. Sign in at /admin/login." },
+          { status: 401 }
+        );
+      }
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    // Authed — fall through to the rest of the middleware (or the route handler)
   }
 
   // Old /blog and /blog/<slug> URLs from a previous site iteration. The blog
@@ -185,6 +221,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Run on all paths except Next.js internals, static files, and API routes
-  matcher: ["/((?!_next|api|favicon|icon|logo|.*\\..*).*)"],
+  // Run on all paths except Next.js internals and static files. We DO want
+  // /admin and the protected /api/whatsapp-* routes to pass through the auth
+  // gate above, so we no longer blanket-exclude /api here. The webhook is
+  // unprotected by an explicit path check inside the middleware.
+  matcher: [
+    "/((?!_next|favicon|icon|logo|.*\\..*).*)",
+  ],
 };
