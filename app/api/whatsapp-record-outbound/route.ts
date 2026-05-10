@@ -47,7 +47,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: {
+  // Read raw body and parse defensively — Zapier sometimes sends JSON as a
+  // form-encoded payload, sometimes nested under a 'data' key, sometimes as
+  // a stringified JSON value. Handle all of those cleanly.
+  type RecordBody = {
     phone?: string;
     body?: string;
     meta_message_id?: string;
@@ -55,13 +58,77 @@ export async function POST(request: NextRequest) {
     contact_name?: string;
     status?: string;
   };
+
+  let raw: string;
   try {
-    body = await request.json();
+    raw = await request.text();
   } catch {
     return NextResponse.json(
-      { success: false, error: "Invalid JSON body." },
+      { success: false, error: "Could not read request body." },
       { status: 400 }
     );
+  }
+
+  let body: RecordBody = {};
+  let parsed: unknown = null;
+
+  // Try JSON first
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    // Fall through to form-encoded
+  }
+
+  // If JSON parsing didn't work, try form-encoded
+  if (parsed === null) {
+    try {
+      const params = new URLSearchParams(raw);
+      const obj: Record<string, string> = {};
+      params.forEach((v, k) => {
+        obj[k] = v;
+      });
+      parsed = obj;
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "Invalid body format." },
+        { status: 400 }
+      );
+    }
+  }
+
+  // If parsed is a string (double-encoded JSON), parse again
+  if (typeof parsed === "string") {
+    try {
+      parsed = JSON.parse(parsed);
+    } catch {
+      // leave as-is
+    }
+  }
+
+  // If parsed is an object with a single "data" key wrapping the real payload
+  // (a Zapier serialisation quirk when payload_type=json + key/value mode),
+  // unwrap it.
+  if (
+    parsed &&
+    typeof parsed === "object" &&
+    !Array.isArray(parsed) &&
+    "data" in (parsed as Record<string, unknown>) &&
+    Object.keys(parsed as Record<string, unknown>).length <= 2
+  ) {
+    const dataField = (parsed as Record<string, unknown>).data;
+    if (typeof dataField === "string") {
+      try {
+        parsed = JSON.parse(dataField);
+      } catch {
+        // ignore
+      }
+    } else if (dataField && typeof dataField === "object") {
+      parsed = dataField;
+    }
+  }
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    body = parsed as RecordBody;
   }
 
   const phoneRaw = (body.phone || "").trim();
