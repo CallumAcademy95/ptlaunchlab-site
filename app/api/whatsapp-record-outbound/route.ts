@@ -105,25 +105,28 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // If parsed is an object with a single "data" key wrapping the real payload
-  // (a Zapier serialisation quirk when payload_type=json + key/value mode),
-  // unwrap it.
+  // Zapier serialisation quirks: when payload_type=json + key/value pair mode,
+  // Zapier wraps the body as either {"": "<json string>"} or {"data": ...}.
+  // Unwrap any single-key object whose value is JSON-string-or-object.
   if (
     parsed &&
     typeof parsed === "object" &&
     !Array.isArray(parsed) &&
-    "data" in (parsed as Record<string, unknown>) &&
-    Object.keys(parsed as Record<string, unknown>).length <= 2
+    Object.keys(parsed as Record<string, unknown>).length === 1
   ) {
-    const dataField = (parsed as Record<string, unknown>).data;
-    if (typeof dataField === "string") {
+    const onlyKey = Object.keys(parsed as Record<string, unknown>)[0];
+    const onlyValue = (parsed as Record<string, unknown>)[onlyKey];
+    if (typeof onlyValue === "string") {
       try {
-        parsed = JSON.parse(dataField);
+        const inner = JSON.parse(onlyValue);
+        if (inner && typeof inner === "object" && !Array.isArray(inner)) {
+          parsed = inner;
+        }
       } catch {
-        // ignore
+        // not JSON, leave parsed alone
       }
-    } else if (dataField && typeof dataField === "object") {
-      parsed = dataField;
+    } else if (onlyValue && typeof onlyValue === "object") {
+      parsed = onlyValue;
     }
   }
 
