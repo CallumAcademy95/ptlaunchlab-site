@@ -104,8 +104,11 @@ const nextConfig: NextConfig = {
             value: "strict-origin-when-cross-origin",
           },
           {
+            // microphone=(self) lets /admin/whatsapp use the mic for voice
+            // message recording. Camera + geolocation stay blocked since
+            // nothing on the site needs them.
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(), microphone=(self), geolocation=()",
           },
           {
             key: "Content-Security-Policy",
