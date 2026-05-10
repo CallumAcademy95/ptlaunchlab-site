@@ -134,12 +134,15 @@ function StatusTicks({ status }: { status: string | null }) {
 
 function ChatBubble({ message }: { message: Message }) {
   const isOutbound = message.direction === "outbound";
-  const hasMedia = !!message.media_url || message.message_type === "image" || message.message_type === "document";
   const isImage =
     message.message_type === "image" ||
-    (message.media_mime_type && message.media_mime_type.startsWith("image/"));
-  const isDocument = message.message_type === "document";
-  const caption = message.media_caption || (hasMedia ? message.body : null);
+    !!(message.media_mime_type && message.media_mime_type.startsWith("image/"));
+  const isDocument =
+    message.message_type === "document" ||
+    message.media_mime_type === "application/pdf";
+  const hasMedia = isImage || isDocument || !!message.media_url;
+  // For text messages: show the body. For media messages: show the caption (if any).
+  const text = hasMedia ? message.media_caption : message.body;
 
   return (
     <div className={`flex ${isOutbound ? "justify-end" : "justify-start"} mb-1.5`}>
@@ -196,10 +199,10 @@ function ChatBubble({ message }: { message: Message }) {
 
         {/* Text or caption */}
         <div className={hasMedia ? "px-2.5 pt-1.5 pb-1" : ""}>
-          {caption && (
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{caption}</p>
+          {text && (
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{text}</p>
           )}
-          {!hasMedia && !caption && (
+          {!text && !hasMedia && (
             <p className="whitespace-pre-wrap text-[15px] leading-relaxed italic opacity-70">
               [{message.message_type || "non-text"} message]
             </p>
