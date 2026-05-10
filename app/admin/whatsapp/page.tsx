@@ -248,8 +248,12 @@ export default function WhatsAppInboxPage() {
     error: string | null;
   } | null>(null);
 
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
+
   const threadRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const docInputRef = useRef<HTMLInputElement | null>(null);
+  const attachMenuRef = useRef<HTMLDivElement | null>(null);
 
   // ─── Conversations polling ────────────────────────────────────────────────
   const fetchConversations = useCallback(async () => {
@@ -357,6 +361,19 @@ export default function WhatsAppInboxPage() {
       return null;
     });
   }, []);
+
+  // Close the attach menu when clicking outside it
+  useEffect(() => {
+    if (!attachMenuOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as Node | null;
+      if (attachMenuRef.current && target && !attachMenuRef.current.contains(target)) {
+        setAttachMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [attachMenuOpen]);
 
   // ─── Send ─────────────────────────────────────────────────────────────────
   const handleSend = useCallback(
@@ -653,29 +670,82 @@ export default function WhatsAppInboxPage() {
               style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
               <input
-                ref={fileInputRef}
+                ref={imageInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 onChange={handleAttachmentChange}
                 className="hidden"
               />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Attach file"
-                disabled={sending || (attachment && attachment.uploading) || false}
-                className="flex-shrink-0 p-2.5 rounded-full text-soft hover:text-gold hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
-                  <path
-                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+              <input
+                ref={docInputRef}
+                type="file"
+                accept="application/pdf"
+                onChange={handleAttachmentChange}
+                className="hidden"
+              />
+              <div ref={attachMenuRef} className="relative flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setAttachMenuOpen((v) => !v)}
+                  aria-label="Attach file"
+                  aria-expanded={attachMenuOpen}
+                  disabled={sending || (attachment && attachment.uploading) || false}
+                  className="p-2.5 rounded-full text-soft hover:text-gold hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+                    <path
+                      d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+                      stroke="currentColor"
+                      strokeWidth="1.7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                {attachMenuOpen && (
+                  <div
+                    className="absolute bottom-full left-0 mb-2 w-48 rounded-xl bg-card border border-white/15 shadow-xl shadow-black/40 overflow-hidden z-10"
+                    role="menu"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachMenuOpen(false);
+                        imageInputRef.current?.click();
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-white hover:bg-white/5 transition-colors"
+                      role="menuitem"
+                    >
+                      <span className="w-9 h-9 rounded-full bg-gold/20 text-gold flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.7" />
+                          <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                          <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium">Photo</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachMenuOpen(false);
+                        docInputRef.current?.click();
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left text-white hover:bg-white/5 transition-colors border-t border-white/10"
+                      role="menuitem"
+                    >
+                      <span className="w-9 h-9 rounded-full bg-blue/20 text-blue flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+                          <path d="M14 2v6h6" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      <span className="text-sm font-medium">Document <span className="text-soft text-xs">(PDF)</span></span>
+                    </button>
+                  </div>
+                )}
+              </div>
               <textarea
                 value={compose}
                 onChange={(e) => setCompose(e.target.value)}
