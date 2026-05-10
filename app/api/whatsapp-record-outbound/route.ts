@@ -133,8 +133,25 @@ export async function POST(request: NextRequest) {
 
   const phoneRaw = (body.phone || "").trim();
   if (!phoneRaw) {
+    // Temporary debug response so we can see what Zapier actually sent.
+    // Remove once the integration is stable.
     return NextResponse.json(
-      { success: false, error: "phone is required." },
+      {
+        success: false,
+        error: "phone is required.",
+        _debug: {
+          version: "v3-defensive",
+          rawBodyFirst500: raw.slice(0, 500),
+          rawLength: raw.length,
+          contentType: request.headers.get("content-type") || "(none)",
+          parsedType: typeof parsed,
+          parsedKeys:
+            parsed && typeof parsed === "object" && !Array.isArray(parsed)
+              ? Object.keys(parsed as Record<string, unknown>)
+              : [],
+          bodyKeys: Object.keys(body),
+        },
+      },
       { status: 400 }
     );
   }
