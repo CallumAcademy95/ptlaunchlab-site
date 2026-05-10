@@ -41,7 +41,6 @@ export default function PhoneCallbackForm() {
     const data = new FormData(form);
     const name = String(data.get("name") || "").trim();
     const mobile = String(data.get("mobile") || "").trim();
-    const availability = String(data.get("availability") || "").trim();
     const topics = String(data.get("topics") || "").trim();
 
     if (!name || !mobile) {
@@ -57,7 +56,6 @@ export default function PhoneCallbackForm() {
       call_type: "phone",
       name,
       mobile,
-      availability,
       topics,
       page_url: window.location.href,
       page_referrer: document.referrer,
@@ -126,26 +124,64 @@ export default function PhoneCallbackForm() {
 
   if (submitted) {
     return (
-      <div className="text-center py-12 px-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold/20 mb-6">
-          <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-gold">
-            <path
-              d="M5 13l4 4L19 7"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+      <div className="py-8 px-2 md:px-4">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold/20 mb-5">
+            <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 text-gold">
+              <path
+                d="M5 13l4 4L19 7"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <h3 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-3">
+            Got your details.
+          </h3>
+          <p className="text-white/85 text-base md:text-lg max-w-xl mx-auto">
+            Callum or Ryan will WhatsApp you shortly. Here&apos;s what to expect:
+          </p>
         </div>
-        <h3 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-4">
-          Got your details.
-        </h3>
-        <p className="text-white/80 text-lg max-w-xl mx-auto mb-3">
-          Callum or Ryan will WhatsApp you within a few hours during business hours to lock in a time that suits you.
-        </p>
-        <p className="text-soft text-sm max-w-xl mx-auto">
-          Keep an eye on your messages — we&apos;ll text the mobile you gave us. No spam, no script.
+
+        {/* Timeline */}
+        <ol className="max-w-md mx-auto space-y-4 mb-8">
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gold/20 text-gold font-bold text-sm flex items-center justify-center mt-0.5">1</span>
+            <div>
+              <p className="text-white text-sm font-semibold">Within a few hours (business hours)</p>
+              <p className="text-soft text-xs leading-relaxed mt-0.5">
+                You&apos;ll get a WhatsApp from <strong className="text-white/80">+44 7418 609039</strong> — that&apos;s us. Save the number so it doesn&apos;t look like spam.
+              </p>
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gold/20 text-gold font-bold text-sm flex items-center justify-center mt-0.5">2</span>
+            <div>
+              <p className="text-white text-sm font-semibold">Quick back-and-forth on WhatsApp</p>
+              <p className="text-soft text-xs leading-relaxed mt-0.5">
+                We&apos;ll find a time that suits you. No calendar wrestling.
+              </p>
+            </div>
+          </li>
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-gold/20 text-gold font-bold text-sm flex items-center justify-center mt-0.5">3</span>
+            <div>
+              <p className="text-white text-sm font-semibold">The call — 15 mins</p>
+              <p className="text-soft text-xs leading-relaxed mt-0.5">
+                Real conversation. No pressure. You decide what happens after.
+              </p>
+            </div>
+          </li>
+        </ol>
+
+        <p className="text-center text-soft text-xs max-w-xs mx-auto">
+          Didn&apos;t receive anything in 4 hrs (during business hours)? Email{" "}
+          <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
+            info@ptlaunchlab.co.uk
+          </a>
+          .
         </p>
       </div>
     );
@@ -186,30 +222,16 @@ export default function PhoneCallbackForm() {
       </div>
 
       <div>
-        <label htmlFor="availability" className="block text-white text-sm font-semibold mb-2">
-          Best days/times to reach you
-        </label>
-        <input
-          id="availability"
-          name="availability"
-          type="text"
-          maxLength={120}
-          className="w-full px-4 py-3 rounded-lg bg-base/60 border border-white/15 text-white placeholder:text-soft focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 transition-colors"
-          placeholder="e.g. weekday evenings, Sat morning"
-        />
-      </div>
-
-      <div>
         <label htmlFor="topics" className="block text-white text-sm font-semibold mb-2">
-          What would you like to cover on the call?
+          What&apos;s the one thing you&apos;d most like to cover?
         </label>
         <textarea
           id="topics"
           name="topics"
-          rows={4}
+          rows={3}
           maxLength={1000}
           className="w-full px-4 py-3 rounded-lg bg-base/60 border border-white/15 text-white placeholder:text-soft focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 resize-none transition-colors"
-          placeholder="Anything on your mind — worries, questions, what you want to figure out. Doesn't need to be polished."
+          placeholder="A worry, a question, the thing keeping you stuck. A few words is enough."
         />
       </div>
 
@@ -229,7 +251,7 @@ export default function PhoneCallbackForm() {
       </button>
 
       <p className="text-center text-soft text-xs leading-relaxed">
-        We&apos;ll WhatsApp you within a few hours during business hours to lock in a time. No pressure, no script — just a real conversation.
+        We&apos;ll WhatsApp you within a few hours during business hours from <strong className="text-white/70">+44 7418 609039</strong>. No pressure, no script.
       </p>
     </form>
   );

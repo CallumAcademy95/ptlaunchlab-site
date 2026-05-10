@@ -69,98 +69,58 @@ export default function BookCallPage() {
     <div className="min-h-screen bg-base">
       <Nav />
 
-      {/* SUCCESS CONFIRMATION */}
-      <section className="pt-[104px] pb-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-emerald-400">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <p className="text-emerald-400 text-lg">Your application has been received</p>
+      {/* HERO — cold-visitor friendly, regret-aversion forward */}
+      <section className="pt-[112px] pb-12 md:pb-16 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-4">
+            Free 15-min call · No pressure
+          </p>
+          <h1 className="font-display font-extrabold text-5xl md:text-7xl text-white leading-[0.95] tracking-tight mb-6">
+            Talk to a real person
+            <br />
+            <span className="text-gold">before you decide.</span>
+          </h1>
+          <p className="text-xl text-soft/85 mb-8 leading-relaxed max-w-2xl mx-auto">
+            15 minutes with Callum, Miles or Ryan. No script. No sales pitch.
+            Just an honest chat about whether becoming a PT is right for you —
+            and whether PT Launch Lab is the right route in.
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-soft/70">
+            <span className="flex items-center gap-2">
+              <span className="text-gold">✓</span> No commitment to enrol
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-gold">✓</span> Phone or video — your choice
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-gold">✓</span> Reply within a few hours
+            </span>
           </div>
         </div>
       </section>
 
-      {/* HERO */}
-      <section className="pb-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-display font-extrabold text-6xl md:text-7xl text-white leading-none tracking-tight mb-6">
-            You&apos;re on the right path.
-          </h1>
-          <div className="mt-6 h-[3px] w-[50px] bg-gold mx-auto mb-10" />
-          <p className="text-2xl text-soft/80 mb-8 leading-relaxed">
-            Thanks for taking the first step. You&apos;ve successfully submitted your details and you&apos;re
-            now moving forward towards becoming a Personal Trainer.
-          </p>
-          <p className="text-lg text-soft/60">
-            The next step is to book your free consultation call so we can talk things through properly.
-          </p>
-        </div>
-      </section>
-
-      {/* VIDEO */}
-      <section className="pb-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="font-display font-extrabold text-3xl text-white leading-none tracking-tight mb-3">Watch this first (2 minutes)</h2>
-            <p className="text-soft/60">This explains what the call is for and what happens next.</p>
+      {/* VIDEO — face exposure before the form (mere exposure → conversion lift) */}
+      <section className="pb-12 md:pb-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight mb-2">
+              Watch this first (2 min)
+            </h2>
+            <p className="text-soft text-sm md:text-base">
+              Exactly what we&apos;ll cover on the call — and what we won&apos;t.
+            </p>
           </div>
           <VideoPlaceholder />
         </div>
       </section>
 
-      {/* WHAT HAPPENS NEXT */}
-      <section className="py-32 px-6 bg-surface">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-display font-extrabold text-5xl md:text-6xl text-white text-center leading-none tracking-tight mb-20">
-            Here&apos;s what happens next
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <StepCard number={1} title="You've Taken Action" description="You've already done the hard part by getting started." />
-            <StepCard number={2} title="Book Your Call" description="Choose a time that works for you and speak directly with our team." />
-            <StepCard number={3} title="Get Clarity" description="We'll talk through your goals, your situation, and what the next steps could look like." />
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="py-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-display font-extrabold text-5xl md:text-6xl text-white leading-none tracking-tight mb-6">
-              What others say about PT Launch Lab
-            </h2>
-            <div className="h-[3px] w-[50px] bg-gold mx-auto" />
-          </div>
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <TestimonialCard
-              quote="I have just completed my training with PT Launch Lab and the support I received was second to none! After having my baby, I thought I would struggle finding the time to complete, however Callum and the team were so supportive and helpful throughout the process."
-              author="Rebecca Davies"
-            />
-            <TestimonialCard
-              quote="I completed my Level 3 Personal Training certification with PT Launch Lab, and they've been fantastic from start to finish. The support didn't stop once I qualified — they've continued to offer guidance and help that's been invaluable as I've grown my own successful business."
-              author="Matthew Bell"
-            />
-            <TestimonialCard
-              quote="My training experience with PT Launch Lab has been amazing. I have gained new skills, knowledge and confidence. I was able to learn at my own pace, I was well supported throughout the program."
-              author="Annie Chomba-Kilbride"
-            />
-          </div>
-          <div className="flex items-center justify-center gap-2 text-soft/60 text-sm">
-            <StarIcon />
-            <span>Rated 5.0 based on Google reviews</span>
-          </div>
-        </div>
-      </section>
-
       {/* BOOKING — TABBED PHONE FORM (default) + VIDEO CALENDLY */}
-      <section id="calendly-section" className="py-32 px-6 bg-surface">
+      <section id="calendly-section" className="py-16 md:py-24 px-6 bg-surface border-y border-white/[0.05]">
         <div className="max-w-3xl mx-auto">
-          <h2 className="font-display font-extrabold text-5xl md:text-6xl text-white text-center leading-none tracking-tight mb-6">
+          <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
             Book your free call
           </h2>
-          <p className="text-xl text-soft/80 text-center mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-soft/80 text-center mb-10 max-w-2xl mx-auto leading-relaxed">
             Two ways to chat. Pick whichever feels right — both are free, both are no-pressure.
           </p>
 
@@ -206,12 +166,12 @@ export default function BookCallPage() {
 
           {tab === "phone" && (
             <div className="bg-card border border-white/10 rounded-2xl p-6 md:p-10">
-              <div className="mb-7 max-w-xl mx-auto">
-                <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-tight tracking-tight mb-3">
-                  Tell us when&apos;s good — we&apos;ll WhatsApp you to lock it in.
+              <div className="mb-6 max-w-xl mx-auto text-center">
+                <h3 className="font-display font-extrabold text-xl md:text-2xl text-white leading-tight tracking-tight mb-2">
+                  Drop your details, we&apos;ll reach out.
                 </h3>
-                <p className="text-white/75 text-center text-base leading-relaxed">
-                  No calendar to navigate. Drop your details below, and one of us will reach out to find a time that suits you.
+                <p className="text-soft text-sm md:text-base leading-relaxed">
+                  No calendar to navigate. Three short fields. We&apos;ll WhatsApp you to lock in a time.
                 </p>
               </div>
               <div className="max-w-xl mx-auto">
@@ -257,38 +217,107 @@ export default function BookCallPage() {
         </div>
       </section>
 
-      {/* REASSURANCE */}
-      <section className="pb-32 px-6">
+      {/* REASSURANCE — catches anxiety right after they see the form */}
+      <section className="py-16 md:py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <ContentCard hover={false}>
-            <h3 className="font-display font-extrabold text-3xl text-white text-center leading-none tracking-tight mb-12">
-              What this call is (and isn&apos;t)
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-tight tracking-tight mb-10">
+              What this call is — and isn&apos;t
             </h3>
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-10 md:gap-12">
               <div>
-                <h4 className="text-xl text-gold mb-6 font-bold">This call is:</h4>
-                <ul className="space-y-4">
-                  {["A chance to talk things through", "Focused on your goals", "Honest and straightforward", "About clarity, not pressure"].map((item) => (
+                <h4 className="text-xl text-gold mb-5 font-bold">It is:</h4>
+                <ul className="space-y-3.5">
+                  {[
+                    "A real conversation about your situation",
+                    "Honest answers — even if the answer is &quot;this isn&apos;t for you&quot;",
+                    "Focused on what you want, not what we sell",
+                    "15 minutes. No more unless you want it",
+                  ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
                       <CheckIcon />
-                      <span className="text-soft/70 text-lg">{item}</span>
+                      <span className="text-white/80 text-base md:text-lg" dangerouslySetInnerHTML={{ __html: item }} />
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <h4 className="text-xl text-soft/50 mb-6 font-bold">This call isn&apos;t:</h4>
-                <ul className="space-y-4">
-                  {["A hard sell", "An obligation to sign up", "Rushed or scripted"].map((item) => (
+                <h4 className="text-xl text-soft/60 mb-5 font-bold">It isn&apos;t:</h4>
+                <ul className="space-y-3.5">
+                  {[
+                    "A hard sell or pressure to enrol",
+                    "A scripted sales call",
+                    "An obligation to sign up to anything",
+                    "A reason to feel awkward saying no",
+                  ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full border-2 border-white/[0.12] shrink-0 mt-0.5" />
-                      <span className="text-soft/50 text-lg">{item}</span>
+                      <span className="text-soft/60 text-base md:text-lg">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
           </ContentCard>
+        </div>
+      </section>
+
+      {/* WHAT HAPPENS NEXT — sets expectations */}
+      <section className="py-16 md:py-20 px-6 bg-surface border-y border-white/[0.05]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-3">
+            Here&apos;s what happens next
+          </h2>
+          <p className="text-soft text-center text-base md:text-lg mb-12 max-w-xl mx-auto">
+            From the moment you submit, to the call itself.
+          </p>
+          <div className="grid md:grid-cols-3 gap-6">
+            <StepCard
+              number={1}
+              title="You drop your details"
+              description="Takes 30 seconds. Three short fields. We don&apos;t ask for your life story."
+            />
+            <StepCard
+              number={2}
+              title="Callum WhatsApps you"
+              description="Within a few hours during business hours. We&apos;ll find a call time that suits you."
+            />
+            <StepCard
+              number={3}
+              title="The call itself"
+              description="15 mins. Real conversation. Then you decide if you want a next step — or you don&apos;t."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="py-16 md:py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-4">
+              What others say about PT Launch Lab
+            </h2>
+            <div className="h-[3px] w-[50px] bg-gold mx-auto" />
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <TestimonialCard
+              quote="I have just completed my training with PT Launch Lab and the support I received was second to none! After having my baby, I thought I would struggle finding the time to complete, however Callum and the team were so supportive and helpful throughout the process."
+              author="Rebecca Davies"
+            />
+            <TestimonialCard
+              quote="I completed my Level 3 Personal Training certification with PT Launch Lab, and they've been fantastic from start to finish. The support didn't stop once I qualified — they've continued to offer guidance and help that's been invaluable as I've grown my own successful business."
+              author="Matthew Bell"
+            />
+            <TestimonialCard
+              quote="My training experience with PT Launch Lab has been amazing. I have gained new skills, knowledge and confidence. I was able to learn at my own pace, I was well supported throughout the program."
+              author="Annie Chomba-Kilbride"
+            />
+          </div>
+          <div className="flex items-center justify-center gap-2 text-soft/60 text-sm">
+            <StarIcon />
+            <span>Rated 5.0 based on Google reviews</span>
+          </div>
         </div>
       </section>
 
