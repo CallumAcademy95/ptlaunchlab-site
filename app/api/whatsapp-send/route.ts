@@ -28,6 +28,7 @@ type SendBody = {
     type: "image" | "document" | "audio";
     filename?: string;
     mime_type?: string;
+    media_url?: string; // Supabase Storage URL for local playback in admin UI
   };
 };
 
@@ -163,6 +164,7 @@ export async function POST(request: NextRequest) {
         meta_message_id: metaMessageId,
         status: "sent",
         media_id: media?.media_id || null,
+        media_url: media?.media_url || null,
         media_filename: media?.filename || null,
         media_mime_type: media?.mime_type || null,
         media_caption: media && message ? message : null,

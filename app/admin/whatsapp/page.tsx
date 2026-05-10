@@ -430,6 +430,7 @@ export default function WhatsAppInboxPage() {
             type: "audio",
             filename,
             mime_type: audioMime,
+            media_url: uploadData.media_url,
           },
         }),
       });

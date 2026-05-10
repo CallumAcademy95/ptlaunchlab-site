@@ -37,6 +37,10 @@ const CSP = [
   // data: for signature canvas; blob: for PDF generation; https: for tracking pixels
   // (Meta, GA, Clarity serve 1x1 tracking images from many CDN subdomains)
   "img-src 'self' data: blob: https:",
+  // Audio playback in /admin/whatsapp (voice messages) — blob: for the
+  // in-browser recording preview, https: for Supabase Storage URLs serving
+  // inbound voice messages from leads.
+  "media-src 'self' blob: https:",
   // Next.js serves Google Fonts locally at build time — no external font host needed
   "font-src 'self' data:",
   `connect-src 'self' ${CONNECT_HOSTS}`,
