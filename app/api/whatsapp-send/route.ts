@@ -25,7 +25,7 @@ type SendBody = {
   message?: string;
   media?: {
     media_id: string;
-    type: "image" | "document";
+    type: "image" | "document" | "audio";
     filename?: string;
     mime_type?: string;
   };
@@ -80,8 +80,8 @@ export async function POST(request: NextRequest) {
   let storedBody: string | null;
 
   if (media) {
-    storedMessageType = media.type; // "image" | "document"
-    storedBody = message || null; // caption (optional)
+    storedMessageType = media.type; // "image" | "document" | "audio"
+    storedBody = message || null; // caption (optional, only image/document support caption)
     if (media.type === "image") {
       cloudApiBody = {
         messaging_product: "whatsapp",
@@ -91,6 +91,14 @@ export async function POST(request: NextRequest) {
           id: media.media_id,
           ...(message ? { caption: message } : {}),
         },
+      };
+    } else if (media.type === "audio") {
+      // Note: audio messages do not support captions in Cloud API
+      cloudApiBody = {
+        messaging_product: "whatsapp",
+        to: phone,
+        type: "audio",
+        audio: { id: media.media_id },
       };
     } else {
       cloudApiBody = {

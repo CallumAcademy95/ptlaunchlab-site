@@ -11,14 +11,24 @@ const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || "115760797742702
 const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 
 const ALLOWED_MIME = new Set([
+  // Images
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/gif",
+  // Documents
   "application/pdf",
+  // Audio (Meta accepts these on Cloud API)
+  "audio/aac",
+  "audio/amr",
+  "audio/mp4",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/webm",
+  "audio/wav",
 ]);
 
-const MAX_BYTES = 16 * 1024 * 1024; // 16MB matches Meta's image cap
+const MAX_BYTES = 16 * 1024 * 1024; // 16MB matches Meta's image cap; audio cap is also 16MB
 
 export async function POST(req: NextRequest) {
   if (!ACCESS_TOKEN) {

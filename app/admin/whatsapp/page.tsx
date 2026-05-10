@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import VoiceRecorder from "./components/VoiceRecorder";
 
 type Conversation = {
   phone: string;
@@ -137,10 +138,14 @@ function ChatBubble({ message }: { message: Message }) {
   const isImage =
     message.message_type === "image" ||
     !!(message.media_mime_type && message.media_mime_type.startsWith("image/"));
+  const isAudio =
+    message.message_type === "audio" ||
+    message.message_type === "voice" ||
+    !!(message.media_mime_type && message.media_mime_type.startsWith("audio/"));
   const isDocument =
     message.message_type === "document" ||
     message.media_mime_type === "application/pdf";
-  const hasMedia = isImage || isDocument || !!message.media_url;
+  const hasMedia = isImage || isAudio || isDocument || !!message.media_url;
   // For text messages: show the body. For media messages: show the caption (if any).
   const text = hasMedia ? message.media_caption : message.body;
 
@@ -173,6 +178,23 @@ function ChatBubble({ message }: { message: Message }) {
         {hasMedia && isImage && !message.media_url && (
           <div className="rounded-xl bg-black/20 px-3 py-8 text-center text-xs opacity-70">
             Image (still processing…)
+          </div>
+        )}
+        {hasMedia && isAudio && message.media_url && (
+          <div className={`rounded-xl px-2 py-1 ${isOutbound ? "bg-deep/10" : "bg-white/5"}`}>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <audio
+              src={message.media_url}
+              controls
+              preload="metadata"
+              className="block w-full max-w-[260px]"
+              style={isOutbound ? {} : { filter: "invert(0.85) hue-rotate(180deg)" }}
+            />
+          </div>
+        )}
+        {hasMedia && isAudio && !message.media_url && (
+          <div className="rounded-xl bg-black/20 px-3 py-4 text-center text-xs opacity-70">
+            Voice message (still processing…)
           </div>
         )}
         {hasMedia && isDocument && (
@@ -374,6 +396,53 @@ export default function WhatsAppInboxPage() {
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [attachMenuOpen]);
+
+  // ─── Voice message send ───────────────────────────────────────────────────
+  const handleVoiceSend = useCallback(
+    async (audioBlob: Blob, audioMime: string) => {
+      if (!selectedPhone) return;
+      setError(null);
+
+      // 1) Upload the recorded audio to Meta via our upload endpoint
+      const fd = new FormData();
+      const ext =
+        audioMime.includes("ogg") ? "ogg" : audioMime.includes("mp4") ? "m4a" : "webm";
+      const filename = `voice-${Date.now()}.${ext}`;
+      fd.append("file", new File([audioBlob], filename, { type: audioMime }));
+
+      const uploadRes = await fetch("/api/whatsapp-upload-media", {
+        method: "POST",
+        body: fd,
+      });
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success) {
+        throw new Error(uploadData.error || "Voice upload failed");
+      }
+
+      // 2) Send the audio via Cloud API
+      const sendRes = await fetch("/api/whatsapp-send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: selectedPhone,
+          media: {
+            media_id: uploadData.media_id,
+            type: "audio",
+            filename,
+            mime_type: audioMime,
+          },
+        }),
+      });
+      const sendData = await sendRes.json();
+      if (!sendData.success) {
+        throw new Error(sendData.error || "Voice send failed");
+      }
+
+      // 3) Refresh thread + conversation list
+      await Promise.all([fetchMessages(selectedPhone), fetchConversations()]);
+    },
+    [selectedPhone, fetchMessages, fetchConversations]
+  );
 
   // ─── Send ─────────────────────────────────────────────────────────────────
   const handleSend = useCallback(
@@ -790,6 +859,10 @@ export default function WhatsAppInboxPage() {
               >
                 {sending ? "Sending…" : "Send"}
               </button>
+              <VoiceRecorder
+                onSend={handleVoiceSend}
+                disabled={sending || Boolean(attachment && attachment.uploading)}
+              />
             </form>
           </>
         )}
