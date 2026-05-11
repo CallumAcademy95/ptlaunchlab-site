@@ -6,7 +6,13 @@ import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config
 import ResultScreen from './ResultScreen';
 import { trackEvent } from '@/app/lib/gtag';
 
-type Screen = 'intro' | 'question' | 'email' | 'submitting' | 'result';
+// Capture split into two single-field screens to reduce friction:
+// - 'mobile' : mobile only (highest-value field, peak sunk-cost moment)
+// - 'email'  : email + name (lighter "intro yourself" ask after mobile is in)
+// The previous all-in-one form had a higher drop-off because users saw
+// three required fields at once. Splitting preserves the same data capture
+// while feeling like two small steps instead of one daunting wall.
+type Screen = 'intro' | 'question' | 'mobile' | 'email' | 'submitting' | 'result';
 
 export default function QuizApp() {
   const [screen, setScreen]               = useState<Screen>('intro');
@@ -16,7 +22,7 @@ export default function QuizApp() {
   const [name, setName]                   = useState('');
   const [phone, setPhone]                 = useState('');
   const [email, setEmail]                 = useState('');
-  const [emailError, setEmailError]       = useState('');
+  const [formError, setFormError]         = useState('');
   const [result, setResult]               = useState<ResultKey | null>(null);
   const [animKey, setAnimKey]             = useState(0);
 
@@ -49,17 +55,25 @@ export default function QuizApp() {
     if (questionIndex < questions.length - 1) {
       setQuestionIndex((i) => i + 1);
     } else {
-      setScreen('email');
+      setScreen('mobile');
     }
   };
 
   const handleBack = () => {
     bump();
     if (screen === 'email') {
+      setFormError('');
+      setScreen('mobile');
+      return;
+    }
+    if (screen === 'mobile') {
+      setFormError('');
+      setScreen('question');
+      setQuestionIndex(questions.length - 1);
+      // Roll back the last answer so the user lands on Q5 with no selection,
+      // matching the back-from-email behaviour the previous flow had.
       setAnswers((prev) => prev.slice(0, -1));
       setSelected(null);
-      setQuestionIndex(questions.length - 1);
-      setScreen('question');
       return;
     }
     if (questionIndex === 0) {
@@ -73,12 +87,26 @@ export default function QuizApp() {
     setQuestionIndex((i) => i - 1);
   };
 
+  const handleMobileSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = phone.trim();
+    // Loose UK mobile validation — must contain at least 9 digits.
+    // We don't want to bounce legitimate numbers on strict formatting.
+    if (trimmed.replace(/\D/g, '').length < 9) {
+      setFormError('Please enter a valid mobile number.');
+      return;
+    }
+    setFormError('');
+    trackEvent('quiz_mobile_captured');
+    setScreen('email');
+    bump();
+  };
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim())         { setEmailError('Please enter your full name.'); return; }
-    if (!phone.trim())        { setEmailError('Please enter your mobile number.'); return; }
-    if (!email.includes('@')) { setEmailError('Please enter a valid email address.'); return; }
-    setEmailError('');
+    if (!name.trim())         { setFormError('Please enter your full name.'); return; }
+    if (!email.includes('@')) { setFormError('Please enter a valid email address.'); return; }
+    setFormError('');
 
     trackEvent('quiz_email_captured');
 
@@ -119,6 +147,7 @@ export default function QuizApp() {
     setName('');
     setPhone('');
     setEmail('');
+    setFormError('');
     setResult(null);
     bump();
   };
@@ -284,7 +313,69 @@ export default function QuizApp() {
             </div>
           )}
 
-          {/* ── EMAIL CAPTURE ── */}
+          {/* ── MOBILE CAPTURE (Step 1 of 2) ── */}
+          {screen === 'mobile' && (
+            <div>
+              <div className="mb-8">
+                <button
+                  onClick={handleBack}
+                  className="text-soft/50 hover:text-white transition-colors text-sm flex items-center gap-1 mb-6"
+                >
+                  ← Back
+                </button>
+
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 bg-surface mb-5">
+                  <span className="text-gold text-xs font-semibold tracking-widest uppercase">
+                    Step 1 of 2 · Almost there
+                  </span>
+                </div>
+
+                <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white leading-none tracking-tight mb-4">
+                  Your path is<br />
+                  <span className="text-gold">ready to unlock.</span>
+                </h2>
+                <p className="text-soft/60 leading-relaxed">
+                  Pop your mobile in below. We&apos;ll send a quick WhatsApp with your personalised path so it&apos;s saved for you.
+                </p>
+              </div>
+
+              <form onSubmit={handleMobileSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-soft/60 mb-2">
+                    Mobile number
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="e.g. 07700 900000"
+                    className="w-full px-5 py-4 rounded-xl bg-card border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-base"
+                    required
+                    autoComplete="tel"
+                    inputMode="tel"
+                    autoFocus
+                  />
+                </div>
+
+                {formError && (
+                  <p className="text-red-400 text-sm">{formError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20 mt-2"
+                >
+                  Continue →
+                </button>
+
+                <p className="text-faint text-xs text-center pt-1">
+                  We&apos;ll message you within a few hours during business hours. No spam, ever.
+                </p>
+              </form>
+            </div>
+          )}
+
+          {/* ── EMAIL + NAME CAPTURE (Step 2 of 2) ── */}
           {screen === 'email' && (
             <div>
               <div className="mb-8">
@@ -297,17 +388,16 @@ export default function QuizApp() {
 
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 bg-surface mb-5">
                   <span className="text-gold text-xs font-semibold tracking-widest uppercase">
-                    Almost there
+                    Step 2 of 2 · Last bit
                   </span>
                 </div>
 
                 <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white leading-none tracking-tight mb-4">
-                  Your results are<br />
-                  <span className="text-gold">ready.</span>
+                  Where do we send<br />
+                  <span className="text-gold">your free guide?</span>
                 </h2>
                 <p className="text-soft/60 leading-relaxed">
-                  Enter your details to unlock your personalised PT career path
-                  and your free guide.
+                  We&apos;ll email your personalised guide as a PDF backup so you&apos;ve got it forever, not just in WhatsApp.
                 </p>
               </div>
 
@@ -324,21 +414,7 @@ export default function QuizApp() {
                     className="w-full px-5 py-4 rounded-xl bg-card border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-base"
                     required
                     autoComplete="name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-soft/60 mb-2">
-                    Mobile number
-                  </label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="e.g. 07700 900000"
-                    className="w-full px-5 py-4 rounded-xl bg-card border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-base"
-                    required
-                    autoComplete="tel"
+                    autoFocus
                   />
                 </div>
 
@@ -357,8 +433,8 @@ export default function QuizApp() {
                   />
                 </div>
 
-                {emailError && (
-                  <p className="text-red-400 text-sm">{emailError}</p>
+                {formError && (
+                  <p className="text-red-400 text-sm">{formError}</p>
                 )}
 
                 <button
