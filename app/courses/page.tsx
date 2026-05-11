@@ -27,17 +27,27 @@ const courseSchema = {
   offers: [
     {
       "@type": "Offer",
-      name: "Full Payment",
+      name: "Pay In Full",
       price: "1599",
       priceCurrency: "GBP",
       url: "https://ptlaunchlab.co.uk/enrol",
+      description: "One-off payment. Best total value.",
     },
     {
       "@type": "Offer",
-      name: "Deposit Plan",
-      price: "599",
+      name: "6-Month Deposit Plan",
+      price: "1599",
       priceCurrency: "GBP",
       url: "https://ptlaunchlab.co.uk/enrol",
+      description: "£599 deposit + £200 × 5 monthly. 0% interest.",
+    },
+    {
+      "@type": "Offer",
+      name: "12-Month Payl8r Finance",
+      price: "1599",
+      priceCurrency: "GBP",
+      url: "https://ptlaunchlab.co.uk/book-call",
+      description: "From £133/month over 12 months. Subject to credit approval.",
     },
   ],
   hasCourseInstance: {
@@ -167,22 +177,48 @@ const objections = [
   },
 ];
 
+// Three-tier pricing — Good / Better / Best framed around payment commitment,
+// not product tier (the product is identical across all three). Middle tier
+// is the psychological winner: small deposit gets you in, no interest,
+// completed in 6 months. Pay-In-Full anchors as "best total value"
+// (saves interest). Payl8r 12-mo is the longest-spread escape hatch for
+// learners who can't commit £200/month.
 const pricing = [
   {
-    title: "Pay In Full",
-    price: "£1,599",
-    perDay: "£4.38 / day for a year",
-    saving: "For learners who want the simplest route in",
+    title: "12-Month Finance",
+    headlineFigure: "From £133",
+    headlineSuffix: "/month",
+    subPrice: "12-month Payl8r finance · subject to approval",
+    saving: "Maximum flexibility for tightest budgets",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
-    recommended: true,
+    cta: "Book a call to qualify",
+    ctaHref: "/book-call",
+    recommended: false,
+    badge: null as string | null,
   },
   {
-    title: "Deposit Plan",
-    price: "£599 + £200 × 5",
-    perDay: "£1,599 total · £266 / month for 6 months",
-    saving: "Spread the cost while you study",
+    title: "6-Month Deposit Plan",
+    headlineFigure: "£200",
+    headlineSuffix: "/month",
+    subPrice: "£599 deposit + £200 × 5 · £1,599 total · 0% interest",
+    saving: "Most chosen — spread the cost while you study",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
+    cta: "Start the deposit plan →",
+    ctaHref: "/enrol",
+    recommended: true,
+    badge: "Most popular",
+  },
+  {
+    title: "Pay In Full",
+    headlineFigure: "£1,599",
+    headlineSuffix: "one-off",
+    subPrice: "£4.38 / day if amortised across a year",
+    saving: "Best total value — pay once, never think about it again",
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
+    cta: "Pay in full →",
+    ctaHref: "/enrol",
     recommended: false,
+    badge: "Best total value",
   },
 ];
 
@@ -244,6 +280,18 @@ export default function CoursesPage() {
             <p className="text-lg text-soft/70 max-w-2xl mx-auto mb-6">
               NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, guaranteed gym interviews, and a complete business launchpad included.
             </p>
+
+            {/* Mentorship moat — surfaced above the fold as the single biggest
+                differentiator. Most UK PT academies sell the qualification
+                then upsell mentorship for £500-£3,000. We bundle it. This
+                is the line that disarms the "what if I can't get clients"
+                silent objection before the visitor even scrolls. */}
+            <div className="max-w-2xl mx-auto mb-8 px-5 py-4 rounded-2xl border border-gold/30 bg-card/40">
+              <p className="text-white text-sm md:text-base leading-relaxed">
+                <span className="text-gold font-bold">£500 business mentorship community — bundled free.</span>{" "}
+                Not an upsell. Not an upgrade. Every learner gets direct access to Callum, Miles &amp; Ryan from day one.
+              </p>
+            </div>
             <p className="text-sm text-soft/60 max-w-2xl mx-auto mb-10">
               New to UK PT courses?{" "}
               <a href="/online-personal-trainer-course-uk" className="text-gold hover:underline font-semibold">
@@ -427,36 +475,56 @@ export default function CoursesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Pratfall — explicitly position above the £29-weekend-course
+                segment. Disarms the "isn't this expensive?" objection by
+                owning the premium positioning. */}
+            <div className="max-w-3xl mx-auto mb-10 px-6 py-5 rounded-2xl border border-white/10 bg-deep/40 text-center">
+              <p className="text-white text-base md:text-lg leading-relaxed">
+                <span className="text-gold font-bold">We&apos;re not the £29 weekend course</span> — and we&apos;re proud of it.
+                If a £29 cert was enough to be hired by a UK gym, we&apos;d sell that. It isn&apos;t. Here&apos;s what £1,599 actually buys you.
+              </p>
+            </div>
+
+            <p className="text-center text-gold text-[11px] font-semibold tracking-widest uppercase mb-3">Three ways to pay</p>
+            <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-none tracking-tight mb-3">
+              Same course. <span className="text-gold">Pick the payment that suits you.</span>
+            </h3>
+            <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
+              Every plan gets the same qualification, the same mentorship, the same gym interviews. The only difference is how you spread the cost.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {pricing.map((plan) => (
-                <div key={plan.title} className={`rounded-2xl p-8 border flex flex-col ${plan.recommended ? "bg-card border-gold/50 shadow-lg shadow-gold/10 relative" : "bg-card border-white/[0.07]"}`}>
-                  {plan.recommended && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold text-deep px-5 py-1.5 rounded-full text-xs font-bold">
-                      Most popular
+                <div key={plan.title} className={`rounded-2xl p-7 border flex flex-col ${plan.recommended ? "bg-card border-gold/60 shadow-xl shadow-gold/10 md:scale-[1.03] relative" : "bg-card border-white/[0.07] relative"}`}>
+                  {plan.badge && (
+                    <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${plan.recommended ? "bg-gold text-deep" : "bg-blue/20 text-blue border border-blue/40"}`}>
+                      {plan.badge}
                     </div>
                   )}
-                  <h3 className="text-white text-xl font-bold mb-2">{plan.title}</h3>
-                  <p className="font-display font-extrabold text-gold text-4xl mb-1">{plan.price}</p>
-                  <p className="text-blue text-sm font-semibold mb-1">{plan.perDay}</p>
-                  {plan.saving && <p className="text-soft/60 text-sm mb-6">{plan.saving}</p>}
-                  {!plan.saving && <div className="mb-6" />}
-                  <ul className="space-y-3 mb-8 flex-1">
+                  <h3 className="text-white text-lg font-bold mb-4 mt-1">{plan.title}</h3>
+                  <div className="mb-2 flex items-baseline gap-1.5">
+                    <span className="font-display font-extrabold text-gold text-4xl md:text-5xl leading-none">{plan.headlineFigure}</span>
+                    <span className="text-soft/80 text-sm font-semibold">{plan.headlineSuffix}</span>
+                  </div>
+                  <p className="text-blue text-xs font-semibold mb-2 leading-snug">{plan.subPrice}</p>
+                  <p className="text-soft/60 text-sm mb-6 leading-snug">{plan.saving}</p>
+                  <ul className="space-y-2.5 mb-7 flex-1">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-start gap-3 text-soft/70 text-sm">
+                      <li key={f} className="flex items-start gap-2.5 text-soft/70 text-sm leading-snug">
                         <CheckIcon />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <a href="/enrol"
-                    className={`text-center px-6 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-gold text-deep hover:brightness-110" : "border border-gold text-gold hover:bg-gold hover:text-deep"}`}>
-                    Get Started →
+                  <a href={plan.ctaHref}
+                    className={`text-center px-5 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-gold text-deep hover:brightness-110 shadow-md shadow-gold/20" : "border border-gold/70 text-gold hover:bg-gold hover:text-deep"}`}>
+                    {plan.cta}
                   </a>
                 </div>
               ))}
             </div>
-            <p className="text-center text-faint text-sm mt-8">
-              Need longer to pay? Finance available via Payl8r over 12–18 months. <a href="/book-call" className="text-gold hover:underline">Book a free call</a> to walk through options.
+            <p className="text-center text-faint text-xs md:text-sm mt-10 max-w-2xl mx-auto leading-relaxed">
+              All three plans include the same qualification, mentorship community, personal tutor, and guaranteed gym interviews. Payl8r finance approval is subject to credit check — <a href="/book-call" className="text-gold hover:underline">book a free call</a> if you&apos;d like to walk through the options.
             </p>
           </div>
         </section>
