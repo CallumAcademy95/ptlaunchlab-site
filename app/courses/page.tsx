@@ -441,9 +441,9 @@ export default function CoursesPage() {
               </div>
               {compare.map((row, i) => (
                 <div key={row.what} className={`grid grid-cols-3 bg-card ${i < compare.length - 1 ? "border-b border-white/10" : ""}`}>
-                  <div className="p-4 md:p-5 text-white text-sm md:text-base font-semibold">{row.what}</div>
-                  <div className="p-4 md:p-5 text-white text-sm md:text-base text-center">{row.typical}</div>
-                  <div className="p-4 md:p-5 text-gold text-sm md:text-base text-center font-semibold">{row.us}</div>
+                  <div style={{ color: "#ffffff" }} className="p-4 md:p-5 text-sm md:text-base font-semibold">{row.what}</div>
+                  <div style={{ color: "#ffffff" }} className="p-4 md:p-5 text-sm md:text-base text-center font-medium">{row.typical}</div>
+                  <div style={{ color: "#F5C518" }} className="p-4 md:p-5 text-sm md:text-base text-center font-semibold">{row.us}</div>
                 </div>
               ))}
               <div className="grid grid-cols-3 bg-deep/70 border-t-2 border-gold/40">
