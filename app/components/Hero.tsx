@@ -1,9 +1,33 @@
 import HeroSlideshow from "./HeroSlideshow";
+import { getVisitorGeo } from "@/app/lib/geoDetect";
 
-export default function Hero() {
+// Geo-aware variant of the homepage hero. Yorkshire visitors get a hero
+// that leans into the local advantage (Pontefract-based, workshops nearby,
+// "built by Yorkshire gym owners"). Everyone else gets a neutral national
+// hero so the Yorkshire flavour doesn't read as "not for me" to a London
+// or Manchester visitor.
+//
+// Reading the visitor's geo via headers() makes this route dynamic. The
+// trade-off: every request goes through Vercel's edge instead of being
+// served as fully cached static HTML. The perf cost is small (edge runs
+// hot) and the conversion lift on the dominant Yorkshire traffic should
+// dwarf it.
+
+export default async function Hero() {
+  const { isYorkshire } = await getVisitorGeo();
+
+  const pillCopy = isYorkshire
+    ? "NCFE Level 3 · Pontefract-Based · Yorkshire Workshops · Ofqual · CIMSPA"
+    : "NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Qualify in 8–16 Weeks";
+
+  const positioningCopy = isYorkshire
+    ? "Built in Yorkshire by gym owners who've hired over 500 personal trainers across the UK — so you learn what actually gets you employed, not just qualified."
+    : "The UK's only PT course built by gym owners who've hired over 500 personal trainers — so you learn what actually gets you employed, not just qualified.";
+
   return (
     <section
       className="relative min-h-screen flex items-center overflow-hidden pt-[72px]"
+      data-hero-variant={isYorkshire ? "yorkshire" : "neutral"}
       style={{ background: "linear-gradient(150deg, #0B2D52 0%, #091F3D 45%, #070D1B 100%)" }}
     >
       {/* Warm radial glow behind headline */}
@@ -28,7 +52,7 @@ export default function Hero() {
             {/* Pill label */}
             <div className="inline-flex flex-wrap items-center gap-2 px-4 py-2 rounded-full border border-gold/30 bg-white/[0.06] backdrop-blur-sm mb-6 md:mb-8 animate-fade-in">
               <span className="text-gold text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase leading-relaxed">
-                NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Qualify in 8–16 Weeks
+                {pillCopy}
               </span>
             </div>
 
@@ -42,7 +66,7 @@ export default function Hero() {
 
             {/* Positioning line */}
             <p className="text-base md:text-lg text-white font-semibold leading-snug mb-3 animate-fade-in-up animate-delay-100">
-              The UK&apos;s only PT course built by gym owners who&apos;ve hired over 500 personal trainers — so you learn what actually gets you employed, not just qualified.
+              {positioningCopy}
             </p>
 
             {/* Sub */}
@@ -71,7 +95,7 @@ export default function Hero() {
               Free 15-min call · No pressure · Tutor assigned within 24 hours of enrolling
             </p>
 
-            {/* Trust bar */}
+            {/* Trust bar — one bullet swaps per geo variant */}
             <div className="flex flex-wrap gap-3 md:gap-5 text-soft/60 text-xs animate-fade-in-up animate-delay-300">
               <span>✓ NCFE &amp; Ofqual Regulated</span>
               <span className="hidden sm:inline opacity-30">·</span>
@@ -81,7 +105,7 @@ export default function Hero() {
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>✓ Yorkshire Workshops Available</span>
+              <span>{isYorkshire ? "✓ Yorkshire Workshops Available" : "✓ 100% Online — Study from Anywhere in the UK"}</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ Study Around Your Current Job</span>
             </div>
