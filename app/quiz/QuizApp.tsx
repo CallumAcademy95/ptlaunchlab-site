@@ -40,6 +40,12 @@ export default function QuizApp() {
     setSelected(null);
     bump();
 
+    trackEvent('quiz_question_answered', {
+      question_index: questionIndex + 1,
+      question_total: questions.length,
+      answer_label: selected.label,
+    });
+
     if (questionIndex < questions.length - 1) {
       setQuestionIndex((i) => i + 1);
     } else {
@@ -73,6 +79,9 @@ export default function QuizApp() {
     if (!phone.trim())        { setEmailError('Please enter your mobile number.'); return; }
     if (!email.includes('@')) { setEmailError('Please enter a valid email address.'); return; }
     setEmailError('');
+
+    trackEvent('quiz_email_captured');
+
     setScreen('submitting');
 
     const calcResult = calculateResult(answers);

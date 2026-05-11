@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useRef, FormEvent } from "react";
+import { trackEvent } from "@/app/lib/gtag";
 
 const ZAPIER_HOOK = process.env.NEXT_PUBLIC_ZAPIER_PHONE_CALLBACK_HOOK || "";
 
@@ -31,6 +32,13 @@ export default function PhoneCallbackForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const startedRef = useRef(false);
+
+  function handleStart() {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackEvent("book_call_form_started", { call_type: "phone" });
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -188,7 +196,7 @@ export default function PhoneCallbackForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} onFocus={handleStart} className="space-y-5">
       <div>
         <label htmlFor="name" className="block text-white text-sm font-semibold mb-2">
           Your name

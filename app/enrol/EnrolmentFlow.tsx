@@ -5,7 +5,66 @@ import { generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 
-// â"€â"€â"€ CONFIGURATION — replace these placeholders before going live â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+// ─── Stripe attribution helpers ──────────────────────────────────────────
+// Encodes first/last touch UTMs + GA client_id into Stripe's
+// `client_reference_id` (URL-safe base64, capped at 200 chars). The
+// /api/stripe-webhook endpoint decodes this when checkout.session.completed
+// fires and forwards it to GA4 Measurement Protocol as the `purchase` event.
+function readTouch(key: string): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as Record<string, string>) : {};
+  } catch {
+    return {};
+  }
+}
+function readGaClientId(): string {
+  if (typeof document === "undefined") return "";
+  const match = document.cookie.match(/(?:^|;\s*)_ga=GA\d\.\d\.(\d+\.\d+)/);
+  return match?.[1] ?? "";
+}
+function urlSafeBase64(input: string): string {
+  if (typeof window === "undefined") return "";
+  // btoa needs a binary string — encode the UTF-8 bytes first
+  const bytes = new TextEncoder().encode(input);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return window
+    .btoa(bin)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+function appendStripeAttribution(url: string, email: string): string {
+  try {
+    const first = readTouch("ptll_first_touch");
+    const last = readTouch("ptll_last_touch");
+    // Short keys keep the payload under Stripe's 200-char client_reference_id limit
+    const payload: Record<string, string> = {};
+    if (first.utm_source) payload.fts = first.utm_source;
+    if (first.utm_medium) payload.ftm = first.utm_medium;
+    if (first.utm_campaign) payload.ftc = first.utm_campaign;
+    if (last.utm_source && last.utm_source !== first.utm_source) payload.lts = last.utm_source;
+    if (last.utm_medium && last.utm_medium !== first.utm_medium) payload.ltm = last.utm_medium;
+    if (last.utm_campaign && last.utm_campaign !== first.utm_campaign) payload.ltc = last.utm_campaign;
+    if (first.fbclid) payload.fbclid = first.fbclid;
+    if (first.gclid) payload.gclid = first.gclid;
+    const gaId = readGaClientId();
+    if (gaId) payload.ga_client_id = gaId;
+
+    const ref = urlSafeBase64(JSON.stringify(payload)).slice(0, 200);
+    // Stripe Payment Links accept both `client_reference_id` and `prefilled_email`
+    // as query params.
+    const u = new URL(url);
+    if (ref) u.searchParams.set("client_reference_id", ref);
+    if (email) u.searchParams.set("prefilled_email", email.trim().toLowerCase());
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+// ─── Configuration — replace these placeholders before going live ────────
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const TERMS_URL                 = "/terms";
@@ -175,6 +234,15 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   const canvasRef               = useRef<HTMLCanvasElement>(null);
   const isDrawing               = useRef(false);
   const lastPos                 = useRef<{ x: number; y: number } | null>(null);
+  const startedRef              = useRef(false);
+
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackEvent('enrolment_started', {
+      ...(partner?.gymReferral && { gym_referral: partner.gymReferral }),
+    });
+  }, [partner?.gymReferral]);
 
   // â"€â"€â"€ Canvas signature â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
   useEffect(() => {
@@ -307,6 +375,10 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     if (step === 3) {
       setA(a => ({ ...a, signature: getSig(), signatureType: signMode, signedAt: new Date().toISOString() }));
     }
+    trackEvent('enrolment_step_completed', {
+      step_number: step,
+      step_label: STEPS[step - 1]?.label ?? `step_${step}`,
+    });
     setStep(s => (s + 1) as Step);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -370,10 +442,20 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       console.warn("Enrolment API call failed — continuing to payment.");
     }
 
-    trackEvent('enrol_complete', { payment_type: type, ...(appliedPromo && { promo: appliedPromo }) });
+    trackEvent('enrolment_payment_attempted', {
+      payment_type: type,
+      amount: record.amountPaid,
+      currency: 'GBP',
+      ...(appliedPromo && { promo_code: appliedPromo }),
+      ...(partner?.gymReferral && { gym_referral: partner.gymReferral }),
+    });
     const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
-    window.location.href = type === "full" ? fullLink : depositLink;
+    const stripeUrl = appendStripeAttribution(
+      type === "full" ? fullLink : depositLink,
+      learner.email,
+    );
+    window.location.href = stripeUrl;
   }
 
   const firstName = learner.fullName.split(" ")[0];
