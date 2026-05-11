@@ -27,14 +27,6 @@ const courseSchema = {
   offers: [
     {
       "@type": "Offer",
-      name: "Pay In Full",
-      price: "1599",
-      priceCurrency: "GBP",
-      url: "https://ptlaunchlab.co.uk/enrol",
-      description: "One-off payment. Best total value.",
-    },
-    {
-      "@type": "Offer",
       name: "6-Month Deposit Plan",
       price: "1599",
       priceCurrency: "GBP",
@@ -43,11 +35,11 @@ const courseSchema = {
     },
     {
       "@type": "Offer",
-      name: "12-Month Payl8r Finance",
+      name: "Pay In Full",
       price: "1599",
       priceCurrency: "GBP",
-      url: "https://ptlaunchlab.co.uk/book-call",
-      description: "From £133/month over 12 months. Subject to credit approval.",
+      url: "https://ptlaunchlab.co.uk/enrol",
+      description: "One-off payment. Best total value.",
     },
   ],
   hasCourseInstance: {
@@ -177,25 +169,11 @@ const objections = [
   },
 ];
 
-// Three-tier pricing — Good / Better / Best framed around payment commitment,
-// not product tier (the product is identical across all three). Middle tier
-// is the psychological winner: small deposit gets you in, no interest,
-// completed in 6 months. Pay-In-Full anchors as "best total value"
-// (saves interest). Payl8r 12-mo is the longest-spread escape hatch for
-// learners who can't commit £200/month.
+// Two payment options — identical product, different cadence. Deposit plan
+// is the highlighted middle: small commitment to get in, manageable monthly,
+// no interest. Pay-In-Full is positioned as "best total value" anchor on the
+// right. (Payl8r 12-mo dropped — not commercially viable.)
 const pricing = [
-  {
-    title: "12-Month Finance",
-    headlineFigure: "From £133",
-    headlineSuffix: "/month",
-    subPrice: "12-month Payl8r finance · subject to approval",
-    saving: "Maximum flexibility for tightest budgets",
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "Guaranteed gym interviews", "Direct access to Callum, Miles & Ryan"],
-    cta: "Book a call to qualify",
-    ctaHref: "/book-call",
-    recommended: false,
-    badge: null as string | null,
-  },
   {
     title: "6-Month Deposit Plan",
     headlineFigure: "£200",
@@ -206,7 +184,7 @@ const pricing = [
     cta: "Start the deposit plan →",
     ctaHref: "/enrol",
     recommended: true,
-    badge: "Most popular",
+    badge: "Most popular" as string | null,
   },
   {
     title: "Pay In Full",
@@ -218,7 +196,7 @@ const pricing = [
     cta: "Pay in full →",
     ctaHref: "/enrol",
     recommended: false,
-    badge: "Best total value",
+    badge: "Best total value" as string | null,
   },
 ];
 
@@ -462,9 +440,9 @@ export default function CoursesPage() {
                 <div className="p-4 md:p-5 text-gold text-[11px] font-bold tracking-widest uppercase text-center">PT Launch Lab</div>
               </div>
               {compare.map((row, i) => (
-                <div key={row.what} className={`grid grid-cols-3 ${i < compare.length - 1 ? "border-b border-white/10" : ""}`}>
+                <div key={row.what} className={`grid grid-cols-3 bg-card ${i < compare.length - 1 ? "border-b border-white/10" : ""}`}>
                   <div className="p-4 md:p-5 text-white text-sm md:text-base font-semibold">{row.what}</div>
-                  <div className="p-4 md:p-5 text-white/80 text-sm md:text-base text-center">{row.typical}</div>
+                  <div className="p-4 md:p-5 text-white text-sm md:text-base text-center">{row.typical}</div>
                   <div className="p-4 md:p-5 text-gold text-sm md:text-base text-center font-semibold">{row.us}</div>
                 </div>
               ))}
@@ -485,15 +463,15 @@ export default function CoursesPage() {
               </p>
             </div>
 
-            <p className="text-center text-gold text-[11px] font-semibold tracking-widest uppercase mb-3">Three ways to pay</p>
+            <p className="text-center text-gold text-[11px] font-semibold tracking-widest uppercase mb-3">Two ways to pay</p>
             <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-none tracking-tight mb-3">
               Same course. <span className="text-gold">Pick the payment that suits you.</span>
             </h3>
             <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
-              Every plan gets the same qualification, the same mentorship, the same gym interviews. The only difference is how you spread the cost.
+              Both plans get the same qualification, the same mentorship, the same gym interviews. The only difference is how you spread the cost.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
               {pricing.map((plan) => (
                 <div key={plan.title} className={`rounded-2xl p-7 border flex flex-col ${plan.recommended ? "bg-card border-gold/60 shadow-xl shadow-gold/10 md:scale-[1.03] relative" : "bg-card border-white/[0.07] relative"}`}>
                   {plan.badge && (
@@ -524,7 +502,7 @@ export default function CoursesPage() {
               ))}
             </div>
             <p className="text-center text-faint text-xs md:text-sm mt-10 max-w-2xl mx-auto leading-relaxed">
-              All three plans include the same qualification, mentorship community, personal tutor, and guaranteed gym interviews. Payl8r finance approval is subject to credit check — <a href="/book-call" className="text-gold hover:underline">book a free call</a> if you&apos;d like to walk through the options.
+              Both plans include the same qualification, mentorship community, personal tutor, and guaranteed gym interviews. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
             </p>
           </div>
         </section>
