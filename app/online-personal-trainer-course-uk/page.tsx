@@ -154,9 +154,16 @@ export default function OnlinePtCourseUkPage() {
             <p className="text-xl text-soft/80 leading-relaxed mb-6">
               An online personal trainer course in the UK is an Ofqual-regulated Level 3 qualification — usually awarded by NCFE or Focus Awards — that you can complete 100% online in 4 to 16 weeks. It bundles the Level 2 Gym Instructor and Level 3 Personal Trainer units, lets you legally take paying clients, and gets you onto the CIMSPA register.
             </p>
-            <p className="text-xl text-soft/80 leading-relaxed mb-8">
+            <p className="text-xl text-soft/80 leading-relaxed mb-6">
               Prices range from around £600 at the cheap-but-legit end up to £2,800 for premium blended courses.{" "}
               <span className="text-white font-semibold">We've hired more than 500 PTs across our gyms — pick your course on honesty, not the brochure.</span>
+            </p>
+            <p className="text-base text-soft/70 leading-relaxed mb-8">
+              New to all of this and not sure where to start? Read our{" "}
+              <Link href="/how-to-become-a-personal-trainer-uk" className="text-gold hover:underline font-semibold">
+                full 5-step UK PT roadmap
+              </Link>
+              {" "}— it walks through every step from decision to your first paying clients.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
