@@ -168,9 +168,7 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         </ul>
 
         <a
-          href="https://success.signup-lauchlab.co.uk/"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/book-call"
           onClick={() => {
             if (typeof window !== 'undefined' && (window as any).fbq) {
               (window as any).fbq('track', 'Schedule');
