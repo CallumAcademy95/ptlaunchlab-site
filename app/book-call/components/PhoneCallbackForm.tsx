@@ -2,6 +2,7 @@
 
 import { useState, useRef, FormEvent } from "react";
 import { trackEvent } from "@/app/lib/gtag";
+import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 
 const ZAPIER_HOOK = process.env.NEXT_PUBLIC_ZAPIER_PHONE_CALLBACK_HOOK || "";
 
@@ -121,6 +122,14 @@ export default function PhoneCallbackForm() {
         window.fbq("track", "Lead", { content_category: "phone_callback" });
       }
 
+      // Fire and forget — issues the 48h £200 promo cookie so the
+      // FunnelPricingBlock below renders the discounted state.
+      fetch("/api/funnel-promo/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source: "book-call" }),
+      }).catch((err) => console.warn("[book-call] promo cookie not set:", err));
+
       setSubmitted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong.";
@@ -184,13 +193,26 @@ export default function PhoneCallbackForm() {
           </li>
         </ol>
 
-        <p className="text-center text-soft text-xs max-w-xs mx-auto">
+        <p className="text-center text-soft text-xs max-w-xs mx-auto mb-8">
           Didn&apos;t receive anything in 4 hrs (during business hours)? Email{" "}
           <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
             info@ptlaunchlab.co.uk
           </a>
           .
         </p>
+
+        {/* PROMO — while-you-wait £200 incentive (48h cookie set on submit) */}
+        <div className="max-w-xl mx-auto">
+          <div className="text-center mb-4">
+            <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-1">
+              While you wait for the call
+            </p>
+            <h4 className="font-display font-extrabold text-xl md:text-2xl text-white leading-tight tracking-tight">
+              We&apos;ve unlocked a £200 discount for you.
+            </h4>
+          </div>
+          <FunnelPricingBlock />
+        </div>
       </div>
     );
   }

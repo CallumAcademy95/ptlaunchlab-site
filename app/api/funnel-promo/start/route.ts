@@ -7,7 +7,13 @@ import { attachPromoCookie, type FunnelSource } from "@/app/lib/funnelPromo";
 // but this route is here for the case where the client needs to set it
 // directly — e.g. arriving from a Zapier-only submission flow.
 
-const ALLOWED: ReadonlyArray<FunnelSource> = ["quiz", "prospectus", "youtube", "salary-calculator"] as const;
+const ALLOWED: ReadonlyArray<FunnelSource> = [
+  "quiz",
+  "prospectus",
+  "youtube",
+  "salary-calculator",
+  "book-call",
+] as const;
 
 export async function POST(req: NextRequest) {
   let source: FunnelSource = "quiz";
