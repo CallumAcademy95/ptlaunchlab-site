@@ -1,6 +1,7 @@
 'use client';
 
 import { results, ResultKey } from './quiz-config';
+import FunnelPricingBlock from '@/app/components/FunnelPricingBlock';
 
 const RESULT_ICONS: Record<ResultKey, React.ReactNode> = {
   onFloor: (
@@ -144,6 +145,9 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         </p>
         <p className="text-white leading-relaxed text-sm">{r.nextStep}</p>
       </div>
+
+      {/* PROMO PRICING BLOCK — 48h £200 discount unlocked by completing the quiz */}
+      <FunnelPricingBlock />
 
       {/* BOOK A CALL CTA */}
       <div className="bg-card rounded-2xl p-6 border border-white/[0.07] mb-8">

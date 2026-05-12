@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { attachPromoCookie } from '@/app/lib/funnelPromo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/prospectus
@@ -47,7 +48,13 @@ export async function POST(request: NextRequest) {
       }).catch(err => console.error('[prospectus] email server error:', err));
     }
 
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+    try {
+      attachPromoCookie(response, 'prospectus');
+    } catch (err) {
+      console.warn('[prospectus] promo cookie not set:', err);
+    }
+    return response;
   } catch (err) {
     console.error('[prospectus]', err);
     return NextResponse.json(

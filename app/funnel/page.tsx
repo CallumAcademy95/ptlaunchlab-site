@@ -118,9 +118,10 @@ export default function FunnelPage() {
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Something went wrong.");
-      window.open("/prospectus.pdf", "_blank");
       setProspectusOpen(false);
       setProspectusForm({ name: "", phone: "", email: "" });
+      try { sessionStorage.removeItem("ptll_prospectus_opened"); } catch {}
+      window.location.href = "/prospectus/thank-you";
     } catch (err: unknown) {
       setProspectusError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {

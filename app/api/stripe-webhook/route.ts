@@ -128,11 +128,48 @@ async function sendToGa4(session: StripeSession) {
           gclid: attribution["gclid"] ?? "",
           gym_referral: session.metadata?.gym_referral ?? "",
           promo_code: session.metadata?.promo_code ?? "",
+          funnel_promo: attribution["funnel_promo"] ?? "",
           engagement_time_msec: 1,
         },
       },
     ],
   };
+
+  // Funnel-promo deposit flag — when a quiz/prospectus lead pays the deposit,
+  // admin needs to cancel the 5th instalment in Stripe Billing to honour the
+  // £200 off. The discounted PIF link is self-handling; deposits aren't.
+  // Log loudly so admin sees it in Vercel logs, and fire a Zapier hook if set.
+  if (attribution["funnel_promo"]) {
+    const isPif = amount >= 1300; // discounted PIF is £1,399; deposit is £599
+    console.warn(
+      `[stripe-webhook] FUNNEL PROMO ${isPif ? "PIF" : "DEPOSIT"} — ` +
+        `source=${attribution["funnel_promo"]} ` +
+        `email=${session.customer_email || session.customer_details?.email || "?"} ` +
+        `session=${session.id} ` +
+        `amount=£${amount}` +
+        (isPif ? "" : " — ADMIN: cancel 5th instalment in Stripe Billing"),
+    );
+
+    const hookUrl = process.env.FUNNEL_PROMO_ADMIN_WEBHOOK;
+    if (hookUrl && !isPif) {
+      // Fire-and-forget admin notification for deposit-plan promo redemptions
+      fetch(hookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "funnel_promo_deposit",
+          source: attribution["funnel_promo"],
+          email: session.customer_email || session.customer_details?.email || "",
+          phone: session.customer_details?.phone || "",
+          name: session.customer_details?.name || "",
+          stripe_session_id: session.id,
+          amount,
+          currency,
+          action_required: "Cancel the 5th instalment in Stripe Billing to honour £200 off",
+        }),
+      }).catch((err) => console.error("[stripe-webhook] admin hook failed:", err));
+    }
+  }
 
   const url = `https://www.google-analytics.com/mp/collect?measurement_id=${encodeURIComponent(
     measurementId,

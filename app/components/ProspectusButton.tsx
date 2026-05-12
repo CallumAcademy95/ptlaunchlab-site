@@ -27,7 +27,9 @@ export default function ProspectusButton() {
       setOpen(false);
       setForm({ name: "", phone: "", email: "" });
       trackEvent('prospectus_download');
-      window.open("/prospectus.pdf", "_blank");
+      // Clear the once-flag so the thank-you page will open the PDF
+      try { sessionStorage.removeItem('ptll_prospectus_opened'); } catch {}
+      window.location.href = "/prospectus/thank-you";
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
