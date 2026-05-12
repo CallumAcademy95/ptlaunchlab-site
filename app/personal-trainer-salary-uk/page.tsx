@@ -69,8 +69,8 @@ export default function SalaryPage() {
               Geography decides the ceiling more than anything else. Below: real numbers from PT Launch Lab podcast guests who&apos;ve actually built six-figure businesses, hired hundreds of trainers, and run gyms across Yorkshire and the UK.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/quiz" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Take the 60-Second Quiz →</Link>
-              <Link href="/online-personal-trainer-course-uk" className="px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all">Compare UK PT Courses</Link>
+              <Link href="/pt-salary-calculator" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Calculate Your PT Salary →</Link>
+              <Link href="/quiz" className="px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all">Take the 60-Second Quiz</Link>
             </div>
           </div>
         </section>
