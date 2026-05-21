@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Unified color system — 4 background tiers + accents */
+  /* Unified color system — 4 background tiers + accents.
+     Text tokens are tuned so they still pass WCAG AA on the darkest navy
+     even when components apply an opacity modifier (text-soft/60 etc.).
+     Previous values (#94A3B8 / #4D6580) failed AA the moment any /X
+     modifier was applied, producing the dim navy-on-navy bug. */
   --color-deep:    #070D1B;
   --color-base:    #081729;
   --color-surface: #0C1F3A;
   --color-card:    #102342;
   --color-gold:    #F5C518;
   --color-blue:    #3B82F6;
-  --color-soft:    #94A3B8;
-  --color-faint:   #4D6580;
+  --color-soft:    #B4C2D6;          /* was #94A3B8 — brighter so /60 + /70 stay readable */
+  --color-faint:   #8FA4BD;          /* was #4D6580 — clears AA on every navy tier */
 
   /* Legacy aliases — keep for other pages */
   --color-navy-dark:  #070D1B;
   --color-navy-light: #102342;
   --color-yellow:     #F5C518;
   --color-blue-light: #3B82F6;
-  --color-muted:      #94A3B8;
-  --color-dim:        #4D6580;
+  --color-muted:      #B4C2D6;       /* synced with --color-soft */
+  --color-dim:        #8FA4BD;       /* synced with --color-faint */
 
   /* Fonts */
   --font-sans:    var(--font-poppins);

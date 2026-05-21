@@ -265,8 +265,11 @@ export default function CoursesPage() {
                 is the line that disarms the "what if I can't get clients"
                 silent objection before the visitor even scrolls. */}
             <div className="max-w-2xl mx-auto mb-8 px-5 py-4 rounded-2xl border border-gold/30 bg-card/40">
-              <p className="text-white text-sm md:text-base leading-relaxed">
-                <span className="text-gold font-bold">£500 business mentorship — bundled free.</span>{" "}
+              <p
+                className="text-white text-sm md:text-base leading-relaxed"
+                style={{ color: '#FFFFFF' }}
+              >
+                <span className="text-gold font-bold" style={{ color: '#F5C518' }}>£500 business mentorship — bundled free.</span>{" "}
                 The Mentorship Hub walks you from qualifying to your first paying client, with Callum, Miles &amp; Ryan a message away. Not an upsell. Not an upgrade.
               </p>
             </div>
