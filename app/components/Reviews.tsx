@@ -2,6 +2,7 @@
 import { useRef, useState, useEffect } from "react";
 
 const reviews = [
+  { name: "Jonathan Plummer",       label: "Level 3 Personal Training",  quote: "I completed my PT qualification with PT Launch Lab around Christmas time and I couldn't recommend them enough. Within the first week you get the feeling Callum genuinely cares — he's always on hand to answer any questions you have despite being a busy person himself, and always coming up with new ideas of how he can help support his learners. What I also love about PT Launch Lab is the amount of support they give you once you've completed the course. Most PTs will fail because they don't understand the business and marketing side of things, and PT Launch Lab help you improve in all these areas." },
   { name: "Rachel Waldock",         label: "Level 2 & Level 3 PT",      quote: "From start to finish, the course was structured, supportive, and everything I needed to make the career change I'd been putting off for years. Couldn't be happier with the experience." },
   { name: "Rebecca Davies",         label: "Level 3 Personal Training",  quote: "The support I received was second to none. After having my baby, I thought I'd struggle to find the time — but Callum and the team were so supportive and helpful every step of the way." },
   { name: "Matthew Bell",           label: "Level 3 Personal Training",  quote: "Fantastic from start to finish. The support didn't stop once I qualified — they've continued to offer guidance and help that's been invaluable as I build my business." },
@@ -79,7 +80,7 @@ export default function Reviews() {
                 ))}
               </div>
               <span className="text-white text-sm font-semibold">5.0</span>
-              <span className="text-soft/60 text-sm">· 17 Verified Reviews</span>
+              <span className="text-soft/60 text-sm">· 19 Verified Reviews</span>
               <a
                 href="https://www.google.com/search?q=pt+launch+lab+pontefract+reviews"
                 target="_blank"
