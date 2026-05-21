@@ -124,7 +124,7 @@ const curriculum = [
 
 const method = [
   { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 4–8 weeks." },
-  { num: "02", title: "Mentorship", body: "Our £500 business mentorship Skool community — included free with the £1,599 fee. Direct access to Callum, Miles and Ryan. Not a helpdesk — the people who've actually done it." },
+  { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free with the £1,599 fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
   { num: "03", title: "Gym Placement", body: "Guaranteed interviews with our partner gyms. We've hired 500+ PTs — we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
   { num: "05", title: "Online Coaching", body: "Expand beyond the gym. Build an income stream that scales without a ceiling." },
@@ -146,7 +146,7 @@ const objections = [
   {
     quote: "What if I qualify and still can't get clients?",
     answer:
-      "This is why the mentorship community is bundled, not a paid extra. Module 6 is the business launch system. Then you stay in the Skool community for life. Most courses qualify you and walk away — we stay until you've launched.",
+      "This is exactly what the Mentorship Hub is built for — it walks you from qualifying to your first paying client, milestone by milestone, with Callum a message away. You also stay in the Skool community for life. Most courses qualify you and walk away. We stay until you've launched.",
     link: null,
   },
   {
@@ -266,8 +266,8 @@ export default function CoursesPage() {
                 silent objection before the visitor even scrolls. */}
             <div className="max-w-2xl mx-auto mb-8 px-5 py-4 rounded-2xl border border-gold/30 bg-card/40">
               <p className="text-white text-sm md:text-base leading-relaxed">
-                <span className="text-gold font-bold">£500 business mentorship community — bundled free.</span>{" "}
-                Not an upsell. Not an upgrade. Every learner gets direct access to Callum, Miles &amp; Ryan from day one.
+                <span className="text-gold font-bold">£500 business mentorship — bundled free.</span>{" "}
+                The Mentorship Hub walks you from qualifying to your first paying client, with Callum, Miles &amp; Ryan a message away. Not an upsell. Not an upgrade.
               </p>
             </div>
             <p className="text-sm text-soft/60 max-w-2xl mx-auto mb-10">

@@ -56,7 +56,7 @@ const faqSchema = {
       name: "What's included in the £1,599 course fee?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The full NCFE Level 2 & 3 Personal Trainer qualification (Ofqual regulated, CIMSPA recognised), a personal tutor assigned within 24 hours of enrolment, our £500 Skool business mentorship community at no extra cost, business training built into the curriculum, and guaranteed warm-introduction interviews to UK gym employers in our network. Most UK PT academies charge £1,200–£2,800 for the qualification alone and price mentorship as a separate £500–£3,000 product. We bundle the lot.",
+        text: "The full NCFE Level 2 & 3 Personal Trainer qualification (Ofqual regulated, CIMSPA recognised), a personal tutor assigned within 24 hours of enrolment, our £500 Mentorship Hub plus Skool community at no extra cost, business training built into the curriculum, and guaranteed warm-introduction interviews to UK gym employers in our network. Most UK PT academies charge £1,200–£2,800 for the qualification alone and price mentorship as a separate £500–£3,000 product. We bundle the lot.",
       },
     },
     {

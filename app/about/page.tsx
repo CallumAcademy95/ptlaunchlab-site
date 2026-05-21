@@ -16,7 +16,7 @@ const values = [
   {
     icon: "target",
     title: "Mentorship as standard",
-    body: "Every student gets real mentorship — not a helpdesk. Direct access to Callum, Miles and Ryan from day one through to your first paying clients.",
+    body: "Every student gets the Mentorship Hub — a private dashboard built to walk you from qualifying to your first paying client, with Callum, Miles and Ryan a message away when you're stuck.",
   },
   {
     icon: "barbell",

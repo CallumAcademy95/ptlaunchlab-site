@@ -24,7 +24,11 @@ const faqs = [
   },
   {
     q: "Why should I choose PT Launch Lab over a cheaper course?",
-    a: "If price is the only factor, cheaper courses exist. Here's the honest comparison: most cheaper courses give you the content to pass the exam, and nothing else. No personal tutor. No business mentorship. No job pipeline. You qualify, then you're on your own. At £1,599 PT Launch Lab sits in the middle of the UK market on price — but the bundle is unmatched: the NCFE Level 3 qualification UK gyms ask for by default, a personal tutor assigned to you within 24 hours, our £500 business mentorship community included at no extra cost, and warm-introduction interviews to gyms our team has hired from. Most UK academies charge £500–£3,000 separately for the mentorship piece, or skip it entirely. We bundle everything into the £1,599 — nothing is sold as a paid upgrade.",
+    a: "If price is the only factor, cheaper courses exist. Here's the honest comparison: most cheaper courses give you the content to pass the exam, and nothing else. No personal tutor. No business mentorship. No job pipeline. You qualify, then you're on your own. At £1,599 PT Launch Lab sits in the middle of the UK market on price — but the bundle is unmatched: the NCFE Level 3 qualification UK gyms ask for by default, a personal tutor assigned to you within 24 hours, our £500 business mentorship included at no extra cost, and warm-introduction interviews to gyms our team has hired from. Most UK academies charge £500–£3,000 separately for the mentorship piece, or skip it entirely. We bundle everything into the £1,599 — nothing is sold as a paid upgrade.",
+  },
+  {
+    q: "What does the business mentorship actually do for me?",
+    a: "It walks you from qualifying to your first paying client. You get the Mentorship Hub — your private dashboard built around that one job — plus our Skool community for daily peer contact. On the Hub you always know the next concrete thing to work on, and Callum's a message away when you're stuck. Most academies charge £500–£3,000 to bolt this on after qualification, or skip it entirely. We include it.",
   },
   {
     q: "I'm in my 30s or 40s — am I too old to start this?",

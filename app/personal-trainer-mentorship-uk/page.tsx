@@ -42,10 +42,10 @@ export default function Page() {
                   <span className="text-[#F5C518]">Bundled, not bolted on.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4">
-                  Every PT Launch Lab student gets our £500 business mentorship community — included free with the course. Direct access to mentors who&apos;ve built real careers in fitness, not tutors who&apos;ve only ever taught.
+                  Every PT Launch Lab student gets our £500 Mentorship Hub — built around one job: walking you from qualifying to your first paying client. Direct access to mentors who&apos;ve built real careers in fitness, not tutors who&apos;ve only ever taught.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  Most UK PT academies charge £500–£3,000 separately for ongoing mentorship — or skip it entirely. We bundle the lot into the £1,599 course fee. From your first lesson through to your first paying client, we&apos;re with you every step.
+                  Most UK PT academies charge £500–£3,000 separately for ongoing mentorship — or skip it entirely. We bundle it into the £1,599 course fee. From your first lesson through to your first paying client, we&apos;re with you every step.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>

@@ -58,7 +58,7 @@ const features = [
   {
     Icon: ChartIcon,
     title: "£500 Business Mentorship — Included",
-    body: "Our private Skool community is a £500 standalone product, bundled into the course at no extra cost. How to get your first clients. How to price yourself. How to build a sustainable self-employed PT business — taught by people who've actually done it. Most UK courses charge for this separately, or skip it entirely.",
+    body: "Your private Mentorship Hub plus the Skool community — built around one job: walking you from qualifying to your first paying client. You always know the next concrete thing to work on, and Callum's a message away when you're stuck. Most UK academies charge £500–£3,000 to bolt mentorship on after qualification, or skip it entirely. We include it.",
     badge: "£500 Included",
   },
   {
