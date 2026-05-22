@@ -19,7 +19,7 @@ import type { NextRequest } from "next/server";
 //   1. Events Manager → your pixel → Settings → Conversions API → Generate
 //      Access Token. Copy long-lived token.
 //   2. Vercel env:
-//        META_PIXEL_ID            = 1988881834762642
+//        META_PIXEL_ID            = 1133525198707842  (PT LAUNCH LAB - WEBSITE)
 //        META_CAPI_ACCESS_TOKEN   = <generated token>
 //        META_CAPI_TEST_EVENT_CODE = TEST12345  (optional, for Test Events tab)
 //   3. Events Manager → Test Events tab → enter TEST_EVENT_CODE, fire a test

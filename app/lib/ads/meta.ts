@@ -9,7 +9,7 @@ import type {
 const BASE = 'https://graph.facebook.com/v21.0';
 const AD_ACCOUNT = process.env.META_AD_ACCOUNT_ID!;
 const PAGE_ID = process.env.META_PAGE_ID!;
-const PIXEL_ID = '1988881834762642';
+const PIXEL_ID = '1133525198707842';
 
 function token() {
   return process.env.META_ACCESS_TOKEN!;
