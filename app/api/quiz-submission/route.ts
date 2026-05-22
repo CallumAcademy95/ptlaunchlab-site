@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name, phone, email, result: quizResult, answers } = result.data;
+    const { name, phone, email, result: quizResult, avatar, answers } = result.data;
     const webhookUrl = process.env.QUIZ_ZAPIER_WEBHOOK_URL;
 
     if (webhookUrl) {
@@ -53,8 +53,9 @@ export async function POST(request: NextRequest) {
         email,
         phone,
         quiz_result:  resultLabels[quizResult] ?? quizResult,
+        avatar:       avatar ?? '',
         answers:      Array.isArray(answers) ? answers.map((a) => a.label).join(' | ') : '',
-        source:       'quiz-funnel',
+        source:       avatar ? `quiz-funnel:${avatar}` : 'quiz-funnel',
         submitted_at: new Date().toISOString(),
       };
 
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       fetch(`${emailServerUrl}/leads/new`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, source: 'quiz', quizResult: resultLabels[quizResult] ?? quizResult }),
+        body: JSON.stringify({ name, email, phone, source: 'quiz', quizResult: resultLabels[quizResult] ?? quizResult, avatar: avatar ?? null }),
       }).catch(err => console.error('[quiz] email server error:', err));
     }
 
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         result: quizResult,
+        avatar: avatar ?? null,
         answers: Array.isArray(answers) ? answers.map((a) => a.label) : [],
       }),
     }).catch(err => console.error('[warmup-email trigger]', err));

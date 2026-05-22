@@ -2,10 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config';
 import ResultScreen from './ResultScreen';
 import { trackEvent } from '@/app/lib/gtag';
 import { useFormSecurity } from '@/app/lib/security/client';
+
+type Avatar = 'starter' | 'switcher' | 'returner';
+const VALID_AVATARS: ReadonlyArray<Avatar> = ['starter', 'switcher', 'returner'];
 
 // Capture split into two single-field screens to reduce friction:
 // - 'mobile' : mobile only (highest-value field, peak sunk-cost moment)
@@ -28,6 +32,15 @@ export default function QuizApp() {
   const [animKey, setAnimKey]             = useState(0);
   const sec = useFormSecurity();
 
+  // Avatar pre-tag from cold-traffic avatar landing pages (Starter / Switcher
+  // / Returner). Used for segmented retargeting + tailored result-page copy.
+  // Quiz still works untouched if visitor arrives without the param.
+  const searchParams = useSearchParams();
+  const rawAvatar = searchParams.get('avatar');
+  const avatar: Avatar | undefined = VALID_AVATARS.includes(rawAvatar as Avatar)
+    ? (rawAvatar as Avatar)
+    : undefined;
+
   const bump = () => setAnimKey((k) => k + 1);
 
   const handleStart = () => {
@@ -36,7 +49,7 @@ export default function QuizApp() {
     setAnswers([]);
     setSelected(null);
     bump();
-    trackEvent('quiz_start');
+    trackEvent('quiz_start', avatar ? { avatar } : undefined);
   };
 
   const handleSelect = (option: QuizOption) => setSelected(option);
@@ -52,6 +65,7 @@ export default function QuizApp() {
       question_index: questionIndex + 1,
       question_total: questions.length,
       answer_label: selected.label,
+      ...(avatar ? { avatar } : {}),
     });
 
     if (questionIndex < questions.length - 1) {
@@ -99,7 +113,7 @@ export default function QuizApp() {
       return;
     }
     setFormError('');
-    trackEvent('quiz_mobile_captured');
+    trackEvent('quiz_mobile_captured', avatar ? { avatar } : undefined);
     setScreen('email');
     bump();
   };
@@ -110,7 +124,7 @@ export default function QuizApp() {
     if (!email.includes('@')) { setFormError('Please enter a valid email address.'); return; }
     setFormError('');
 
-    trackEvent('quiz_email_captured');
+    trackEvent('quiz_email_captured', avatar ? { avatar } : undefined);
 
     setScreen('submitting');
 
@@ -126,13 +140,14 @@ export default function QuizApp() {
           phone:   phone.trim(),
           email:   email.trim().toLowerCase(),
           result:  calcResult,
+          ...(avatar ? { avatar } : {}),
           answers: answers.map((a) => ({ label: a.label })),
           [sec.SEC_KEY]: sec.payload(),
         }),
       });
-      trackEvent('quiz_complete', { quiz_result: calcResult });
+      trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
       if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Lead', { content_name: calcResult });
+        (window as any).fbq('track', 'Lead', { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) });
       }
     } catch {
       // Non-blocking — user still gets their result if the save fails
@@ -468,6 +483,7 @@ export default function QuizApp() {
             <ResultScreen
               name={name}
               resultKey={result}
+              avatar={avatar}
               onStartOver={handleStartOver}
             />
           )}

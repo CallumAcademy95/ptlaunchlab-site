@@ -33,11 +33,18 @@ const contactSchema = z.object({
 });
 
 // ── Quiz ──────────────────────────────────────────────────────────────────
+// Avatar is the cold-traffic pre-tag from /become-a-personal-trainer-uk,
+// /career-change-to-personal-trainer, /retrain-as-a-personal-trainer. It's
+// orthogonal to the quiz result (which is a career-path computed from
+// answers) — avatar describes WHO the visitor is, result describes WHICH
+// path suits them. Used downstream for segmented retargeting and tailored
+// result-page framing.
 const quizSchema = z.object({
   name:    z.string().max(200),
   email:   z.string().max(254),
   phone:   z.string().max(40),
   result:  z.string().max(64),
+  avatar:  z.enum(['starter', 'switcher', 'returner']).optional(),
   answers: z.array(z.object({ label: z.string().max(500) })).max(40).optional(),
   [SEC_KEY]: secSchema,
 });
@@ -143,6 +150,7 @@ export type QuizClean = {
   email: string;
   phone: string;
   result: string;
+  avatar?: 'starter' | 'switcher' | 'returner';
   answers: { label: string }[];
 };
 
@@ -176,6 +184,7 @@ export function validateQuiz(raw: unknown): ValidationResult<QuizClean> {
       email: ec.normalised!,
       phone: pc.normalised!,
       result: parsed.data.result,
+      avatar: parsed.data.avatar,
       answers: parsed.data.answers ?? [],
     },
     signals: [],

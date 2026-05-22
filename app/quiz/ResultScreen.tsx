@@ -3,6 +3,8 @@
 import { results, ResultKey } from './quiz-config';
 import FunnelPricingBlock from '@/app/components/FunnelPricingBlock';
 
+type Avatar = 'starter' | 'switcher' | 'returner';
+
 const RESULT_ICONS: Record<ResultKey, React.ReactNode> = {
   onFloor: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="w-8 h-8 text-gold">
@@ -26,17 +28,81 @@ const RESULT_ICONS: Record<ResultKey, React.ReactNode> = {
   ),
 };
 
+// Avatar-specific pre-frame shown ABOVE the result reveal when the visitor
+// arrived from /become-a-personal-trainer-uk, /career-change-to-personal-trainer,
+// or /retrain-as-a-personal-trainer. Leaves the existing 4 result types
+// untouched — adds a tailored "we know who you are" framing layer around them.
+const AVATAR_PREFRAME: Record<Avatar, { eyebrow: string; headline: string; body: string }> = {
+  starter: {
+    eyebrow: 'We know how you got here',
+    headline: 'You came in already half-decided.',
+    body: "You live in the gym. Your mates already ask you for programmes. You just needed someone to tell you which qualification is actually legit and what comes next. The result below is the answer — built around the fact that you're closer to coaching than you think.",
+  },
+  switcher: {
+    eyebrow: 'We know how you got here',
+    headline: "You came in looking for a believable exit.",
+    body: "Not a quit-on-Monday fantasy — a transition that fits a salary, a mortgage, a life you've already built. The result below is the path most career-changers like you actually take. It's gradual. It works around what you've got. It's real.",
+  },
+  returner: {
+    eyebrow: 'We know how you got here',
+    headline: "You came in quietly wondering if it's already too late.",
+    body: "It's not. You've kept hold of fitness through everything — through kids, caring, rebuilding. The result below is the path that fits a life that doesn't pause for you. Kind, local, sustainable. Built around the school run, not against it.",
+  },
+};
+
+// Avatar-specific CTA framing on the booking card. Same destination, different
+// emotional register so the close matches the avatar's mental state.
+const AVATAR_CTA: Record<Avatar, { eyebrow: string; headline: string; sub: string; button: string }> = {
+  starter: {
+    eyebrow: 'Step 2',
+    headline: 'Book Your Free 15-Min Career Call',
+    sub: "15 minutes with the team. We'll tell you straight if PT is the right move — and exactly what your first step looks like.",
+    button: 'Book My Career Call →',
+  },
+  switcher: {
+    eyebrow: 'Step 2',
+    headline: 'Book Your Free 15-Min Transition Call',
+    sub: "15 minutes with the team. We'll map your transition around your current salary, hours, and timeline — and tell you straight if the maths works.",
+    button: 'Map My Transition →',
+  },
+  returner: {
+    eyebrow: 'Step 2',
+    headline: 'Book a No-Pressure 15-Min Chat',
+    sub: "15 minutes with the team. We'll listen, ask kind questions, and tell you honestly if this is the right fit for your life right now.",
+    button: 'Book My No-Pressure Chat →',
+  },
+};
+
 interface Props {
   name: string;
   resultKey: ResultKey;
+  avatar?: Avatar;
   onStartOver: () => void;
 }
 
-export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
+export default function ResultScreen({ name, resultKey, avatar, onStartOver }: Props) {
   const r = results[resultKey];
+  const preframe = avatar ? AVATAR_PREFRAME[avatar] : null;
+  const cta = avatar ? AVATAR_CTA[avatar] : {
+    eyebrow: 'Step 2',
+    headline: 'Book Your Free Strategy Call',
+    sub: "15 minutes. No pressure. We'll map out your exact path into PT and answer every question you have.",
+    button: 'Book Your Free Strategy Call →',
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
+
+      {/* AVATAR PRE-FRAME — only renders when the quiz was reached via an avatar page */}
+      {preframe && (
+        <div className="mb-8 bg-gradient-to-br from-card via-card to-base border border-gold/30 rounded-2xl p-6">
+          <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-2">{preframe.eyebrow}</p>
+          <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-white leading-tight tracking-tight mb-3">
+            {preframe.headline}
+          </h3>
+          <p className="text-soft/80 text-[15px] leading-relaxed">{preframe.body}</p>
+        </div>
+      )}
 
       {/* RESULT REVEAL */}
       <div className="mb-10">
@@ -149,13 +215,11 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
       {/* PROMO PRICING BLOCK — 48h £200 discount unlocked by completing the quiz */}
       <FunnelPricingBlock />
 
-      {/* BOOK A CALL CTA */}
+      {/* BOOK A CALL CTA — avatar-tailored copy when known */}
       <div className="bg-card rounded-2xl p-6 border border-white/[0.07] mb-8">
-        <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-1">Step 2</p>
-        <h4 className="font-display font-extrabold text-white text-xl leading-none tracking-tight mb-1">Book Your Free Strategy Call</h4>
-        <p className="text-soft/60 text-sm mb-5">
-          15 minutes. No pressure. We&apos;ll map out your exact path into PT and answer every question you have.
-        </p>
+        <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-1">{cta.eyebrow}</p>
+        <h4 className="font-display font-extrabold text-white text-xl leading-none tracking-tight mb-1">{cta.headline}</h4>
+        <p className="text-soft/60 text-sm mb-5">{cta.sub}</p>
 
         <ul className="space-y-2 mb-6">
           {[
@@ -172,15 +236,15 @@ export default function ResultScreen({ name, resultKey, onStartOver }: Props) {
         </ul>
 
         <a
-          href="/book-call"
+          href={avatar ? `/book-call?avatar=${avatar}` : '/book-call'}
           onClick={() => {
             if (typeof window !== 'undefined' && (window as any).fbq) {
-              (window as any).fbq('track', 'Schedule');
+              (window as any).fbq('track', 'Schedule', avatar ? { content_category: avatar } : undefined);
             }
           }}
           className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20"
         >
-          Book Your Free Strategy Call →
+          {cta.button}
         </a>
 
         <p className="text-center text-faint text-xs mt-3">
