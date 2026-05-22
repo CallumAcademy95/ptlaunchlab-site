@@ -162,10 +162,26 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">you&apos;ve outgrown?</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Train as a qualified UK PT around your current job. NCFE Level 2 + Level 3, Ofqual regulated, fully online — with the business mentorship most courses leave out. Drop your details below to lock in £200 off and we&apos;ll WhatsApp you a quick intro.
+              Train as a qualified UK PT around your current job. NCFE Level 2 + Level 3, Ofqual regulated, fully online — with the business mentorship most courses leave out. Take the 60-second quiz to see if PT is a believable next step for your situation. Honest answer either way.
             </p>
-            <HeroLeadForm avatar="switcher" />
-            <p className="text-soft/60 text-xs mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+              <Link
+                href="/quiz?avatar=switcher"
+                data-cta="hero-quiz"
+                className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30 text-center"
+              >
+                See If PT Could Suit You →
+              </Link>
+              <Link
+                href="/book-call"
+                data-cta="hero-bookcall"
+                className="px-10 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-base hover:bg-white/10 transition-all text-center"
+              >
+                Already Sure? Book a Call
+              </Link>
+            </div>
+            <p className="text-soft/55 text-xs">60 seconds · No email required to start · Honest result either way</p>
+            <p className="text-soft/60 text-xs mt-4">
               ⭐ 5.0 · 19 Verified Google Reviews &nbsp;·&nbsp; Built around full-time work &nbsp;·&nbsp; No hard sell, no pressure
             </p>
           </div>
@@ -234,6 +250,22 @@ export default function CareerChangeToPersonalTrainerPage() {
             <p className="text-soft/85 text-lg leading-relaxed">
               You&apos;re not going to wake up next year and find that the desk has gotten better. The question stops being &ldquo;should I change careers&rdquo; and starts being &ldquo;what does a realistic exit actually look like.&rdquo;
             </p>
+          </div>
+        </section>
+
+        {/* SKIP-THE-QUIZ — secondary lead capture for high intent */}
+        <section className="bg-gradient-to-b from-base via-card to-base py-16 px-6 border-y border-gold/15">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-3">Already decided?</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-4">
+              Skip the quiz.
+              <br />
+              <span className="text-gold">Map your transition with the team.</span>
+            </h2>
+            <p className="text-soft/75 text-base mb-8 max-w-xl mx-auto">
+              If you already know PT is the move, drop your details. We&apos;ll WhatsApp you a quick intro, lock in £200 off, and you can book a 15-min transition call straight after.
+            </p>
+            <HeroLeadForm avatar="switcher" />
           </div>
         </section>
 

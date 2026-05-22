@@ -162,10 +162,26 @@ export default function BecomeAPersonalTrainerUkPage() {
               into a <span className="text-gold">recognised career.</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              NCFE Level 2 + Level 3, fully online, no degree — taught by gym owners who&apos;ve personally hired 500+ PTs into real gyms across the UK. Drop your details below to lock in £200 off and get a WhatsApp intro from the team.
+              NCFE Level 2 + Level 3, fully online, no degree — taught by gym owners who&apos;ve personally hired 500+ PTs into real gyms across the UK. Take the 60-second quiz to see if PT is actually the right move for you. Honest answer either way.
             </p>
-            <HeroLeadForm avatar="starter" />
-            <p className="text-soft/60 text-xs mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+              <Link
+                href="/quiz?avatar=starter"
+                data-cta="hero-quiz"
+                className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30 text-center"
+              >
+                Take The PT Career Quiz →
+              </Link>
+              <Link
+                href="/book-call"
+                data-cta="hero-bookcall"
+                className="px-10 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-base hover:bg-white/10 transition-all text-center"
+              >
+                Already Sure? Book a Call
+              </Link>
+            </div>
+            <p className="text-soft/55 text-xs">60 seconds · No email required to start · Honest result either way</p>
+            <p className="text-soft/60 text-xs mt-4">
               ⭐ 5.0 · 19 Verified Google Reviews &nbsp;·&nbsp; Run by gym owners, not lecturers &nbsp;·&nbsp; No hard sell on the call
             </p>
           </div>
@@ -234,6 +250,22 @@ export default function BecomeAPersonalTrainerUkPage() {
             <p className="text-soft/85 text-lg leading-relaxed">
               The honest answer is usually the same one. You don&apos;t know which qualification is real. You don&apos;t know if you&apos;re &ldquo;expert enough.&rdquo; You don&apos;t know what happens after you qualify. The rest of this page is the straight answer to all three.
             </p>
+          </div>
+        </section>
+
+        {/* SKIP-THE-QUIZ — secondary lead capture for high intent */}
+        <section className="bg-gradient-to-b from-base via-card to-base py-16 px-6 border-y border-gold/15">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-3">Already decided?</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-4">
+              Skip the quiz.
+              <br />
+              <span className="text-gold">Talk to a real person.</span>
+            </h2>
+            <p className="text-soft/75 text-base mb-8 max-w-xl mx-auto">
+              If you already know PT is for you, drop your details. We&apos;ll WhatsApp you a quick intro, lock in £200 off, and you can book your call straight after.
+            </p>
+            <HeroLeadForm avatar="starter" />
           </div>
         </section>
 
