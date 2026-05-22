@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -7,7 +8,8 @@ import StickyMobileCTA from "../components/StickyMobileCTA";
 import Accreditation from "../components/Accreditation";
 import Reviews from "../components/Reviews";
 import FunnelPricingBlock from "../components/FunnelPricingBlock";
-import ProspectusButton from "../components/ProspectusButton";
+import HeroLeadForm from "../components/HeroLeadForm";
+import PromoBar from "../components/PromoBar";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/career-change-to-personal-trainer";
 const TODAY = new Date().toISOString().split("T")[0];
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-// ─── COPY (escape, autonomy, realistic) ───────────────────────────────────────
+// ─── COPY ─────────────────────────────────────────────────────────────────────
 
 const forYouIf = [
   "You're burnt out in corporate, hospitality, sales, retail or shift work",
@@ -66,31 +68,28 @@ const steps = [
   { n: 6, title: "Scale via the Mentorship Hub when ready", body: "When your client roster outgrows your old salary, leave the day job. Hub walks you through pricing, packaging, retention. Most career-changers replace their salary inside 6–12 months." },
 ];
 
+const comparisonRows = [
+  { other: "Built for school-leavers in classrooms",       us: "Built for working adults — online, self-paced" },
+  { other: "Quit your job to study full-time",             us: "Study evenings + weekends while you keep earning" },
+  { other: "Just a certificate — figure clients out alone", us: "£500 Mentorship Hub bundled free" },
+  { other: "Lecturer telling you the theory",              us: "Gym owners who've personally hired 500+ PTs" },
+  { other: "Cold CV drops once you qualify",               us: "Warm intros to salaried roles in our network" },
+  { other: "Surprise upsell fees post-enrolment",          us: "£1,599 total. Nothing sold as a paid upgrade later" },
+];
+
 const faqs = [
-  {
-    q: "Can I really qualify as a personal trainer while working full-time in the UK?",
-    a: "Yes. 100% online via Google Classroom, fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym — you film yourself coaching real movements, your tutor reviews. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time.",
-  },
-  {
-    q: "Is it too late to change careers in my 30s or 40s?",
-    a: "No — and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working.",
-  },
-  {
-    q: "How much can I realistically earn as a PT in year one?",
-    a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one.",
-  },
-  {
-    q: "What if I don't want to be self-employed?",
-    a: "Employed-first is a real route. We make warm introductions into our partner gym network — PureGym, JD Gyms, The Gym Group, Nuffield Health, plus independents. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo.",
-  },
-  {
-    q: "What does the £500 Mentorship Hub include?",
-    a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course — most UK academies charge £500–£3,000 for this layer or skip it entirely.",
-  },
-  {
-    q: "When can I start?",
-    a: "Immediately. The moment you enrol, Google Classroom access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend.",
-  },
+  { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online via Google Classroom, fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym — you film yourself coaching real movements, your tutor reviews. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
+  { q: "Is it too late to change careers in my 30s or 40s?", a: "No — and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
+  { q: "How much can I realistically earn as a PT in year one?", a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one." },
+  { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We make warm introductions into our partner gym network — PureGym, JD Gyms, The Gym Group, Nuffield Health, plus independents. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
+  { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course — most UK academies charge £500–£3,000 for this layer or skip it entirely." },
+  { q: "When can I start?", a: "Immediately. The moment you enrol, Google Classroom access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
+];
+
+const founders = [
+  { src: "/callum.webp", name: "Callum",  role: "Head of Education", quote: "Career-changers in their 30s & 40s outperform everyone else when they get the business side." },
+  { src: "/ryan.webp",   name: "Ryan",    role: "Co-founder",        quote: "Most PTs fail because nobody taught them the business. We built the course we wish had existed." },
+  { src: "/miles.webp",  name: "Miles",   role: "Business Mentor",   quote: "You don't need a sales personality. You need a sales process. We give you one." },
 ];
 
 // ─── SCHEMA ───────────────────────────────────────────────────────────────────
@@ -99,8 +98,7 @@ const courseSchema = {
   "@context": "https://schema.org",
   "@type": "Course",
   name: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training (Career Change Pathway)",
-  description:
-    "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm-introduction interviews into employed PT roles.",
+  description: "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm-introduction interviews into employed PT roles.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
   offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
@@ -146,11 +144,12 @@ export default function CareerChangeToPersonalTrainerPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <Breadcrumbs trail={[{ name: "Career Change to Personal Trainer", url: PAGE_URL }]} />
 
+      <PromoBar />
       <Nav />
       <main className="pt-[72px]">
 
-        {/* HERO — calm, credible, realistic */}
-        <section className="bg-base py-20 md:py-28 px-6 relative overflow-hidden">
+        {/* HERO — calm, credible, inline lead capture */}
+        <section className="bg-base py-16 md:py-24 px-6 relative overflow-hidden">
           <div className="absolute -left-48 top-0 w-[600px] h-[600px] rounded-full bg-gold opacity-[0.06] blur-3xl pointer-events-none" />
           <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-blue opacity-[0.07] blur-3xl pointer-events-none" />
           <div className="relative max-w-5xl mx-auto text-center">
@@ -160,32 +159,48 @@ export default function CareerChangeToPersonalTrainerPage() {
             <h1 className="font-display font-extrabold text-5xl md:text-8xl text-white leading-[0.95] tracking-tight mb-7">
               Sick of working a job
               <br />
-              <span className="text-gold">you've outgrown?</span>
+              <span className="text-gold">you&apos;ve outgrown?</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Train as a qualified UK personal trainer around your current job. NCFE Level 2 + Level 3, Ofqual regulated, fully online — with the business mentorship most courses leave out. A realistic transition, not a leap of faith.
+              Train as a qualified UK PT around your current job. NCFE Level 2 + Level 3, Ofqual regulated, fully online — with the business mentorship most courses leave out. Drop your details below to lock in £200 off and we&apos;ll WhatsApp you a quick intro.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-              <Link
-                href="/book-call"
-                data-cta="hero-primary"
-                className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30"
-              >
-                See How It Works →
-              </Link>
-            </div>
-            <p className="text-soft/60 text-xs">
+            <HeroLeadForm avatar="switcher" />
+            <p className="text-soft/60 text-xs mt-6">
               ⭐ 5.0 · 19 Verified Google Reviews &nbsp;·&nbsp; Built around full-time work &nbsp;·&nbsp; No hard sell, no pressure
             </p>
           </div>
         </section>
 
+        {/* VSL */}
+        <section className="bg-surface py-16 px-6 border-y border-white/[0.05]">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first — 4 minutes</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-3">
+              Why 80% of PTs fail —
+              <br />
+              <span className="text-gold">and exactly how we fix it.</span>
+            </h2>
+            <p className="text-soft/75 text-center text-base max-w-2xl mx-auto mb-10">
+              Callum, Miles and Ryan on what most courses get wrong, what gym managers actually hire for, and why this one&apos;s built differently — specifically for career-changers.
+            </p>
+            <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/0rhp9fkBFsU"
+                title="Why PT Launch Lab — from the founders"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full absolute inset-0"
+              />
+            </div>
+          </div>
+        </section>
+
         {/* THIS IS FOR YOU IF */}
-        <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
+        <section className="bg-base py-20 px-6">
           <div className="max-w-4xl mx-auto">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Built for one type of person</p>
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white text-center leading-none tracking-tight mb-10">
-              This is for you <span className="text-gold">if&hairsp;…</span>
+              This is for you <span className="text-gold">if&hellip;</span>
             </h2>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4 max-w-3xl mx-auto">
               {forYouIf.map((line) => (
@@ -196,33 +211,57 @@ export default function CareerChangeToPersonalTrainerPage() {
               ))}
             </ul>
             <p className="text-soft/75 text-center text-base mt-10 max-w-2xl mx-auto">
-              If you ticked four or more — you're not browsing. You're stuck. The rest of this page is the route out.
+              If you ticked four or more — you&apos;re not browsing. You&apos;re stuck. The rest of this page is the route out.
             </p>
           </div>
         </section>
 
-        {/* EMPATHY — burnout language */}
-        <section className="bg-base py-20 md:py-24 px-6">
+        {/* EMPATHY */}
+        <section className="bg-surface py-20 md:py-24 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-4">You already know</p>
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-8">
-              You're good at working hard.
+              You&apos;re good at working hard.
               <br />
-              <span className="text-gold">You're working hard for something you no longer want.</span>
+              <span className="text-gold">You&apos;re working hard for something you no longer want.</span>
             </h2>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
-              The Sunday-night dread is back. The 6:45 alarm has stopped feeling normal. You're checking your phone in meetings, doing the bare minimum, and wondering when this stopped being your life.
+              The Sunday-night dread is back. The 6:45 alarm has stopped feeling normal. You&apos;re checking your phone in meetings, doing the bare minimum, and wondering when this stopped being your life.
             </p>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
-              And every time it gets bad you do the same thing — you go to the gym. That hour at lunchtime, the early session before work, the late evening when the office finally goes quiet. <span className="text-white font-semibold">Fitness has been the one thing that's never let you down.</span>
+              And every time it gets bad you do the same thing — you go to the gym. That hour at lunchtime, the early session before work, the late evening when the office finally goes quiet. <span className="text-white font-semibold">Fitness has been the one thing that&apos;s never let you down.</span>
             </p>
             <p className="text-soft/85 text-lg leading-relaxed">
-              You're not going to wake up next year and find that the desk has gotten better. The question stops being "should I change careers" and starts being "what does a realistic exit actually look like."
+              You&apos;re not going to wake up next year and find that the desk has gotten better. The question stops being &ldquo;should I change careers&rdquo; and starts being &ldquo;what does a realistic exit actually look like.&rdquo;
             </p>
           </div>
         </section>
 
-        {/* REMOVE RISK — designed around real life */}
+        {/* FOUNDERS STRIP */}
+        <section className="bg-base py-16 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Run by gym owners</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-10">
+              We&apos;ve hired the PT
+              <br />
+              <span className="text-gold">you&apos;re about to become.</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {founders.map((f) => (
+                <div key={f.name} className="bg-card border border-white/[0.06] rounded-2xl p-6 text-center hover:border-gold/30 transition-all">
+                  <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-gold/50 mb-4">
+                    <Image src={f.src} alt={f.name} fill className="object-cover object-top" sizes="96px" />
+                  </div>
+                  <p className="text-white font-bold text-lg">{f.name}</p>
+                  <p className="text-gold text-xs font-bold tracking-widest uppercase mt-1 mb-4">{f.role}</p>
+                  <p className="text-soft/80 text-sm italic leading-relaxed">&ldquo;{f.quote}&rdquo;</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* DESIGNED AROUND REAL LIFE */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-4xl mx-auto">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Designed around real life</p>
@@ -232,7 +271,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">No financial freefall.</span>
             </h2>
             <p className="text-soft/80 text-lg text-center max-w-2xl mx-auto mb-12">
-              Every single piece of this course is built to be done on top of a full-time job — including the way it's priced.
+              Every single piece of this course is built to be done on top of a full-time job — including the way it&apos;s priced.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
@@ -251,8 +290,45 @@ export default function CareerChangeToPersonalTrainerPage() {
           </div>
         </section>
 
-        {/* FUTURE IDENTITY — 18 months from now */}
-        <section className="bg-base py-24 md:py-28 px-6 relative overflow-hidden">
+        {/* COMPARISON TABLE */}
+        <section className="bg-base py-20 px-6">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">The honest comparison</p>
+            <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              Most PT courses
+              <br />
+              <span className="text-gold">aren&apos;t built for working adults.</span>
+            </h2>
+            <p className="text-soft/75 text-center text-base mb-12 max-w-2xl mx-auto">
+              They&apos;re built for 18-year-old college kids in classrooms. You need something different.
+            </p>
+            <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
+              <div className="grid grid-cols-2 bg-card">
+                <div className="px-5 sm:px-6 py-4 border-r border-white/[0.06]">
+                  <p className="text-soft/60 text-[11px] font-bold uppercase tracking-widest">Most PT Courses</p>
+                </div>
+                <div className="px-5 sm:px-6 py-4 bg-gold/[0.05]">
+                  <p className="text-gold text-[11px] font-bold uppercase tracking-widest">PT Launch Lab</p>
+                </div>
+              </div>
+              {comparisonRows.map((row, i) => (
+                <div key={i} className={`grid grid-cols-2 border-t border-white/[0.06] ${i % 2 === 0 ? "bg-surface" : "bg-base"}`}>
+                  <div className="px-5 sm:px-6 py-4 border-r border-white/[0.06] flex items-start gap-3">
+                    <span className="text-red-400/80 shrink-0 mt-0.5 font-bold">✕</span>
+                    <p className="text-soft/65 text-sm leading-relaxed">{row.other}</p>
+                  </div>
+                  <div className="px-5 sm:px-6 py-4 flex items-start gap-3 bg-gold/[0.02]">
+                    <span className="text-gold shrink-0 mt-0.5 font-bold">✓</span>
+                    <p className="text-white text-sm leading-relaxed font-medium">{row.us}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FUTURE IDENTITY */}
+        <section className="bg-surface py-24 md:py-28 px-6 border-y border-white/[0.05] relative overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="w-[800px] h-[500px] rounded-full bg-gold/[0.05] blur-3xl" />
           </div>
@@ -261,7 +337,7 @@ export default function CareerChangeToPersonalTrainerPage() {
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-10">
               The Tuesday morning
               <br />
-              <span className="text-gold">that doesn't feel like a chore.</span>
+              <span className="text-gold">that doesn&apos;t feel like a chore.</span>
             </h2>
             <ul className="space-y-5 text-lg text-soft/90">
               {[
@@ -278,14 +354,11 @@ export default function CareerChangeToPersonalTrainerPage() {
                 </li>
               ))}
             </ul>
-            <p className="text-soft/80 text-base leading-relaxed mt-10">
-              This is the realistic outcome for a career-changer who actually uses the Mentorship Hub after qualifying. Not the fantasy. Not the six-figure-online-coach grift. The believable version.
-            </p>
           </div>
         </section>
 
-        {/* OBJECTION HANDLING */}
-        <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
+        {/* OBJECTIONS */}
+        <section className="bg-base py-20 px-6">
           <div className="max-w-4xl mx-auto">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">The four things actually stopping you</p>
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white text-center leading-none tracking-tight mb-12">
@@ -308,7 +381,7 @@ export default function CareerChangeToPersonalTrainerPage() {
         </section>
 
         {/* HOW IT WORKS */}
-        <section className="bg-base py-20 px-6">
+        <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-6xl mx-auto">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Your transition plan</p>
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white text-center leading-none tracking-tight mb-6">
@@ -317,21 +390,31 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">No gamble. No cliff edge.</span>
             </h2>
             <p className="text-soft/75 text-center text-lg mb-14 max-w-2xl mx-auto">
-              The whole pathway, in plain English. Most career-changers finish in 8–16 weeks while still earning full-time, then transition employed-first before going solo.
+              Most career-changers finish in 8–16 weeks while still earning full-time, then transition employed-first before going solo.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {steps.map((step, i) => (
-                <div
-                  key={step.n}
-                  className={`rounded-2xl p-6 border transition-all hover:-translate-y-0.5 ${
-                    i === 5 ? "bg-card border-gold/40 shadow-xl shadow-gold/10" : "bg-card border-white/[0.06]"
-                  }`}
-                >
+                <div key={step.n} className={`rounded-2xl p-6 border transition-all hover:-translate-y-0.5 ${i === 5 ? "bg-card border-gold/40 shadow-xl shadow-gold/10" : "bg-card border-white/[0.06]"}`}>
                   <p className={`text-xs font-bold tracking-widest uppercase mb-2 ${i === 5 ? "text-gold" : "text-blue"}`}>
                     Step {String(step.n).padStart(2, "0")}
                   </p>
                   <h3 className="text-white font-bold text-lg mb-2">{step.title}</h3>
                   <p className="text-soft/70 text-sm leading-relaxed">{step.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* LEARNER PHOTO STRIP */}
+        <section className="bg-base py-14 overflow-hidden">
+          <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-8">Real career-changers · Real PT careers</p>
+          <div className="overflow-hidden">
+            <div className="flex gap-3 md:gap-4 animate-scroll-x w-max px-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n, i) => (
+                <div key={i} className="relative shrink-0 w-36 h-52 sm:w-44 sm:h-60 md:w-56 md:h-72 rounded-2xl overflow-hidden border border-white/[0.06] shadow-xl">
+                  <Image src={`/learner-${n}.png`} alt="PT Launch Lab learner" fill className="object-cover object-center" sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 224px" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-base/70 to-transparent" />
                 </div>
               ))}
             </div>
@@ -348,12 +431,9 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">across your exit.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm-introduction gym interviews. Most career-changers use the deposit plan so payments roughly match one PT session per week post-qualification.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm gym intros. Most career-changers use the deposit plan so payments roughly match one PT session per week post-qualification.
             </p>
             <FunnelPricingBlock variant="dark" />
-            <div className="mt-8 text-center">
-              <ProspectusButton />
-            </div>
           </div>
         </section>
 
@@ -372,10 +452,7 @@ export default function CareerChangeToPersonalTrainerPage() {
             </h2>
             <div className="space-y-3">
               {faqs.map((faq) => (
-                <details
-                  key={faq.q}
-                  className="group bg-card border border-white/[0.06] rounded-xl overflow-hidden open:border-gold/30 transition-colors"
-                >
+                <details key={faq.q} className="group bg-card border border-white/[0.06] rounded-xl overflow-hidden open:border-gold/30 transition-colors">
                   <summary className="cursor-pointer list-none px-6 py-5 flex items-center justify-between gap-4 hover:bg-surface/40 transition-colors">
                     <span className="text-white font-semibold text-[15px] pr-4">{faq.q}</span>
                     <span className="text-gold text-xl font-bold shrink-0 transition-transform duration-300 group-open:rotate-90">›</span>
@@ -389,38 +466,64 @@ export default function CareerChangeToPersonalTrainerPage() {
           </div>
         </section>
 
-        {/* FINAL CTA */}
-        <section className="bg-gradient-to-br from-base via-surface to-base py-24 px-6 text-center relative overflow-hidden">
+        {/* TWO-OPTION CLOSE */}
+        <section className="bg-surface py-24 px-6 border-t border-white/[0.05] relative overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[700px] h-[420px] rounded-full bg-gold/[0.07] blur-3xl" />
+            <div className="w-[700px] h-[400px] rounded-full bg-gold/[0.05] blur-3xl" />
           </div>
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-5">Your move</p>
-            <h2 className="font-display font-extrabold text-5xl md:text-7xl text-white leading-none tracking-tight mb-6">
-              The desk isn't getting better.
+          <div className="relative max-w-5xl mx-auto">
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Ready to make a move?</p>
+            <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white text-center leading-none tracking-tight mb-4">
+              Two routes out.
               <br />
-              <span className="text-gold">The exit can start tonight.</span>
+              <span className="text-gold">Both believable.</span>
             </h2>
-            <p className="text-soft/80 text-lg mb-10 max-w-xl mx-auto">
-              Book 15 minutes with the team. We'll map your transition based on your actual job, salary, and time — and we'll tell you straight if it isn't a fit. No script, no hard sell.
+            <p className="text-soft/75 text-center text-lg mb-14 max-w-xl mx-auto">
+              Pick the one that matches where you actually are. We&apos;ll handle the rest.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-              <Link
-                href="/book-call"
-                data-cta="final-primary"
-                className="px-10 py-4 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/30"
-              >
-                Book Your Free Career Call →
-              </Link>
-              <Link
-                href="/enrol"
-                data-cta="final-secondary"
-                className="px-10 py-4 rounded-full border-2 border-white/40 text-white font-semibold hover:bg-white/10 transition-all"
-              >
-                I'm In — Enrol Today
-              </Link>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-card border-2 border-gold/70 rounded-2xl p-8 flex flex-col shadow-xl shadow-gold/10">
+                <div className="mb-4">
+                  <span className="bg-gold text-deep text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Most popular</span>
+                </div>
+                <h3 className="text-white text-2xl font-bold mb-3">I&apos;ve decided. Let&apos;s start.</h3>
+                <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
+                  Enrol today and start studying tonight. Your tutor is introduced within 24 hours — payment plans designed to never sit on top of your salary.
+                </p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {["Immediate Google Classroom access", "Tutor introduced within 24 hours", "Pay £599 + 5 × £200 monthly", "Cancel within 7 days, no questions"].map((line) => (
+                    <li key={line} className="flex items-center gap-3 text-sm">
+                      <span className="text-gold font-bold">✓</span>
+                      <span className="text-white">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/enrol" data-cta="close-enrol" className="block w-full text-center py-4 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/30">
+                  Enrol Now →
+                </Link>
+              </div>
+              <div className="bg-card border-2 border-white/15 rounded-2xl p-8 flex flex-col">
+                <div className="mb-4">
+                  <span className="bg-blue text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">No hard sell</span>
+                </div>
+                <h3 className="text-white text-2xl font-bold mb-3">I want to talk it through first.</h3>
+                <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
+                  Book 15 minutes with the team. We&apos;ll map your transition based on your salary, time, and timeline — and tell you straight if it isn&apos;t a fit.
+                </p>
+                <ul className="space-y-3 mb-8 flex-1">
+                  {["15 minutes, completely free", "Honest pathway plan", "No script, no hard sell", "We'll tell you if it's not right for you"].map((line) => (
+                    <li key={line} className="flex items-center gap-3 text-sm">
+                      <span className="text-blue font-bold">✓</span>
+                      <span className="text-white">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/book-call" data-cta="close-bookcall" className="block w-full text-center py-4 rounded-full border-2 border-gold text-gold font-bold hover:bg-gold hover:text-deep transition-all">
+                  Book a Free Career Call →
+                </Link>
+              </div>
             </div>
-            <p className="text-soft/50 text-xs">No commitment · Tutor introduced within 24 hours · Cancel anytime in your first 7 days</p>
+            <p className="text-soft/50 text-xs text-center mt-8">No commitment · Tutor introduced within 24 hours · Cancel anytime in your first 7 days</p>
           </div>
         </section>
 
