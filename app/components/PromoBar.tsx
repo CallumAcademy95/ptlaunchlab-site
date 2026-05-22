@@ -56,24 +56,25 @@ export default function PromoBar() {
   const secondsRemaining = Math.max(0, Math.floor((status.expiresAt - now) / 1000));
   if (secondsRemaining <= 0) return null;
 
+  // Rendered INLINE (not fixed) so it never overlaps the fixed Nav. Sits at
+  // the very top of the page, scrolls away on first scroll. Urgency is
+  // re-asserted in the FunnelPricingBlock countdown deeper in the page —
+  // visitors see the same timer at the pricing decision moment.
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] bg-gold text-deep shadow-lg shadow-gold/20">
-      <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-[11px] font-bold tracking-widest uppercase shrink-0 hidden sm:inline">
-            £200 off your course · expires in
+    <div className="bg-gold text-deep shadow-lg shadow-gold/20">
+      <div className="max-w-7xl mx-auto px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase shrink-0">
+            £200 off · expires in
           </span>
-          <span className="text-[11px] font-bold tracking-widest uppercase shrink-0 sm:hidden">
-            £200 off ·
-          </span>
-          <span className="font-display font-extrabold text-lg sm:text-xl tabular-nums">
+          <span className="font-display font-extrabold text-base sm:text-xl tabular-nums">
             {formatCountdown(secondsRemaining)}
           </span>
         </div>
         <Link
           href="/book-call"
           data-cta="promo-bar"
-          className="shrink-0 px-4 py-1.5 rounded-full bg-deep text-gold text-xs font-bold hover:brightness-110 transition-all"
+          className="shrink-0 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-deep text-gold text-[11px] sm:text-xs font-bold hover:brightness-110 transition-all"
         >
           Book Your Call →
         </Link>

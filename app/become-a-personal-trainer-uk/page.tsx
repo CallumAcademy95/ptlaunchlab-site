@@ -60,7 +60,7 @@ const objections = [
 ];
 
 const steps = [
-  { n: 1, title: "Enrol — your tutor lands within 24 hours", body: "Immediate Google Classroom access. No cohort start dates. Your tutor is a real person, not a help desk — most learners are messaging them by day two." },
+  { n: 1, title: "Enrol — your tutor lands within 24 hours", body: "Immediate access to the Merve app. No cohort start dates. Your tutor is a real person, not a help desk — most learners are messaging them by day two." },
   { n: 2, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite for Level 3 — already included in your fee, not sold separately." },
   { n: 3, title: "Move into Level 3 — Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals — film yourself coaching real movements at any gym, tutor reviews the footage." },
   { n: 4, title: "Qualify — NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
@@ -82,8 +82,8 @@ const faqs = [
   { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes — Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
   { q: "Will gyms actually hire me with this qualification?", a: "Yes. NCFE is the awarding body UK gym managers ask for by default on job postings — PureGym, JD Gyms, Nuffield Health, David Lloyd, and every major independent operator. Our team has personally hired 500+ PTs across our partner gym network, so we know exactly what the hiring managers look for. We make warm introductions when you qualify." },
   { q: "Can I afford it?", a: "Most learners use a payment plan. £599 deposit then 5 × £200 monthly is the most popular. Payl8er finance over 3–18 months and Stripe 0% over 12 months are also available. Once qualified, a single PT session at £30 covers a month's payment." },
-  { q: "Can I really do this online from home?", a: "Yes — 100% online. Theory via Google Classroom, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs get hired at every major UK gym every week — what matters is the certificate, not the room you got it in." },
-  { q: "When can I start?", a: "Immediately. Full Google Classroom access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date — many learners are halfway through their first unit by the end of day one." },
+  { q: "Can I really do this online from home?", a: "Yes — 100% online. Theory via the Merve app, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs get hired at every major UK gym every week — what matters is the certificate, not the room you got it in." },
+  { q: "When can I start?", a: "Immediately. Full access to the Merve app opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date — many learners are halfway through their first unit by the end of day one." },
 ];
 
 const founders = [
@@ -529,7 +529,7 @@ export default function BecomeAPersonalTrainerUkPage() {
                 </div>
                 <h3 className="text-white text-2xl font-bold mb-3">I&apos;m in. Let&apos;s go.</h3>
                 <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
-                  Enrol today and get immediate Google Classroom access. Your tutor is introduced within 24 hours and you can start your first module tonight.
+                  Enrol today and get immediate the Merve app access. Your tutor is introduced within 24 hours and you can start your first module tonight.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Immediate access on enrolment", "Tutor introduced within 24 hours", "Start module 1 today", "Multiple payment plans available"].map((line) => (

@@ -78,12 +78,12 @@ const comparisonRows = [
 ];
 
 const faqs = [
-  { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online via Google Classroom, fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym — you film yourself coaching real movements, your tutor reviews. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
+  { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online via the Merve app, fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym — you film yourself coaching real movements, your tutor reviews. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
   { q: "Is it too late to change careers in my 30s or 40s?", a: "No — and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
   { q: "How much can I realistically earn as a PT in year one?", a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one." },
   { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We make warm introductions into our partner gym network — PureGym, JD Gyms, The Gym Group, Nuffield Health, plus independents. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
   { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course — most UK academies charge £500–£3,000 for this layer or skip it entirely." },
-  { q: "When can I start?", a: "Immediately. The moment you enrol, Google Classroom access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
+  { q: "When can I start?", a: "Immediately. The moment you enrol, your Merve app access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
 ];
 
 const founders = [
@@ -307,7 +307,7 @@ export default function CareerChangeToPersonalTrainerPage() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
-                { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online via Google Classroom. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
+                { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online via the Merve app. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
                 { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly is the most popular plan. Roughly matches a single PT session per week once you qualify. Payl8er 3–18 months and Stripe 0% over 12 also available." },
                 { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews your work before submission so the assessments stop being scary." },
                 { tag: "Exit", title: "Employed-first, then self-employed", body: "Warm-introduction interviews into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
@@ -523,7 +523,7 @@ export default function CareerChangeToPersonalTrainerPage() {
                   Enrol today and start studying tonight. Your tutor is introduced within 24 hours — payment plans designed to never sit on top of your salary.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {["Immediate Google Classroom access", "Tutor introduced within 24 hours", "Pay £599 + 5 × £200 monthly", "Cancel within 7 days, no questions"].map((line) => (
+                  {["Immediate access to the Merve app", "Tutor introduced within 24 hours", "Pay £599 + 5 × £200 monthly", "Cancel within 7 days, no questions"].map((line) => (
                     <li key={line} className="flex items-center gap-3 text-sm">
                       <span className="text-gold font-bold">✓</span>
                       <span className="text-white">{line}</span>
