@@ -37,11 +37,24 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([OPENER]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  // Mirror StickyMobileCTA's visibility trigger (scrollY > 400). When the
+  // bottom CTA bar is showing, push the chatbot button up so its 56px circle
+  // doesn't overlap the bar's right edge / clip the "Start Today" button.
+  // Only applies under lg (where StickyMobileCTA is visible) — desktop is
+  // unaffected.
+  const [stickyCtaVisible, setStickyCtaVisible] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  useEffect(() => {
+    const onScroll = () => setStickyCtaVisible(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   async function send() {
     const text = input.trim();
@@ -94,11 +107,15 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Toggle button */}
+      {/* Toggle button — lifts above the StickyMobileCTA (~64px tall) on
+          mobile when the sticky CTA is visible. Desktop (lg+) is unaffected
+          because StickyMobileCTA is hidden via lg:hidden. */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Open chat"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#F5C518] text-[#072B4A] flex items-center justify-center shadow-lg hover:brightness-110 transition-all"
+        className={`fixed right-6 z-50 w-14 h-14 rounded-full bg-[#F5C518] text-[#072B4A] flex items-center justify-center shadow-lg hover:brightness-110 transition-all duration-200 ${
+          stickyCtaVisible ? "bottom-24 lg:bottom-6" : "bottom-6"
+        }`}
         style={{ boxShadow: "0 4px 24px rgba(245,197,24,0.4)" }}
       >
         {open ? (
@@ -113,10 +130,12 @@ export default function Chatbot() {
         )}
       </button>
 
-      {/* Chat window */}
+      {/* Chat window — also lifts on mobile when the sticky CTA is showing */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] flex flex-col rounded-2xl overflow-hidden shadow-2xl"
+          className={`fixed right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] flex flex-col rounded-2xl overflow-hidden shadow-2xl ${
+            stickyCtaVisible ? "bottom-[10.5rem] lg:bottom-24" : "bottom-24"
+          }`}
           style={{ height: "480px", background: "#072B4A", border: "1px solid rgba(59,130,246,0.25)" }}
         >
           {/* Header */}
