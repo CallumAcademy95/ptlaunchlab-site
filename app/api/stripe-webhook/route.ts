@@ -228,6 +228,53 @@ async function sendToMetaCapi(session: StripeSession) {
   });
 }
 
+// Live gym-partner sales tracker — POSTs one row of sale data to a Make.com
+// webhook URL, which appends a row to the Google Sheet tracker.
+//
+// Required env var:
+//   GYM_TRACKER_WEBHOOK_URL  — the Make.com custom-webhook URL
+//
+// Filter: only PTLL course sales (deposit £599 or PIF £1,399 ± promo).
+// USA gym-membership signups go through the same Stripe account but use
+// monthly subscription pricing in a different range, so we cap at £1,500.
+async function sendToGymTracker(session: StripeSession) {
+  const url = process.env.GYM_TRACKER_WEBHOOK_URL;
+  if (!url) return; // not configured — no-op
+
+  const amount = (session.amount_total ?? 0) / 100;
+  const currency = (session.currency ?? "gbp").toUpperCase();
+
+  // Heuristic: PTLL course sales are one-off £599 (deposit) or £1,399 (PIF).
+  // Skip USA-membership monthly subscriptions which land here too.
+  const isPtllCourseSale = amount > 0 && amount <= 1500;
+  if (!isPtllCourseSale) return;
+
+  const email = session.customer_email || session.customer_details?.email || "";
+  const name = session.customer_details?.name || "";
+  const phone = session.customer_details?.phone || "";
+  const gym_referral = session.metadata?.gym_referral ?? "";
+  const promo_code = session.metadata?.promo_code ?? "";
+  const plan_type = amount >= 1300 ? "PIF" : "deposit";
+
+  await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      timestamp: new Date().toISOString(),
+      gym_referral,                  // blank = direct sale
+      promo_code,
+      customer_email: email,
+      customer_name: name,
+      customer_phone: phone,
+      amount_gbp: amount,
+      currency,
+      plan_type,                     // "deposit" | "PIF"
+      stripe_session_id: session.id,
+      stripe_link: `https://dashboard.stripe.com/payments/${session.id}`,
+    }),
+  });
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const payload = await req.text();
@@ -261,6 +308,11 @@ export async function POST(req: NextRequest) {
         await sendToMetaCapi(session);
       } catch (err) {
         console.error("[stripe-webhook] Meta CAPI dispatch failed:", err);
+      }
+      try {
+        await sendToGymTracker(session);
+      } catch (err) {
+        console.error("[stripe-webhook] gym tracker dispatch failed:", err);
       }
     }
   }
