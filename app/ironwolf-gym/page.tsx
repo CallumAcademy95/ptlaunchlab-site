@@ -5,13 +5,12 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 const config: GymConfig = {
   // ── Identity
   gymName: "Iron Wolf Gym",
-  logoUrl: "https://ironwolf-gym.co.uk/wp-content/uploads/2025/06/IWGWhiteHorizontalLogo.png",
+  logoUrl: "/logos/iron-wolf-gym-white.png",
   logoAlt: "Iron Wolf Gym Goole",
 
-  // ── Branding (monochrome — true to Iron Wolf's black/white identity)
-  primaryColor: "#1F2937",
-  darkAccent: "#FFFFFF",
-  sectionBg: "#1F2937",
+  // ── Branding — Iron Wolf brand: Black, White, Vivid Orange #f15927
+  primaryColor: "#f15927",
+  sectionBg: "#0A0A0A",
   heroBg: "#000000",
 
   // ── Hero copy

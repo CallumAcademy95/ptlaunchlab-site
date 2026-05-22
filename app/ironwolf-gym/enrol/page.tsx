@@ -31,7 +31,7 @@ export default function IronWolfEnrolPage() {
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://ironwolf-gym.co.uk/wp-content/uploads/2025/06/IWGWhiteHorizontalLogo.png"
+              src="/logos/iron-wolf-gym-white.png"
               alt="Iron Wolf Gym"
               width={120}
               height={36}
@@ -42,7 +42,7 @@ export default function IronWolfEnrolPage() {
               <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
             </div>
           </div>
-          <div className="bg-[#1F2937] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+          <div className="bg-[#f15927] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
             IWGPTDISCOUNT
           </div>
         </div>
