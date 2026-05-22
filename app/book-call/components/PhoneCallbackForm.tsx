@@ -118,9 +118,32 @@ export default function PhoneCallbackForm() {
           last_touch_source: payload.last_touch_source,
         });
       }
+      // Shared event_id for browser fbq + server CAPI dedup on Meta's side.
+      // Browser fires Schedule + Lead immediately; the server CAPI relay below
+      // sends a matching Schedule event for iOS/Safari/ad-block recovery.
+      const scheduleEventId =
+        window.crypto?.randomUUID?.() ?? `schedule-${Date.now()}-${Math.random().toString(36).slice(2)}`;
       if (typeof window.fbq === "function") {
+        window.fbq(
+          "track",
+          "Schedule",
+          { content_category: "phone_callback" },
+          { eventID: scheduleEventId },
+        );
+        // Keep the legacy Lead event firing too — useful for any audience
+        // still optimised on Lead rather than Schedule.
         window.fbq("track", "Lead", { content_category: "phone_callback" });
       }
+      fetch("/api/capi-schedule", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event_id: scheduleEventId,
+          name,
+          phone: mobile,
+          source: "phone_callback",
+        }),
+      }).catch((err) => console.warn("[book-call] CAPI schedule relay failed:", err));
 
       // Fire and forget — issues the 48h £200 promo cookie so the
       // FunnelPricingBlock below renders the discounted state.

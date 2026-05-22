@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Nav from "../../components/Nav";
 import Footer from "../../components/Footer";
+import PurchasePixel from "./PurchasePixel";
 
 export const metadata: Metadata = {
   title: "Enrolment Confirmed | PT Launch Lab",
@@ -12,6 +14,12 @@ export const metadata: Metadata = {
 export default function EnrolSuccessPage() {
   return (
     <div className="min-h-screen bg-base">
+      {/* Fire browser-side fbq Purchase, dedup with the server CAPI event via
+          the Stripe session_id from the URL. useSearchParams requires a
+          Suspense boundary in App Router. */}
+      <Suspense fallback={null}>
+        <PurchasePixel />
+      </Suspense>
       <Nav />
 
       <section className="pt-[128px] pb-16 md:pb-24 px-6">

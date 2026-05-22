@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { sendCapiEvent } from "@/app/lib/metaCapi";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -186,6 +187,47 @@ async function sendToGa4(session: StripeSession) {
   }
 }
 
+// Meta Conversions API — server-side Purchase. Uses the Stripe session id as
+// the event_id; the browser thank-you page at /enrol/success fires the same
+// event_id so Meta deduplicates. If the browser thank-you tab is closed
+// (ITP / mobile multitasking) we still capture the conversion server-side.
+async function sendToMetaCapi(session: StripeSession) {
+  const attribution = decodeClientRef(session.client_reference_id);
+  const amount = (session.amount_total ?? 0) / 100;
+  const currency = (session.currency ?? "gbp").toUpperCase();
+  const email = session.customer_email || session.customer_details?.email || undefined;
+  const phone = session.customer_details?.phone || undefined;
+  const fullName = session.customer_details?.name || "";
+  const [firstName, ...rest] = fullName.split(/\s+/);
+  const lastName = rest.join(" ");
+
+  await sendCapiEvent({
+    eventName: "Purchase",
+    eventId: session.id,                  // stripe session id is unique + stable
+    eventSourceUrl: `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`,
+    actionSource: "website",
+    userData: {
+      email: email || undefined,
+      phone: phone || undefined,
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+      country: "gb",
+      externalId: session.id,
+      fbp: attribution["fbp"] || undefined,
+      fbc: attribution["fbc"] || undefined,
+    },
+    customData: {
+      currency,
+      value: amount,
+      contentName: amount >= 1300 ? "course_pif" : "course_deposit",
+      contentCategory: attribution["funnel_promo"] || undefined,
+      orderId: session.id,
+      promo_code: session.metadata?.promo_code ?? "",
+      funnel_promo: attribution["funnel_promo"] ?? "",
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const payload = await req.text();
@@ -214,6 +256,11 @@ export async function POST(req: NextRequest) {
         await sendToGa4(session);
       } catch (err) {
         console.error("[stripe-webhook] GA4 dispatch failed:", err);
+      }
+      try {
+        await sendToMetaCapi(session);
+      } catch (err) {
+        console.error("[stripe-webhook] Meta CAPI dispatch failed:", err);
       }
     }
   }

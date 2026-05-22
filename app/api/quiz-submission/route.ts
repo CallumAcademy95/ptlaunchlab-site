@@ -3,6 +3,7 @@ import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateQuiz } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
+import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
@@ -93,6 +94,37 @@ export async function POST(request: NextRequest) {
     }).catch(err => console.error('[warmup-email trigger]', err));
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
+
+    // Meta Conversions API — server-side Lead event paired with the browser
+    // fbq Lead via event_id for dedup. event_id is provided by the client
+    // (QuizApp.tsx) so both sides match; if absent we generate a deterministic
+    // one from email + result for retry/idempotency.
+    const rawEventId = typeof (raw as Record<string, unknown>)?.event_id === 'string'
+      ? ((raw as Record<string, unknown>).event_id as string).slice(0, 64)
+      : null;
+    const eventId = rawEventId || deterministicEventId('quiz_lead', email, quizResult);
+    const [firstName, ...rest] = (name || '').split(/\s+/);
+    const lastName = rest.join(' ');
+    void sendCapiEvent({
+      eventName: 'Lead',
+      eventId,
+      eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/quiz',
+      userData: {
+        email,
+        phone,
+        firstName,
+        lastName,
+        country: 'gb',
+        ...extractRequestUserData(request),
+      },
+      customData: {
+        currency: 'GBP',
+        value: 0,                // lead value — not the course price, just a Lead signal
+        contentName: quizResult, // result key (onFloor / online / hybrid / alreadyQualified)
+        contentCategory: avatar ?? undefined,
+      },
+    });
+
     const response = NextResponse.json({ success: true });
     try {
       attachPromoCookie(response, 'quiz');

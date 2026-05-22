@@ -131,6 +131,14 @@ export default function QuizApp() {
     const calcResult = calculateResult(answers);
     setResult(calcResult);
 
+    // Generate a shared event_id so the server-side CAPI Lead event (fired in
+    // /api/quiz-submission) and the browser fbq Lead below dedup on Meta's
+    // side. Meta merges duplicates by event_name + event_id within 7 days.
+    const eventId =
+      typeof window !== 'undefined' && window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `quiz-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
     try {
       await fetch('/api/quiz-submission', {
         method: 'POST',
@@ -140,6 +148,7 @@ export default function QuizApp() {
           phone:   phone.trim(),
           email:   email.trim().toLowerCase(),
           result:  calcResult,
+          event_id: eventId,
           ...(avatar ? { avatar } : {}),
           answers: answers.map((a) => ({ label: a.label })),
           [sec.SEC_KEY]: sec.payload(),
@@ -147,7 +156,13 @@ export default function QuizApp() {
       });
       trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
       if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Lead', { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) });
+        // 4th argument carries the eventID for dedup with the server CAPI event
+        (window as any).fbq(
+          'track',
+          'Lead',
+          { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) },
+          { eventID: eventId },
+        );
       }
     } catch {
       // Non-blocking — user still gets their result if the save fails

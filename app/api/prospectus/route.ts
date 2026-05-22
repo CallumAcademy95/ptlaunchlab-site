@@ -3,6 +3,7 @@ import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateProspectus } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
+import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/prospectus
@@ -69,6 +70,35 @@ export async function POST(request: NextRequest) {
     }
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
+
+    // Meta CAPI — server-side Lead. Dedups with the browser fbq Lead via the
+    // client-provided event_id (or a deterministic fallback).
+    const rawObj = raw as Record<string, unknown> | null;
+    const rawEventId = typeof rawObj?.event_id === 'string' ? (rawObj.event_id as string).slice(0, 64) : null;
+    const rawAvatar = typeof rawObj?.avatar === 'string' ? (rawObj.avatar as string).slice(0, 24) : undefined;
+    const eventId = rawEventId || deterministicEventId('prospectus_lead', email);
+    const [firstName, ...rest] = (name || '').split(/\s+/);
+    const lastName = rest.join(' ');
+    void sendCapiEvent({
+      eventName: 'Lead',
+      eventId,
+      eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/',
+      userData: {
+        email,
+        phone,
+        firstName,
+        lastName,
+        country: 'gb',
+        ...extractRequestUserData(request),
+      },
+      customData: {
+        currency: 'GBP',
+        value: 0,
+        contentName: 'prospectus_download',
+        contentCategory: rawAvatar,
+      },
+    });
+
     const response = NextResponse.json({ success: true });
     try {
       attachPromoCookie(response, 'prospectus');

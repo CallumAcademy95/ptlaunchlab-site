@@ -74,15 +74,28 @@ export default function HeroLeadForm({ avatar }: { avatar: Avatar }) {
     e.preventDefault();
     setError("");
     setBusy(true);
+    // Shared event_id so server CAPI Lead and browser fbq Lead dedup on Meta
+    const eventId =
+      typeof window !== "undefined" && window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `hero-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     try {
       const res = await fetch("/api/prospectus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
+        body: JSON.stringify({ ...form, event_id: eventId, avatar, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Something went wrong.");
       trackEvent("lead_capture_submitted", { avatar, source: "hero-form" });
+      if (typeof window !== "undefined" && (window as { fbq?: (...args: unknown[]) => void }).fbq) {
+        (window as { fbq: (...args: unknown[]) => void }).fbq(
+          "track",
+          "Lead",
+          { content_name: "prospectus_download", content_category: avatar },
+          { eventID: eventId },
+        );
+      }
       // Poll status to get authoritative expiresAt
       try {
         const s = await fetch("/api/funnel-promo/status", { cache: "no-store" }).then((r) => r.json());

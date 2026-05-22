@@ -14,11 +14,17 @@ export default function ProspectusButton() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    // Shared event_id so server CAPI Lead (in /api/prospectus) and the
+    // browser fbq Lead below dedup on Meta's side.
+    const eventId =
+      typeof window !== "undefined" && window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `prospectus-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     try {
       const res = await fetch("/api/prospectus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
+        body: JSON.stringify({ ...form, event_id: eventId, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -29,6 +35,14 @@ export default function ProspectusButton() {
       setOpen(false);
       setForm({ name: "", phone: "", email: "" });
       trackEvent('prospectus_download');
+      if (typeof window !== "undefined" && (window as { fbq?: (...args: unknown[]) => void }).fbq) {
+        (window as { fbq: (...args: unknown[]) => void }).fbq(
+          "track",
+          "Lead",
+          { content_name: "prospectus_download" },
+          { eventID: eventId },
+        );
+      }
       // Clear the once-flag so the thank-you page will open the PDF
       try { sessionStorage.removeItem('ptll_prospectus_opened'); } catch {}
       window.location.href = "/prospectus/thank-you";
