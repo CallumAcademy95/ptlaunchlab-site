@@ -36,12 +36,13 @@ function urlSafeBase64(input: string): string {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
-function appendStripeAttribution(url: string, email: string): string {
+function appendStripeAttribution(url: string, email: string, gym?: string): string {
   try {
     const first = readTouch("ptll_first_touch");
     const last = readTouch("ptll_last_touch");
     // Short keys keep the payload under Stripe's 200-char client_reference_id limit
     const payload: Record<string, string> = {};
+    if (gym) payload.gym = gym;
     if (first.utm_source) payload.fts = first.utm_source;
     if (first.utm_medium) payload.ftm = first.utm_medium;
     if (first.utm_campaign) payload.ftc = first.utm_campaign;
@@ -456,6 +457,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     const stripeUrl = appendStripeAttribution(
       type === "full" ? fullLink : depositLink,
       learner.email,
+      partner?.gymReferral,
     );
     window.location.href = stripeUrl;
   }

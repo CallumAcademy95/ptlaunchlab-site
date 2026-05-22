@@ -252,7 +252,10 @@ async function sendToGymTracker(session: StripeSession) {
   const email = session.customer_email || session.customer_details?.email || "";
   const name = session.customer_details?.name || "";
   const phone = session.customer_details?.phone || "";
-  const gym_referral = session.metadata?.gym_referral ?? "";
+  // Gym attribution falls back to the client_reference_id payload because all
+  // gym Payment Links share the same Stripe URL — metadata isn't per-gym.
+  const attribution = decodeClientRef(session.client_reference_id);
+  const gym_referral = session.metadata?.gym_referral || attribution.gym || "";
   const promo_code = session.metadata?.promo_code ?? "";
   const plan_type = amount >= 1300 ? "PIF" : "deposit";
 
