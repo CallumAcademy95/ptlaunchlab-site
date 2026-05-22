@@ -44,6 +44,7 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/muscle-bound-academy`,                priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/ebor-fitness`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/mof-gym`,                             priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
+  { url: `${BASE}/ironwolf-gym`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
