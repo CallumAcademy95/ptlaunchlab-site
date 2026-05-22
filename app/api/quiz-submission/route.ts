@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
+import { validateQuiz } from '@/app/lib/security/validate';
+import { logSec } from '@/app/lib/security/log';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
@@ -8,6 +10,7 @@ import { attachPromoCookie } from '@/app/lib/funnelPromo';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const rateLimiter = createRateLimiter(5, 60_000); // 5 submissions per minute per IP
+const ENDPOINT = '/api/quiz-submission';
 
 const resultLabels: Record<string, string> = {
   onFloor:          'On-Floor PT Path',
@@ -17,21 +20,31 @@ const resultLabels: Record<string, string> = {
 };
 
 export async function POST(request: NextRequest) {
-  if (!rateLimiter(getIP(request))) {
+  const ip = getIP(request);
+  if (!rateLimiter(ip)) {
+    logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-silent', signals: ['rate-limit'], ip });
     return NextResponse.json({ success: false, error: 'Too many requests.' }, { status: 429 });
   }
 
+  let raw: unknown;
   try {
-    const body = await request.json();
-    const { name, phone, email, result, answers } = body;
+    raw = await request.json();
+  } catch {
+    return NextResponse.json({ success: false, error: 'Invalid request.' }, { status: 400 });
+  }
 
-    if (!name || !phone || !email || !result) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields.' },
-        { status: 400 }
-      );
+  const result = validateQuiz(raw);
+  if (!result.ok) {
+    if (result.silent) {
+      logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-silent', signals: result.signals, ip, ua: request.headers.get('user-agent') });
+      return NextResponse.json({ success: true });
     }
+    logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-user', signals: result.signals, ip });
+    return NextResponse.json({ success: false, error: result.error }, { status: result.status });
+  }
 
+  try {
+    const { name, phone, email, result: quizResult, answers } = result.data;
     const webhookUrl = process.env.QUIZ_ZAPIER_WEBHOOK_URL;
 
     if (webhookUrl) {
@@ -39,8 +52,8 @@ export async function POST(request: NextRequest) {
         name,
         email,
         phone,
-        quiz_result:  resultLabels[result] ?? result,
-        answers:      Array.isArray(answers) ? answers.map((a: { label: string }) => a.label).join(' | ') : '',
+        quiz_result:  resultLabels[quizResult] ?? quizResult,
+        answers:      Array.isArray(answers) ? answers.map((a) => a.label).join(' | ') : '',
         source:       'quiz-funnel',
         submitted_at: new Date().toISOString(),
       };
@@ -60,7 +73,7 @@ export async function POST(request: NextRequest) {
       fetch(`${emailServerUrl}/leads/new`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, source: 'quiz', quizResult: resultLabels[result] ?? result }),
+        body: JSON.stringify({ name, email, phone, source: 'quiz', quizResult: resultLabels[quizResult] ?? quizResult }),
       }).catch(err => console.error('[quiz] email server error:', err));
     }
 
@@ -72,11 +85,12 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         name,
         email,
-        result,
-        answers: Array.isArray(answers) ? answers.map((a: { label: string }) => a.label) : [],
+        result: quizResult,
+        answers: Array.isArray(answers) ? answers.map((a) => a.label) : [],
       }),
     }).catch(err => console.error('[warmup-email trigger]', err));
 
+    logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
     const response = NextResponse.json({ success: true });
     try {
       attachPromoCookie(response, 'quiz');

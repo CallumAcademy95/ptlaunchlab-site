@@ -4,6 +4,7 @@ import { trackEvent } from "@/app/lib/gtag";
 import { generateEnrolmentPDFBase64 } from "../lib/generateEnrolmentPDF";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 // ─── Stripe attribution helpers ──────────────────────────────────────────
 // Encodes first/last touch UTMs + GA client_id into Stripe's
@@ -235,6 +236,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   const isDrawing               = useRef(false);
   const lastPos                 = useRef<{ x: number; y: number } | null>(null);
   const startedRef              = useRef(false);
+  const sec                     = useFormSecurity();
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -436,7 +438,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       await fetch("/api/enrolments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(record),
+        body: JSON.stringify({ ...record, [sec.SEC_KEY]: sec.payload() }),
       });
     } catch (_) {
       console.warn("Enrolment API call failed — continuing to payment.");
@@ -466,6 +468,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       {!standalone && <Nav />}
       <main className={`${standalone ? "" : "pt-[72px]"} min-h-screen bg-deep`}>
         <div className="max-w-2xl mx-auto px-5 py-16">
+          <sec.Honeypot />
 
           {/* Page header */}
           <div className="text-center mb-10">

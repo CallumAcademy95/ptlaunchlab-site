@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config';
 import ResultScreen from './ResultScreen';
 import { trackEvent } from '@/app/lib/gtag';
+import { useFormSecurity } from '@/app/lib/security/client';
 
 // Capture split into two single-field screens to reduce friction:
 // - 'mobile' : mobile only (highest-value field, peak sunk-cost moment)
@@ -25,6 +26,7 @@ export default function QuizApp() {
   const [formError, setFormError]         = useState('');
   const [result, setResult]               = useState<ResultKey | null>(null);
   const [animKey, setAnimKey]             = useState(0);
+  const sec = useFormSecurity();
 
   const bump = () => setAnimKey((k) => k + 1);
 
@@ -125,6 +127,7 @@ export default function QuizApp() {
           email:   email.trim().toLowerCase(),
           result:  calcResult,
           answers: answers.map((a) => ({ label: a.label })),
+          [sec.SEC_KEY]: sec.payload(),
         }),
       });
       trackEvent('quiz_complete', { quiz_result: calcResult });
@@ -402,6 +405,7 @@ export default function QuizApp() {
               </div>
 
               <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <sec.Honeypot />
                 <div>
                   <label className="block text-sm font-medium text-soft/60 mb-2">
                     Full name

@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import HeroSlideshow from "../components/HeroSlideshow";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -89,6 +90,7 @@ export default function FunnelPage() {
   const [prospectusForm, setProspectusForm] = useState({ name: "", phone: "", email: "" });
   const [prospectusSubmitting, setProspectusSubmitting] = useState(false);
   const [prospectusError, setProspectusError] = useState("");
+  const sec = useFormSecurity();
 
   useEffect(() => {
     function update() {
@@ -114,7 +116,7 @@ export default function FunnelPage() {
       const res = await fetch("/api/prospectus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(prospectusForm),
+        body: JSON.stringify({ ...prospectusForm, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error || "Something went wrong.");
@@ -149,6 +151,7 @@ export default function FunnelPage() {
               <p className="text-[#8CA3BF] text-sm leading-relaxed">Enter your details and we&apos;ll open the prospectus — full course overview, modules, pricing, and payment options.</p>
             </div>
             <form onSubmit={handleProspectusSubmit} className="space-y-4">
+              <sec.Honeypot />
               <div>
                 <label className="block text-white text-sm font-medium mb-1.5">Full name</label>
                 <input type="text" required placeholder="e.g. Jordan Smith" value={prospectusForm.name} onChange={(e) => setProspectusForm((f) => ({ ...f, name: e.target.value }))} className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors" />

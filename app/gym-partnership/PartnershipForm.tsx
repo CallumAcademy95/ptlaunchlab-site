@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 export default function PartnershipForm() {
   const [form, setForm] = useState({
     gymName: "", name: "", email: "", phone: "", location: "", gymSize: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const sec = useFormSecurity();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -18,7 +20,7 @@ export default function PartnershipForm() {
       const res = await fetch("/api/gym-partnership", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       setStatus(data.success ? "success" : "error");
@@ -45,6 +47,7 @@ export default function PartnershipForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <sec.Honeypot />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[#8CA3BF] text-[11px] font-semibold mb-1.5 uppercase tracking-wider">

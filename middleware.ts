@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { hubSlugs, getHubForLocation } from "./app/lib/ukLocations";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "./app/lib/admin-auth";
+import { isProtectedFormPath, checkFormRequest } from "./app/lib/security/middleware-checks";
 
 // Paths that require a valid admin auth cookie.
 // Webhook is intentionally excluded — Meta hits it without our cookie and
@@ -137,6 +138,14 @@ export async function middleware(request: NextRequest) {
     url.host = "ptlaunchlab.co.uk";
     url.protocol = "https:";
     return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // ─── Form endpoint hardening ─────────────────────────────────────────
+  // Method + content-type + body-size + origin checks BEFORE the route
+  // handler. Keeps the cheap stuff at the edge.
+  if (isProtectedFormPath(pathname)) {
+    const rejection = checkFormRequest(request);
+    if (rejection) return rejection;
   }
 
   // ─── Admin auth gate ─────────────────────────────────────────────────

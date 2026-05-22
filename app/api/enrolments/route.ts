@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generateEnrolmentPDFServer } from "@/app/lib/server/generateEnrolmentPDF.server";
+import { validateEnrolmentSec } from "@/app/lib/security/validate";
+import { logSec } from "@/app/lib/security/log";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -12,11 +14,22 @@ const GA4_API_SECRET = process.env.GA4_API_SECRET;
 const rateLimiter = createRateLimiter(3, 60_000); // 3 submissions per minute per IP
 
 export async function POST(req: NextRequest) {
-  if (!rateLimiter(getIP(req))) {
+  const ip = getIP(req);
+  if (!rateLimiter(ip)) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
   try {
     const body = await req.json();
+
+    // Honeypot-only check for enrolments — we never silent-drop based on
+    // timing because the form is multi-step and a real enrolment is too
+    // valuable to lose to overzealous gating.
+    const secCheck = validateEnrolmentSec(body);
+    if (!secCheck.ok) {
+      logSec({ level: "security", endpoint: "/api/enrolments", outcome: "blocked-silent", signals: [`sec:${secCheck.reason}`], ip, ua: req.headers.get("user-agent") });
+      return NextResponse.json({ ok: true });
+    }
+
     const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, gymReferral, promoCode, discountApplied, amountPaid } = body;
 
     if (!l?.fullName || !l?.email) {

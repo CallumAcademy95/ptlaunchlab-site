@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import { trackEvent } from "@/app/lib/gtag";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 export default function ProspectusButton() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const sec = useFormSecurity();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -16,7 +18,7 @@ export default function ProspectusButton() {
       const res = await fetch("/api/prospectus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -68,6 +70,7 @@ export default function ProspectusButton() {
               <button onClick={() => setOpen(false)} className="text-[#4A6280] hover:text-white transition-colors text-2xl leading-none ml-4">×</button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <sec.Honeypot />
               <input
                 type="text"
                 placeholder="Full name"

@@ -2,10 +2,12 @@
 import { useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const sec = useFormSecurity();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,7 +18,7 @@ export default function ContactPage() {
     await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
     });
     setSubmitted(true);
   }
@@ -98,6 +100,7 @@ export default function ContactPage() {
                 <>
                   <h2 className="text-white font-bold text-2xl mb-6">Send us a message</h2>
                   <form onSubmit={handleSubmit} className="space-y-5">
+                    <sec.Honeypot />
                     <div>
                       <label className="text-[#8CA3BF] text-sm mb-2 block">Name</label>
                       <input
