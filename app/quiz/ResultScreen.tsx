@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { results, ResultKey } from './quiz-config';
 import FunnelPricingBlock from '@/app/components/FunnelPricingBlock';
+import { trackEvent } from '@/app/lib/gtag';
 
 type Avatar = 'starter' | 'switcher' | 'returner';
 
@@ -138,6 +140,33 @@ interface Props {
 }
 
 export default function ResultScreen({ name, resultKey, avatar, onStartOver }: Props) {
+  // Virtual GA4 page view + custom result_screen_viewed event.
+  //
+  // The whole quiz flow (intro -> 5 questions -> mobile capture -> email
+  // capture -> result) lives at one URL: /quiz. So GA4 cannot distinguish
+  // "time on result page" from "time on intro" — they share an engagement
+  // bucket. Firing a virtual page_view for /quiz/result on mount gives the
+  // result page its own row in GA4 reports with its own engagement-time and
+  // bounce metrics. This is the key creative-resonance signal per the Meta
+  // expert review (2026-05-26): if avg engagement time on /quiz/result is
+  // <15s, the result page isn't landing emotionally; if >60s with low CTA
+  // click-through, the offer is the bottleneck not the framing.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const win = window as { gtag?: (...args: unknown[]) => void };
+    if (typeof win.gtag === 'function') {
+      win.gtag('event', 'page_view', {
+        page_location: `${window.location.origin}/quiz/result`,
+        page_title: `Quiz Result — ${resultKey}`,
+        page_path: '/quiz/result',
+      });
+    }
+    trackEvent('result_screen_viewed', {
+      quiz_result: resultKey,
+      ...(avatar ? { avatar } : {}),
+    });
+  }, [resultKey, avatar]);
+
   const r = results[resultKey];
   const preframe = avatar ? AVATAR_PREFRAME[avatar] : null;
   const cta = avatar ? AVATAR_CTA[avatar] : {
