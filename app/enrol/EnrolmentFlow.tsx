@@ -24,6 +24,12 @@ function readGaClientId(): string {
   const match = document.cookie.match(/(?:^|;\s*)_ga=GA\d\.\d\.(\d+\.\d+)/);
   return match?.[1] ?? "";
 }
+function readCookie(name: string): string {
+  if (typeof document === "undefined") return "";
+  const escaped = name.replace(/[.$?*|{}()[\]\\/+^]/g, "\\$&");
+  const match = document.cookie.match(new RegExp("(?:^|;\\s*)" + escaped + "=([^;]+)"));
+  return match ? decodeURIComponent(match[1]) : "";
+}
 function urlSafeBase64(input: string): string {
   if (typeof window === "undefined") return "";
   // btoa needs a binary string — encode the UTF-8 bytes first
@@ -51,6 +57,14 @@ function appendStripeAttribution(url: string, email: string, gym?: string): stri
     if (last.utm_campaign && last.utm_campaign !== first.utm_campaign) payload.ltc = last.utm_campaign;
     if (first.fbclid) payload.fbclid = first.fbclid;
     if (first.gclid) payload.gclid = first.gclid;
+    // _fbp / _fbc are the Meta Pixel cookies. The Stripe webhook decodes
+    // these out of client_reference_id and forwards them on the Purchase
+    // CAPI event for higher EMQ. Read at the latest possible moment so
+    // CookieYes-delayed pixel loads still get captured.
+    const fbp = readCookie("_fbp");
+    if (fbp) payload.fbp = fbp;
+    const fbc = readCookie("_fbc");
+    if (fbc) payload.fbc = fbc;
     const gaId = readGaClientId();
     if (gaId) payload.ga_client_id = gaId;
 
@@ -452,6 +466,44 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       ...(appliedPromo && { promo_code: appliedPromo }),
       ...(partner?.gymReferral && { gym_referral: partner.gymReferral }),
     });
+
+    // Meta InitiateCheckout — fires right before the Stripe redirect so
+    // Meta sees the high-intent moment between Lead and Purchase. Browser
+    // fbq + server CAPI share one eventID for dedup. Both calls are
+    // fire-and-forget so they NEVER delay the Stripe redirect (a 200ms
+    // pause here costs conversions).
+    const planName = type === "full" ? "course_pif" : "course_deposit";
+    const icEventId =
+      (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
+      `ic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    if (typeof window !== "undefined" && typeof window.fbq === "function") {
+      window.fbq(
+        "track",
+        "InitiateCheckout",
+        {
+          currency: "GBP",
+          value: record.amountPaid,
+          content_name: planName,
+          content_category: partner?.gymReferral || (appliedPromo ?? undefined),
+        },
+        { eventID: icEventId },
+      );
+    }
+    fetch("/api/capi-initiate-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_id: icEventId,
+        name: learner.fullName,
+        email: learner.email,
+        phone: learner.mobile,
+        plan: planName,
+        value: record.amountPaid,
+        currency: "GBP",
+        source: partner?.gymReferral || "enrol",
+      }),
+    }).catch(() => { /* fire-and-forget — never block Stripe redirect */ });
+
     const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
     const stripeUrl = appendStripeAttribution(

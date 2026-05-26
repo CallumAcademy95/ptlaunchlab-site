@@ -4,6 +4,7 @@ import {
   STRIPE_LINKS,
   encodeClientRef,
 } from "@/app/lib/funnelPromo";
+import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 
 // GET /api/funnel-promo/checkout?plan=full|deposit
 //
@@ -64,6 +65,35 @@ export async function GET(req: NextRequest) {
   url.searchParams.set("client_reference_id", clientRef);
   const email = utm.get("email");
   if (email) url.searchParams.set("prefilled_email", email);
+
+  // Meta CAPI InitiateCheckout — fires server-side just before the 302 to
+  // Stripe. Browser FunnelPricingBlock.handleCheckout fires the matching
+  // fbq IC with the same event_id (passed here as `ic_eid`), so Meta dedups
+  // the two on event_name + event_id within 7 days. user_data is limited to
+  // fbp/fbc/IP/UA because the promo cookie carries no PII — the browser
+  // pixel's matching cookies (which extractRequestUserData picks up) handle
+  // identity matching.
+  const value = plan === "full" ? (promo ? 1399 : 1599) : 599;
+  const contentName = plan === "full" ? "course_pif" : "course_deposit";
+  const icEventId =
+    (utm.get("ic_eid") ?? "").slice(0, 64) ||
+    deterministicEventId("funnel_promo_ic", promo?.source ?? "anon", plan, String(Date.now()));
+
+  void sendCapiEvent({
+    eventName: "InitiateCheckout",
+    eventId: icEventId,
+    eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk/",
+    userData: {
+      country: "gb",
+      ...extractRequestUserData(req),
+    },
+    customData: {
+      currency: "GBP",
+      value,
+      contentName,
+      contentCategory: promo?.source ?? undefined,
+    },
+  });
 
   return NextResponse.redirect(url.toString(), { status: 302 });
 }

@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
+    fbq?: (...args: unknown[]) => void;
   }
 }
 
@@ -126,6 +128,20 @@ function ctaLocationFrom(el: HTMLElement): string {
 }
 
 export default function Tracking() {
+  const pathname = usePathname();
+
+  // Meta Pixel PageView on every pathname change. The Pixel snippet in
+  // app/layout.tsx no longer fires its own PageView — we own it here so the
+  // first hard load AND every Next.js <Link> SPA navigation get tracked.
+  // The fbq queue swallows calls fired before the script finishes loading,
+  // so this is safe to run on the first render too.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof window.fbq === "function") {
+      window.fbq("track", "PageView");
+    }
+  }, [pathname]);
+
   useEffect(() => {
     captureUtms();
 

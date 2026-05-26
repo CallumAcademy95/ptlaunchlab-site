@@ -24,24 +24,24 @@ type Avatar = "starter" | "switcher" | "returner";
 
 const COPY: Record<Avatar, { eyebrow: string; submit: string; busy: string; thankHeadline: string; thankBody: string }> = {
   starter: {
-    eyebrow: "Lock in your £200 off — straight answer in 60 secs",
+    eyebrow: "Straight answer in 60 seconds — plus your priority intake incentive",
     submit: "Start My PT Career →",
     busy: "One sec…",
-    thankHeadline: "You're in. £200 off is locked.",
+    thankHeadline: "You're in. Your priority intake is reserved.",
     thankBody: "We'll text you on WhatsApp shortly. While you're here — book your free 15-min call so we can map the route in person.",
   },
   switcher: {
     eyebrow: "See if it works for your situation — no pressure",
     submit: "See How It Works →",
     busy: "One sec…",
-    thankHeadline: "You're in. £200 off is locked.",
+    thankHeadline: "You're in. Your priority intake is reserved.",
     thankBody: "We'll WhatsApp you with a quick intro shortly. Book a 15-min call below and we'll walk through your exact transition plan.",
   },
   returner: {
-    eyebrow: "Honest answers + your £200 off locked in",
+    eyebrow: "Honest answers — plus your priority intake reserved",
     submit: "I'm Ready to Hear More →",
     busy: "One sec…",
-    thankHeadline: "Got it — and your £200 off is locked.",
+    thankHeadline: "Got it — your priority intake is reserved.",
     thankBody: "We'll WhatsApp you a kind hello shortly. If you'd like to talk it through, book a no-pressure 15-min chat below.",
   },
 };
@@ -115,7 +115,7 @@ export default function HeroLeadForm({ avatar }: { avatar: Avatar }) {
     const secondsRemaining = expiresAt ? Math.max(0, Math.floor((expiresAt - now) / 1000)) : null;
     return (
       <div className="bg-card border-2 border-gold/60 rounded-2xl p-7 md:p-8 max-w-2xl mx-auto shadow-xl shadow-gold/10">
-        <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">£200 off · expires in</p>
+        <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">Priority Intake · window closes in</p>
         <p className="font-display font-extrabold text-5xl md:text-6xl text-white leading-none tracking-tight mb-5 tabular-nums">
           {secondsRemaining !== null ? formatCountdown(secondsRemaining) : "48:00:00"}
         </p>

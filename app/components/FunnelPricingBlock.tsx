@@ -106,7 +106,44 @@ export default function FunnelPricingBlock({
 
   const handleCheckout = (plan: "full" | "deposit") => {
     trackEvent("promo_checkout_clicked", { plan, has_promo: showPromo });
-    window.location.href = `/api/funnel-promo/checkout?plan=${plan}`;
+
+    // Meta InitiateCheckout — hybrid dedup: browser fbq fires now with a UUID
+    // event_id, the server-side /api/funnel-promo/checkout route reads the
+    // same id from `ic_eid` and dispatches a matching CAPI IC event before
+    // 302-redirecting to Stripe. Meta dedups on event_name + event_id within
+    // 7 days, so the two fire as one event. The discounted Stripe URL stays
+    // server-side (the bounce-page alternative would have leaked it to the DOM).
+    const icEventId =
+      (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
+      `ic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // Plan economics — funnel-promo holders see £1,399 PIF / £599 deposit
+    // (admin cancels the 5th instalment to land on £1,399 total). Without
+    // an active cookie, full PIF is £1,599. Pick the right value per state.
+    const value =
+      plan === "full"
+        ? (showPromo ? 1399 : 1599)
+        : 599;
+    const contentName = plan === "full" ? "course_pif" : "course_deposit";
+
+    if (typeof window !== "undefined") {
+      const win = window as { fbq?: (...args: unknown[]) => void };
+      if (typeof win.fbq === "function") {
+        win.fbq(
+          "track",
+          "InitiateCheckout",
+          {
+            currency: "GBP",
+            value,
+            content_name: contentName,
+            content_category: showPromo ? "funnel_promo" : undefined,
+          },
+          { eventID: icEventId },
+        );
+      }
+    }
+
+    window.location.href = `/api/funnel-promo/checkout?plan=${plan}&ic_eid=${encodeURIComponent(icEventId)}`;
   };
 
   return (
@@ -173,25 +210,33 @@ export default function FunnelPricingBlock({
         </>
       )}
 
-      {/* ─── EXISTING PROMO / TIER CARDS ─── */}
+      {/* ─── PROMO / TIER CARDS ─── */}
+      {/* Priority Intake Incentive framing (Priority 9 — replaces scarcity-style
+          "£200 OFF HURRY" tone with an education-brand framing: this is
+          standard practice in regulated training providers, not a flash sale. */}
       {showPromo ? (
         <>
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-            <span
-              className="text-xs font-semibold tracking-widest uppercase px-3 py-1.5 rounded-full"
-              style={{ color: accent, background: `${accent}15`, border: `1px solid ${accent}40` }}
-            >
-              £200 off — funnel exclusive
-            </span>
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-soft/60">Expires in</span>
+          <div className="rounded-xl bg-deep/40 border border-white/[0.08] p-4 mb-5">
+            <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
               <span
-                className="font-mono font-bold text-sm tabular-nums"
-                style={{ color: accent }}
+                className="text-[11px] font-semibold tracking-widest uppercase px-3 py-1.5 rounded-full"
+                style={{ color: accent, background: `${accent}15`, border: `1px solid ${accent}40` }}
               >
-                {formatCountdown(secondsRemaining)}
+                Priority Intake Incentive
               </span>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-soft/60">Window closes in</span>
+                <span
+                  className="font-mono font-bold text-sm tabular-nums"
+                  style={{ color: accent }}
+                >
+                  {formatCountdown(secondsRemaining)}
+                </span>
+              </div>
             </div>
+            <p className="text-soft/65 text-[12px] leading-relaxed">
+              Available for 48 hours after completing your pathway assessment — covers your enrolment admin and reserves your tutor on the next intake.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
@@ -248,7 +293,7 @@ export default function FunnelPricingBlock({
           </div>
 
           <p className="text-faint text-xs text-center mt-4">
-            Discount auto-applies via your unique link. Offer ends when the timer hits zero.
+            Incentive auto-applies via your personalised link. Honoured until the timer ends.
           </p>
         </>
       ) : (

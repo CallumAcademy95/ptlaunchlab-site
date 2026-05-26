@@ -213,13 +213,25 @@ export default function QuizApp() {
         <span className="text-soft/50 text-sm">Career Path Quiz</span>
       </header>
 
-      {/* Progress bar */}
+      {/* Progress bar — with completion framing (Priority 8) */}
       {screen !== 'intro' && (
-        <div className="relative z-10 h-1 bg-white/[0.05] w-full">
-          <div
-            className="h-full bg-gold transition-all duration-500 ease-out"
-            style={{ width: `${progressPct}%` }}
-          />
+        <div className="relative z-10">
+          {screen === 'question' && (
+            <div className="flex items-center justify-between px-6 py-2 bg-deep border-b border-white/[0.04]">
+              <span className="text-soft/55 text-[11px] font-semibold tracking-widest uppercase">
+                Question {questionIndex + 1} of {questions.length}
+              </span>
+              <span className="text-gold text-[11px] font-bold tabular-nums">
+                {Math.round(progressPct)}% complete
+              </span>
+            </div>
+          )}
+          <div className="h-1 bg-white/[0.05] w-full">
+            <div
+              className="h-full bg-gold transition-all duration-500 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
         </div>
       )}
 
@@ -237,21 +249,21 @@ export default function QuizApp() {
               </div>
 
               <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-white leading-none tracking-tight mb-6">
-                Discover Your<br />
-                <span className="text-gold">PT Career Path</span>
+                Could Personal Training<br />
+                <span className="text-gold">actually be the right career for you?</span>
               </h1>
 
               <p className="text-soft/60 text-lg max-w-lg mx-auto mb-8 leading-relaxed">
                 Answer 5 quick questions and find out exactly which personal
-                training career suits you best — and what to do next.
+                training career fits you best — and what your next step is.
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-2 text-faint text-sm mb-6">
                 <span>5 questions</span>
                 <span className="text-white/10">·</span>
-                <span>Under 2 minutes</span>
+                <span>Under 60 seconds</span>
                 <span className="text-white/10">·</span>
-                <span>Free personalised results</span>
+                <span>Free personalised pathway</span>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-4 text-faint text-xs mb-10">
@@ -279,7 +291,7 @@ export default function QuizApp() {
                 onClick={handleStart}
                 className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20"
               >
-                Find My Path →
+                Take The Free Quiz →
               </button>
             </div>
           )}
@@ -287,16 +299,13 @@ export default function QuizApp() {
           {/* ── QUESTION ── */}
           {screen === 'question' && currentQuestion && (
             <div>
-              <div className="flex items-center justify-between mb-8">
+              <div className="mb-8">
                 <button
                   onClick={handleBack}
                   className="text-soft/50 hover:text-white transition-colors text-sm flex items-center gap-1"
                 >
                   ← Back
                 </button>
-                <span className="text-faint text-sm">
-                  {questionIndex + 1} / {questions.length}
-                </span>
               </div>
 
               <h2 className="font-display font-extrabold text-xl sm:text-3xl text-white leading-tight tracking-tight mb-6">
@@ -402,7 +411,7 @@ export default function QuizApp() {
                 </button>
 
                 <p className="text-faint text-xs text-center pt-1">
-                  We&apos;ll message you within a few hours during business hours. No spam, ever.
+                  We&apos;ll only use this to send your result and support options. No spam, ever.
                 </p>
               </form>
             </div>
@@ -475,11 +484,11 @@ export default function QuizApp() {
                   type="submit"
                   className="w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20 mt-2"
                 >
-                  Show My Results →
+                  Unlock My Pathway →
                 </button>
 
                 <p className="text-faint text-xs text-center pt-1">
-                  No spam. We&apos;ll send relevant PT tips and resources only. Unsubscribe anytime.
+                  No spam. Just your personalised PT pathway and next steps.
                 </p>
               </form>
             </div>

@@ -50,10 +50,11 @@ export default function PhoneCallbackForm() {
     const data = new FormData(form);
     const name = String(data.get("name") || "").trim();
     const mobile = String(data.get("mobile") || "").trim();
+    const email = String(data.get("email") || "").trim();
     const topics = String(data.get("topics") || "").trim();
 
-    if (!name || !mobile) {
-      setError("Please enter your name and mobile number.");
+    if (!name || !mobile || !email) {
+      setError("Please enter your name, email and mobile number.");
       setSubmitting(false);
       return;
     }
@@ -65,6 +66,7 @@ export default function PhoneCallbackForm() {
       call_type: "phone",
       name,
       mobile,
+      email,
       topics,
       page_url: window.location.href,
       page_referrer: document.referrer,
@@ -141,6 +143,7 @@ export default function PhoneCallbackForm() {
           event_id: scheduleEventId,
           name,
           phone: mobile,
+          email,
           source: "phone_callback",
         }),
       }).catch((err) => console.warn("[book-call] CAPI schedule relay failed:", err));
@@ -271,6 +274,22 @@ export default function PhoneCallbackForm() {
           maxLength={20}
           className="w-full px-4 py-3 rounded-lg bg-base/60 border border-white/15 text-white placeholder:text-soft focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 transition-colors"
           placeholder="07..."
+        />
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-white text-sm font-semibold mb-2">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          maxLength={120}
+          className="w-full px-4 py-3 rounded-lg bg-base/60 border border-white/15 text-white placeholder:text-soft focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40 transition-colors"
+          placeholder="you@email.com"
         />
       </div>
 
