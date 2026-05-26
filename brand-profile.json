@@ -1,0 +1,113 @@
+{
+  "brand": {
+    "name": "PT Launch Lab",
+    "url": "https://ptlaunchlab.co.uk",
+    "tagline": "The only PT course run by gym owners who actually hire trainers",
+    "category": "UK personal trainer qualification (NCFE Level 2 + Level 3, Ofqual regulated)",
+    "industry": "education / fitness / career change",
+    "country": "United Kingdom",
+    "logo_path": "/logo.png"
+  },
+  "visual_identity": {
+    "color_palette": {
+      "primary_background": "#072B4A",
+      "deep_background": "#051D33",
+      "card_background": "#0D3559",
+      "card_alt": "#102342",
+      "accent_gold": "#F5C518",
+      "accent_blue": "#3B82F6",
+      "text_white": "#FFFFFF",
+      "text_soft": "#B4C2D6",
+      "text_faint": "#8FA4BD"
+    },
+    "color_usage_rules": {
+      "background_default": "Dark navy #072B4A or #051D33 — almost never anything else",
+      "headline_text": "White (#FFFFFF) for body headlines, gold (#F5C518) for hero accent words",
+      "cta_button_fill": "Gold #F5C518 with dark navy text #072B4A",
+      "cta_button_outline": "White or gold border with white text on dark bg",
+      "accent_lines_borders": "Gold #F5C518 at 40-60% opacity, OR blue #3B82F6 at 20-30%",
+      "avoid": "Light backgrounds, gradients other than dark-navy-to-darker, neon colours, generic Facebook blue"
+    },
+    "typography": {
+      "display_font": "Barlow Condensed (extra-bold weight, tight tracking) — for all headlines and hero text",
+      "body_font": "Poppins (medium / semibold) — for body copy and supporting text",
+      "rules": [
+        "Headlines: Barlow Condensed, weight 800, tracking tight, leading near-zero",
+        "Eyebrows (small caps above headlines): Poppins, weight 700, tracking widest, uppercase, gold colour",
+        "Body: Poppins, weight 400-500, comfortable line-height",
+        "Avoid: serif fonts, decorative fonts, light weights for headlines"
+      ]
+    },
+    "logo_treatment": "PT Launch Lab logo (small, top-left of frame, max 80px height in 1080x1920). Logo is white-on-transparent — works on dark navy.",
+    "imagery_style": {
+      "preferred": [
+        "Real candid photography — natural lighting, slight imperfection, mobile-phone feel",
+        "Domestic environments (kitchen, sofa, car interior) for relatability",
+        "Gym-floor reality shots (low-light, no influencer staging)",
+        "Founder photos (Callum / Miles / Ryan — assets at /callum.webp /miles.webp /ryan.webp)"
+      ],
+      "avoid": [
+        "Stock photography of shredded models with chrome dumbbells",
+        "Cinematic / overproduced imagery",
+        "Drones, cinematography, slow-mo aesthetic",
+        "Generic 'corporate fitness' imagery",
+        "AI-generated faces (composition only — never faux-people)"
+      ]
+    }
+  },
+  "voice_and_tone": {
+    "persona": "Gym-owner authority. Honest, no hype. Anti-£29-weekend-course. Built by people who've been on the hiring side of the desk.",
+    "principles": [
+      "Identity-first, not feature-first ('You want X' before 'We do Y')",
+      "Direct, plain English — no jargon, no marketing speak",
+      "Honesty over hype — 'Most PTs fail in 18 months' is a stronger opener than 'Become a successful PT'",
+      "Anti-scarcity — call it 'Priority Intake Incentive', not 'HURRY 48 HOURS'",
+      "Education brand, not internet-marketing brand"
+    ],
+    "voice_examples_dos": [
+      "Stuck in a job you've outgrown?",
+      "You don't hate working hard. You hate building somebody else's future.",
+      "The only PT course run by gym owners who actually hire trainers.",
+      "Most PT courses give you a certificate. Then leave you stuck.",
+      "Real route into PT. No degree. No fluff."
+    ],
+    "voice_examples_donts": [
+      "🔥 LIMITED SLOTS! 🔥",
+      "Transform your life today!",
+      "Unlock your fitness potential",
+      "Join thousands who've already...",
+      "DM us NOW to secure your spot"
+    ]
+  },
+  "trust_signals": [
+    "NCFE Level 2 + Level 3 (Ofqual regulated)",
+    "CIMSPA recognised",
+    "17+ verified 5-star Google reviews",
+    "500+ PTs hired by founders' network",
+    "£500K+ revenue built as independent PTs",
+    "Real partner gyms (Ultimate Shred, 6Fit, Ironwolf, MOF, etc.)"
+  ],
+  "audience_avatars": [
+    {
+      "slug": "starter",
+      "label": "Gym Starter",
+      "age": "18-30",
+      "tone": "identity-driven, slightly confrontational, gym-floor energy",
+      "primary_hook": "You're already in the gym anyway — so why are you still in a job you hate?"
+    },
+    {
+      "slug": "switcher",
+      "label": "Career Switcher",
+      "age": "28-40",
+      "tone": "honest, no-nonsense, transitional — believable exit from a salary",
+      "primary_hook": "You don't hate working hard. You hate building somebody else's future."
+    },
+    {
+      "slug": "returner",
+      "label": "Returner / Parent",
+      "age": "32-55 (female-skewing)",
+      "tone": "warm, soft, kind. Do NOT over-produce. NO gym-bro energy.",
+      "primary_hook": "Ready for something that's yours again?"
+    }
+  ]
+}
