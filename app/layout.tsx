@@ -25,6 +25,11 @@ export const metadata: Metadata = {
   title: "PT Launch Lab — Become a Qualified Personal Trainer",
   description:
     "Get your NCFE Level 3 PT qualification online in as little as 8 weeks, with real mentorship and business support to launch your career.",
+  verification: {
+    other: {
+      "facebook-domain-verification": "vwepg3x20z4pmksvkubk7v1vzinalg",
+    },
+  },
   openGraph: {
     type: "website",
     siteName: "PT Launch Lab",
@@ -213,16 +218,19 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "w0qwj7lviw");
         `}</Script>
-        {/* 5. Meta Pixel — deferred to lazyOnload. PageView still fires on
-            every load, just after the page is interactive. */}
-        <Script id="meta-pixel" strategy="lazyOnload">{`
+        {/* 5. Meta Pixel — loaded afterInteractive so `fbq` is queued before
+            any form can be submitted (forms on cached pages otherwise hit
+            the typeof-guard while window.fbq is undefined under lazyOnload).
+            PageView is fired by Tracking.tsx on every pathname change so
+            Next.js SPA navigations are counted too — do NOT add a PageView
+            call here. */}
+        <Script id="meta-pixel" strategy="afterInteractive">{`
           !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
           n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
           t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
           document,'script','https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '1133525198707842');
-          fbq('track', 'PageView');
         `}</Script>
       </body>
     </html>
