@@ -59,12 +59,13 @@ const prospectusSchema = z.object({
 
 // ── Gym partnership ──────────────────────────────────────────────────────
 const gymPartnershipSchema = z.object({
-  gymName:  z.string().min(2).max(200),
-  name:     z.string().max(200),
-  email:    z.string().max(254),
-  phone:    z.string().max(40),
-  location: z.string().min(2).max(200),
-  gymSize:  z.string().max(64).optional().or(z.literal("")),
+  gymName:    z.string().min(2).max(200),
+  name:       z.string().max(200),
+  email:      z.string().max(254),
+  phone:      z.string().max(40),
+  location:   z.string().min(2).max(200),
+  gymSize:    z.string().max(64).optional().or(z.literal("")),
+  referredBy: z.string().max(200).optional().or(z.literal("")),
   [SEC_KEY]: secSchema,
 });
 
@@ -229,6 +230,7 @@ export type GymPartnershipClean = {
   phone: string;
   location: string;
   gymSize: string;
+  referredBy: string;
 };
 
 export function validateGymPartnership(raw: unknown): ValidationResult<GymPartnershipClean> {
@@ -261,12 +263,13 @@ export function validateGymPartnership(raw: unknown): ValidationResult<GymPartne
   return {
     ok: true,
     data: {
-      gymName:  gymCheck.normalised!,
-      name:     nameCheck.normalised!,
-      email:    ec.normalised!,
-      phone:    pc.normalised!,
-      location: parsed.data.location.trim(),
-      gymSize:  parsed.data.gymSize ?? "",
+      gymName:    gymCheck.normalised!,
+      name:       nameCheck.normalised!,
+      email:      ec.normalised!,
+      phone:      pc.normalised!,
+      location:   parsed.data.location.trim(),
+      gymSize:    parsed.data.gymSize ?? "",
+      referredBy: (parsed.data.referredBy ?? "").trim(),
     },
     signals: [],
   };

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { gymName, name, email, phone, location, gymSize } = result.data;
+    const { gymName, name, email, phone, location, gymSize, referredBy } = result.data;
     const webhookUrl = process.env.GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL;
 
     if (webhookUrl) {
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
           phone,
           location,
           gym_size: gymSize,
+          referred_by: referredBy,
           submitted_at: new Date().toISOString(),
         }),
       });

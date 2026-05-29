@@ -4,7 +4,7 @@ import { useFormSecurity } from "@/app/lib/security/client";
 
 export default function PartnershipForm() {
   const [form, setForm] = useState({
-    gymName: "", name: "", email: "", phone: "", location: "", gymSize: "",
+    gymName: "", name: "", email: "", phone: "", location: "", gymSize: "", referredBy: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const sec = useFormSecurity();
@@ -91,6 +91,18 @@ export default function PartnershipForm() {
             <option value="600–1000">600–1,000 members</option>
             <option value="1000+">1,000+ members</option>
           </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-[#8CA3BF] text-[11px] font-semibold mb-1.5 uppercase tracking-wider">
+            Referred By
+          </label>
+          <input
+            name="referredBy"
+            value={form.referredBy}
+            onChange={handleChange}
+            placeholder="Gym or person who referred you (optional)"
+            className={inputClass}
+          />
         </div>
       </div>
 
