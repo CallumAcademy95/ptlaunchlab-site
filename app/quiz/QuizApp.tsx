@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config';
@@ -19,8 +19,19 @@ const VALID_AVATARS: ReadonlyArray<Avatar> = ['starter', 'switcher', 'returner']
 // while feeling like two small steps instead of one daunting wall.
 type Screen = 'intro' | 'question' | 'mobile' | 'email' | 'submitting' | 'result';
 
-export default function QuizApp() {
-  const [screen, setScreen]               = useState<Screen>('intro');
+// Props let the same quiz power both surfaces:
+// - Standalone /quiz page: no props → full-screen chrome + intro gate.
+// - Embedded on a cold-traffic landing page: `embedded` drops the full-screen
+//   wrapper/logo header (the page already has them) and starts straight on Q1
+//   to preserve momentum. `avatar` is passed directly so the embedded quiz
+//   tags leads even though there's no ?avatar= param to read.
+interface QuizAppProps {
+  embedded?: boolean;
+  avatar?: Avatar;
+}
+
+export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAppProps = {}) {
+  const [screen, setScreen]               = useState<Screen>(embedded ? 'question' : 'intro');
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers]             = useState<QuizOption[]>([]);
   const [selected, setSelected]           = useState<QuizOption | null>(null);
@@ -31,17 +42,28 @@ export default function QuizApp() {
   const [result, setResult]               = useState<ResultKey | null>(null);
   const [animKey, setAnimKey]             = useState(0);
   const sec = useFormSecurity();
+  // Guards quiz_start to fire exactly once per attempt. In embedded mode there's
+  // no intro "Start" button, so quiz_start fires on the first answer selection —
+  // a real engagement signal that stays distinct from page_view.
+  const startedRef = useRef(false);
 
   // Avatar pre-tag from cold-traffic avatar landing pages (Starter / Switcher
   // / Returner). Used for segmented retargeting + tailored result-page copy.
-  // Quiz still works untouched if visitor arrives without the param.
+  // A direct `avatar` prop (embedded use) wins; otherwise read the ?avatar=
+  // param. Quiz still works untouched if neither is present.
   const searchParams = useSearchParams();
   const rawAvatar = searchParams.get('avatar');
-  const avatar: Avatar | undefined = VALID_AVATARS.includes(rawAvatar as Avatar)
-    ? (rawAvatar as Avatar)
-    : undefined;
+  const avatar: Avatar | undefined =
+    avatarProp ??
+    (VALID_AVATARS.includes(rawAvatar as Avatar) ? (rawAvatar as Avatar) : undefined);
 
   const bump = () => setAnimKey((k) => k + 1);
+
+  const fireStart = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackEvent('quiz_start', avatar ? { avatar } : undefined);
+  };
 
   const handleStart = () => {
     setScreen('question');
@@ -49,10 +71,14 @@ export default function QuizApp() {
     setAnswers([]);
     setSelected(null);
     bump();
-    trackEvent('quiz_start', avatar ? { avatar } : undefined);
+    fireStart();
   };
 
-  const handleSelect = (option: QuizOption) => setSelected(option);
+  const handleSelect = (option: QuizOption) => {
+    // Embedded quiz has no intro gate, so the first option tap is the start.
+    fireStart();
+    setSelected(option);
+  };
 
   const handleContinue = () => {
     if (!selected) return;
@@ -173,7 +199,7 @@ export default function QuizApp() {
   };
 
   const handleStartOver = () => {
-    setScreen('intro');
+    setScreen(embedded ? 'question' : 'intro');
     setQuestionIndex(0);
     setAnswers([]);
     setSelected(null);
@@ -182,6 +208,7 @@ export default function QuizApp() {
     setEmail('');
     setFormError('');
     setResult(null);
+    startedRef.current = false;
     bump();
   };
 
@@ -193,25 +220,31 @@ export default function QuizApp() {
   const currentQuestion = questions[questionIndex];
 
   return (
-    <div className="min-h-screen flex flex-col bg-base">
-      {/* Background glows */}
-      <div className="fixed -left-48 top-0 w-[600px] h-[600px] rounded-full bg-gold opacity-[0.04] blur-3xl pointer-events-none" />
-      <div className="fixed -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-blue opacity-[0.05] blur-3xl pointer-events-none" />
+    <div className={embedded ? 'flex flex-col' : 'min-h-screen flex flex-col bg-base'}>
+      {/* Full-screen chrome only on the standalone /quiz page. Embedded on a
+          landing page, the page supplies its own header + background. */}
+      {!embedded && (
+        <>
+          {/* Background glows */}
+          <div className="fixed -left-48 top-0 w-[600px] h-[600px] rounded-full bg-gold opacity-[0.04] blur-3xl pointer-events-none" />
+          <div className="fixed -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-blue opacity-[0.05] blur-3xl pointer-events-none" />
 
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-3 bg-deep border-b border-white/[0.06]">
-        <a href="/">
-          <Image
-            src="/logo.png"
-            alt="PT Launch Lab"
-            width={120}
-            height={48}
-            className="h-12 w-auto object-contain"
-            priority
-          />
-        </a>
-        <span className="text-soft/50 text-sm">Career Path Quiz</span>
-      </header>
+          {/* Header */}
+          <header className="relative z-10 flex items-center justify-between px-6 py-3 bg-deep border-b border-white/[0.06]">
+            <a href="/">
+              <Image
+                src="/logo.png"
+                alt="PT Launch Lab"
+                width={120}
+                height={48}
+                className="h-12 w-auto object-contain"
+                priority
+              />
+            </a>
+            <span className="text-soft/50 text-sm">Career Path Quiz</span>
+          </header>
+        </>
+      )}
 
       {/* Progress bar — with completion framing (Priority 8) */}
       {screen !== 'intro' && (
@@ -236,7 +269,13 @@ export default function QuizApp() {
       )}
 
       {/* Main content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-6 sm:py-12">
+      <main
+        className={
+          embedded
+            ? 'relative z-10 flex justify-center px-4 py-8 sm:py-10'
+            : 'relative z-10 flex-1 flex items-center justify-center px-4 py-6 sm:py-12'
+        }
+      >
         <div key={animKey} className="w-full max-w-2xl animate-fade-in-up">
 
           {/* ── INTRO ── */}
@@ -299,14 +338,18 @@ export default function QuizApp() {
           {/* ── QUESTION ── */}
           {screen === 'question' && currentQuestion && (
             <div>
-              <div className="mb-8">
-                <button
-                  onClick={handleBack}
-                  className="text-soft/50 hover:text-white transition-colors text-sm flex items-center gap-1"
-                >
-                  ← Back
-                </button>
-              </div>
+              {/* Embedded quiz starts on Q1 with no intro to go back to, so the
+                  Back button is hidden there until the user is past Q1. */}
+              {!(embedded && questionIndex === 0) && (
+                <div className="mb-8">
+                  <button
+                    onClick={handleBack}
+                    className="text-soft/50 hover:text-white transition-colors text-sm flex items-center gap-1"
+                  >
+                    ← Back
+                  </button>
+                </div>
+              )}
 
               <h2 className="font-display font-extrabold text-xl sm:text-3xl text-white leading-tight tracking-tight mb-6">
                 {currentQuestion.question}

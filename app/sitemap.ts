@@ -35,10 +35,12 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/how-to-become-a-personal-trainer-uk`, priority: 0.9,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/too-old-to-become-a-personal-trainer`, priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/are-online-pt-qualifications-recognised-by-uk-gyms`, priority: 0.7, changeFrequency: "monthly", lastModified: TODAY },
-  // Avatar-targeted Meta ads landing pages
-  { url: `${BASE}/become-a-personal-trainer-uk`,        priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
-  { url: `${BASE}/career-change-to-personal-trainer`,   priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
-  { url: `${BASE}/retrain-as-a-personal-trainer`,       priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
+  // Avatar long-form sales/VSL pages (canonical targets). The bare-slug cold
+  // ad pages are short-form quiz funnels that canonical here, so only the
+  // /vsl/* twins are advertised to Google.
+  { url: `${BASE}/vsl/become-a-personal-trainer-uk`,      priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
+  { url: `${BASE}/vsl/career-change-to-personal-trainer`, priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
+  { url: `${BASE}/vsl/retrain-as-a-personal-trainer`,     priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
   // Gym partnership landing pages
   { url: `${BASE}/6fit-academy`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/muscle-bound-academy`,                priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
