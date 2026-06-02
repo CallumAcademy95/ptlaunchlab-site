@@ -372,15 +372,6 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
               </p>
             </div>
 
-            {/* Finance */}
-            <div className="bg-deep border border-white/10 rounded-xl p-4 text-center">
-              <p className="text-soft text-sm">
-                Finance available via Payl8r over 12–18 months.{" "}
-                <a href="/book-call" className="text-gold hover:underline">Book a free call</a>
-                {" "}and we&apos;ll walk you through it.
-              </p>
-            </div>
-
             {/* Support */}
             <div className="bg-deep border border-white/10 rounded-2xl p-6 text-center">
               <p className="text-white font-bold mb-2">Need help before you continue?</p>

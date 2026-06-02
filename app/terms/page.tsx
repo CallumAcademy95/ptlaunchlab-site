@@ -60,7 +60,6 @@ export default function TermsPage() {
               {ul([
                 "Full Payment: £1,599 — single payment, immediate access",
                 "Deposit Plan: £599 deposit followed by 5 monthly payments of £200 (total £1,599)",
-                "Finance: available via Payl8r over 12–18 months — contact us for details",
               ])}
               {p("All prices are inclusive of VAT where applicable. Payments are processed securely via Stripe. PT Launch Lab does not store your card details.")}
               {p("If you choose the deposit plan, the monthly payments of £200 are due on the same date each month following your initial deposit. Failure to maintain payments may result in suspension of course access until payments are brought up to date.")}

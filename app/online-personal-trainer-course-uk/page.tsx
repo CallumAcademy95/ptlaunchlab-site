@@ -304,7 +304,7 @@ export default function OnlinePtCourseUkPage() {
               ))}
             </div>
             <p className="mt-8 text-soft/70 text-base leading-relaxed">
-              Pay attention to payment plans too. We do <strong className="text-white">£1,599 full or a £599 deposit + 5×£200 split</strong>, plus Payl8r finance. If a course only quotes a monthly figure and never the total, that's a tell.
+              Pay attention to payment plans too. We do <strong className="text-white">£1,599 full or a £599 deposit + 5×£200 split</strong>. If a course only quotes a monthly figure and never the total, that's a tell.
             </p>
           </div>
         </section>

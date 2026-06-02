@@ -48,7 +48,7 @@ const faqSchema = {
       name: "How much does the PT Launch Lab course cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The course costs £1,599 for full payment, or £599 deposit followed by 5 monthly payments of £200. Finance is also available via Payl8r over 12–18 months. The £1,599 is the total cost — it includes our £500 business mentorship community, your personal tutor, the full NCFE Level 3 qualification, and access to our gym-partnership interview pipeline. Nothing is bolted on as a paid upgrade.",
+        text: "The course costs £1,599 for full payment, or £599 deposit followed by 5 monthly payments of £200. The £1,599 is the total cost — it includes our £500 business mentorship community, your personal tutor, the full NCFE Level 3 qualification, and access to our gym-partnership interview pipeline. Nothing is bolted on as a paid upgrade.",
       },
     },
     {

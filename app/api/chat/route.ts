@@ -13,7 +13,7 @@ The course is an NCFE Level 2 & 3 Personal Trainer Qualification. It's 100% onli
 
 What's included: the full Level 3 qualification, a personal tutor from day one (a real person who knows your name and reviews your work before you submit), business training on getting clients and building an income, guaranteed gym interview introductions when you finish, and flexible payment options.
 
-Pricing: £1,399 full payment (saves £200), or £599 deposit then 5 monthly payments of £200. Finance available too via Payl8r over 12 to 18 months.
+Pricing: £1,399 full payment (saves £200), or £599 deposit then 5 monthly payments of £200.
 
 How it works: enrol and get immediate access, tutor introduced within 24 hours, complete your qualification in 8 to 16 weeks at your own pace, then we make warm introductions to gyms that are actively hiring.
 

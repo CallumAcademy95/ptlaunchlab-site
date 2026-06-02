@@ -212,7 +212,7 @@ const faqs = [
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
   { q: "How long does it take?", a: "Most students complete in 4–8 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
   { q: "What is the guaranteed gym interview?", a: "Once you qualify, we actively connect you with our partner gyms for interviews. This isn't a vague promise — it's built into the course. We've hired 500+ PTs ourselves and we know exactly what gyms look for." },
-  { q: "Is finance available?", a: "Yes. We offer Payl8r finance over 12–18 months. Book a free call and we'll walk you through the options." },
+  { q: "Can I spread the cost?", a: "Yes. Our deposit plan lets you start with a £599 deposit, then 5 monthly payments of £200 (total £1,599). Book a free call if you'd like to talk it through." },
 ];
 
 function CheckIcon() {
