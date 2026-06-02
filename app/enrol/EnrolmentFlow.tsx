@@ -211,6 +211,23 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       }),
     }).catch(() => { /* fire-and-forget — never block Stripe redirect */ });
 
+    // Pay-first safety net — alert admin that checkout has started so an
+    // abandoned post-payment form (paid but never enrolled) can be chased.
+    // Fire-and-forget so it never delays the Stripe redirect.
+    fetch("/api/enrolment-pending", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        plan: type,
+        amount,
+        ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
+        ...(appliedPromo && { promoCode: appliedPromo }),
+        [sec.SEC_KEY]: sec.payload(),
+      }),
+    }).catch(() => { /* fire-and-forget — never block Stripe redirect */ });
+
     const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
     const stripeUrl = appendStripeAttribution(
