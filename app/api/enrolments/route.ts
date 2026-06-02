@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, gymReferral, promoCode, discountApplied, amountPaid } = body;
+    const { learnerDetails: l, learningDetails: ln, agreement: a, paymentChoice, submittedAt, gymReferral, promoCode, discountApplied, amountPaid, stripeSessionId } = body;
 
     if (!l?.fullName || !l?.email) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
     const zapierPayload = {
       submitted_at:          submittedDate,
       payment_choice:        paymentLabel,
+      stripe_session_id:     stripeSessionId || "",
       title:                 l.title,
       full_name:             l.fullName,
       date_of_birth:         l.dateOfBirth,
@@ -126,6 +127,7 @@ export async function POST(req: NextRequest) {
     <div style="background:#0D3559;padding:16px 28px;border-left:4px solid #F5C518;">
       <div style="font-size:18px;font-weight:700;color:#F5C518;">New Enrolment: ${l.title} ${l.fullName}</div>
       <div style="color:#8CA3BF;font-size:13px;margin-top:4px;">${submittedDate} &nbsp;·&nbsp; ${paymentLabel}</div>
+      ${stripeSessionId ? `<div style="color:#4A6280;font-size:11px;margin-top:4px;">Stripe session: <a href="https://dashboard.stripe.com/payments?query=${stripeSessionId}" style="color:#F5C518;">${stripeSessionId}</a></div>` : ""}
     </div>
 
     <!-- Body -->
