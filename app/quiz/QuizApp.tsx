@@ -166,7 +166,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
         : `quiz-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     try {
-      await fetch('/api/quiz-submission', {
+      const res = await fetch('/api/quiz-submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -180,15 +180,25 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
           [sec.SEC_KEY]: sec.payload(),
         }),
       });
-      trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        // 4th argument carries the eventID for dedup with the server CAPI event
-        (window as any).fbq(
-          'track',
-          'Lead',
-          { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) },
-          { eventID: eventId },
-        );
+
+      // Only fire the conversion events when the server confirms it accepted a
+      // REAL lead (`lead === true`). Suspected spam/bot submissions are silently
+      // blocked server-side and return `lead: false` — firing Lead/quiz_complete
+      // for those inflates Meta + GA4 and teaches the algorithm to chase junk.
+      // The server-side CAPI Lead (in /api/quiz-submission) is the deduped
+      // partner of the fbq Lead below via the shared eventID.
+      const data = (await res.json().catch(() => null)) as { lead?: boolean } | null;
+      if (data?.lead === true) {
+        trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          // 4th argument carries the eventID for dedup with the server CAPI event
+          (window as any).fbq(
+            'track',
+            'Lead',
+            { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) },
+            { eventID: eventId },
+          );
+        }
       }
     } catch {
       // Non-blocking — user still gets their result if the save fails

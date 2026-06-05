@@ -91,29 +91,63 @@
 
 ---
 
-## Campaign 2 — Retargeting
+## Campaign 2 — Retargeting (WhatsApp Click-to-Chat)
+
+> **CHANGED 2026-06-05 — killed the IG DM automation.** The IG Click-to-Message + ManyChat test produced **797 clicks / 0 conversations** — a huge intent mismatch. Per the retargeting review: career-changers (28–45, cautious, working parents) trust **WhatsApp** far more than IG DMs, and a ManyChat maze asking them to self-disclose to a bot makes them freeze. RT now opens a **WhatsApp chat with a prefilled, low-pressure message** that a **human replies to** — no bot, no keyword, no flow. Trade-off unchanged: bypasses the pixel Lead event, 48h promo cookie and auto-MailerLite — but the conversation lands in the **already-live `/admin/whatsapp` inbox**. Result metric = **conversations started**. Competitor note: *no* top-tier UK PT advertiser (OriGym, PT Academy) uses click-to-message — genuine white-space.
 
 **Setup**
-- Objective: **Leads**
-- Conversion event: **Lead**
-- Budget: **£4/day** (CBO across 2 ad sets, £2/day each)
+- Objective: **Engagement** (the Leads objective also works if you want it in the Leads reporting column — either is fine; Engagement is simplest)
+- Conversion location: **Messaging apps**
+- Messaging app: **WhatsApp only** (untick Messenger + Instagram)
+- Performance goal: **Maximise number of conversations**
+- CTA button: pick the most WhatsApp-explicit option available (renders with the WhatsApp glyph) — e.g. **Send Message** / **Send WhatsApp Message**
+- WhatsApp destination: **`07822012186`** (Callum's usable WhatsApp on the Business app — see v1 routing decision in the WhatsApp section below)
+- Prefilled message: set per the WhatsApp section below
+- Placements: **Advantage+ (automatic)** — Meta will favour FB + IG feeds/stories where the WhatsApp hand-off is smoothest
+- Budget: **£4/day on ONE consolidated ad set** (see note below — do NOT split £2/£2)
+
+> **Budget consolidation:** `Maximise conversations` needs enough conversation volume to exit the learning phase. At £2/day on a small RT pool it will stall. Run **one ad set at £4/day** with both creatives inside it and let Meta pick the winner, rather than two starved £2/day ad sets.
 
 **Audiences — build these in Meta Audiences BEFORE launching**
 
-> v1 has no video viewer audience because we're launching static-only. Replaced with deeper-page-viewer audiences which are higher-intent anyway.
+> Per the retargeting review: messaging ads work on the **warmest** audiences, not all visitors — "click curiosity exists, interaction intent doesn't" is what kills generic-visitor messaging ads. Prioritise by intent; quiz completers + result-page viewers are the hottest. Union all four into the single ad set, but know that 1 + 2 carry it.
 
-1. **RT · Quiz Starters No Lead** — URL contains `/quiz` AND NOT URL contains `/book-call` AND NOT `Lead` event in last 30 days. Window: 30 days.
-2. **RT · Avatar Visitors No Lead** — URL contains any of `become-a-personal-trainer-uk`, `career-change-to-personal-trainer`, `retrain-as-a-personal-trainer` AND NOT `Lead` event in last 30 days. Window: 30 days.
-3. **RT · Deep Page Viewers No Lead** — URL contains `/courses` OR `/about` OR `/online-personal-trainer-course-uk` AND NOT `Lead` event in last 30 days. Window: 30 days. (Higher-intent than feed scrollers.)
-4. **RT · IG / FB Engagers** — Engaged with PT Launch Lab IG or FB page (sent message, saved post, visited profile). Window: 365 days.
+1. **RT · Quiz Completers / Result Viewers** *(hottest)* — URL contains `/quiz/result` OR fired `result_screen_viewed`, AND NOT `Lead` in last 30 days. Window: 30 days.
+2. **RT · Course / Pricing / VSL Viewers** — URL contains `/courses` OR `/vsl/` OR `/online-personal-trainer-course-uk`, AND NOT `Lead` in last 30 days. Window: 30 days.
+3. **RT · Avatar + Quiz Visitors No Lead** — URL contains any of `become-a-personal-trainer-uk`, `career-change-to-personal-trainer`, `retrain-as-a-personal-trainer`, `/quiz`, AND NOT `Lead` in last 30 days. Window: 30 days.
+4. **RT · IG / FB Engagers + Repeat Visitors** — engaged with PTLL IG/FB (message, save, profile visit), OR 2+ site sessions. Window: 365 days (engagers) / 30 days (repeat).
 
-**Ad set split**
+**Ad set (single, consolidated)**
 | Ad set name | Budget/day | Audience |
 |---|---|---|
-| RT · Engaged No Lead | £2 | Union of audiences 1 + 2 |
-| RT · Awareness (deep page + social) | £2 | Union of audiences 3 + 4, EXCLUDE Lead event 30d |
+| RT · WhatsApp Message | £4 | Union of audiences 1 + 2 + 3 + 4 |
 
-Both ad sets exclude: Purchasers (180d), All Leads (14d — to give them a breather post-Lead).
+Excludes: Purchasers (180d), All Leads (14d — give them a breather post-Lead).
+Both RT creatives (RT1 "Stuck" + RT2 "Too Late") run inside this one ad set.
+
+### Replies land in your existing WhatsApp inbox — reply manually (no ManyChat)
+
+The whole point of the switch is to **remove the funnel maze**. There is **no ManyChat, no keyword, no automation flow** in v1. A warm prospect taps the ad → WhatsApp opens with the prefilled message → they hit send → the conversation lands in the **existing `/admin/whatsapp` inbox** (inbound webhook → Supabase, already live) → **a human (Callum / Miles / Ryan) replies personally.** That's it. This is trust conversion, not lead volume — exactly what the 797-clicks/0-conversations result was telling us.
+
+**Prefilled message (set this in the ad — it's what the prospect sends):**
+> Hey — I've been looking at PT Launch Lab and just wanted to see whether becoming a PT is realistically doable around full-time work.
+
+*Per-creative variant (optional): RT2 can prefill* `Hey — is it actually too late / am I too old to start as a PT?` *— but keep ONE default if unsure.*
+
+**v1 routing — DECISION (Callum, 2026-06-05): send straight to a usable phone WhatsApp, reply manually.**
+Skip the Cloud-API line + web inbox for v1. Point the RT ads — and a "Book a call on WhatsApp" CTA — directly at **Callum's usable WhatsApp: `07822012186`** (`wa.me/447822012186`). Messages arrive as normal WhatsApp chats on the phone; Callum replies manually and books the call in-conversation. No inbox, no automation, no auth dependency — the simplest possible version of the "human replies" model.
+
+**Setup (one-time):**
+1. Put `07822012186` on the **WhatsApp Business app** (free; a number can't be on personal WhatsApp *and* the Business app at once — convert it, or use a number that's already on Business).
+2. **Connect it to the Facebook Page** (Meta Business Suite → Settings → WhatsApp accounts) so it's selectable as the click-to-WhatsApp ad destination.
+3. In the ad: select this number + set the prefilled opener.
+4. **"Book a call" path = a wa.me deep link (this IS the automation):** add a CTA button `Chat on WhatsApp` linking to
+   `https://wa.me/447822012186?text=Hi%20—%20I'd%20like%20to%20book%20a%20call%20about%20the%20PT%20course`
+   on the quiz **result page** + **/book-call**. A prefilled WhatsApp message lands on Callum's phone; he replies and arranges the call manually. No backend, no Zap.
+
+**Tradeoff vs the Cloud-API inbox (`+44 7418 609039` → `/admin/whatsapp`):** the personal-number route is simpler + phone-native + sidesteps the unauthenticated `/admin/whatsapp` risk entirely, BUT you lose the Supabase logging, the central/shared team inbox, and the Phase-B "Mark as Lead → CAPI" hook. Fine for solo manual v1. Revisit the Cloud-API inbox if volume grows or the team needs a shared inbox.
+
+**Lead handling (v1):** result metric in Ads Manager = **conversations started** (messaging objective fires no pixel Lead). When a chat shows real intent, drop the name + number into MailerLite + the lead sheet manually; tag `rt_wa_lead`.
 
 ---
 
@@ -309,17 +343,18 @@ Take the free PT Career Quiz below and see which path fits you best.
 
 ---
 
-### RETARGETING AD 1 — "Most PT Courses Leave You Stuck" (£2/day)
+### RETARGETING AD 1 — "Most PT Courses Leave You Stuck" (WhatsApp chat)
 
 | Field | Value |
 |---|---|
 | Format | **Single static image** — bold typography on dark navy bg, gold accent |
 | Aspect ratios to produce | 1:1 + 9:16 |
-| Visual direction | Headline `Most PT Courses Leave You Stuck` dominates. Subline: "We don't." Comparison-style layout (Most courses ✕ vs PT Launch Lab ✓) works well at this stage — visitor has already seen the brand, so contrast positioning lands harder. |
+| Visual direction | Headline `Most PT Courses Leave You Stuck` dominates. Subline: "We don't." Comparison-style layout (Most courses ✕ vs PT Launch Lab ✓). **On-image CTA footer must read "Chat on WhatsApp →"** (with a small WhatsApp glyph) — the current PNG says "MESSAGE US 'INFO'"; regenerate the footer so the creative matches the WhatsApp Send-Message button. |
 | Headline | `Most PT Courses Leave You Stuck` |
-| CTA button | `Learn More` |
-| Destination URL | `https://ptlaunchlab.co.uk/quiz?utm_source=meta&utm_medium=paid-social&utm_campaign=rt-stuck&utm_content=rt1-stuck-static` |
-| Audience | RT · Engaged No Lead |
+| Conversion location | **Click to message → WhatsApp (`07822012186`)** |
+| CTA button | `Send Message` (WhatsApp) |
+| Prefilled message | default opener (see WhatsApp section) |
+| Audience | RT · WhatsApp Message (consolidated) |
 
 **Primary text:**
 
@@ -333,30 +368,27 @@ That's exactly why so many newly-qualified PTs struggle to:
 • build confidence
 • earn consistently
 
-PT Launch Lab was built differently.
+PT Launch Lab was built differently — personal tutor, £500 mentorship bundled, real client-acquisition help, guaranteed gym interviews.
 
-We focus on:
-• real coaching confidence
-• business support
-• client acquisition
-• long-term career growth
+Want the honest version of how we actually get newly-qualified PTs earning?
 
-Take the free PT Career Quiz and see which pathway fits you best.
+Tap below — it opens a WhatsApp chat with us. A real person replies (no bots, no hard sell).
 ```
 
 ---
 
-### RETARGETING AD 2 — "Too Old / Too Inexperienced / Too Late" (£2/day)
+### RETARGETING AD 2 — "Too Old / Too Inexperienced / Too Late" (WhatsApp chat)
 
 | Field | Value |
 |---|---|
 | Format | **Single static image** |
 | Aspect ratios to produce | 1:1 + 9:16 |
-| Visual direction | Headline `Too Late To Become A PT? Not Quite.` with three bullet points underneath (too old? / too inexperienced? / too late to start?) each struck through with the gold tick. Final line: "Most start with zero clients, no coaching experience, no idea where to start." |
+| Visual direction | Headline `Too Late To Become A PT? Not Quite.` with three struck-through objections (too old / too inexperienced / too late). **On-image CTA footer must read "Chat on WhatsApp →"** (with a small WhatsApp glyph) — the current PNG says "DM US 'PT'"; regenerate the footer so it matches the WhatsApp Send-Message button. |
 | Headline | `Too Late To Become A PT? Not Quite.` |
-| CTA button | `Learn More` |
-| Destination URL | `https://ptlaunchlab.co.uk/quiz?utm_source=meta&utm_medium=paid-social&utm_campaign=rt-objection&utm_content=rt2-toolate-static` |
-| Audience | RT · Awareness (engaged + IG) |
+| Conversion location | **Click to message → WhatsApp (`07822012186`)** |
+| CTA button | `Send Message` (WhatsApp) |
+| Prefilled message | variant: `Hey — is it actually too late / am I too old to start as a PT?` |
+| Audience | RT · WhatsApp Message (consolidated) |
 
 **Primary text:**
 
@@ -373,7 +405,9 @@ Most students at PT Launch Lab begin with:
 
 You do NOT need to be an influencer to become a great coach.
 
-Take the free PT Career Quiz and find your best-fit pathway into fitness.
+Not sure if it's realistic for YOU specifically? That's the exact question to ask us.
+
+Tap below — it opens a WhatsApp chat. We'll tell you straight whether it's a fit, even if the answer's no.
 ```
 
 ---
@@ -389,8 +423,8 @@ All exports at 1080×1080 (1:1, feed) AND 1080×1920 (9:16, Stories/Reels).
 | 1 | Cold · Switcher | `Stuck In A Job You Hate?` | Text-dominant on navy + gold. Subline: "There's a real route into PT — and you don't need a degree." | A: text only · B: text over candid photo (30-something at desk/in car) |
 | 2 | Cold · Starter | `You're Already In The Gym Anyway…` | Text-dominant. Subline: "Stop renting motivation. Start coaching it." | A: text only · B: text over gym-floor photo (low-light, candid) |
 | 3 | Cold · Returner | `Ready For Something That's Yours Again?` | Warmer tone. Text-dominant. Subline: "A flexible PT qualification built for real life — kids, mortgage, school run." | A: text only · B: text over warm domestic photo (no faces — coffee mug, morning light) |
-| 4 | RT 1 | `Most PT Courses Leave You Stuck` | Comparison ✕ vs ✓ list. Brand-consistent navy + gold. | Single variant |
-| 5 | RT 2 | `Too Late To Become A PT? Not Quite.` | Headline + 3 struck-through objections (too old / too inexperienced / too late). | Single variant |
+| 4 | RT 1 | `Most PT Courses Leave You Stuck` | Comparison ✕ vs ✓ list. Brand-consistent navy + gold. **Footer CTA: "Chat on WhatsApp →"** + WhatsApp glyph (NOT quiz, NOT "Message us INFO" — these now run as WhatsApp Click-to-Chat ads) | Single variant — REGENERATE footer |
+| 5 | RT 2 | `Too Late To Become A PT? Not Quite.` | Headline + 3 struck-through objections (too old / too inexperienced / too late). **Footer CTA: "Chat on WhatsApp →"** + WhatsApp glyph | Single variant — REGENERATE footer |
 
 ### Static image creative rules
 - **Dimensions:** 1080×1080 (feed) + 1080×1920 (Stories/Reels) — both required per ad
@@ -492,6 +526,38 @@ The only exception: CTR under 1% after 72 hours = the creative is broken, kill a
 
 ---
 
+## First-week reality check + Switcher fix plan (2026-06-05)
+
+**The numbers lied in both directions.** Three systems disagreed on week-1 cold results:
+
+| Source | Reported | Verdict |
+|---|---|---|
+| Meta Ads Manager | 14 leads · £9.81 CPL | **Inflated ~4.7×** (1-day-view attribution + every lead type firing one generic `Lead`) |
+| GA4 | 1 quiz_complete | **Under-counted** (client-side/consent loss) |
+| **MailerLite (PTLL Quiz group)** | **3 real leads** (phone numbers captured) | ✅ **Ground truth** |
+
+**Real CPL ≈ £46** (3 leads ÷ £137 spent on Switcher). Also: **only Switcher delivered** — Starter (£1.45) and Returner (£0.26) were starved by Advantage Campaign Budget chasing Switcher's *fake* £9.81 CPL.
+
+### Decision: concentrate on Switcher (don't spread £20/day across 3 angles)
+At £20/day + ~£46 real CPL, only one angle can reach learning. Switcher is the only one with traction → feed it, fix the measurement, improve the creative, then judge. **Leave Advantage Campaign Budget ON** (it's already concentrating on Switcher — which is now what we want). No restructure.
+
+### ✅ Code fixes shipped (2026-06-05)
+- **Phantom Lead gated** — `QuizApp.tsx` now fires `Lead` + `quiz_complete` only when the server returns `lead: true`. Silently-blocked spam/bot submissions return `lead: false` and no longer inflate Meta/GA4 or teach the algorithm to chase junk. (`/api/quiz-submission` returns the flag.)
+- **MailerLite push hardened** — the Zapier push retries once and logs `level:lead-lost` on failure instead of silently dropping the lead or 500-ing the submission.
+
+### ⚙️ Meta settings to change (Callum — UI, ~5 min)
+1. **Attribution:** set Switcher to **7-day click, NO view** (drop the 1-day-view bucket that's manufacturing most of the phantom leads).
+2. **Custom Conversion "PTLL · Quiz Lead":** event `Lead` filtered to `content_category` ∈ {switcher, starter, returner} (quiz Leads set this; prospectus/hero/book-call Leads don't). Lets you report/optimise on *quiz* leads specifically instead of the lumped `Lead`.
+
+### 📏 Scoreboard + decision rule
+- **Judge on the MailerLite PTLL Quiz group, never Meta's Lead column.**
+- **Bar:** if real (MailerLite) CPL doesn't drop **under ~£25 over the next ~£150 spend** — with fixed tracking + the creative pop applied — that's the signal to split **Starter** into its own £15–20/day campaign and test a fresh angle.
+
+### 🎨 Creative lever (biggest CPL mover)
+Apply the **v2 POP LAYER** in `AD-IMAGE-PROMPTS.md` and regenerate Switcher: real founder/learner **face** + solid gold **CTA button** first. Watch the quiz-start rate once tracking is trustworthy.
+
+---
+
 ## Open items before go-live (assign to Callum)
 
 - [ ] Confirm `META_PIXEL_ID` + `META_CAPI_ACCESS_TOKEN` in Vercel Production
@@ -500,6 +566,8 @@ The only exception: CTR under 1% after 72 hours = the creative is broken, kill a
 - [ ] Fire one test Lead from the live site, confirm it lands in Events Manager Test Events with EMQ ≥7.0
 - [ ] Review committed code (current uncommitted diff = 4 Meta-readiness fixes + quiz rebuild + IC bounce) — commit when happy
 - [ ] Queue Phase 2 video production for week 3 if v1 CPL clears <£22
+- [ ] **WhatsApp RT routing:** put `07822012186` on the WhatsApp Business app + connect to the Facebook Page (Meta Business Suite → Settings → WhatsApp accounts) so it's selectable as the click-to-WhatsApp ad destination
+- [ ] **Book-a-call CTA:** add a `Chat on WhatsApp` button → `https://wa.me/447822012186?text=...` on the quiz result page + `/book-call` (manual reply)
 
 ---
 

@@ -36,6 +36,28 @@ Do NOT include:
 
 ---
 
+## v2 — POP LAYER (apply to EVERY ad) ⭐ NEW 2026-06-05
+
+The v1 statics are clean but flat. After studying OriGym's live Meta creatives (real faces, baked-in proof, button-style CTAs, depth), add these **on-brand** pop upgrades when you regenerate. They lift CTR without betraying the premium/anti-hype positioning — so **no** loud colours, sale badges or urgency.
+
+**1. Depth (do in AI gen):** instead of pure flat navy, add a **large subtle diagonal tonal panel** — a darker navy wedge (`#051D33`) cutting across the lower-left at ~20° behind the headline, plus a single **thin gold diagonal accent line**. Gives dimension so the ad doesn't read as a flat slide. Keep it whisper-quiet.
+
+**2. A real human (Canva composite — NOT AI):** the biggest miss in v1 is zero faces. Generate the text/background in Gemini, then in **Canva composite a REAL cut-out photo** on the right third:
+   - Cold Switcher → a founder candid (`/callum.webp` or `/miles.webp`) OR a real 30-something looking thoughtful
+   - Cold Starter → a real gym-floor learner (`/learner-*.png`)
+   - Cold Returner → keep softer; a warm real learner photo, relaxed, NOT gym kit
+   - **Never** AI-generate the person (brand rule). Composite a real asset.
+
+**3. Trust strip (do in AI gen or Canva):** a **slim bottom bar** in soft white, small caps, low-key: `NCFE LEVEL 2+3 · CIMSPA · ★★★★★ 17 GOOGLE REVIEWS`. Quiet credibility — matches OriGym's social proof without the loud Trustpilot graphic.
+
+**4. CTA as a BUTTON, not a bare arrow:** replace the thin gold arrow with a **solid gold pill button** (`#F5C518` fill, dark navy `#072B4A` text, rounded corners) reading the ad's CTA. Reads clickable → lifts CTR. Cold = `TAKE THE QUIZ →` · RT = `CHAT ON WHATSAPP →` (+ small WhatsApp glyph).
+
+**5. Differentiator badge (optional, top-right):** a small gold-outline badge: `RUN BY GYM OWNERS WHO HIRE PTs`. It's the one claim no competitor (OriGym, PT Academy, anyone) can make — the anti-factory wedge, baked into the visual.
+
+> Priority if time-boxed: **#4 (button) + #2 (face) first** — they move CTR most. #1 and #3 are polish.
+
+---
+
 ## AD 1 — Career Switcher (Cold, primary)
 
 **Audience:** 28-40 year olds, burned out at work, considering career change.
@@ -169,7 +191,7 @@ Composition:
       - "Personal tutor included"
       - "Mentorship Hub bundled free"
       - "Guaranteed gym interviews"
-- Bottom of frame, centred: small gold text "Take the 60-sec quiz →"
+- Bottom of frame, centred: a solid gold (#F5C518) rounded pill button with dark navy text reading "Chat on WhatsApp →" plus a small WhatsApp glyph (NOT a quiz CTA — these run as WhatsApp Click-to-Chat ads)
 
 Aspect ratio: 1:1 (1080 × 1080 pixels)
 ```
@@ -209,7 +231,7 @@ Composition:
   - Pill 3: "Too late" (struck through)
 - Pill tags are dark grey rounded rectangles with white text and a single thin red diagonal line crossing through each
 - Bottom of frame: soft white subline "Most start with zero clients, no coaching experience, no idea where to start."
-- Bottom-right: small gold "Take the free quiz →" CTA text
+- Bottom of frame, centred: a solid gold (#F5C518) rounded pill button with dark navy text reading "Chat on WhatsApp →" plus a small WhatsApp glyph (NOT a quiz CTA — these run as WhatsApp Click-to-Chat ads)
 
 Aspect ratio: 1:1 (1080 × 1080 pixels)
 ```

@@ -38,7 +38,9 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     if (result.silent) {
       logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-silent', signals: result.signals, ip, ua: request.headers.get('user-agent') });
-      return NextResponse.json({ success: true });
+      // Silent bot/spam block: look successful to the client but signal lead:false
+      // so the browser does NOT fire Lead/quiz_complete for junk submissions.
+      return NextResponse.json({ success: true, lead: false });
     }
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-user', signals: result.signals, ip });
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });
@@ -60,11 +62,24 @@ export async function POST(request: NextRequest) {
         submitted_at: new Date().toISOString(),
       };
 
-      await fetch(webhookUrl, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
-      });
+      // Resilient push — a Zapier blip must not 500 the submission or silently
+      // lose the lead. Retry once, then log loudly so it's recoverable from the
+      // server logs (search `level:lead-lost`). The CAPI Lead + email-server
+      // calls below still run regardless, so the conversion signal survives.
+      const pushToZapier = async (attempt = 1): Promise<void> => {
+        try {
+          const r = await fetch(webhookUrl, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+          });
+          if (!r.ok) throw new Error(`Zapier responded ${r.status}`);
+        } catch (err) {
+          if (attempt < 2) return pushToZapier(attempt + 1);
+          console.error('[quiz-submission] level:lead-lost — Zapier push failed after retry, lead may be missing from MailerLite:', payload.email, err);
+        }
+      };
+      await pushToZapier();
     } else {
       console.warn('[quiz-submission] QUIZ_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
@@ -125,7 +140,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const response = NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true, lead: true });
     try {
       attachPromoCookie(response, 'quiz');
     } catch (err) {
