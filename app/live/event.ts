@@ -3,10 +3,25 @@
 //
 // EDIT ME EACH MONTH: bump the EVENT object (number, title, topic, ISO
 // start/end, hosts, panellists, talkingPoints). Everything else — the human
-// date label, the Google Calendar link, the Event schema on /live, and the
-// date shown on /ask — derives from this. The stream link itself lives
-// server-side in LIVE_STREAM_URL and is returned by /api/live-register.
+// date label, the session label, the Google Calendar link, the Event schema on
+// /live, and the date shown on /ask — derives from this. The stream link itself
+// lives server-side in LIVE_STREAM_URL and is returned by /api/live-register.
+//
+// Speaker photos: drop images in /public/live/speakers/ and set `photo` to the
+// path (e.g. "/live/speakers/callum.webp"). If `photo` is omitted the page
+// renders a clean initials avatar instead — so missing photos never break it.
 // ─────────────────────────────────────────────────────────────────────────────
+
+export type Speaker = {
+  name: string;
+  /** Business / role line shown under the name. */
+  org: string;
+  /** Optional headshot path under /public. Falls back to initials avatar. */
+  photo?: string;
+};
+
+export const SERIES_NAME = "PT Launch Lab LIVE";
+export const SERIES_TAGLINE = "Monthly live discussions with leading fitness professionals.";
 
 export const EVENT = {
   number: 1,
@@ -18,22 +33,23 @@ export const EVENT = {
   startIso: "2026-07-15T20:00:00+01:00",
   endIso: "2026-07-15T21:15:00+01:00",
   hosts: [
-    "Callum Brown",
-    "Ryan Robinson",
-    "Miles Halstead",
-  ],
+    { name: "Callum Brown", org: "PT Launch Lab" },
+    { name: "Ryan Robinson", org: "PT Launch Lab" },
+    { name: "Miles Halstead", org: "PT Launch Lab" },
+  ] as Speaker[],
   panellists: [
-    "Jerome Scherrer — Muscle Mechanics",
-    "Sam Hinks — SJH Coaching",
-    "Tom Blackman — Ministry of Fitness",
-    "Aaron Caseley — MOFO Body Mechanic",
-    "Sohail Rashid — Brawn",
-  ],
+    { name: "Jerome Scherrer", org: "Muscle Mechanics" },
+    { name: "Sam Hinks", org: "SJH Coaching" },
+    { name: "Tom Blackman", org: "Ministry of Fitness" },
+    { name: "Aaron Caseley", org: "MOFO Body Mechanic" },
+    { name: "Sohail Rashid", org: "Brawn" },
+  ] as Speaker[],
+  // "Questions we'll be discussing" — teasers shown on /live.
   talkingPoints: [
-    "Is the PT market really saturated — or just full of part-timers?",
-    "What's actually filling client rosters in 2026 (and what's dead)",
-    "Employed vs self-employed vs online: the honest numbers",
-    "Live Q&A — your questions, answered on air",
+    "Is the PT market saturated?",
+    "Are GLP-1 weight-loss drugs a threat or an opportunity for coaches?",
+    "Where is the money really being made in fitness right now?",
+    "Where is the industry heading next? — plus live audience Q&A",
   ],
 };
 
@@ -50,12 +66,18 @@ export const whenLabel = new Intl.DateTimeFormat("en-GB", {
   timeZone: "Europe/London",
 }).format(start);
 
+// e.g. "July Session"
+export const sessionLabel = `${new Intl.DateTimeFormat("en-GB", {
+  month: "long",
+  timeZone: "Europe/London",
+}).format(start)} Session`;
+
 // Google Calendar wants UTC stamps as YYYYMMDDTHHMMSSZ.
 const toCalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
 export const calendarUrl =
   "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-  `&text=${encodeURIComponent(`PT Launch Lab LIVE — ${EVENT.title}`)}` +
+  `&text=${encodeURIComponent(`${SERIES_NAME} — ${EVENT.title}`)}` +
   `&dates=${toCalStamp(start)}/${toCalStamp(end)}` +
   `&details=${encodeURIComponent(`${EVENT.topic}\n\nYour watch link is in your confirmation email.`)}` +
   `&location=${encodeURIComponent("Online (link in your email)")}`;
