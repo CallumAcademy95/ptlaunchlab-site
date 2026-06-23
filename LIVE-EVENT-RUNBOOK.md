@@ -117,7 +117,13 @@ connection. Send every panellist this before the rehearsal:
 
 ---
 
-## PHASE 2 — MailerLite reminder automation (5 emails)
+## PHASE 2 — MailerLite emails
+
+> **Full email architecture is now in `LIVE-EVENT-EMAIL-PLAN.md`** — the
+> dual-purpose (event + nurture) plan: Track A welcome automation, Track B
+> monthly event cycle, Track C ongoing podcast/course/nurture, segments, and the
+> monthly operating rhythm. The condensed 5-email reminder set below is the
+> minimum to run Event #1; use the full plan for the complete build.
 
 Trigger: subscriber joins **"Live Sessions"**. Replace `{{WATCH_LINK}}` with the unlisted YouTube URL, `{{CALENDAR_LINK}}` with the Google Calendar link (the `/live` page builds the same one), `{{ASK_LINK}}` = `https://ptlaunchlab.co.uk/ask`, `{{TOPIC}}` and `{{WHEN}}` per event. Personalisation tag: `{$name}`.
 
