@@ -57,6 +57,18 @@ const prospectusSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
+// ── Live session registration ───────────────────────────────────────────────
+// Low-friction gate for the monthly live webinar/podcast. Email is the asset
+// we're capturing, so name + email are required and phone is OPTIONAL — every
+// extra required field on a free-event signup costs registrations. The phone,
+// when given, joins the WhatsApp reminder flow alongside the email sequence.
+const liveRegisterSchema = z.object({
+  name:  z.string().max(200),
+  email: z.string().max(254),
+  phone: z.string().max(40).optional().or(z.literal("")),
+  [SEC_KEY]: secSchema,
+});
+
 // ── Gym partnership ──────────────────────────────────────────────────────
 const gymPartnershipSchema = z.object({
   gymName:    z.string().min(2).max(200),
@@ -219,6 +231,43 @@ export function validateProspectus(raw: unknown): ValidationResult<ProspectusCle
   return {
     ok: true,
     data: { name: nameCheck.normalised!, email: ec.normalised!, phone: pc.normalised! },
+    signals: [],
+  };
+}
+
+export type LiveRegisterClean = { name: string; email: string; phone: string };
+
+export function validateLiveRegister(raw: unknown): ValidationResult<LiveRegisterClean> {
+  const parsed = liveRegisterSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Please enter your name and email.", signals: ["schema-fail"] };
+  }
+  const secCheck = sec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+
+  const nameCheck = validateName(parsed.data.name);
+  if (!nameCheck.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter your full name.", signals: [`name:${nameCheck.reason}`] };
+  }
+  const ec = validateEmail(parsed.data.email);
+  if (!ec.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  }
+  // Phone optional — only validate if the visitor chose to give one.
+  let phone = "";
+  if (parsed.data.phone) {
+    const pc = validateUKPhone(parsed.data.phone);
+    if (!pc.ok) {
+      return { ok: false, silent: false, status: 422, error: "Please enter a valid UK phone number, or leave it blank.", signals: [`phone:${pc.reason}`] };
+    }
+    phone = pc.normalised!;
+  }
+
+  return {
+    ok: true,
+    data: { name: nameCheck.normalised!, email: ec.normalised!, phone },
     signals: [],
   };
 }
