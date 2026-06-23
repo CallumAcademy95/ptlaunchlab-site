@@ -102,7 +102,20 @@ export default function LiveRegisterForm({ calendarUrl, whenLabel }: Props) {
             </a>
           )}
         </div>
-        <p className="text-soft/55 text-[12px] mt-5">
+        <div className="mt-7 pt-6 border-t border-white/[0.08]">
+          <p className="text-white font-semibold text-base mb-1">Got a question for the panel?</p>
+          <p className="text-soft/75 text-sm leading-relaxed mb-4">
+            Submit it now and we&apos;ll answer the best ones live on the night.
+          </p>
+          <a
+            href="/ask"
+            data-cta="live-ask-question"
+            className="inline-block text-center px-7 py-3 rounded-full border border-gold/50 text-gold font-bold text-sm hover:bg-gold/10 transition-all"
+          >
+            Submit a Question →
+          </a>
+        </div>
+        <p className="text-soft/55 text-[12px] mt-6">
           Can&apos;t make it live? Register anyway — we&apos;ll send you the podcast episode a week later.
         </p>
       </div>

@@ -119,7 +119,7 @@ connection. Send every panellist this before the rehearsal:
 
 ## PHASE 2 — MailerLite reminder automation (5 emails)
 
-Trigger: subscriber joins **"Live Sessions"**. Replace `{{WATCH_LINK}}` with the unlisted YouTube URL, `{{CALENDAR_LINK}}` with the Google Calendar link (the `/live` page builds the same one), `{{TOPIC}}` and `{{WHEN}}` per event. Personalisation tag: `{$name}`.
+Trigger: subscriber joins **"Live Sessions"**. Replace `{{WATCH_LINK}}` with the unlisted YouTube URL, `{{CALENDAR_LINK}}` with the Google Calendar link (the `/live` page builds the same one), `{{ASK_LINK}}` = `https://ptlaunchlab.co.uk/ask`, `{{TOPIC}}` and `{{WHEN}}` per event. Personalisation tag: `{$name}`.
 
 ### Email 1 — instant (on register)
 **Subject:** You're in 🎟️ here's your watch link
@@ -134,9 +134,11 @@ Save your watch link now so you don't lose it:
 
 Add it to your calendar: {{CALENDAR_LINK}}
 
-It's a proper live panel — 5 gym owners, coaches and PTs, no script,
-plus a live Q&A where we answer YOUR questions on air. Start thinking
-about what you want to ask.
+It's a proper live panel — gym owners, coaches and PTs, no script, plus a
+live Q&A where we answer YOUR questions on air.
+
+🎤 Got a question for the panel? Submit it here and we'll answer the best
+ones live: {{ASK_LINK}}
 
 See you there,
 Callum
@@ -148,17 +150,18 @@ PT Launch Lab
 ```
 {$name}, we go live tomorrow at 7:30pm.
 
-On the panel:
-• Callum Brown — PT Launch Lab, gym owner
-• Ryan Robinson — built & sold a £500k online PT business
-• + 3 working PTs, coaches and gym owners
+Your hosts: Callum Brown, Ryan Robinson & Miles Halstead
+On the panel: Jerome Scherrer (Muscle Mechanics), Sam Hinks (SJH Coaching),
+Tom Blackman (Ministry of Fitness), Aaron Caseley (MOFO Body Mechanic) &
+Sohail Rashid (Brawn).
 
-The 3 questions we're tackling:
-1. Is the PT market actually saturated — or just full of part-timers?
-2. What's really filling client rosters in 2026
-3. Employed vs self-employed vs online — the honest numbers
+What we're tackling:
+1. The GLP-1 / weight-loss-drug boom — threat or biggest opportunity yet?
+2. Is the PT market saturated — and how do you actually stand out?
+3. Where the money really is in 2026
 
-Got a question? Reply to this email and we'll try to get to it live.
+🎤 Last chance to get your question in — we read every one and answer the
+best live: {{ASK_LINK}}
 
 Your watch link: {{WATCH_LINK}}
 ```
@@ -235,14 +238,25 @@ Objective **Leads**, optimise for the `/live` registration (custom conversion on
 - **Host (Callum)** — drives conversation, hits run-of-show beats, reads out Q&A.
 - **Moderator (Ryan or 2nd person)** — works Omnichat: picks best questions, feeds host, drops links, mutes bad mics, triggers call-ins.
 
-### Run-of-show (90 min)
-| Time | Segment |
-|---|---|
-| 0–5 | Welcome · "drop your questions now" · housekeeping |
-| 5–20 | Quick intros — 8 people, ~90s each (hosts keep theirs tight) |
-| 20–55 | Main discussion — the 4 talking points, keep it moving |
-| 55–85 | **Live audience Q&A** — the trust engine, give it room |
-| 85–90 | Wrap · tease next month · CTA (courses / mentorship Hub) |
+### Run-of-show (~65 min — three 20-min segments + welcome/wrap)
+| Clock | Segment | What happens |
+|---|---|---|
+| 0–3 | Welcome | Fast hello + intro the 8, "drop questions in the chat now" |
+| 3–23 | **① Topics (20m)** | 1–2 researched industry themes — panel debates |
+| 23–43 | **② Submitted Q&A (20m)** | Host reads questions from the `/ask` form, grouped by theme |
+| 43–63 | **③ Open live Q&A (20m)** | Moderator pulls a handful of best live chat/Omnichat questions |
+| 63–65 | Wrap | Tease next month + CTA (courses / mentorship Hub) |
+
+**Segment ② mechanics:** questions come in via the **`/ask` page** (linked from the
+confirmation + reminder emails — NOT the signup form, to protect list conversion).
+Callum reviews + picks the best beforehand; host reads them grouped by theme.
+
+### Topic bank (segment ①) — rotate one or two per episode
+**Tier 1 (lead with these):** GLP-1 / weight-loss-drug boom · Is the market saturated & how to stand out · Where the money is (employed vs self-employed vs online).
+**Tier 2:** First 10 clients in 2026 (what's dead) · Retention as the real business · Social/content for PTs now · AI in coaching.
+**Tier 3:** Burnout & the hours · Women's strength boom · Pricing/raising rates · Gym-floor → own studio · Qualifications & CPD that matter.
+
+**Event #1 recommended:** lead with **GLP-1 revolution** + **saturated market / standing out** (the episode is literally "the real state of the industry").
 
 ### Pre-flight checklist (T-30 min, 19:00)
 - [ ] All 8 on screen (3 hosts + 5 guests) in the Riverside studio, camera + mic green (guests via **guest link**)

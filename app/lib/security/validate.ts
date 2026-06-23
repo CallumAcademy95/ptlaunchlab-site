@@ -57,6 +57,17 @@ const prospectusSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
+// ── Live session question ────────────────────────────────────────────────────
+// Separate from registration on purpose — the question form lives at /ask and
+// is reached via the confirmation/reminder emails, so it never adds friction to
+// the mailing-list signup. Email ties the question back to the registrant.
+const liveQuestionSchema = z.object({
+  name:     z.string().max(200).optional().or(z.literal("")),
+  email:    z.string().max(254),
+  question: z.string().min(5).max(2000),
+  [SEC_KEY]: secSchema,
+});
+
 // ── Live session registration ───────────────────────────────────────────────
 // Low-friction gate for the monthly live webinar/podcast. Email is the asset
 // we're capturing, so name + email are required and phone is OPTIONAL — every
@@ -233,6 +244,37 @@ export function validateProspectus(raw: unknown): ValidationResult<ProspectusCle
     data: { name: nameCheck.normalised!, email: ec.normalised!, phone: pc.normalised! },
     signals: [],
   };
+}
+
+export type LiveQuestionClean = { name: string; email: string; question: string };
+
+export function validateLiveQuestion(raw: unknown): ValidationResult<LiveQuestionClean> {
+  const parsed = liveQuestionSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Please enter your email and a question.", signals: ["schema-fail"] };
+  }
+  const secCheck = sec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+
+  const ec = validateEmail(parsed.data.email);
+  if (!ec.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  }
+  const question = (parsed.data.question ?? "").trim();
+  if (question.length < 5) {
+    return { ok: false, silent: false, status: 422, error: "Please type your question.", signals: ["question:too-short"] };
+  }
+
+  // Name optional — keep it if a real name, otherwise blank.
+  let name = "";
+  if (parsed.data.name) {
+    const nc = validateName(parsed.data.name);
+    if (nc.ok) name = nc.normalised!;
+  }
+
+  return { ok: true, data: { name, email: ec.normalised!, question }, signals: [] };
 }
 
 export type LiveRegisterClean = { name: string; email: string; phone: string };

@@ -3,65 +3,15 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
 import LiveRegisterForm from "./LiveRegisterForm";
+import { EVENT, whenLabel, calendarUrl } from "./event";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // /live — monthly live webinar/podcast registration page
 //
-// EDIT ME EACH MONTH: bump the EVENT object below (title, topic, ISO start/end,
-// panellists, talking points). Everything else — calendar link, schema, the
-// human date label — derives from it. The stream link itself lives server-side
-// in LIVE_STREAM_URL and is returned by /api/live-register after signup.
+// Event details live in ./event.ts (single source of truth, edited monthly).
+// The stream link lives server-side in LIVE_STREAM_URL and is returned by
+// /api/live-register after signup.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const EVENT = {
-  number: 1,
-  title: "The Real State of the PT Industry in 2026",
-  topic:
-    "Gym owners, coaches and PTs go live on the questions everyone's asking — is the market saturated, what actually fills a client roster now, and where the money really is. Bring your questions for the live Q&A.",
-  // ISO 8601 with explicit offset. July = BST (UTC+1). 20:00–21:30 local.
-  startIso: "2026-07-15T20:00:00+01:00",
-  endIso: "2026-07-15T21:30:00+01:00",
-  hosts: [
-    "Callum Brown",
-    "Ryan Robinson",
-    "Miles Halstead",
-  ],
-  panellists: [
-    "Jerome Scherrer — Muscle Mechanics",
-    "Sam Hinks — SJH Coaching",
-    "Tom Blackman — Ministry of Fitness",
-    "Aaron Caseley — MOFO Body Mechanic",
-    "Sohail Rashid — Brawn",
-  ],
-  talkingPoints: [
-    "Is the PT market really saturated — or just full of part-timers?",
-    "What's actually filling client rosters in 2026 (and what's dead)",
-    "Employed vs self-employed vs online: the honest numbers",
-    "Live Q&A — your questions, answered on air",
-  ],
-};
-
-// ── Derived date helpers ──────────────────────────────────────────────────
-const start = new Date(EVENT.startIso);
-const end = new Date(EVENT.endIso);
-
-const whenLabel = new Intl.DateTimeFormat("en-GB", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "Europe/London",
-}).format(start);
-
-// Google Calendar wants UTC stamps as YYYYMMDDTHHMMSSZ.
-const toCalStamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-const calendarUrl =
-  "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-  `&text=${encodeURIComponent(`PT Launch Lab LIVE — ${EVENT.title}`)}` +
-  `&dates=${toCalStamp(start)}/${toCalStamp(end)}` +
-  `&details=${encodeURIComponent(`${EVENT.topic}\n\nYour watch link is in your confirmation email.`)}` +
-  `&location=${encodeURIComponent("Online (link in your email)")}`;
 
 export const metadata: Metadata = {
   title: `PT Launch Lab LIVE — ${EVENT.title}`,
@@ -188,7 +138,7 @@ export default function Page() {
           <div className="max-w-5xl mx-auto px-5 py-14 md:py-20">
             <div className="grid sm:grid-cols-3 gap-8 text-center">
               {[
-                { h: "Register free", b: "Pop your name and email in — we'll send the private watch link straight away." },
+                { h: "Register free", b: "Pop your name and email in — we'll send the private watch link straight away, plus a link to submit a question for the panel." },
                 { h: "Join us live", b: "Watch the panel live and drop your questions in the Q&A. We answer them on air." },
                 { h: "Get the replay", b: "Miss it? It drops as a podcast episode a week later — we'll email you when it's up." },
               ].map((step, i) => (
