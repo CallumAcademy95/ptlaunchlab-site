@@ -10,11 +10,13 @@ Built around the existing site (`/live`), MailerLite, Meta ads and Riverside (**
 | | |
 |---|---|
 | **Title** | The Real State of the PT Industry in 2026 |
-| **Date/time** | **Thursday 24 July 2026, 19:30–21:00 (UK)** |
+| **Date/time** | **Wednesday 15 July 2026, 20:00–21:30 (UK)** |
 | **Platform** | Riverside (Grow) → multistream to **unlisted YouTube Live** |
 | **Gate** | Email-required-then-open (registration on `ptlaunchlab.co.uk/live`) |
-| **Panel** | Callum, Ryan + 3 guests (gym-floor PT / online coach / gym owner) |
-| **Podcast drop** | ~1 week later (~31 July) → Buzzsprout + YouTube + `/podcast` |
+| **Hosts** | Callum Brown · Ryan Robinson · Miles Halstead |
+| **Guest panellists** | Jerome Scherrer (Muscle Mechanics) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
+| **On screen** | 8 (3 hosts + 5 guests) — within Riverside studio limits |
+| **Podcast drop** | ~1 week later (~22 July) → Buzzsprout + YouTube + `/podcast` |
 
 ---
 
@@ -216,14 +218,14 @@ Objective **Leads**, optimise for the `/live` registration (custom conversion on
 
 | When | Task | Owner |
 |---|---|---|
-| **Now (wk of 23 Jun)** | Enable YouTube live streaming (24h activation). Lock 5 panellists + date. Build Phase 0 (Riverside studio, MailerLite seg + automation, Zapier, Vercel env). | Callum |
-| **Now** | Edit `EVENT` in `/live`, deploy. Confirm `/live` works end-to-end (test register → check MailerLite + confirmation email). | Callum |
-| **~3 July (3 wks out)** | Launch Meta ads. Start organic teasing (podcast audience, IG, WhatsApp list). | Callum |
-| **~17 July (1 wk out)** | **Tech rehearsal** in Riverside with all 5 guests — cameras, mics, guest links, recording on. | All |
-| **23 July (eve before)** | Final check: YouTube broadcast scheduled & unlisted, `LIVE_STREAM_URL` correct, emails queued, roles confirmed. | Callum |
-| **24 July, 19:00** | Pre-flight (below). | Host + Mod |
-| **24 July, 19:30** | **GO LIVE.** | All |
-| **~31 July** | Edit + publish episode → Buzzsprout + YouTube + `/podcast`. Cut clips. | Callum |
+| **Now (wk of 23 Jun)** | Enable YouTube live streaming (24h activation). Confirm all 8 panellists + date. Build Phase 0 (Riverside studio, MailerLite seg + automation, Zapier, Vercel env). | Callum |
+| **Now** | `EVENT` in `/live` set (date + panel ✓). Confirm `/live` works end-to-end (test register → check MailerLite + confirmation email). | Callum |
+| **ASAP (~3 wks out)** | Launch Meta ads (event is only 3 weeks out — don't delay). Start organic teasing (podcast audience, IG, WhatsApp list). | Callum |
+| **~8 July (1 wk out)** | **Tech rehearsal** in Riverside with all 8 — cameras, mics, guest links, recording on. | All |
+| **14 July (eve before)** | Final check: YouTube broadcast scheduled & unlisted, `LIVE_STREAM_URL` correct, emails queued, roles confirmed. | Callum |
+| **15 July, 19:30** | Pre-flight (below). | Host + Mod |
+| **15 July, 20:00** | **GO LIVE.** | All |
+| **~22 July** | Edit + publish episode → Buzzsprout + YouTube + `/podcast`. Cut clips. | Callum |
 
 ---
 
@@ -237,13 +239,13 @@ Objective **Leads**, optimise for the `/live` registration (custom conversion on
 | Time | Segment |
 |---|---|
 | 0–5 | Welcome · "drop your questions now" · housekeeping |
-| 5–15 | Panellist intros (~2 min each) |
-| 15–55 | Main discussion — the 4 talking points, keep it moving |
+| 5–20 | Quick intros — 8 people, ~90s each (hosts keep theirs tight) |
+| 20–55 | Main discussion — the 4 talking points, keep it moving |
 | 55–85 | **Live audience Q&A** — the trust engine, give it room |
 | 85–90 | Wrap · tease next month · CTA (courses / mentorship Hub) |
 
 ### Pre-flight checklist (T-30 min, 19:00)
-- [ ] All 5 panellists in the Riverside studio via **guest link**, camera + mic green
+- [ ] All 8 on screen (3 hosts + 5 guests) in the Riverside studio, camera + mic green (guests via **guest link**)
 - [ ] **Separate track recording confirmed ON**
 - [ ] YouTube destination connected, stream healthy (green) in Riverside
 - [ ] Unlisted YouTube watch page loads from `LIVE_STREAM_URL`

@@ -17,16 +17,21 @@ const EVENT = {
   number: 1,
   title: "The Real State of the PT Industry in 2026",
   topic:
-    "Five gym owners, coaches and PTs go live on the questions everyone's asking — is the market saturated, what actually fills a client roster now, and where the money really is. Bring your questions for the live Q&A.",
-  // ISO 8601 with explicit offset. July = BST (UTC+1). 19:30–21:00 local.
-  startIso: "2026-07-24T19:30:00+01:00",
-  endIso: "2026-07-24T21:00:00+01:00",
+    "Gym owners, coaches and PTs go live on the questions everyone's asking — is the market saturated, what actually fills a client roster now, and where the money really is. Bring your questions for the live Q&A.",
+  // ISO 8601 with explicit offset. July = BST (UTC+1). 20:00–21:30 local.
+  startIso: "2026-07-15T20:00:00+01:00",
+  endIso: "2026-07-15T21:30:00+01:00",
+  hosts: [
+    "Callum Brown",
+    "Ryan Robinson",
+    "Miles Halstead",
+  ],
   panellists: [
-    "Callum Brown — PT Launch Lab co-founder, gym owner",
-    "Ryan Robinson — built & sold a £500k online PT business",
-    "A working gym-floor PT (guest)",
-    "An online/hybrid coach (guest)",
-    "An independent gym owner (guest)",
+    "Jerome Scherrer — Muscle Mechanics",
+    "Sam Hinks — SJH Coaching",
+    "Tom Blackman — Ministry of Fitness",
+    "Aaron Caseley — MOFO Body Mechanic",
+    "Sohail Rashid — Brawn",
   ],
   talkingPoints: [
     "Is the PT market really saturated — or just full of part-timers?",
@@ -100,7 +105,10 @@ const eventSchema = {
     url: "https://ptlaunchlab.co.uk/live",
     validFrom: new Date().toISOString(),
   },
-  performer: { "@type": "Organization", name: "PT Launch Lab" },
+  performer: [
+    ...EVENT.hosts.map((name) => ({ "@type": "Person", name })),
+    ...EVENT.panellists.map((p) => ({ "@type": "Person", name: p.split("—")[0].trim() })),
+  ],
 };
 
 export default function Page() {
@@ -142,6 +150,16 @@ export default function Page() {
           <div className="max-w-5xl mx-auto px-5 py-14 md:py-20 grid md:grid-cols-2 gap-10 md:gap-16">
             <div>
               <h2 className="font-display font-extrabold text-2xl md:text-3xl mb-5">On the panel</h2>
+              <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">Your hosts</p>
+              <ul className="space-y-3 mb-7">
+                {EVENT.hosts.map((p) => (
+                  <li key={p} className="flex gap-3 text-soft/85 text-base leading-relaxed">
+                    <span className="text-gold mt-1.5 shrink-0">●</span>
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">Guest panellists</p>
               <ul className="space-y-3">
                 {EVENT.panellists.map((p) => (
                   <li key={p} className="flex gap-3 text-soft/85 text-base leading-relaxed">
