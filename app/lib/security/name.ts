@@ -15,7 +15,7 @@
 
 const URL_FRAGMENTS = /\b(https?:|www\.|\.com\b|\.net\b|\.ru\b|\.cn\b|\.xyz\b|<|>|\[url|t\.me\/|whatsapp\.com)/i;
 const REPEAT_CHAR = /(.)\1{5,}/;        // 6+ same char in a row
-const REPEAT_PAIR = /(..){5,}/;          // same 2-char pattern repeated 5+ times
+const REPEAT_PAIR = /(..)\1{4,}/;         // same 2-char pattern repeated 5+ times (e.g. "ababababab")
 const VOWEL_RE = /[aeiouyÀ-ſ]/i; // includes common accented vowels
 
 export type NameCheck = {
