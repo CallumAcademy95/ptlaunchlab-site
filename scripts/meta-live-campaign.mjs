@@ -291,6 +291,59 @@ async function creatives() {
   console.log('');
 }
 
-const fns = { recon, build, creatives };
+// ── monitor ───────────────────────────────────────────────────────────────
+async function monitor() {
+  const camps = await getAll(`/${ACCT}/campaigns`, 'id,name,status');
+  const camp = camps.find((c) => c.name === CONFIG.campaignName);
+  if (!camp) { console.error(`Campaign "${CONFIG.campaignName}" not found.`); process.exit(1); }
+
+  const preset = (args.find((a) => a.startsWith('--since='))?.split('=')[1]) || 'today';
+  const insOf = async (id) => {
+    const r = await graph(`/${id}/insights`, 'GET', {
+      fields: 'impressions,clicks,spend,ctr,cpc,actions', date_preset: preset,
+    });
+    const d = (r.data || [])[0];
+    if (!d) return { spend: 0, impressions: 0, clicks: 0, ctr: 0, leads: 0 };
+    const acts = d.actions || [];
+    const lead = acts.find((a) => a.action_type === 'lead'
+      || a.action_type === 'offsite_conversion.fb_pixel_custom'
+      || a.action_type.startsWith('offsite_conversion'));
+    return {
+      spend: +d.spend || 0, impressions: +d.impressions || 0, clicks: +d.clicks || 0,
+      ctr: +d.ctr || 0, leads: lead ? +lead.value : 0,
+    };
+  };
+  const f = (n) => `£${n.toFixed(2)}`;
+
+  console.log(`\n📊 ${camp.name}  [${camp.status}]  · window: ${preset}\n`);
+  const sets = await getAll(`/${camp.id}/adsets`, 'id,name,status,daily_budget');
+  let tSpend = 0, tLeads = 0;
+  for (const s of sets.sort((a, b) => a.name.localeCompare(b.name))) {
+    const si = await insOf(s.id);
+    console.log(`▸ ${s.name}  [${s.status}]  ${f(s.daily_budget / 100)}/day`);
+    console.log(`    spend ${f(si.spend)} · impr ${si.impressions} · clicks ${si.clicks} · CTR ${si.ctr.toFixed(2)}% · regs ${si.leads}${si.leads ? ` · CPL ${f(si.spend / si.leads)}` : ''}`);
+    const ads = await getAll(`/${s.id}/ads`, 'id,name,status,effective_status');
+    for (const ad of ads) {
+      const ai = await insOf(ad.id);
+      const flag = ad.effective_status !== 'ACTIVE' ? `  ⚠️ ${ad.effective_status}` : '';
+      const score = scoreAd(ai);
+      console.log(`      • ${ad.name}${flag}`);
+      if (ai.spend > 0) console.log(`          ${f(ai.spend)} · CTR ${ai.ctr.toFixed(2)}% · regs ${ai.leads}${ai.leads ? ` · CPL ${f(ai.spend / ai.leads)}` : ''} · ${score.label}`);
+    }
+    tSpend += si.spend; tLeads += si.leads;
+  }
+  console.log(`\n   TOTAL: spend ${f(tSpend)} · registrations ${tLeads}${tLeads ? ` · blended CPL ${f(tSpend / tLeads)}` : ''}\n`);
+}
+
+// minimal scorer (mirrors lib/ads/meta.ts thresholds)
+function scoreAd(i) {
+  if (i.spend < 5) return { label: 'insufficient data' };
+  let s = 50;
+  if (i.ctr >= 2.5) s += 25; else if (i.ctr >= 1.5) s += 10; else if (i.ctr < 0.8) s -= 20;
+  if (i.leads > 0) { const cpl = i.spend / i.leads; if (cpl < 6) s += 25; else if (cpl < 10) s += 10; else if (cpl > 15) s -= 25; }
+  return { label: s >= 70 ? 'good ✅' : s >= 45 ? 'ok' : 'poor ⚠️' };
+}
+
+const fns = { recon, build, creatives, monitor };
 if (!fns[command]) { console.error(`Unknown command "${command}". Use: recon | build | creatives`); process.exit(1); }
 fns[command]().catch((e) => { console.error('\n✗', e.message, '\n'); process.exit(1); });
