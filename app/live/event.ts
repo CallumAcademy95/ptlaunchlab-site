@@ -38,7 +38,7 @@ export const EVENT = {
     { name: "Miles Halstead", org: "PT Launch Lab" },
   ] as Speaker[],
   panellists: [
-    { name: "Jerome Scherrer", org: "Muscle Mechanics" },
+    { name: "Jonny Grayshon", org: "Vaxa Fitness Transformations" },
     { name: "Sam Hinks", org: "SJH Coaching" },
     { name: "Tom Blackman", org: "Ministry of Fitness" },
     { name: "Aaron Caseley", org: "MOFO Body Mechanic" },

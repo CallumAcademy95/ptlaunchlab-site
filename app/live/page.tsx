@@ -120,7 +120,7 @@ export default function Page() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
               </span>
-              Monthly live series · Free to join
+              Live Online Discussion · Free to join
             </span>
 
             <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl leading-[1.02] tracking-tight mb-4">

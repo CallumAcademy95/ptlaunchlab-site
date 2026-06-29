@@ -14,7 +14,7 @@ Built around the existing site (`/live`), MailerLite, Meta ads and Riverside (**
 | **Platform** | Riverside (Grow) → multistream to **unlisted YouTube Live** |
 | **Gate** | Email-required-then-open (registration on `ptlaunchlab.co.uk/live`) |
 | **Hosts** | Callum Brown · Ryan Robinson · Miles Halstead |
-| **Guest panellists** | Jerome Scherrer (Muscle Mechanics) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
+| **Guest panellists** | Jonny Grayshon (Vaxa Fitness Transformations) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
 | **On screen** | 8 (3 hosts + 5 guests) — within Riverside studio limits |
 | **Podcast drop** | ~1 week later (~22 July) → Buzzsprout + YouTube + `/podcast` |
 
@@ -157,7 +157,7 @@ PT Launch Lab
 {$name}, we go live tomorrow at 7:30pm.
 
 Your hosts: Callum Brown, Ryan Robinson & Miles Halstead
-On the panel: Jerome Scherrer (Muscle Mechanics), Sam Hinks (SJH Coaching),
+On the panel: Jonny Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching),
 Tom Blackman (Ministry of Fitness), Aaron Caseley (MOFO Body Mechanic) &
 Sohail Rashid (Brawn).
 

@@ -33,7 +33,7 @@ live attendance rate, cost per *new* subscriber.
 | **Title** | The Real State of the PT Industry in 2026 |
 | **Date/time** | **Wednesday 15 July 2026, 8:00pm UK** (~1 hour) |
 | **Hosts** | Callum Brown · Ryan Robinson · Miles Halstead (PT Launch Lab) |
-| **Guest panellists** | Jerome Scherrer (Muscle Mechanics) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
+| **Guest panellists** | Jonny Grayshon (Vaxa Fitness Transformations) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
 | **Topics** | The GLP-1 / weight-loss-drug boom (threat or opportunity for PTs?) · Is the PT market saturated & how to stand out · Where the money really is in 2026 |
 | **Live hook** | Audience Q&A — viewers submit questions and get them answered live |
 | **Platform** | Riverside → streamed to an unlisted YouTube link given only to registrants |

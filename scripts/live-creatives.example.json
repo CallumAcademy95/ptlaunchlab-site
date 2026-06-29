@@ -1,0 +1,37 @@
+{
+  "_note": "Fill imagePathOrUrl for each ad (local file path or public URL). 'adSet' must match an ad-set name created by build. Copy = the two variations from LIVE-EVENT-CAMPAIGN-PLAN.md §4. Duplicate/trim entries to control which ads land in which ad set. Then: node --use-system-ca scripts/meta-live-campaign.mjs creatives --manifest=scripts/live-creatives.json --execute",
+  "ads": [
+    {
+      "adSet": "LIVE Jul26 — Warm Audience",
+      "name": "LIVE Jul26 — Lead Angle (saturated) — V1",
+      "headline": "The Real State Of The PT Industry In 2026",
+      "primaryText": "Thinking about becoming a PT? Already qualified but struggling to grow? Or wondering what the fitness industry actually looks like in 2026?\n\nWe're bringing together some of the UK's leading coaches, gym owners and fitness professionals for a live discussion covering:\n✓ Is the PT market saturated?\n✓ Are GLP-1 weight loss drugs a threat or opportunity?\n✓ Where is the money really being made in fitness right now?\n✓ Live audience Q&A\n\nFree to attend. Register now and we'll send you the private watch link.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": ""
+    },
+    {
+      "adSet": "LIVE Jul26 — Quiz Segments",
+      "name": "LIVE Jul26 — Industry Panel — V2",
+      "headline": "Live Fitness Industry Panel",
+      "primaryText": "Everyone has an opinion about the fitness industry. We're bringing together the people actually building businesses inside it.\n\nJoin PT Launch Lab LIVE and hear what some of the UK's leading coaches think about:\n• The future of personal training • Online coaching • AI • GLP-1 drugs • Standing out in a crowded market\n\nFree registration. Limited live places.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": ""
+    },
+    {
+      "adSet": "LIVE Jul26 — Lookalikes",
+      "name": "LIVE Jul26 — Lead Angle (saturated) — V1",
+      "headline": "The Real State Of The PT Industry In 2026",
+      "primaryText": "Thinking about becoming a PT? Already qualified but struggling to grow? Or wondering what the fitness industry actually looks like in 2026?\n\nWe're bringing together some of the UK's leading coaches, gym owners and fitness professionals for a live discussion covering:\n✓ Is the PT market saturated?\n✓ Are GLP-1 weight loss drugs a threat or opportunity?\n✓ Where is the money really being made in fitness right now?\n✓ Live audience Q&A\n\nFree to attend. Register now and we'll send you the private watch link.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": ""
+    },
+    {
+      "adSet": "LIVE Jul26 — Broad",
+      "name": "LIVE Jul26 — Industry Panel — V2",
+      "headline": "Live Fitness Industry Panel",
+      "primaryText": "Everyone has an opinion about the fitness industry. We're bringing together the people actually building businesses inside it.\n\nJoin PT Launch Lab LIVE and hear what some of the UK's leading coaches think about:\n• The future of personal training • Online coaching • AI • GLP-1 drugs • Standing out in a crowded market\n\nFree registration. Limited live places.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": ""
+    }
+  ]
+}

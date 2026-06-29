@@ -1,0 +1,97 @@
+{
+  "_note": "9-ad matrix: every audience (Warm/Lookalikes/Broad) x every creative (Saturated/Worth It/GLP-1). Copy is short-form, answers the image hook, adds urgency + social proof. Per-audience descriptions, per-ad UTMs (utm_content={aud}_{creative}). Run: cd C:/Projects/ptlaunchlab-site && META_ACCESS_TOKEN=... META_AD_ACCOUNT_ID=act_37869536 META_PAGE_ID=798389646699303 node --use-system-ca scripts/meta-live-campaign.mjs creatives --manifest=scripts/live-creatives.json --execute. Idempotent: skips ads whose name already exists.",
+  "ads": [
+    {
+      "adSet": "LIVE Jul26 — Warm Audience",
+      "name": "LIVE Jul26 — Saturated — Warm",
+      "headline": "The Real State Of The PT Industry In 2026",
+      "description": "Free live online discussion • Wed 15 July • 8PM UK",
+      "primaryText": "Is the personal training market really saturated?\n\nThe coaches and gym owners actually making money say no.\n\nJoin us live on 15 July for a free, honest discussion on where the money really is in fitness right now — and how to stand out.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/lead-saturated-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=warm_saturated"
+    },
+    {
+      "adSet": "LIVE Jul26 — Warm Audience",
+      "name": "LIVE Jul26 — Worth It — Warm",
+      "headline": "Is Becoming A PT Still Worth It In 2026?",
+      "description": "Free live online discussion • Wed 15 July • 8PM UK",
+      "primaryText": "Short answer: yes — but not the way most courses sell it.\n\nWe're getting UK gym owners and coaches on one live panel to talk honestly about 2026: market saturation, GLP-1 drugs, and where the money actually is.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nRegister free today.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/worth-it-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=warm_worthit"
+    },
+    {
+      "adSet": "LIVE Jul26 — Warm Audience",
+      "name": "LIVE Jul26 — Contrarian — Warm",
+      "headline": "Most PTs Are Worried About The Wrong Thing",
+      "description": "Free live online discussion • Wed 15 July • 8PM UK",
+      "primaryText": "AI. Market saturation. Weight-loss drugs.\n\nEveryone's worrying about the same things.\n\nBut that's not what decides who succeeds in fitness.\n\nJoin us live on 15 July to hear what the people actually building businesses focus on instead.\n\nLive only. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/contrarian-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=warm_contrarian"
+    },
+
+    {
+      "adSet": "LIVE Jul26 — Lookalikes",
+      "name": "LIVE Jul26 — Saturated — LAL",
+      "headline": "The Real State Of The PT Industry In 2026",
+      "description": "Reserve your place today",
+      "primaryText": "Is the personal training market really saturated?\n\nThe coaches and gym owners actually making money say no.\n\nJoin us live on 15 July for a free, honest discussion on where the money really is in fitness right now — and how to stand out.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/lead-saturated-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=lookalike_saturated"
+    },
+    {
+      "adSet": "LIVE Jul26 — Lookalikes",
+      "name": "LIVE Jul26 — Worth It — LAL",
+      "headline": "Is Becoming A PT Still Worth It In 2026?",
+      "description": "Reserve your place today",
+      "primaryText": "Short answer: yes — but not the way most courses sell it.\n\nWe're getting UK gym owners and coaches on one live panel to talk honestly about 2026: market saturation, GLP-1 drugs, and where the money actually is.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nRegister free today.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/worth-it-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=lookalike_worthit"
+    },
+    {
+      "adSet": "LIVE Jul26 — Lookalikes",
+      "name": "LIVE Jul26 — Contrarian — LAL",
+      "headline": "Most PTs Are Worried About The Wrong Thing",
+      "description": "Reserve your place today",
+      "primaryText": "AI. Market saturation. Weight-loss drugs.\n\nEveryone's worrying about the same things.\n\nBut that's not what decides who succeeds in fitness.\n\nJoin us live on 15 July to hear what the people actually building businesses focus on instead.\n\nLive only. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/contrarian-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=lookalike_contrarian"
+    },
+
+    {
+      "adSet": "LIVE Jul26 — Broad",
+      "name": "LIVE Jul26 — Saturated — Broad",
+      "headline": "The Real State Of The PT Industry In 2026",
+      "description": "Live panel • Free registration • Ask questions live",
+      "primaryText": "Is the personal training market really saturated?\n\nThe coaches and gym owners actually making money say no.\n\nJoin us live on 15 July for a free, honest discussion on where the money really is in fitness right now — and how to stand out.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/lead-saturated-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=broad_saturated"
+    },
+    {
+      "adSet": "LIVE Jul26 — Broad",
+      "name": "LIVE Jul26 — Worth It — Broad",
+      "headline": "Is Becoming A PT Still Worth It In 2026?",
+      "description": "Live panel • Free registration • Ask questions live",
+      "primaryText": "Short answer: yes — but not the way most courses sell it.\n\nWe're getting UK gym owners and coaches on one live panel to talk honestly about 2026: market saturation, GLP-1 drugs, and where the money actually is.\n\nBuilt by gym owners who've hired 500+ trainers.\n\nLive only. One discussion. Ask your questions live.\n\nRegister free today.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/worth-it-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=broad_worthit"
+    },
+    {
+      "adSet": "LIVE Jul26 — Broad",
+      "name": "LIVE Jul26 — Contrarian — Broad",
+      "headline": "Most PTs Are Worried About The Wrong Thing",
+      "description": "Live panel • Free registration • Ask questions live",
+      "primaryText": "AI. Market saturation. Weight-loss drugs.\n\nEveryone's worrying about the same things.\n\nBut that's not what decides who succeeds in fitness.\n\nJoin us live on 15 July to hear what the people actually building businesses focus on instead.\n\nLive only. Ask your questions live.\n\nReserve your free seat.",
+      "cta": "SIGN_UP",
+      "imagePathOrUrl": "ad-assets/live-july2026/contrarian-1080x1080.png",
+      "url": "https://ptlaunchlab.co.uk/live?utm_source=facebook&utm_medium=paid_social&utm_campaign=ptll_live_july&utm_content=broad_contrarian"
+    }
+  ]
+}
