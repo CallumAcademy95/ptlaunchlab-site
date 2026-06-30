@@ -3,6 +3,7 @@ import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateLiveQuestion } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { EVENT } from '@/app/live/event';
+import { getSupabaseAdmin } from '@/app/lib/supabase-admin';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/live-question
@@ -47,6 +48,24 @@ export async function POST(request: NextRequest) {
 
   try {
     const { name, email, question } = result.data;
+    const eventLabel = `#${EVENT.number} — ${EVENT.title}`;
+
+    // Primary store: Supabase, so the host can read + triage on
+    // /admin/live-questions. Best-effort — a DB hiccup must not lose the
+    // question, so we still fall through to the Zapier push below.
+    try {
+      const { error } = await getSupabaseAdmin().from('live_questions').insert({
+        name: name || null,
+        email,
+        question,
+        event: eventLabel,
+        source: 'live-question',
+        ip,
+      });
+      if (error) throw error;
+    } catch (dbErr) {
+      console.error('[live-question] level:lead-lost — Supabase insert failed:', email, dbErr);
+    }
 
     const webhookUrl =
       process.env.LIVE_ZAPIER_WEBHOOK_URL ||
@@ -58,7 +77,7 @@ export async function POST(request: NextRequest) {
         email,
         question,
         source: 'live-question',
-        event: `#${EVENT.number} — ${EVENT.title}`,
+        event: eventLabel,
         submitted_at: new Date().toISOString(),
       };
       const pushToZapier = async (attempt = 1): Promise<void> => {
