@@ -11,9 +11,12 @@ import { getSupabaseAdmin } from '@/app/lib/supabase-admin';
 // Pre-submitted questions for the monthly live panel (the /ask page, linked
 // from the confirmation + reminder emails). Deliberately NOT part of the
 // registration form — keeping the signup to name+email protects the mailing-
-// list conversion. Forwards to the same Zapier pipeline tagged
-// `source: live-question` + the current event, so questions land alongside the
-// leads for the host to review and pick the best before going live.
+// list conversion.
+//
+// Saves to the live_questions table; the host reads + triages them on
+// /admin/live-questions before going live. No MailerLite add here on purpose —
+// anyone reaching /ask came from a confirmation/reminder email, so they are
+// already on the "Live Sessions" list (subscribed at registration).
 //
 // No CAPI here — the person is already a registered lead; this is content, not
 // a conversion signal.
@@ -50,52 +53,20 @@ export async function POST(request: NextRequest) {
     const { name, email, question } = result.data;
     const eventLabel = `#${EVENT.number} — ${EVENT.title}`;
 
-    // Primary store: Supabase, so the host can read + triage on
-    // /admin/live-questions. Best-effort — a DB hiccup must not lose the
-    // question, so we still fall through to the Zapier push below.
-    try {
-      const { error } = await getSupabaseAdmin().from('live_questions').insert({
-        name: name || null,
-        email,
-        question,
-        event: eventLabel,
-        source: 'live-question',
-        ip,
-      });
-      if (error) throw error;
-    } catch (dbErr) {
-      console.error('[live-question] level:lead-lost — Supabase insert failed:', email, dbErr);
-    }
-
-    const webhookUrl =
-      process.env.LIVE_ZAPIER_WEBHOOK_URL ||
-      process.env.PROSPECTUS_ZAPIER_WEBHOOK_URL;
-
-    if (webhookUrl) {
-      const payload = {
-        name: name || '',
-        email,
-        question,
-        source: 'live-question',
-        event: eventLabel,
-        submitted_at: new Date().toISOString(),
-      };
-      const pushToZapier = async (attempt = 1): Promise<void> => {
-        try {
-          const r = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          if (!r.ok) throw new Error(`Zapier responded ${r.status}`);
-        } catch (err) {
-          if (attempt < 2) return pushToZapier(attempt + 1);
-          console.error('[live-question] level:lead-lost — Zapier push failed after retry:', email, err);
-        }
-      };
-      await pushToZapier();
-    } else {
-      console.warn('[live-question] no webhook configured — skipping.');
+    const { error } = await getSupabaseAdmin().from('live_questions').insert({
+      name: name || null,
+      email,
+      question,
+      event: eventLabel,
+      source: 'live-question',
+      ip,
+    });
+    if (error) {
+      console.error('[live-question] level:lead-lost — Supabase insert failed:', email, error);
+      return NextResponse.json(
+        { success: false, error: 'Server error. Please try again.' },
+        { status: 500 },
+      );
     }
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
