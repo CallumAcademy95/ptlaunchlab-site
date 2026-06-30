@@ -33,16 +33,16 @@ export const EVENT = {
   startIso: "2026-07-15T20:00:00+01:00",
   endIso: "2026-07-15T21:15:00+01:00",
   hosts: [
-    { name: "Callum Brown", org: "PT Launch Lab" },
-    { name: "Ryan Robinson", org: "PT Launch Lab" },
-    { name: "Miles Halstead", org: "PT Launch Lab" },
+    { name: "Callum Brown", org: "PT Launch Lab", photo: "/callum.webp" },
+    { name: "Ryan Robinson", org: "PT Launch Lab", photo: "/ryan.webp" },
+    { name: "Miles Halstead", org: "PT Launch Lab", photo: "/miles.webp" },
   ] as Speaker[],
   panellists: [
-    { name: "Jonny Grayshon", org: "Vaxa Fitness Transformations" },
-    { name: "Sam Hinks", org: "SJH Coaching" },
-    { name: "Tom Blackman", org: "Ministry of Fitness" },
-    { name: "Aaron Caseley", org: "MOFO Body Mechanic" },
-    { name: "Sohail Rashid", org: "Brawn" },
+    { name: "Jonny Grayshon", org: "Vaxa Fitness Transformations", photo: "/live/speakers/jonny-grayshon.png" },
+    { name: "Sam Hinks", org: "SJH Coaching", photo: "/live/speakers/sam-hinks.png" },
+    { name: "Tom Blackman", org: "Ministry of Fitness", photo: "/live/speakers/tom-blackman.png" },
+    { name: "Aaron Caseley", org: "MOFO Body Mechanic", photo: "/live/speakers/aaron-caseley.png" },
+    { name: "Sohail Rashid", org: "Brawn", photo: "/live/speakers/sohail-rashid.png" },
   ] as Speaker[],
   // "Questions we'll be discussing" — teasers shown on /live.
   talkingPoints: [
