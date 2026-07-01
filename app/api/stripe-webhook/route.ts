@@ -27,17 +27,19 @@ import { sendCapiEvent } from "@/app/lib/metaCapi";
 
 export const runtime = "nodejs"; // need crypto + raw body
 
-// PTLL course sale amounts (initial payment, £). This Stripe account also
-// processes Ultimate Shred gym memberships, which must NOT fire PTLL pixel /
-// GA4 Purchase events. We separate the two by the initial charge amount:
-//   599  = deposit plan (£599 + 5×£200 later)
-//   1399 = pay-in-full with the PIF promo
-//   1599 = pay-in-full standard
-// A checkout whose amount isn't one of these is treated as non-course (gym
-// membership etc.) and skipped for PTLL analytics. Add partner-specific
-// course amounts here if a partner ever uses a custom-priced Payment Link.
-const COURSE_SALE_AMOUNTS = new Set([599, 1399, 1599]);
-const isCourseSale = (amountGbp: number) => COURSE_SALE_AMOUNTS.has(amountGbp);
+// Separate PTLL course sales from anything else on this shared Stripe account
+// (e.g. Ultimate Shred gym memberships) so only course sales fire the PTLL
+// pixel + GA4 Purchase.
+//
+// Course sales are one-off Checkout payments (mode='payment') — deposit £599,
+// or pay-in-full at the current/promo price (£1,099 / £1,299 / £1,399 / £1,599).
+// We gate on mode + a £500 floor rather than an amount whitelist so new promo
+// prices don't silently drop out of tracking. Gym memberships are subscriptions
+// (mode='subscription'); instalment top-ups are < £500 — both excluded.
+function isCourseSale(session: StripeSession): boolean {
+  const amountGbp = (session.amount_total ?? 0) / 100;
+  return session.mode !== "subscription" && amountGbp >= 500;
+}
 
 function verifySignature(payload: string, header: string | null, secret: string): boolean {
   if (!header || !secret) return false;
@@ -71,6 +73,7 @@ type StripeSession = {
   client_reference_id?: string | null;
   metadata?: Record<string, string>;
   payment_status?: string;
+  mode?: string; // "payment" | "subscription" | "setup"
 };
 
 type StripeEvent = {
@@ -342,7 +345,7 @@ export async function POST(req: NextRequest) {
       // PTLL analytics (GA4 purchase + Meta CAPI Purchase) only fire for actual
       // course sales — this keeps Ultimate Shred gym-membership charges on the
       // shared Stripe account out of the PTLL pixel + GA4 property.
-      if (isCourseSale(amountGbp)) {
+      if (isCourseSale(session)) {
         try {
           await sendToGa4(session);
         } catch (err) {

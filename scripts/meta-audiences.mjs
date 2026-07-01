@@ -225,19 +225,24 @@ async function fromMailerlite() {
 }
 
 // ── source: Stripe API — PTLL COURSE buyers only ─────────────────────────────
-// This Stripe account also processes Ultimate Shred gym memberships, so we do
-// NOT pull the raw customer list (that would mix gym members into the audience).
-// Instead we list paid Checkout Sessions and keep only PTLL course amounts:
-//   599 (deposit) · 1399 (PIF promo) · 1599 (PIF standard).
-// Override with --amounts=599,1399,1599 if a partner uses custom course pricing.
+// This Stripe account may also process other products (e.g. gym memberships).
+// We list PAID Checkout Sessions and keep course sales = one-off `payment` mode
+// of ≥ £500 (deposit £599, or pay-in-full £1,099 / £1,299 / £1,399 / £1,599).
+// Subscriptions (gym) and sub-£500 instalment top-ups are excluded. Gate on
+// mode + floor (not an amount whitelist) so new promo prices aren't dropped.
+//   --min=500     course-sale floor in £ (default 500)
+//   --amounts=…   exact-amount override (whitelist mode) if ever needed
 async function fromStripe() {
   const key = process.env.STRIPE_SECRET_KEY || flags.token;
   if (!key) die('STRIPE_SECRET_KEY not set (or pass --token=).');
-  const courseAmounts = new Set(
-    (flags.amounts ? String(flags.amounts).split(',') : ['599', '1399', '1599']).map((n) => Math.round(Number(n) * 100)),
-  );
+  const minPence = Math.round(Number(flags.min ?? 500) * 100);
+  const whitelist = flags.amounts
+    ? new Set(String(flags.amounts).split(',').map((n) => Math.round(Number(n) * 100)))
+    : null;
+  const isCourse = (s) =>
+    whitelist ? whitelist.has(s.amount_total) : s.mode !== 'subscription' && (s.amount_total ?? 0) >= minPence;
   const records = [];
-  let seen = 0, kept = 0, gym = 0;
+  let seen = 0, kept = 0, skipped = 0;
   let startingAfter = '';
   for (;;) {
     const url = `https://api.stripe.com/v1/checkout/sessions?limit=100${startingAfter ? `&starting_after=${startingAfter}` : ''}`;
@@ -247,7 +252,7 @@ async function fromStripe() {
     for (const s of json.data || []) {
       seen++;
       if (s.payment_status !== 'paid') continue;
-      if (!courseAmounts.has(s.amount_total)) { gym++; continue; } // gym / non-course
+      if (!isCourse(s)) { skipped++; continue; }
       const cd = s.customer_details || {};
       const email = normEmail(cd.email || s.customer_email);
       if (!email) continue;
@@ -261,7 +266,7 @@ async function fromStripe() {
       });
       kept++;
     }
-    console.log(`  …Stripe: scanned ${seen} sessions, ${kept} course sales kept, ${gym} non-course skipped`);
+    console.log(`  …Stripe: scanned ${seen} sessions, ${kept} course sales kept, ${skipped} non-course skipped`);
     if (!json.has_more || !json.data?.length) break;
     startingAfter = json.data[json.data.length - 1].id;
   }
