@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# customer PII exports (Meta audience CSVs) — never commit
+meta-audiences/*.csv
+
 # vercel
 .vercel
 
