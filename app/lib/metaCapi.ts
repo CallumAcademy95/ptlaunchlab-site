@@ -147,15 +147,18 @@ function buildUserDataPayload(user: MetaCapiUserData | undefined): Record<string
  * paths because it cannot break the calling request.
  */
 export async function sendCapiEvent(input: SendCapiEventInput): Promise<unknown | null> {
-  const pixelId = process.env.META_PIXEL_ID;
+  // Pixel id is also hard-coded in the browser (layout.tsx) — fall back to it so
+  // CAPI only needs the access token to be configured, not both env vars.
+  const pixelId = process.env.META_PIXEL_ID || "1133525198707842";
   const accessToken = process.env.META_CAPI_ACCESS_TOKEN;
   const testEventCode = process.env.META_CAPI_TEST_EVENT_CODE;
 
-  if (!pixelId || !accessToken) {
-    // Don't spam logs on every event — log once per cold start by checking a
-    // module-level flag. For now keep it simple and log every call until the
-    // env vars are set, so the user sees the message in Vercel logs.
-    console.warn("[meta-capi] META_PIXEL_ID or META_CAPI_ACCESS_TOKEN not set — skipping event:", input.eventName);
+  if (!accessToken) {
+    // No CAPI token → every server event is skipped. The browser Pixel still
+    // fires, but server-side events (and the Purchase VALUE, which the browser
+    // Purchase deliberately omits) are lost. Set META_CAPI_ACCESS_TOKEN on
+    // Vercel to enable. Logged so it's visible in Vercel logs.
+    console.warn("[meta-capi] META_CAPI_ACCESS_TOKEN not set — CAPI disabled, skipping event:", input.eventName);
     return null;
   }
 
