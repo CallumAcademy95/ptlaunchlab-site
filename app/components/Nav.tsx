@@ -15,6 +15,7 @@ export default function Nav() {
   const links = [
     { label: "Home",    href: "/" },
     { label: "Course",  href: "/courses" },
+    { label: "Career Planner", href: "/career-planner" },
     { label: "Podcast", href: "/podcast" },
     { label: "About",   href: "/about" },
     { label: "Contact", href: "/contact" },
