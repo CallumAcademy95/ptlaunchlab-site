@@ -27,6 +27,18 @@ import { sendCapiEvent } from "@/app/lib/metaCapi";
 
 export const runtime = "nodejs"; // need crypto + raw body
 
+// PTLL course sale amounts (initial payment, £). This Stripe account also
+// processes Ultimate Shred gym memberships, which must NOT fire PTLL pixel /
+// GA4 Purchase events. We separate the two by the initial charge amount:
+//   599  = deposit plan (£599 + 5×£200 later)
+//   1399 = pay-in-full with the PIF promo
+//   1599 = pay-in-full standard
+// A checkout whose amount isn't one of these is treated as non-course (gym
+// membership etc.) and skipped for PTLL analytics. Add partner-specific
+// course amounts here if a partner ever uses a custom-priced Payment Link.
+const COURSE_SALE_AMOUNTS = new Set([599, 1399, 1599]);
+const isCourseSale = (amountGbp: number) => COURSE_SALE_AMOUNTS.has(amountGbp);
+
 function verifySignature(payload: string, header: string | null, secret: string): boolean {
   if (!header || !secret) return false;
   // Header shape: t=timestamp,v1=signature,v0=optional
@@ -325,16 +337,27 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data?.object;
     if (session && session.payment_status === "paid") {
-      try {
-        await sendToGa4(session);
-      } catch (err) {
-        console.error("[stripe-webhook] GA4 dispatch failed:", err);
+      const amountGbp = (session.amount_total ?? 0) / 100;
+
+      // PTLL analytics (GA4 purchase + Meta CAPI Purchase) only fire for actual
+      // course sales — this keeps Ultimate Shred gym-membership charges on the
+      // shared Stripe account out of the PTLL pixel + GA4 property.
+      if (isCourseSale(amountGbp)) {
+        try {
+          await sendToGa4(session);
+        } catch (err) {
+          console.error("[stripe-webhook] GA4 dispatch failed:", err);
+        }
+        try {
+          await sendToMetaCapi(session);
+        } catch (err) {
+          console.error("[stripe-webhook] Meta CAPI dispatch failed:", err);
+        }
+      } else {
+        console.log(`[stripe-webhook] non-course sale (£${amountGbp}) — skipping PTLL GA4 + Meta Purchase`);
       }
-      try {
-        await sendToMetaCapi(session);
-      } catch (err) {
-        console.error("[stripe-webhook] Meta CAPI dispatch failed:", err);
-      }
+
+      // Gym tracker keeps its own internal filtering.
       try {
         await sendToGymTracker(session);
       } catch (err) {
