@@ -193,13 +193,35 @@ async function sendToGa4(session: StripeSession) {
 // (ITP / mobile multitasking) we still capture the conversion server-side.
 async function sendToMetaCapi(session: StripeSession) {
   const attribution = decodeClientRef(session.client_reference_id);
-  const amount = (session.amount_total ?? 0) / 100;
+  const amountPaid = (session.amount_total ?? 0) / 100;
   const currency = (session.currency ?? "gbp").toUpperCase();
   const email = session.customer_email || session.customer_details?.email || undefined;
   const phone = session.customer_details?.phone || undefined;
   const fullName = session.customer_details?.name || "";
   const [firstName, ...rest] = fullName.split(/\s+/);
   const lastName = rest.join(" ");
+
+  // Value sent to Meta = the FULL course contract value, not just the cash
+  // collected in this one Stripe session. Why: the deposit plan charges £599
+  // up front and the remaining £1,000 arrives later as Stripe Billing
+  // subscription invoices (invoice.paid) which this webhook does NOT forward.
+  // Without this uplift Meta would learn a deposit buyer is worth £599 when
+  // they're really a £1,599 course sale — starving value-based bidding and the
+  // value-based lookalike of ~62% of each deposit enrolment's worth.
+  //
+  //   PIF (single payment ≥ £1,300)  → amount already equals the full value
+  //                                     (£1,599, or £1,399 with the PIF promo)
+  //   Deposit (£599 exactly)         → uplift to the full course value
+  //                                     (£1,399 if a funnel/PIF promo applies,
+  //                                      else £1,599)
+  //
+  // The £599-exact gate keeps this from ever mis-valuing a non-course charge
+  // (e.g. a gym-membership subscription that shares this Stripe account) as a
+  // course sale — those keep their real amount.
+  const hasFunnelPromo = !!attribution["funnel_promo"];
+  const isPif = amountPaid >= 1300;
+  const isCourseDeposit = amountPaid === 599;
+  const courseValue = isCourseDeposit ? (hasFunnelPromo ? 1399 : 1599) : amountPaid;
 
   await sendCapiEvent({
     eventName: "Purchase",
@@ -218,8 +240,9 @@ async function sendToMetaCapi(session: StripeSession) {
     },
     customData: {
       currency,
-      value: amount,
-      contentName: amount >= 1300 ? "course_pif" : "course_deposit",
+      value: courseValue,                 // full contract value for optimisation
+      amount_paid: amountPaid,            // cash collected in this session (ref)
+      contentName: isPif ? "course_pif" : "course_deposit",
       contentCategory: attribution["funnel_promo"] || undefined,
       orderId: session.id,
       promo_code: session.metadata?.promo_code ?? "",
