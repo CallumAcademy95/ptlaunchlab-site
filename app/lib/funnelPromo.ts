@@ -18,7 +18,7 @@ import { NextResponse, type NextRequest } from "next/server";
 export const COOKIE_NAME = "ptll_promo";
 export const WINDOW_MS = 48 * 60 * 60 * 1000;
 
-export type FunnelSource = "quiz" | "prospectus" | "youtube" | "salary-calculator" | "book-call";
+export type FunnelSource = "quiz" | "prospectus" | "youtube" | "salary-calculator" | "book-call" | "career-planner";
 
 export type PromoPayload = {
   source: FunnelSource;
