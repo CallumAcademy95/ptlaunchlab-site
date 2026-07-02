@@ -7,6 +7,7 @@ import { VideoPlaceholder } from "./components/VideoPlaceholder";
 import { StepCard } from "./components/StepCard";
 import { TestimonialCard } from "./components/TestimonialCard";
 import PhoneCallbackForm from "./components/PhoneCallbackForm";
+import ObjectionCapture from "../components/ObjectionCapture";
 
 function CheckIcon() {
   return (
@@ -214,6 +215,17 @@ export default function BookCallPage() {
               </p>
             </>
           )}
+        </div>
+      </section>
+
+      {/* OBJECTION INTELLIGENCE — capture why warm visitors don't book */}
+      <section className="py-12 px-6">
+        <div className="max-w-3xl mx-auto">
+          <ObjectionCapture
+            context="book_call"
+            heading="Not ready to book a call? Tell us what's on your mind."
+            sub="One tap — no email needed. It helps us make the next step easier for people like you."
+          />
         </div>
       </section>
 

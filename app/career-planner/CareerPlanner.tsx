@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import ObjectionCapture from "../components/ObjectionCapture";
 import { trackEvent } from "@/app/lib/gtag";
 import { useFormSecurity } from "@/app/lib/security/client";
 import {
@@ -502,6 +503,14 @@ function Results({ r, name }: { r: CareerPlannerResult; name: string }) {
             Talk it through on a call
           </a>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <ObjectionCapture
+          context="career_planner_result"
+          heading="Not ready to take the next step? Tell us why."
+          sub="One tap — no email needed. It helps us make this easier for people in your situation."
+        />
       </div>
 
       <p className="text-faint text-[11px] text-center mt-6 leading-relaxed max-w-lg mx-auto">

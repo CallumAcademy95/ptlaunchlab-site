@@ -92,6 +92,30 @@ const careerPlannerSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
+// ── Objection Intelligence (Sprint 3) ─────────────────────────────────────
+// Micro-survey at warm drop-off points: "what's holding you back?". Anonymous
+// by design (email optional) so it stays low-friction — the value is the
+// aggregate trend, not the individual. reason is a fixed taxonomy; note + email
+// are optional. context tags WHERE the objection was captured.
+export const OBJECTION_REASONS = [
+  "too_expensive",
+  "need_finance",
+  "no_time",
+  "comparing",
+  "need_level2",
+  "not_confident",
+  "just_researching",
+  "other",
+] as const;
+
+const objectionSchema = z.object({
+  reason:  z.enum(OBJECTION_REASONS),
+  note:    z.string().max(1000).optional().or(z.literal("")),
+  context: z.string().max(64).optional().or(z.literal("")),
+  email:   z.string().max(254).optional().or(z.literal("")),
+  [SEC_KEY]: secSchema,
+});
+
 // ── Graduate story (Proof Engine capture) ─────────────────────────────────
 // Graduates submit their story to be published on /graduates. Name + email +
 // story required (email so we can verify/thank them and confirm consent);
@@ -375,6 +399,40 @@ export function validateCareerPlanner(raw: unknown): ValidationResult<CareerPlan
   }
 
   return { ok: true, data: { name: nameCheck.normalised!, email: ec.normalised!, phone }, signals: [] };
+}
+
+export type ObjectionClean = {
+  reason: (typeof OBJECTION_REASONS)[number];
+  note: string;
+  context: string;
+  email: string;
+};
+
+export function validateObjection(raw: unknown): ValidationResult<ObjectionClean> {
+  const parsed = objectionSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Please pick an option.", signals: ["schema-fail"] };
+  }
+  const secCheck = sec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+  // Email optional — only validate if given; never block the objection on it.
+  let email = "";
+  if (parsed.data.email) {
+    const ec = validateEmail(parsed.data.email);
+    if (ec.ok) email = ec.normalised!;
+  }
+  return {
+    ok: true,
+    data: {
+      reason: parsed.data.reason,
+      note: (parsed.data.note ?? "").trim(),
+      context: (parsed.data.context ?? "").trim(),
+      email,
+    },
+    signals: [],
+  };
 }
 
 export type GraduateStoryClean = {
