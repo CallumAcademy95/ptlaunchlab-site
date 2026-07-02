@@ -7,6 +7,7 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 import StickyMobileCTA from "../../components/StickyMobileCTA";
 import Accreditation from "../../components/Accreditation";
 import Reviews from "../../components/Reviews";
+import ProofStrip from "../../components/ProofStrip";
 import FunnelPricingBlock from "../../components/FunnelPricingBlock";
 import HeroLeadForm from "../../components/HeroLeadForm";
 import PromoBar from "../../components/PromoBar";
@@ -477,6 +478,9 @@ export default function BecomeAPersonalTrainerUkPage() {
             <FunnelPricingBlock variant="dark" />
           </div>
         </section>
+
+        {/* AVATAR-MATCHED PROOF (Proof Engine) */}
+        <ProofStrip avatar="starter" heading="People who started right where you are" />
 
         {/* REVIEWS */}
         <Reviews />

@@ -92,6 +92,25 @@ const careerPlannerSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
+// ── Graduate story (Proof Engine capture) ─────────────────────────────────
+// Graduates submit their story to be published on /graduates. Name + email +
+// story required (email so we can verify/thank them and confirm consent);
+// phone optional. The tag fields (previousJob/region/specialism/avatar) are
+// optional self-tags that a curator confirms before the entry is added to the
+// published graduates DB. `consent` must be true — we publish names + quotes.
+const graduateStorySchema = z.object({
+  name:        z.string().max(200),
+  email:       z.string().max(254),
+  phone:       z.string().max(40).optional().or(z.literal("")),
+  previousJob: z.string().max(120).optional().or(z.literal("")),
+  region:      z.string().max(60).optional().or(z.literal("")),
+  specialism:  z.string().max(120).optional().or(z.literal("")),
+  avatar:      z.enum(['starter', 'switcher', 'returner']).optional(),
+  story:       z.string().min(20).max(2000),
+  consent:     z.literal(true),
+  [SEC_KEY]: secSchema,
+});
+
 // ── Gym partnership ──────────────────────────────────────────────────────
 const gymPartnershipSchema = z.object({
   gymName:    z.string().min(2).max(200),
@@ -356,6 +375,65 @@ export function validateCareerPlanner(raw: unknown): ValidationResult<CareerPlan
   }
 
   return { ok: true, data: { name: nameCheck.normalised!, email: ec.normalised!, phone }, signals: [] };
+}
+
+export type GraduateStoryClean = {
+  name: string;
+  email: string;
+  phone: string;
+  previousJob: string;
+  region: string;
+  specialism: string;
+  avatar?: 'starter' | 'switcher' | 'returner';
+  story: string;
+};
+
+export function validateGraduateStory(raw: unknown): ValidationResult<GraduateStoryClean> {
+  const parsed = graduateStorySchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Please add your name, email and story, and tick consent.", signals: ["schema-fail"] };
+  }
+  const secCheck = sec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+
+  const nameCheck = validateName(parsed.data.name);
+  if (!nameCheck.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter your full name.", signals: [`name:${nameCheck.reason}`] };
+  }
+  const ec = validateEmail(parsed.data.email);
+  if (!ec.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  }
+  const story = parsed.data.story.trim();
+  if (story.length < 20) {
+    return { ok: false, silent: false, status: 422, error: "Please tell us a little more about your story.", signals: ["story:too-short"] };
+  }
+  // Phone optional.
+  let phone = "";
+  if (parsed.data.phone) {
+    const pc = validateUKPhone(parsed.data.phone);
+    if (!pc.ok) {
+      return { ok: false, silent: false, status: 422, error: "Please enter a valid UK phone number, or leave it blank.", signals: [`phone:${pc.reason}`] };
+    }
+    phone = pc.normalised!;
+  }
+
+  return {
+    ok: true,
+    data: {
+      name: nameCheck.normalised!,
+      email: ec.normalised!,
+      phone,
+      previousJob: (parsed.data.previousJob ?? "").trim(),
+      region: (parsed.data.region ?? "").trim(),
+      specialism: (parsed.data.specialism ?? "").trim(),
+      avatar: parsed.data.avatar,
+      story,
+    },
+    signals: [],
+  };
 }
 
 export type GymPartnershipClean = {
