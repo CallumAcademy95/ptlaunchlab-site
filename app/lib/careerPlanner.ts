@@ -29,6 +29,23 @@ export interface CareerPlannerInputs {
   risk: number;                // 1–5
 }
 
+export interface FinancePlan {
+  name: string;
+  upfront: number;             // £ paid up front
+  monthly: number;             // £ / month (0 = pay in full)
+  months: number;              // number of monthly instalments
+  note: string;
+}
+
+export interface FinanceBreakdown {
+  roiYear1: number;            // year-1 income ÷ course price (e.g. 9.2)
+  breakEvenWeeks: number;      // weeks of PT income to recoup the course fee
+  threeYearGross: number;      // cumulative gross income over years 1–3
+  monthlyPTIncomeYear1: number;// £ / month, year one
+  plans: FinancePlan[];
+  planNote: string;
+}
+
 export interface CareerPlannerResult {
   readinessScore: number;      // 0–100
   readinessBand: string;
@@ -47,6 +64,7 @@ export interface CareerPlannerResult {
   paybackSessions: number;
   paybackNote: string;
   sessionRate: number;         // £ / session used in the model
+  finance: FinanceBreakdown;   // ROI / finance module
 }
 
 // ── Tunable constants ────────────────────────────────────────────────────────
@@ -195,6 +213,47 @@ export function computeCareerPlan(raw: CareerPlannerInputs): CareerPlannerResult
   const paybackSessions = Math.ceil(COURSE_PRICE / sessionRate);
   const paybackNote = `About ${paybackSessions} sessions at ${raw.region || "UK"} rates (£${sessionRate}/session) pays your course back — most new PTs clear that inside their first month or two.`;
 
+  // ── Finance / ROI module ───────────────────────────────────────────────────
+  // How the £1,599 stacks up against what the plan projects you'll earn.
+  const weeklyYear1 = year1Income / WEEKS_PER_YEAR;
+  const breakEvenWeeks = weeklyYear1 > 0 ? clamp(Math.ceil(COURSE_PRICE / weeklyYear1), 1, 52) : 0;
+  const roiYear1 = COURSE_PRICE > 0 ? Math.round((year1Income / COURSE_PRICE) * 10) / 10 : 0;
+  const year2Income = round((year1Income + steadyIncome) / 2); // ramps between yr1 and steady
+  const threeYearGross = year1Income + year2Income + steadyIncome;
+  const monthlyPTIncomeYear1 = round(year1Income / 12);
+
+  const plans: FinancePlan[] = [
+    {
+      name: "Pay in full",
+      upfront: COURSE_PRICE,
+      monthly: 0,
+      months: 0,
+      note: "Simplest — one payment, nothing to manage, and it saves against the instalment plan.",
+    },
+    {
+      name: "Deposit + instalments",
+      upfront: 599,
+      monthly: 200,
+      months: 5,
+      note: "Most popular — £599 deposit then 5 × £200. Start straight away and keep your savings buffer.",
+    },
+  ];
+
+  const planCover = monthlyPTIncomeYear1 > 0 ? Math.max(1, Math.round(monthlyPTIncomeYear1 / 200)) : 0;
+  const planNote =
+    planCover >= 2
+      ? `On the instalment plan, your projected first-year PT income (~£${monthlyPTIncomeYear1.toLocaleString()}/mo) covers the £200 monthly payment roughly ${planCover}× over once you start taking clients.`
+      : "The £200 monthly instalment is designed to be covered by just a couple of PT sessions a week once you qualify.";
+
+  const finance: FinanceBreakdown = {
+    roiYear1,
+    breakEvenWeeks,
+    threeYearGross,
+    monthlyPTIncomeYear1,
+    plans,
+    planNote,
+  };
+
   let incomeNote: string;
   if (currentSalary > 0 && steadyIncome >= currentSalary) {
     incomeNote = `At a full book (~£${steadyIncome.toLocaleString()}) you'd beat your current £${currentSalary.toLocaleString()} salary — and packages, online clients and rate rises push it higher.`;
@@ -213,5 +272,6 @@ export function computeCareerPlan(raw: CareerPlannerInputs): CareerPlannerResult
     businessModel, businessNote,
     paybackSessions, paybackNote,
     sessionRate,
+    finance,
   };
 }

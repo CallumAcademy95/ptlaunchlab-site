@@ -8,6 +8,7 @@ import { useFormSecurity } from "@/app/lib/security/client";
 import {
   computeCareerPlan,
   REGIONS,
+  COURSE_PRICE,
   type CareerPlannerInputs,
   type CareerPlannerResult,
   type GymExperience,
@@ -481,6 +482,8 @@ function Results({ r, name }: { r: CareerPlannerResult; name: string }) {
       </div>
       <Insight title="Your course pays for itself fast" body={r.paybackNote} />
 
+      <FinanceModule r={r} />
+
       {/* CTAs */}
       <div className="bg-base border border-gold/30 rounded-2xl p-6 md:p-8 text-center mt-8">
         <p className="text-gold text-xs font-bold tracking-widest uppercase mb-2">Your next step</p>
@@ -505,6 +508,47 @@ function Results({ r, name }: { r: CareerPlannerResult; name: string }) {
         These figures are illustrative estimates based on your answers and typical UK PT rates — a guide to
         help you plan, not a guarantee of earnings.
       </p>
+    </div>
+  );
+}
+
+// ── Finance / ROI module ─────────────────────────────────────────────────────
+function FinanceModule({ r }: { r: CareerPlannerResult }) {
+  const f = r.finance;
+  return (
+    <div className="bg-base border border-white/10 rounded-2xl p-6 md:p-8 mt-8">
+      <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1">The numbers on the investment</p>
+      <h3 className="font-display font-extrabold text-2xl text-white leading-tight tracking-tight mb-5">
+        £{COURSE_PRICE.toLocaleString()} in. Here&apos;s what it returns.
+      </h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <StatCard big={`${f.roiYear1}×`} label="Year-1 return" note="projected income vs course fee" />
+        <StatCard
+          big={f.breakEvenWeeks ? `~${f.breakEvenWeeks}` : "—"}
+          unit={f.breakEvenWeeks ? "wk" : undefined}
+          label="Break-even"
+          note="weeks of clients to recoup the fee"
+        />
+        <StatCard big={gbp(f.threeYearGross)} label="3-year gross" note="cumulative, years 1–3" />
+      </div>
+
+      {/* Finance plan comparison */}
+      <div className="grid sm:grid-cols-2 gap-3 mb-4">
+        {f.plans.map((p) => (
+          <div key={p.name} className="bg-deep border border-white/10 rounded-xl p-5">
+            <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1.5">{p.name}</p>
+            <p className="text-white font-bold text-lg leading-tight">
+              {p.monthly > 0
+                ? <>{gbp(p.upfront)} <span className="text-soft text-sm font-semibold">+ {p.months} × {gbp(p.monthly)}</span></>
+                : <>{gbp(p.upfront)} <span className="text-soft text-sm font-semibold">one-off</span></>}
+            </p>
+            <p className="text-faint text-xs leading-snug mt-1.5">{p.note}</p>
+          </div>
+        ))}
+      </div>
+
+      <Insight title="Can you afford the payments?" body={f.planNote} />
     </div>
   );
 }
