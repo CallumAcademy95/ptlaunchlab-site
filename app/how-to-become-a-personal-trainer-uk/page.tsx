@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import RelatedGuides from "../components/RelatedGuides";
 import Breadcrumbs from "../components/Breadcrumbs";
 import StickyMobileCTA from "../components/StickyMobileCTA";
 import MidContentCTA from "../components/MidContentCTA";
@@ -554,6 +555,7 @@ export default function HowToBecomePtUkPage() {
           </div>
         </section>
 
+        <RelatedGuides currentHref="/how-to-become-a-personal-trainer-uk" />
       </main>
       <Footer />
       <StickyMobileCTA />

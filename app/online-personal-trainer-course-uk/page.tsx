@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import RelatedGuides from "../components/RelatedGuides";
 import Breadcrumbs from "../components/Breadcrumbs";
 import StickyMobileCTA from "../components/StickyMobileCTA";
 import MidContentCTA from "../components/MidContentCTA";
@@ -504,6 +505,7 @@ export default function OnlinePtCourseUkPage() {
           </div>
         </section>
 
+        <RelatedGuides currentHref="/online-personal-trainer-course-uk" />
       </main>
       <Footer />
       <StickyMobileCTA />

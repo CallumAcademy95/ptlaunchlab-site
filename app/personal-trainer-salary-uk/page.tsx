@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import RelatedGuides from "../components/RelatedGuides";
 import Breadcrumbs from "../components/Breadcrumbs";
 import MidContentCTA from "../components/MidContentCTA";
 
@@ -237,6 +238,7 @@ export default function SalaryPage() {
           </div>
         </section>
 
+        <RelatedGuides currentHref="/personal-trainer-salary-uk" />
       </main>
       <Footer />
     </>

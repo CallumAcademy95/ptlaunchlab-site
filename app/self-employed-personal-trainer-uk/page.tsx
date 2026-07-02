@@ -1,4 +1,5 @@
 import Nav from "@/app/components/Nav";
+import RelatedGuides from "@/app/components/RelatedGuides";
 import PainPoints from "@/app/components/PainPoints";
 import Reframe from "@/app/components/Reframe";
 import FounderStory from "@/app/components/FounderStory";
@@ -72,6 +73,7 @@ export default function Page() {
         <Podcast />
         <ConversionSection />
         <FAQ />
+        <RelatedGuides currentHref="/self-employed-personal-trainer-uk" />
         <FinalCTA />
       </main>
       <Footer />
