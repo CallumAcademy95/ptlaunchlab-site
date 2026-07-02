@@ -39,7 +39,7 @@ export const EVENT = {
   ] as Speaker[],
   panellists: [
     { name: "Jonny Grayshon", org: "Vaxa Fitness Transformations", photo: "/live/speakers/jonny-grayshon.png" },
-    { name: "Sam Hinks", org: "SJH Coaching", photo: "/live/speakers/sam-hinks.png" },
+    { name: "Jon Baker", org: "Operations Director, The Gym Group", photo: "/live/speakers/jon-baker.png" },
     { name: "Tom Blackman", org: "Ministry of Fitness", photo: "/live/speakers/tom-blackman.png" },
     { name: "Aaron Caseley", org: "MOFO Body Mechanic", photo: "/live/speakers/aaron-caseley.png" },
     { name: "Sohail Rashid", org: "Brawn", photo: "/live/speakers/sohail-rashid.png" },
