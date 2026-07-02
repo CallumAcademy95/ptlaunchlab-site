@@ -41,7 +41,7 @@ export const EVENT = {
     { name: "Jonny Grayshon", org: "Vaxa Fitness Transformations", photo: "/live/speakers/jonny-grayshon.png" },
     { name: "Jon Baker", org: "Operations Director, The Gym Group", photo: "/live/speakers/jon-baker.png" },
     { name: "Tom Blackman", org: "Ministry of Fitness", photo: "/live/speakers/tom-blackman.png" },
-    { name: "Aaron Caseley", org: "MOFO Body Mechanic", photo: "/live/speakers/aaron-caseley.png" },
+    { name: "Chris Duffin", org: "Chief Scientific Advisor & Resilience Coach", photo: "/live/speakers/chris-duffin.png" },
     { name: "Sohail Rashid", org: "Brawn", photo: "/live/speakers/sohail-rashid.png" },
   ] as Speaker[],
   // "Questions we'll be discussing" — teasers shown on /live.
