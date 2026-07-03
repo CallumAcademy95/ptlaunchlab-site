@@ -28,6 +28,7 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/personal-trainer-salary-uk`,          priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/pt-salary-calculator`,                priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/career-planner`,                      priority: 0.8,  changeFrequency: "monthly", lastModified: TODAY },
+  { url: `${BASE}/career-blueprint`,                    priority: 0.9,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/graduates`,                           priority: 0.7,  changeFrequency: "weekly",  lastModified: TODAY },
   { url: `${BASE}/hub`,                                  priority: 0.8,  changeFrequency: "weekly",  lastModified: TODAY },
   { url: `${BASE}/personal-trainer-mentorship-uk`,      priority: 0.7,  changeFrequency: "monthly", lastModified: TODAY },
