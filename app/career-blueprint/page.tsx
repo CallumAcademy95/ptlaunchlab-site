@@ -190,24 +190,24 @@ export default function CareerBlueprintPage() {
             <p className="text-soft/75 text-center text-base max-w-2xl mx-auto mb-12">
               Same certificate at the end. A completely different outcome.
             </p>
-            <div className="rounded-2xl border border-white/[0.08] overflow-hidden">
-              <div className="grid grid-cols-2 bg-card/60">
-                <div className="p-4 md:p-5 text-center border-r border-white/[0.08]">
-                  <p className="text-soft/60 text-[11px] md:text-xs font-bold tracking-widest uppercase">Most providers</p>
+            <div className="rounded-2xl border border-white/[0.12] overflow-hidden bg-card">
+              <div className="grid grid-cols-2">
+                <div className="p-4 md:p-5 text-center border-r border-white/[0.12] bg-white/[0.03]">
+                  <p className="text-soft text-[11px] md:text-xs font-bold tracking-widest uppercase">Most providers</p>
                 </div>
-                <div className="p-4 md:p-5 text-center bg-gold/[0.06]">
+                <div className="p-4 md:p-5 text-center bg-gold/[0.10]">
                   <p className="text-gold text-[11px] md:text-xs font-bold tracking-widest uppercase">PT Launch Lab</p>
                 </div>
               </div>
-              {comparison.map(([left, right], i) => (
-                <div key={left} className={`grid grid-cols-2 ${i % 2 ? "bg-transparent" : "bg-white/[0.02]"}`}>
-                  <div className="p-4 md:p-5 border-r border-white/[0.08] flex items-start gap-2">
-                    <span className="text-soft/40 shrink-0">✕</span>
-                    <span className="text-soft/75 text-sm md:text-base">{left}</span>
+              {comparison.map(([left, right]) => (
+                <div key={left} className="grid grid-cols-2 border-t border-white/[0.12]">
+                  <div className="p-4 md:p-5 border-r border-white/[0.12] bg-white/[0.03] flex items-start gap-2.5">
+                    <span className="text-red-400/80 shrink-0 font-bold">✕</span>
+                    <span className="text-soft text-sm md:text-base">{left}</span>
                   </div>
-                  <div className="p-4 md:p-5 bg-gold/[0.04] flex items-start gap-2">
-                    <span className="text-gold shrink-0">✓</span>
-                    <span className="text-white text-sm md:text-base font-medium">{right}</span>
+                  <div className="p-4 md:p-5 bg-gold/[0.06] flex items-start gap-2.5">
+                    <span className="text-gold shrink-0 font-bold">✓</span>
+                    <span className="text-white text-sm md:text-base font-semibold">{right}</span>
                   </div>
                 </div>
               ))}
