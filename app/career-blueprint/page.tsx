@@ -202,8 +202,8 @@ export default function CareerBlueprintPage() {
               {comparison.map(([left, right]) => (
                 <div key={left} className="grid grid-cols-2 border-t border-white/[0.12]">
                   <div className="p-4 md:p-5 border-r border-white/[0.12] bg-white/[0.03] flex items-start gap-2.5">
-                    <span className="text-red-400/80 shrink-0 font-bold">✕</span>
-                    <span className="text-soft text-sm md:text-base">{left}</span>
+                    <span className="text-red-400 shrink-0 font-bold">✕</span>
+                    <span className="text-white text-sm md:text-base">{left}</span>
                   </div>
                   <div className="p-4 md:p-5 bg-gold/[0.06] flex items-start gap-2.5">
                     <span className="text-gold shrink-0 font-bold">✓</span>
