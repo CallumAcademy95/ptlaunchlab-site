@@ -4,6 +4,8 @@ import { attachPromoCookie } from "@/app/lib/funnelPromo";
 import { validateCareerPlanner } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
+import { buildEscapePlanEmail, type EscapePlanResult } from "@/app/lib/careerPlannerEmail";
+import { Resend } from "resend";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/career-planner
@@ -90,13 +92,46 @@ export async function POST(request: NextRequest) {
       console.warn("[career-planner] no Zapier webhook configured — skipping.");
     }
 
-    // Nurture sequence (email server), non-blocking.
+    // Instant, personalised "Your Escape Plan" email (transactional; non-fatal so
+    // a delivery hiccup never breaks the on-page result the user already sees).
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const { subject, html, text } = buildEscapePlanEmail(name, res as unknown as EscapePlanResult);
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: "Callum @ PT Launch Lab <callum@ptlaunchlab.co.uk>",
+          to: email,
+          replyTo: "callum@ptlaunchlab.co.uk",
+          subject,
+          html,
+          text,
+        });
+      } catch (err) {
+        console.error("[career-planner] level:lead-lost — instant email failed:", email, err);
+      }
+    }
+
+    // Nurture sequence (email server), non-blocking. Pass the plan snapshot so the
+    // server can route to the dedicated `career_planner` track and personalise on
+    // their result (readiness / quit date / income) instead of the generic quiz track.
     const emailServerUrl = process.env.EMAIL_SERVER_URL;
     if (emailServerUrl) {
+      const plan = {
+        readinessScore: res.readinessScore ?? null,
+        readinessBand: res.readinessBand ?? null,
+        quitMonths: res.quitMonths ?? null,
+        year1Income: res.year1Income ?? null,
+        steadyIncome: res.steadyIncome ?? null,
+        recommendedRoute: res.recommendedRoute ?? null,
+        businessModel: res.businessModel ?? null,
+        financeOption: res.financeOption ?? null,
+        region: inp.region ?? null,
+        currentJob: inp.job ?? null,
+      };
       fetch(`${emailServerUrl}/leads/new`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, source: "career-planner" }),
+        body: JSON.stringify({ name, email, phone, source: "career-planner", plan }),
       }).catch((err) => console.error("[career-planner] email server error:", err));
     }
 
