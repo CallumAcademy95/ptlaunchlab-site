@@ -62,7 +62,7 @@ const objections = [
 
 const steps = [
   { n: 1, title: "Book a free 15-min call", body: "Tell us your situation honestly. Current role, hours, financial pressure, when you want to be out. We'll tell you if the maths actually works — and if it doesn't." },
-  { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: "£599 deposit then 5 × £200 monthly is the most popular. Payl8er finance 3–18 months. Stripe 0% over 12. Payments roughly match a single PT session per week once you qualify." },
+  { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: "£599 deposit then 5 × £200 monthly, or pay in full. Payments roughly match a single PT session per week once you qualify." },
   { n: 3, title: "Study evenings + weekends — keep earning", body: "Tutor introduced within 24 hours. Average 8–10 hours per week alongside full-time work. Level 2 done in ~4 weeks, Level 3 in another ~6–8." },
   { n: 4, title: "Qualify — NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by name. Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
   { n: 5, title: "Transition employed-first — warm gym introductions", body: "We've personally hired 500+ PTs through our network. Direct warm intros into salaried PT roles — no cold CV drops. Overlap salaries while you build your client base." },
@@ -309,7 +309,7 @@ export default function CareerChangeToPersonalTrainerPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
                 { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online via the Merve app. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
-                { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly is the most popular plan. Roughly matches a single PT session per week once you qualify. Payl8er 3–18 months and Stripe 0% over 12 also available." },
+                { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly, or pay in full. Roughly matches a single PT session per week once you qualify." },
                 { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews your work before submission so the assessments stop being scary." },
                 { tag: "Exit", title: "Employed-first, then self-employed", body: "Warm-introduction interviews into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
               ].map((row) => (

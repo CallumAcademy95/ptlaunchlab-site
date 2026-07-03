@@ -72,7 +72,7 @@ const faqs = [
   { q: "Do I need any experience?",             a: "No. We teach everything step by step, from the foundations up. All you need is a genuine passion for fitness and the drive to make it your career." },
   { q: "Is the qualification recognised?",      a: "Yes. You earn an industry-recognised Level 2 & Level 3 PT qualification — NCFE accredited, Ofqual regulated, and accepted by every gym and insurance provider in the UK." },
   { q: "Will I get help getting work?",         a: "Yes — mentoring and gym interview opportunities are included. We've personally hired over 500 PTs across our gym network, so we know exactly what gets you through the door." },
-  { q: "Do I need to pay in full?",             a: "No. We have flexible payment plans available including Klarna, pay later, deposit options, and zero-finance plans. We work hard to make sure the cost isn't the barrier." },
+  { q: "Do I need to pay in full?",             a: "No. You can pay in full, or spread it with our deposit plan — £599 deposit then 5 × £200 monthly. We work hard to make sure the cost isn't the barrier." },
   { q: "How long does it take?",                a: "Most students complete in 8–16 weeks, studying around their job. You set the pace — qualify faster if you want, or take your time if life gets busy." },
   { q: "When can I start?",                     a: "Immediately. From the moment you enrol, you have full access to the course, your learning platform, and your personal tutor. No waiting around." },
 ];

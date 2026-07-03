@@ -211,7 +211,7 @@ function Intro({ onStart }: { onStart: () => void }) {
           ["Quit date", "When you could go full-time"],
           ["Year-1 income", "What you could realistically earn"],
           ["Readiness score", "How ready you are today"],
-          ["Your route", "Qualification, finance & model"],
+          ["Your route", "Qualification, payment & model"],
         ].map(([t, s]) => (
           <div key={t} className="bg-deep border border-white/10 rounded-xl p-3">
             <p className="text-gold text-xs font-bold uppercase tracking-wide mb-1">{t}</p>

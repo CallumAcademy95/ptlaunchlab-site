@@ -192,8 +192,8 @@ export function computeCareerPlan(raw: CareerPlannerInputs): CareerPlannerResult
     financeOption = "£599 deposit + 5 × £200";
     financeNote = "Keeps your savings buffer intact while you start straight away.";
   } else {
-    financeOption = "Deposit plan / 0% finance";
-    financeNote = "Spread the cost and start now — your first few clients can cover the payments.";
+    financeOption = "£599 deposit + 5 × £200";
+    financeNote = "The £599 deposit gets you started, then five monthly payments your first clients can cover.";
   }
 
   // ── Business model ─────────────────────────────────────────────────────────

@@ -62,7 +62,7 @@ const objections = [
 
 const steps = [
   { n: 1, title: "Book a free 15-min chat — no pressure", body: "Tell us your situation: kids' ages, what time you've actually got, what's pulling you towards PT. We'll listen first, then tell you honestly if it's the right move." },
-  { n: 2, title: "Enrol on a plan that fits the household", body: "£599 deposit + 5 × £200 monthly is the most popular. Payl8er finance 3–18 months. Stripe 0% over 12. Most returners spread it across school terms." },
+  { n: 2, title: "Enrol on a plan that fits the household", body: "£599 deposit + 5 × £200 monthly, or pay in full. Most returners spread it across school terms." },
   { n: 3, title: "Study from home, on your hours", body: "100% online via the Merve app. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings — entirely your call." },
   { n: 4, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite — already included in your fee, with full tutor support." },
   { n: 5, title: "Qualify in Level 3 — NCFE, Ofqual regulated", body: "Programming, nutrition, business planning, video-assessed practicals. The qualification UK gyms and insurers both recognise by default." },
@@ -310,7 +310,7 @@ export default function RetrainAsAPersonalTrainerPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
                 { tag: "Time", title: "Whenever they're not awake or there", body: "100% online via the Merve app. While they're at school, after bedtime, weekend mornings — your hours, your pace. Most returners finish in 12–20 weeks." },
-                { tag: "Money", title: "Spread across the school term", body: "£599 deposit + 5 × £200 monthly is the most popular plan. Payl8er 3–18 months, Stripe 0% over 12. Designed to never sit on top of the food shop." },
+                { tag: "Money", title: "Spread across the school term", body: "£599 deposit + 5 × £200 monthly, or pay in full. Designed to never sit on top of the food shop." },
                 { tag: "Support", title: "A real tutor — not a help desk", body: "Personal tutor introduced within 24 hours. Reviews your work before submission so assessments stop being scary. Resubmissions are free." },
                 { tag: "Confidence", title: "We rebuild it on purpose", body: "The Mentorship Hub doesn't just teach business — it teaches the version of confidence you need when you've been out of the workforce." },
               ].map((row) => (
