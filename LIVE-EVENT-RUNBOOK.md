@@ -10,7 +10,7 @@ Built around the existing site (`/live`), MailerLite, Meta ads and Riverside (**
 | | |
 |---|---|
 | **Title** | The Real State of the PT Industry in 2026 |
-| **Date/time** | **Wednesday 15 July 2026, 20:00–21:30 (UK)** |
+| **Date/time** | **Wednesday 22 July 2026, 20:00–21:30 (UK)** |
 | **Platform** | Riverside (Grow) → multistream to **unlisted YouTube Live** |
 | **Gate** | Email-required-then-open (registration on `ptlaunchlab.co.uk/live`) |
 | **Hosts** | Callum Brown · Ryan Robinson · Miles Halstead |
@@ -232,8 +232,8 @@ Objective **Leads**, optimise for the `/live` registration (custom conversion on
 | **ASAP (~3 wks out)** | Launch Meta ads (event is only 3 weeks out — don't delay). Start organic teasing (podcast audience, IG, WhatsApp list). | Callum |
 | **~8 July (1 wk out)** | **Tech rehearsal** in Riverside with all 8 — cameras, mics, guest links, recording on. | All |
 | **14 July (eve before)** | Final check: YouTube broadcast scheduled & unlisted, `LIVE_STREAM_URL` correct, emails queued, roles confirmed. | Callum |
-| **15 July, 19:30** | Pre-flight (below). | Host + Mod |
-| **15 July, 20:00** | **GO LIVE.** | All |
+| **22 July, 19:30** | Pre-flight (below). | Host + Mod |
+| **22 July, 20:00** | **GO LIVE.** | All |
 | **~22 July** | Edit + publish episode → Buzzsprout + YouTube + `/podcast`. Cut clips. | Callum |
 
 ---

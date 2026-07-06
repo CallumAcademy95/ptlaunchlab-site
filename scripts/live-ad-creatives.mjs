@@ -33,7 +33,7 @@ const SPEAKERS = [
   ['Jerome Scherrer', 'Muscle Mechanics'], ['Sam Hinks', 'SJH Coaching'], ['Tom Blackman', 'Ministry of Fitness'],
   ['Aaron Caseley', 'MOFO Body Mechanic'], ['Sohail Rashid', 'Brawn'],
 ];
-const EYEBROW = 'PT LAUNCH LAB LIVE · WED 15 JULY · 8PM · FREE';
+const EYEBROW = 'PT LAUNCH LAB LIVE · WED 22 JULY · 8PM · FREE';
 
 // gold helper
 const g = (t) => `<span style="color:${C.gold}">${t}</span>`;

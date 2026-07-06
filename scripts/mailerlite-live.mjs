@@ -78,7 +78,7 @@ const CAMPAIGNS = [
     subject: 'Next PT Launch Lab LIVE: The Real State of the PT Industry in 2026',
     body: `{$name|"there"}, the next live session is locked in.
 
-📅 Wednesday 15 July, 8:00pm (UK)
+📅 Wednesday 22 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 🎤 On the panel: ${PANEL}.
 
@@ -138,7 +138,7 @@ Next live is monthly, so you're already on the list for the next one.` },
 
   { key: 'B7', name: 'LIVE Jul26 — B7 Episode is up',
     subject: '🎧 Last week\'s live is now up',
-    body: `{$name|"there"}, the full recording from 15 July is now live as a podcast episode:
+    body: `{$name|"there"}, the full recording from 22 July is now live as a podcast episode:
 
 🎧 ${POD}
 
@@ -154,7 +154,7 @@ const WELCOME = [
     subject: 'You\'re in 🎟️ here\'s your watch link',
     body: `{$name|"Hey"}, you're on the list for PT Launch Lab LIVE.
 
-📅 Next session: Wednesday 15 July, 8:00pm (UK)
+📅 Next session: Wednesday 22 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 
 Save your watch link: [WATCH LINK]
@@ -190,7 +190,7 @@ From what we and the coaches we know are seeing on the ground, three things are 
 2. Owning the in-person/accountability piece machines can't replace.
 3. Treating retention as the business — keeping clients 12+ months, not chasing new ones.
 
-We go deep on this stuff live. Speaking of which — your next session is Wednesday 15 July, 8pm.
+We go deep on this stuff live. Speaking of which — your next session is Wednesday 22 July, 8pm.
 
 Callum` },
 
@@ -216,7 +216,7 @@ Callum` },
 
 All here: ${POD}
 
-Then come settle the debates with us live, Wednesday 15 July, 8pm.
+Then come settle the debates with us live, Wednesday 22 July, 8pm.
 Callum` },
 ];
 

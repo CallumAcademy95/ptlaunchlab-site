@@ -1,11 +1,11 @@
-# PT Launch Lab LIVE — Event #1 Emails + Setup (15 July 2026)
+# PT Launch Lab LIVE — Event #1 Emails + Setup (22 July 2026)
 
 Ready-to-send copy for Event #1, plus the exact MailerLite + Zapier setup to make
 the funnel live. Generic templates live in `LIVE-EVENT-EMAIL-PLAN.md`; this file is
 the **filled-in, event-specific** version.
 
 **Event facts used throughout**
-- **When:** Wednesday 15 July 2026, 8:00pm (UK)
+- **When:** Wednesday 22 July 2026, 8:00pm (UK)
 - **Topic:** The Real State of the PT Industry in 2026
 - **Panel:** Hosts Callum Brown, Ryan Robinson & Miles Halstead — with guests Jonny
   Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching), Tom Blackman (Ministry of
@@ -21,15 +21,15 @@ the **filled-in, event-specific** version.
 
 ---
 
-## A. Send schedule (work back from Wed 15 July, 8pm)
+## A. Send schedule (work back from Wed 22 July, 8pm)
 
 | When | Email | Type |
 |---|---|---|
 | **ASAP (now)** | B1 — Announce / you're in | Campaign → whole list |
 | **Tue 8 July** | B2 — 1 week to go | Campaign → whole list |
 | **Mon 14 July, ~6pm** | B3 — Tomorrow night | Campaign → whole list |
-| **Wed 15 July, 7pm** | B4 — Live in 1 hour | Campaign → whole list |
-| **Wed 15 July, 8pm** | B5 — We're live now | Campaign → whole list |
+| **Wed 22 July, 7pm** | B4 — Live in 1 hour | Campaign → whole list |
+| **Wed 22 July, 8pm** | B5 — We're live now | Campaign → whole list |
 | **Thu 16 July** | B6 — Thanks / sorry we missed you | Campaign → split (attendees / no-shows) |
 | **~Tue 22 July** | B7 — The episode is up | Campaign → whole list |
 | **On signup (always)** | A1 — Instant "you're in" + watch link | Automation (new joiners) |
@@ -46,7 +46,7 @@ Trigger in MailerLite: **subscriber joins "Live Sessions"**. Fires once ever.
 ```
 {$name|"Hey"}, you're on the list for PT Launch Lab LIVE.
 
-📅 Next session: Wednesday 15 July, 8:00pm (UK)
+📅 Next session: Wednesday 22 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 
 Save your watch link: [WATCH LINK]
@@ -97,7 +97,7 @@ quietly working in 2026 while everyone else panics about AI and saturation:
 3. Treating retention as the business — keeping clients 12+ months, not chasing new ones.
 
 We go deep on this stuff live. Speaking of which — your next session is
-Wednesday 15 July, 8pm.
+Wednesday 22 July, 8pm.
 
 Callum
 ```
@@ -131,7 +131,7 @@ Callum
 
 All here: https://ptlaunchlab.co.uk/podcast
 
-Then come settle the debates with us live, Wednesday 15 July, 8pm.
+Then come settle the debates with us live, Wednesday 22 July, 8pm.
 Callum
 ```
 
@@ -146,7 +146,7 @@ Send as scheduled **campaigns to the whole "Live Sessions" group**.
 ```
 {$name|"there"}, the next live session is locked in.
 
-📅 Wednesday 15 July, 8:00pm (UK)
+📅 Wednesday 22 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 🎤 On the panel: Callum Brown, Ryan Robinson & Miles Halstead, with guests Jonny
 Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching), Tom Blackman (Ministry of
@@ -192,14 +192,14 @@ Watch link: [WATCH LINK]
 Final chance to submit a question: https://ptlaunchlab.co.uk/ask
 ```
 
-### B4 — T-1h (Wed 15 July, 7pm)
+### B4 — T-1h (Wed 22 July, 7pm)
 **Subject:** ⏰ Live in 1 hour
 ```
 {$name|"there"}, we're live in an hour (8pm). Grab a brew and your questions.
 👉 [WATCH LINK]
 ```
 
-### B5 — T-0 (Wed 15 July, 8pm)
+### B5 — T-0 (Wed 22 July, 8pm)
 **Subject:** 🔴 We're LIVE now
 ```
 {$name|"there"}, we've started — come join us. Drop your questions in the chat.
@@ -226,7 +226,7 @@ Next live is monthly, so you're already on the list for the next one.
 ### B7 — T+~7 (~Tue 22 July)
 **Subject:** 🎧 Last week's live is now up
 ```
-{$name|"there"}, the full recording from 15 July is now live as a podcast episode:
+{$name|"there"}, the full recording from 22 July is now live as a podcast episode:
 
 🎧 https://ptlaunchlab.co.uk/podcast
 

@@ -25,7 +25,7 @@ Final record of what was actually created in Meta, 2026-06-29. Everything is
 
 - **Series:** PT Launch Lab LIVE — monthly live discussions with leading fitness professionals
 - **Event #1:** *The Real State of the PT Industry in 2026*
-- **When:** Wednesday 15 July 2026, 8:00pm UK (~75 min)
+- **When:** Wednesday 22 July 2026, 8:00pm UK (~75 min)
 - **Conversion goal:** email registration (a Lead), not a course sale — grows the "Live Sessions" list
 
 ---
@@ -142,7 +142,7 @@ Warm should land cheapest. 3× Kill Rule: pause an ad/ad set whose CPL runs >3×
 
 ## 8. Post-event loop
 
-After 15 July: cut 10–20 clips from the discussion → those become August's
+After 22 July: cut 10–20 clips from the discussion → those become August's
 creative (real, native, social-proofed). Re-run the build script with an updated
 CONFIG (new date in copy) for next month.
 

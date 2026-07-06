@@ -30,8 +30,8 @@ export const EVENT = {
     "Gym owners, coaches and PTs go live on the questions everyone's asking — is the market saturated, what actually fills a client roster now, and where the money really is. Bring your questions for the live Q&A.",
   // ISO 8601 with explicit offset. July = BST (UTC+1). ~1hr: 3×20min segments
   // (topics / submitted Q&A / open Q&A) + welcome + wrap.
-  startIso: "2026-07-15T20:00:00+01:00",
-  endIso: "2026-07-15T21:15:00+01:00",
+  startIso: "2026-07-22T20:00:00+01:00",
+  endIso: "2026-07-22T21:15:00+01:00",
   hosts: [
     { name: "Callum Brown", org: "PT Launch Lab", photo: "/callum.webp" },
     { name: "Ryan Robinson", org: "PT Launch Lab", photo: "/ryan.webp" },

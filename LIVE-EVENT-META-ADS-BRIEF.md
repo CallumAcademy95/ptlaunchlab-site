@@ -18,7 +18,7 @@ page, where visitors give their **name + email** to get the watch link.
   that we market to every month. Each event is a fresh reason to opt in + re-engage.
 - **This is recurring** — a new event every month, so we want a **repeatable, always-on
   structure**, not a one-off burst.
-- **First event is ~3 weeks out (15 July 2026)** — we need to launch quickly.
+- **First event is ~3 weeks out (22 July 2026)** — we need to launch quickly.
 
 **Primary KPI:** cost per registration (Lead). **Secondary:** list growth volume,
 live attendance rate, cost per *new* subscriber.
@@ -31,7 +31,7 @@ live attendance rate, cost per *new* subscriber.
 |---|---|
 | **Format** | Free live panel webinar, streamed live, then released as a podcast episode ~1 week later |
 | **Title** | The Real State of the PT Industry in 2026 |
-| **Date/time** | **Wednesday 15 July 2026, 8:00pm UK** (~1 hour) |
+| **Date/time** | **Wednesday 22 July 2026, 8:00pm UK** (~1 hour) |
 | **Hosts** | Callum Brown · Ryan Robinson · Miles Halstead (PT Launch Lab) |
 | **Guest panellists** | Jonny Grayshon (Vaxa Fitness Transformations) · Sam Hinks (SJH Coaching) · Tom Blackman (Ministry of Fitness) · Aaron Caseley (MOFO Body Mechanic) · Sohail Rashid (Brawn) |
 | **Topics** | The GLP-1 / weight-loss-drug boom (threat or opportunity for PTs?) · Is the PT market saturated & how to stand out · Where the money really is in 2026 |
@@ -145,8 +145,8 @@ On a successful registration, `/live` fires:
 
 | When | Milestone |
 |---|---|
-| **ASAP (now, ~3 wks out)** | Launch cold + retargeting — don't wait, the event is 15 July |
-| **15 July, 8pm** | Live event |
+| **ASAP (now, ~3 wks out)** | Launch cold + retargeting — don't wait, the event is 22 July |
+| **22 July, 8pm** | Live event |
 | **~22 July** | Podcast episode published → becomes retargeting + new creative |
 | **Monthly thereafter** | Repeat: new event date, refreshed creative, best Q&A clips as ads |
 
