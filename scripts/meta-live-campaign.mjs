@@ -291,6 +291,63 @@ async function creatives() {
   console.log('');
 }
 
+// ─── update-creatives ─────────────────────────────────────────────────────────
+// For each manifest ad that ALREADY EXISTS (by name), mint a fresh creative from
+// the current image + copy and swap it onto the ad in place (preserves ad IDs +
+// ad-set structure). Meta creatives are immutable, so "editing" an ad = new
+// creative + POST /{ad_id}. Ads re-enter review afterwards. Dry-run unless --execute.
+async function updateCreatives() {
+  if (!manifestArg) { console.error('Need --manifest=path/to/creatives.json'); process.exit(1); }
+  const fs = await import('node:fs');
+  const manifest = JSON.parse(fs.readFileSync(manifestArg, 'utf8'));
+  console.log(`\n${EXECUTE ? '🟢 EXECUTE' : '🟡 DRY-RUN'} — swap creative on ${manifest.ads.length} ad(s)\n`);
+
+  const camps = await getAll(`/${ACCT}/campaigns`, 'id,name');
+  const camp = camps.find((c) => c.name === CONFIG.campaignName);
+  if (!camp) { console.error(`Campaign "${CONFIG.campaignName}" not found — run build first.`); process.exit(1); }
+  const sets = await getAll(`/${camp.id}/adsets`, 'id,name');
+  const existingAds = (await Promise.all(sets.map((s) => getAll(`/${s.id}/ads`, 'id,name')))).flat();
+
+  let swapped = 0, missing = 0;
+  for (const ad of manifest.ads) {
+    const link = ad.url || CONFIG.landingUrl;
+    const target = existingAds.find((x) => x.name === ad.name);
+    console.log(`  AD: ${ad.name}`);
+    if (!target) { console.log('    ✗ not found in Meta — skipping (use `creatives` to create it)'); missing++; continue; }
+    if (!EXECUTE) { console.log(`    ~ would upload ${ad.imagePathOrUrl}, mint creative, swap onto ${target.id}`); continue; }
+
+    // upload image (URL, or local file as base64 bytes)
+    let up;
+    if (/^https?:\/\//.test(ad.imagePathOrUrl)) {
+      up = await graph(`/${ACCT}/adimages`, 'POST', { url: ad.imagePathOrUrl });
+    } else {
+      const b64 = fs.readFileSync(ad.imagePathOrUrl).toString('base64');
+      up = await graph(`/${ACCT}/adimages`, 'POST', { bytes: b64 });
+    }
+    const imageHash = Object.values(up.images)[0].hash;
+
+    const creative = await graph(`/${ACCT}/adcreatives`, 'POST', {
+      name: `${ad.name} — creative (22 Jul)`,
+      object_story_spec: {
+        page_id: PAGE,
+        link_data: {
+          link,
+          message: ad.primaryText,
+          name: ad.headline,
+          description: ad.description || undefined,
+          call_to_action: { type: ad.cta || 'SIGN_UP', value: { link } },
+          image_hash: imageHash,
+        },
+      },
+    });
+
+    await graph(`/${target.id}`, 'POST', { creative: { creative_id: creative.id } });
+    console.log(`    ↻ swapped ad ${target.id} -> new creative ${creative.id}`);
+    swapped++;
+  }
+  console.log(`\n${EXECUTE ? `Done. Swapped ${swapped}/${manifest.ads.length} (${missing} not found). Ads re-enter review; they stay PAUSED.` : 'Dry-run complete. Re-run with --execute to swap.'}\n`);
+}
+
 // ── monitor ───────────────────────────────────────────────────────────────
 async function monitor() {
   const camps = await getAll(`/${ACCT}/campaigns`, 'id,name,status');
@@ -344,6 +401,6 @@ function scoreAd(i) {
   return { label: s >= 70 ? 'good ✅' : s >= 45 ? 'ok' : 'poor ⚠️' };
 }
 
-const fns = { recon, build, creatives, monitor };
-if (!fns[command]) { console.error(`Unknown command "${command}". Use: recon | build | creatives`); process.exit(1); }
+const fns = { recon, build, creatives, 'update-creatives': updateCreatives, monitor };
+if (!fns[command]) { console.error(`Unknown command "${command}". Use: recon | build | creatives | update-creatives | monitor`); process.exit(1); }
 fns[command]().catch((e) => { console.error('\n✗', e.message, '\n'); process.exit(1); });
