@@ -1,37 +1,39 @@
-# PT Launch Lab LIVE — Event #1 Emails + Setup (22 July 2026)
+# PT Launch Lab LIVE — Event #1 Emails + Setup (29 July 2026)
 
 Ready-to-send copy for Event #1, plus the exact MailerLite + Zapier setup to make
 the funnel live. Generic templates live in `LIVE-EVENT-EMAIL-PLAN.md`; this file is
 the **filled-in, event-specific** version.
 
 **Event facts used throughout**
-- **When:** Wednesday 22 July 2026, 8:00pm (UK)
+- **When:** Wednesday 29 July 2026, 8:00pm (UK)
 - **Topic:** The Real State of the PT Industry in 2026
 - **Panel:** Hosts Callum Brown, Ryan Robinson & Miles Halstead — with guests Jonny
-  Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching), Tom Blackman (Ministry of
-  Fitness), Aaron Caseley (MOFO Body Mechanic) & Sohail Rashid (Brawn)
+  Grayshon (Vaxa Fitness Transformations), Jon Baker (The Gym Group), Tom Blackman (Ministry of
+  Fitness), Chris Duffin (Resilience coach) & Sohail Rashid (Brawn)
 - **Ask a question:** https://ptlaunchlab.co.uk/ask
-- **Podcast (episode lands ~22 July):** https://ptlaunchlab.co.uk/podcast
+- **Podcast (episode lands ~5 Aug):** https://ptlaunchlab.co.uk/podcast
 - **Quiz:** https://ptlaunchlab.co.uk/quiz
 
 > ⚠️ **The one thing only you can supply:** the **WATCH LINK** (the unlisted
 > YouTube/Riverside stream URL). Everywhere below it says `[WATCH LINK]` — paste your
 > stream URL there, and set it as `LIVE_STREAM_URL` on Vercel so the website reveals
-> it too. Confirm the **Sam Hinks / Hincks** spelling before sending.
+> it too. Guest panel matches the `/live` site (Jonny Grayshon, Jon Baker, Tom
+> Blackman, Chris Duffin, Sohail Rashid) — keep them in sync if it changes.
 
 ---
 
-## A. Send schedule (work back from Wed 22 July, 8pm)
+## A. Send schedule (work back from Wed 29 July, 8pm)
 
 | When | Email | Type |
 |---|---|---|
+| **ASAP (only if wrong date already sent)** | B0 — Date correction | Campaign → whole list |
 | **ASAP (now)** | B1 — Announce / you're in | Campaign → whole list |
-| **Tue 8 July** | B2 — 1 week to go | Campaign → whole list |
-| **Mon 14 July, ~6pm** | B3 — Tomorrow night | Campaign → whole list |
-| **Wed 22 July, 7pm** | B4 — Live in 1 hour | Campaign → whole list |
-| **Wed 22 July, 8pm** | B5 — We're live now | Campaign → whole list |
-| **Thu 16 July** | B6 — Thanks / sorry we missed you | Campaign → split (attendees / no-shows) |
-| **~Tue 22 July** | B7 — The episode is up | Campaign → whole list |
+| **Tue 22 July** | B2 — 1 week to go | Campaign → whole list |
+| **Tue 28 July, ~6pm** | B3 — Tomorrow night | Campaign → whole list |
+| **Wed 29 July, 7pm** | B4 — Live in 1 hour | Campaign → whole list |
+| **Wed 29 July, 8pm** | B5 — We're live now | Campaign → whole list |
+| **Thu 30 July** | B6 — Thanks / sorry we missed you | Campaign → split (attendees / no-shows) |
+| **~Wed 5 Aug** | B7 — The episode is up | Campaign → whole list |
 | **On signup (always)** | A1 — Instant "you're in" + watch link | Automation (new joiners) |
 | **Days 2–10 after signup** | A2–A5 welcome | Automation (new joiners) |
 
@@ -46,7 +48,7 @@ Trigger in MailerLite: **subscriber joins "Live Sessions"**. Fires once ever.
 ```
 {$name|"Hey"}, you're on the list for PT Launch Lab LIVE.
 
-📅 Next session: Wednesday 22 July, 8:00pm (UK)
+📅 Next session: Wednesday 29 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 
 Save your watch link: [WATCH LINK]
@@ -97,7 +99,7 @@ quietly working in 2026 while everyone else panics about AI and saturation:
 3. Treating retention as the business — keeping clients 12+ months, not chasing new ones.
 
 We go deep on this stuff live. Speaking of which — your next session is
-Wednesday 22 July, 8pm.
+Wednesday 29 July, 8pm.
 
 Callum
 ```
@@ -131,7 +133,7 @@ Callum
 
 All here: https://ptlaunchlab.co.uk/podcast
 
-Then come settle the debates with us live, Wednesday 22 July, 8pm.
+Then come settle the debates with us live, Wednesday 29 July, 8pm.
 Callum
 ```
 
@@ -141,16 +143,47 @@ Callum
 
 Send as scheduled **campaigns to the whole "Live Sessions" group**.
 
+### B0 — Date correction (one-off — send ASAP if a wrong date already went out)
+Use this **only if** an earlier email/announcement went out showing the old date
+(22 July). It corrects the record as a sending error — no need to explain the
+reschedule. Send to the whole "Live Sessions" group; keep it short and warm.
+
+**Subject:** Quick correction — the right date for our live session
+**Preview:** Wednesday 29 July, 8pm. Same session, corrected date.
+```
+{$name|"there"}, quick correction — and apologies for the confusion.
+
+An earlier email went out with the wrong date for our upcoming live session. A
+gremlin in our email system pulled the wrong date through. Here are the correct
+details:
+
+📅 Wednesday 29 July 2026
+🕗 8:00pm (UK)
+💻 Online — free to attend
+🎙️ The Real State of the PT Industry in 2026
+
+Nothing else has changed and there's nothing you need to do — your seat is still
+reserved and your watch link below still works. Just swap the date in your diary
+to Wednesday 29 July.
+
+👉 Add the correct date to your calendar: [CALENDAR LINK]
+Your watch link: [WATCH LINK]
+
+Sorry for the mix-up — that one was on us. See you on the 29th.
+
+— Callum & the PT Launch Lab team
+```
+
 ### B1 — Announce (send ASAP)
 **Subject:** Next PT Launch Lab LIVE: The Real State of the PT Industry in 2026
 ```
 {$name|"there"}, the next live session is locked in.
 
-📅 Wednesday 22 July, 8:00pm (UK)
+📅 Wednesday 29 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 🎤 On the panel: Callum Brown, Ryan Robinson & Miles Halstead, with guests Jonny
-Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching), Tom Blackman (Ministry of
-Fitness), Aaron Caseley (MOFO Body Mechanic) & Sohail Rashid (Brawn).
+Grayshon (Vaxa Fitness Transformations), Jon Baker (The Gym Group), Tom Blackman (Ministry of
+Fitness), Chris Duffin (Resilience coach) & Sohail Rashid (Brawn).
 
 You're already on the list, so you're in — here's your watch link: [WATCH LINK]
 
@@ -158,7 +191,7 @@ Want something specific covered? Submit your question now and we'll answer the
 best ones live: https://ptlaunchlab.co.uk/ask
 ```
 
-### B2 — T-7 (Tue 8 July)
+### B2 — T-7 (Tue 22 July)
 **Subject:** 1 week: The Real State of the PT Industry in 2026
 ```
 {$name|"there"}, one week until we go live.
@@ -169,15 +202,15 @@ Here's what we're getting into:
 • Where the money's actually being made in fitness in 2026
 • Where the industry is heading next — plus your live Q&A
 
-With: Callum, Ryan & Miles + Jonny Grayshon, Sam Hinks, Tom Blackman, Aaron
-Caseley and Sohail Rashid.
+With: Callum, Ryan & Miles + Jonny Grayshon, Jon Baker, Tom Blackman, Chris
+Duffin and Sohail Rashid.
 
 Last call to get your question in — we read every one:
 https://ptlaunchlab.co.uk/ask
 Your watch link: [WATCH LINK]
 ```
 
-### B3 — T-24h (Mon 14 July, ~6pm)
+### B3 — T-24h (Tue 28 July, ~6pm)
 **Subject:** Tomorrow, 8pm 👀
 ```
 {$name|"there"}, we go live tomorrow at 8pm.
@@ -192,21 +225,21 @@ Watch link: [WATCH LINK]
 Final chance to submit a question: https://ptlaunchlab.co.uk/ask
 ```
 
-### B4 — T-1h (Wed 22 July, 7pm)
+### B4 — T-1h (Wed 29 July, 7pm)
 **Subject:** ⏰ Live in 1 hour
 ```
 {$name|"there"}, we're live in an hour (8pm). Grab a brew and your questions.
 👉 [WATCH LINK]
 ```
 
-### B5 — T-0 (Wed 22 July, 8pm)
+### B5 — T-0 (Wed 29 July, 8pm)
 **Subject:** 🔴 We're LIVE now
 ```
 {$name|"there"}, we've started — come join us. Drop your questions in the chat.
 👉 [WATCH LINK]
 ```
 
-### B6 — T+1 (Thu 16 July) — split by segment
+### B6 — T+1 (Thu 30 July) — split by segment
 **Attendees (clicked the watch link) — Subject:** Thanks for being on the live
 ```
 {$name|"there"}, cheers for joining last night — proper session.
@@ -223,10 +256,10 @@ episode in about a week and we'll send it straight to you.
 Next live is monthly, so you're already on the list for the next one.
 ```
 
-### B7 — T+~7 (~Tue 22 July)
+### B7 — T+~7 (~Wed 5 Aug)
 **Subject:** 🎧 Last week's live is now up
 ```
-{$name|"there"}, the full recording from 22 July is now live as a podcast episode:
+{$name|"there"}, the full recording from 29 July is now live as a podcast episode:
 
 🎧 https://ptlaunchlab.co.uk/podcast
 

@@ -1,6 +1,6 @@
 # PT Launch Lab LIVE — Meta Campaign Plan (Build Pack)
 
-Strategist's plan for **Event #1 (Wed 22 July 2026)**, ready to build in Meta Ads
+Strategist's plan for **Event #1 (Wed 29 July 2026)**, ready to build in Meta Ads
 Manager. Pairs with `LIVE-EVENT-META-ADS-BRIEF.md` (account/pixel/tracking) and
 `LIVE-EVENT-RUNBOOK.md` (event ops).
 
@@ -62,7 +62,7 @@ Launch it, get data, then optimise from real numbers.
 
 ### Video 1 — "The PT Industry Is Changing"
 - **Hook:** Is the PT industry getting harder?
-- **Body:** Everyone keeps saying personal training is dead. That GLP-1 drugs will replace coaches. That the market is saturated. That nobody can make money anymore. So we're bringing together some of the UK's leading coaches and gym owners for a live discussion on what's actually happening in the fitness industry right now. Join us live on July 22nd.
+- **Body:** Everyone keeps saying personal training is dead. That GLP-1 drugs will replace coaches. That the market is saturated. That nobody can make money anymore. So we're bringing together some of the UK's leading coaches and gym owners for a live discussion on what's actually happening in the fitness industry right now. Join us live on July 29nd.
 - **CTA:** Register free.
 
 ### Video 2 — "Where The Money Is"

@@ -49,7 +49,7 @@ const FROM_NAME = 'Callum — PT Launch Lab';
 const ASK = 'https://ptlaunchlab.co.uk/ask';
 const POD = 'https://ptlaunchlab.co.uk/podcast';
 const QUIZ = 'https://ptlaunchlab.co.uk/quiz';
-const PANEL = 'Callum Brown, Ryan Robinson & Miles Halstead, with guests Jonny Grayshon (Vaxa Fitness Transformations), Sam Hinks (SJH Coaching), Tom Blackman (Ministry of Fitness), Aaron Caseley (MOFO Body Mechanic) & Sohail Rashid (Brawn)';
+const PANEL = 'Callum Brown, Ryan Robinson & Miles Halstead, with guests Jonny Grayshon (Vaxa Fitness Transformations), Jon Baker (The Gym Group), Tom Blackman (Ministry of Fitness), Chris Duffin (Resilience coach) & Sohail Rashid (Brawn)';
 const WATCH_LINK = process.env.WATCH_LINK || ''; // audience watch link; baked into [WATCH LINK] when set
 
 // plaintext → simple branded HTML (linkify URLs, highlight [WATCH LINK], paragraphs)
@@ -78,7 +78,7 @@ const CAMPAIGNS = [
     subject: 'Next PT Launch Lab LIVE: The Real State of the PT Industry in 2026',
     body: `{$name|"there"}, the next live session is locked in.
 
-📅 Wednesday 22 July, 8:00pm (UK)
+📅 Wednesday 29 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 🎤 On the panel: ${PANEL}.
 
@@ -96,7 +96,7 @@ Here's what we're getting into:
 • Where the money's actually being made in fitness in 2026
 • Where the industry is heading next — plus your live Q&A
 
-With: Callum, Ryan & Miles + Jonny Grayshon, Sam Hinks, Tom Blackman, Aaron Caseley and Sohail Rashid.
+With: Callum, Ryan & Miles + Jonny Grayshon, Jon Baker, Tom Blackman, Chris Duffin and Sohail Rashid.
 
 Last call to get your question in — we read every one: ${ASK}
 Your watch link: [WATCH LINK]` },
@@ -138,7 +138,7 @@ Next live is monthly, so you're already on the list for the next one.` },
 
   { key: 'B7', name: 'LIVE Jul26 — B7 Episode is up',
     subject: '🎧 Last week\'s live is now up',
-    body: `{$name|"there"}, the full recording from 22 July is now live as a podcast episode:
+    body: `{$name|"there"}, the full recording from 29 July is now live as a podcast episode:
 
 🎧 ${POD}
 
@@ -154,7 +154,7 @@ const WELCOME = [
     subject: 'You\'re in 🎟️ here\'s your watch link',
     body: `{$name|"Hey"}, you're on the list for PT Launch Lab LIVE.
 
-📅 Next session: Wednesday 22 July, 8:00pm (UK)
+📅 Next session: Wednesday 29 July, 8:00pm (UK)
 🎙️ The Real State of the PT Industry in 2026
 
 Save your watch link: [WATCH LINK]
@@ -190,7 +190,7 @@ From what we and the coaches we know are seeing on the ground, three things are 
 2. Owning the in-person/accountability piece machines can't replace.
 3. Treating retention as the business — keeping clients 12+ months, not chasing new ones.
 
-We go deep on this stuff live. Speaking of which — your next session is Wednesday 22 July, 8pm.
+We go deep on this stuff live. Speaking of which — your next session is Wednesday 29 July, 8pm.
 
 Callum` },
 
@@ -216,7 +216,7 @@ Callum` },
 
 All here: ${POD}
 
-Then come settle the debates with us live, Wednesday 22 July, 8pm.
+Then come settle the debates with us live, Wednesday 29 July, 8pm.
 Callum` },
 ];
 

@@ -327,7 +327,7 @@ async function updateCreatives() {
     const imageHash = Object.values(up.images)[0].hash;
 
     const creative = await graph(`/${ACCT}/adcreatives`, 'POST', {
-      name: `${ad.name} — creative (22 Jul)`,
+      name: `${ad.name} — creative (29 Jul)`,
       object_story_spec: {
         page_id: PAGE,
         link_data: {

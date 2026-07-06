@@ -30,9 +30,9 @@ if (!CHROME) { console.error('No Chrome/Edge found'); process.exit(1); }
 // ── Event date — single knob ────────────────────────────────────────────────
 const DATE = {
   dayLine1: 'WEDNESDAY',
-  dayLine2: '22 JULY',
-  dayInline: 'WED 22 JULY',       // eyebrow / footer strips
-  dayShort: '22 July',            // sentence-case footer
+  dayLine2: '29 JULY',
+  dayInline: 'WED 29 JULY',       // eyebrow / footer strips
+  dayShort: '29 July',            // sentence-case footer
   time: '8:00PM',
   tz: '(UK)',
 };
