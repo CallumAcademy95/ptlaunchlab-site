@@ -21,13 +21,24 @@ export type Speaker = {
 };
 
 export const SERIES_NAME = "PT Launch Lab LIVE";
-export const SERIES_TAGLINE = "Monthly live discussions with leading fitness professionals.";
+export const SERIES_TAGLINE = "Live discussions with the people shaping the future of fitness.";
 
 export const EVENT = {
   number: 1,
-  title: "The Real State of the PT Industry in 2026",
+  title: "Where Is the Fitness Industry Really Heading in 2026?",
+  // Punchy sub-head shown directly under the title on /live.
+  subhead:
+    "AI. GLP-1s. Fitness technology. The future of PT. Commercial gyms vs independents.",
+  // Body paragraphs shown under the sub-head on /live.
+  blurb: [
+    "The fitness industry is changing faster than ever.",
+    "Join leading gym operators, coaches, investors and fitness-tech experts for a live, no-filter discussion on the biggest questions facing the industry right now.",
+    "What's changing? What's overhyped? What are we underestimating? And where are the biggest opportunities for gyms and personal trainers?",
+    "Bring your questions for the live Q&A.",
+  ],
+  // Concise summary used by the Event schema, calendar link and /ask.
   topic:
-    "Gym owners, coaches and PTs go live on the questions everyone's asking — is the market saturated, what actually fills a client roster now, and where the money really is. Bring your questions for the live Q&A.",
+    "AI, GLP-1s, fitness technology, the future of PT and commercial gyms vs independents — leading gym operators, coaches, investors and fitness-tech experts go live on the biggest questions facing the industry right now. Bring your questions for the live Q&A.",
   // ISO 8601 with explicit offset. July = BST (UTC+1). ~1hr: 3×20min segments
   // (topics / submitted Q&A / open Q&A) + welcome + wrap.
   startIso: "2026-07-29T20:00:00+01:00",
@@ -43,6 +54,7 @@ export const EVENT = {
     { name: "Tom Blackman", org: "Ministry of Fitness", photo: "/live/speakers/tom-blackman.png" },
     { name: "Chris Duffin", org: "Chief Scientific Advisor & Resilience Coach", photo: "/live/speakers/chris-duffin.png" },
     { name: "Sohail Rashid", org: "Brawn", photo: "/live/speakers/sohail-rashid.png" },
+    { name: "Paul Richardson", org: "Entrepreneur & Investor — Fitness, Football & Retail", photo: "/live/speakers/paul-richardson.jpeg" },
   ] as Speaker[],
   // "Questions we'll be discussing" — teasers shown on /live.
   talkingPoints: [

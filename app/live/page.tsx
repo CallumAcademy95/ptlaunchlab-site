@@ -133,12 +133,19 @@ export default function Page() {
             {/* This session */}
             <div className="mb-9">
               <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-2">{sessionLabel}</p>
-              <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl leading-tight tracking-tight mb-3">
+              <h2 className="font-display font-extrabold text-3xl sm:text-4xl md:text-5xl leading-tight tracking-tight mb-4">
                 {EVENT.title}
               </h2>
-              <p className="text-soft/75 text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-2">
-                {EVENT.topic}
+              <p className="text-white font-bold text-lg md:text-xl max-w-2xl mx-auto leading-snug mb-5">
+                {EVENT.subhead}
               </p>
+              <div className="max-w-2xl mx-auto space-y-3 mb-6">
+                {EVENT.blurb.map((p) => (
+                  <p key={p} className="text-soft/75 text-base md:text-lg leading-relaxed">
+                    {p}
+                  </p>
+                ))}
+              </div>
               <p className="text-gold font-semibold text-base md:text-lg">{whenLabel}</p>
             </div>
 
