@@ -133,13 +133,27 @@ export default function Tracking() {
   // Meta Pixel PageView on every pathname change. The Pixel snippet in
   // app/layout.tsx no longer fires its own PageView — we own it here so the
   // first hard load AND every Next.js <Link> SPA navigation get tracked.
-  // The fbq queue swallows calls fired before the script finishes loading,
-  // so this is safe to run on the first render too.
+  //
+  // The Pixel base snippet loads `afterInteractive`, which can lose the race
+  // against this effect on a hard page load. When it does, `window.fbq` is
+  // still undefined and the old guarded call silently dropped the PageView
+  // forever — the effect only re-runs on a pathname change, so a single-page
+  // bounce never retried. That race is why production Lead events (fired in
+  // user handlers, seconds later, once fbq is ready) registered fine while
+  // PageView barely fired at all. Retry briefly until fbq is available.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (typeof window.fbq === "function") {
-      window.fbq("track", "PageView");
-    }
+    let tries = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const firePageView = () => {
+      if (typeof window.fbq === "function") {
+        window.fbq("track", "PageView");
+        return;
+      }
+      if (tries++ < 50) timer = setTimeout(firePageView, 100); // up to ~5s
+    };
+    firePageView();
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {
