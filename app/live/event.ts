@@ -54,7 +54,7 @@ export const EVENT = {
     { name: "Tom Blackman", org: "Ministry of Fitness", photo: "/live/speakers/tom-blackman.png" },
     { name: "Chris Duffin", org: "Chief Scientific Advisor & Resilience Coach", photo: "/live/speakers/chris-duffin.png" },
     { name: "Sohail Rashid", org: "Brawn", photo: "/live/speakers/sohail-rashid.png" },
-    { name: "Paul Richardson", org: "Entrepreneur & Investor — Fitness, Football & Retail", photo: "/live/speakers/paul-richardson.jpeg" },
+    { name: "Paul Richardson", org: "Entrepreneur & Investor — Fitness, Football & Retail", photo: "/live/speakers/paul-richardson.png" },
   ] as Speaker[],
   // "Questions we'll be discussing" — teasers shown on /live.
   talkingPoints: [
