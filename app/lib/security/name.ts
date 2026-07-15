@@ -43,3 +43,31 @@ export function validateName(input: unknown, opts: { min?: number; max?: number 
   }
   return { ok: true, normalised: trimmed };
 }
+
+/**
+ * Business/trading-name validation. Same junk filters as validateName, minus
+ * the vowel rule — brands are not people. "F45", "TRX", "BLK BX" and "PT4U"
+ * are all real UK gym brands that a vowel requirement rejects outright, and a
+ * rejected gym name costs us a partnership lead.
+ *
+ * Digits-only is still allowed here ("360", "1Rebel" are plausible trading
+ * names), so the letter requirement goes too. We keep the URL, repeat-char and
+ * length filters, which are what actually catch bot junk.
+ */
+export function validateBusinessName(
+  input: unknown,
+  opts: { min?: number; max?: number } = {},
+): NameCheck {
+  if (typeof input !== "string") return { ok: false, normalised: null, reason: "empty" };
+  const trimmed = input.trim().replace(/\s+/g, " ");
+  const min = opts.min ?? 2;
+  const max = opts.max ?? 200;
+  if (!trimmed) return { ok: false, normalised: null, reason: "empty" };
+  if (trimmed.length < min) return { ok: false, normalised: null, reason: "too-short" };
+  if (trimmed.length > max) return { ok: false, normalised: null, reason: "too-long" };
+  if (URL_FRAGMENTS.test(trimmed)) return { ok: false, normalised: null, reason: "url" };
+  if (REPEAT_CHAR.test(trimmed) || REPEAT_PAIR.test(trimmed)) {
+    return { ok: false, normalised: null, reason: "repeat" };
+  }
+  return { ok: true, normalised: trimmed };
+}

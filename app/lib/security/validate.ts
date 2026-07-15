@@ -13,7 +13,7 @@
 
 import { z } from "zod";
 import { validateEmail } from "./email";
-import { validateName } from "./name";
+import { validateName, validateBusinessName } from "./name";
 import { validateUKPhone, validateAnyPhone } from "./phone";
 import { checkHoneypot, SEC_KEY, type SecCheck } from "./honeypot";
 
@@ -509,7 +509,14 @@ export function validateGymPartnership(raw: unknown): ValidationResult<GymPartne
   if (!parsed.success) {
     return { ok: false, silent: false, status: 400, error: "Missing required fields.", signals: ["schema-fail"] };
   }
-  const secCheck = sec(raw);
+  // Deliberately permissive, for the same reason enrolments are (see
+  // validateEnrolmentSec): a gym partnership supplies learners repeatedly, so a
+  // lost partnership lead costs far more than a bot costs us to filter later.
+  // We ONLY drop on a honeypot trip. The time-trap and nonce checks are not
+  // worth their false-positive rate here — a password manager filling the
+  // honeypot, or JS that hasn't hydrated, silently binned real applicants who
+  // were shown "Application Received" and then never contacted.
+  const secCheck = validateGymPartnershipSec(raw);
   if (!secCheck.ok) {
     return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
   }
@@ -518,7 +525,8 @@ export function validateGymPartnership(raw: unknown): ValidationResult<GymPartne
   if (!nameCheck.ok) {
     return { ok: false, silent: false, status: 422, error: "Please enter your full name.", signals: [`name:${nameCheck.reason}`] };
   }
-  const gymCheck = validateName(parsed.data.gymName, { min: 2, max: 200 });
+  // Business name, not a person's name — "F45" and "TRX" are real gyms.
+  const gymCheck = validateBusinessName(parsed.data.gymName, { min: 2, max: 200 });
   if (!gymCheck.ok) {
     return { ok: false, silent: false, status: 422, error: "Please enter a valid gym name.", signals: [`gym:${gymCheck.reason}`] };
   }
@@ -544,6 +552,24 @@ export function validateGymPartnership(raw: unknown): ValidationResult<GymPartne
     },
     signals: [],
   };
+}
+
+/**
+ * Gym partnership sec check. Same permissive stance as validateEnrolmentSec —
+ * honeypot only. A B2B partnership lead is worth more than an enrolment (one
+ * partner supplies learners repeatedly), so the time-trap and nonce checks
+ * aren't worth their false-positive rate: both silent-drop while showing the
+ * applicant a success screen, which reads to them as "the form is broken".
+ */
+export function validateGymPartnershipSec(raw: unknown): SecCheck {
+  if (!raw || typeof raw !== "object") return { ok: true };
+  const s = (raw as Record<string, unknown>)[SEC_KEY];
+  if (!s || typeof s !== "object") return { ok: true };
+  const hp = (s as { hp?: unknown }).hp;
+  if (typeof hp === "string" && hp.length > 0) {
+    return { ok: false, reason: "honeypot" };
+  }
+  return { ok: true };
 }
 
 /**

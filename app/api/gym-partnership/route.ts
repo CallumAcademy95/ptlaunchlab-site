@@ -34,23 +34,50 @@ export async function POST(request: NextRequest) {
     const { gymName, name, email, phone, location, gymSize, referredBy } = result.data;
     const webhookUrl = process.env.GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL;
 
-    if (webhookUrl) {
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          gym_name: gymName,
-          name,
-          email,
-          phone,
-          location,
-          gym_size: gymSize,
-          referred_by: referredBy,
-          submitted_at: new Date().toISOString(),
-        }),
-      });
-    } else {
-      console.warn('[gym-partnership] GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL not set — skipping.');
+    if (!webhookUrl) {
+      // No sink configured means the application goes nowhere. Never tell the
+      // applicant it was received.
+      console.error('[gym-partnership] level:lead-lost — GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL not set.');
+      return NextResponse.json(
+        { success: false, error: "We couldn't submit your application — please email partnerships@ptlaunchlab.co.uk." },
+        { status: 500 },
+      );
+    }
+
+    const payload = {
+      gym_name: gymName,
+      name,
+      email,
+      phone,
+      location,
+      gym_size: gymSize,
+      referred_by: referredBy,
+      submitted_at: new Date().toISOString(),
+    };
+
+    // Mirrors the career-planner push: retry once, and surface a real failure to
+    // the applicant rather than returning success for a lead we didn't capture.
+    const push = async (attempt = 1): Promise<boolean> => {
+      try {
+        const r = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) throw new Error(`Zapier ${r.status}`);
+        return true;
+      } catch (err) {
+        if (attempt < 2) return push(attempt + 1);
+        console.error('[gym-partnership] level:lead-lost — Zapier push failed after retry:', email, err);
+        return false;
+      }
+    };
+
+    if (!(await push())) {
+      return NextResponse.json(
+        { success: false, error: "We couldn't submit your application — please email partnerships@ptlaunchlab.co.uk." },
+        { status: 502 },
+      );
     }
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });

@@ -7,7 +7,11 @@ export default function PartnershipForm() {
     gymName: "", name: "", email: "", phone: "", location: "", gymSize: "", referredBy: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [error, setError] = useState("");
   const sec = useFormSecurity();
+
+  const FALLBACK_ERROR =
+    "Something went wrong — please try again, or email partnerships@ptlaunchlab.co.uk.";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -16,6 +20,7 @@ export default function PartnershipForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    setError("");
     try {
       const res = await fetch("/api/gym-partnership", {
         method: "POST",
@@ -23,8 +28,16 @@ export default function PartnershipForm() {
         body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
-      setStatus(data.success ? "success" : "error");
+      if (data.success) {
+        setStatus("success");
+        return;
+      }
+      // Show what the server actually objected to. Without this every
+      // rejection reads as a broken form and the applicant can't self-correct.
+      setError(typeof data.error === "string" && data.error ? data.error : FALLBACK_ERROR);
+      setStatus("error");
     } catch {
+      setError(FALLBACK_ERROR);
       setStatus("error");
     }
   };
@@ -107,7 +120,9 @@ export default function PartnershipForm() {
       </div>
 
       {status === "error" && (
-        <p className="text-red-400 text-sm text-center">Something went wrong — please try again.</p>
+        <p role="alert" className="text-red-400 text-sm text-center">
+          {error || FALLBACK_ERROR}
+        </p>
       )}
 
       <button

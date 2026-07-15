@@ -50,8 +50,15 @@ export function useFormSecurity() {
   }
 
   // Honeypot input. Hidden via aria + tabIndex + CSS, never seen by humans
-  // or visible-DOM bots. `autoComplete="off"` blocks browser autofill, but
-  // we use a non-suggestive label/name to avoid AI-driven form fillers.
+  // or visible-DOM bots.
+  //
+  // The field name matters more than it looks. It was previously `website_url`,
+  // which password managers and browser autofill happily recognise and fill —
+  // and a filled honeypot silently drops the submission while still showing the
+  // user a success screen. That failure mode is invisible to us and reads to
+  // them as "your form is broken". The name below is deliberately meaningless
+  // so no autofill heuristic matches it, and the data-* attributes are the
+  // documented opt-outs for 1Password, LastPass and Dashlane.
   function Honeypot() {
     return (
       <div
@@ -67,14 +74,17 @@ export function useFormSecurity() {
           pointerEvents: "none",
         }}
       >
-        <label htmlFor="website-url-field">Leave this field empty</label>
+        <label htmlFor="pf-x9-field">Leave this field empty</label>
         <input
           ref={hpRef}
-          id="website-url-field"
-          name="website_url"
+          id="pf-x9-field"
+          name="pf_x9"
           type="text"
           tabIndex={-1}
           autoComplete="off"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-form-type="other"
           defaultValue=""
         />
       </div>
