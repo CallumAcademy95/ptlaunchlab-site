@@ -3,6 +3,7 @@ import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
+import CalendlyCallLink from "./CalendlyCallLink";
 
 export const metadata: Metadata = {
   title: "Gym Partnership Programme | PT Launch Lab — A New Annual Revenue Stream",
@@ -459,14 +460,7 @@ export default function GymPartnershipPage() {
 
             <p className="text-center text-faint text-sm mt-6">
               Prefer to talk first?{" "}
-              <a
-                href="https://calendly.com/ptlaunchlab-info/information-call"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold hover:underline font-semibold"
-              >
-                Book a 15-min partnership call →
-              </a>
+              <CalendlyCallLink />
             </p>
           </div>
         </section>

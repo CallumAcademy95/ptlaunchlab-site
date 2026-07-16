@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateGymPartnership } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
+import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 
 const rateLimiter = createRateLimiter(3, 60_000);
 const ENDPOINT = '/api/gym-partnership';
@@ -24,7 +25,9 @@ export async function POST(request: NextRequest) {
   if (!result.ok) {
     if (result.silent) {
       logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-silent', signals: result.signals, ip, ua: request.headers.get('user-agent') });
-      return NextResponse.json({ success: true });
+      // Look successful, but signal lead:false so the browser doesn't fire a
+      // Meta Lead for honeypot/junk. Mirrors the career-planner contract.
+      return NextResponse.json({ success: true, lead: false });
     }
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'blocked-user', signals: result.signals, ip });
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });
@@ -81,7 +84,39 @@ export async function POST(request: NextRequest) {
     }
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
-    return NextResponse.json({ success: true });
+
+    // Meta CAPI Lead — this is the event the gym-partnership campaign
+    // (52550722458518) optimises on. Paired with the browser fbq Lead via a
+    // shared event_id so the two dedup on Meta's side. fbc/fbp/IP/UA are pulled
+    // from the request cookies (the Pixel sets _fbc from ?fbclid on landing) so
+    // the click can be attributed back to the ad.
+    const rawEventId =
+      typeof (raw as Record<string, unknown>)?.event_id === 'string'
+        ? ((raw as Record<string, unknown>).event_id as string).slice(0, 64)
+        : null;
+    const eventId = rawEventId || deterministicEventId('gym_partnership_lead', email);
+    const [firstName, ...rest] = (name || '').split(/\s+/);
+    void sendCapiEvent({
+      eventName: 'Lead',
+      eventId,
+      eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/gym-partnership',
+      userData: {
+        email,
+        phone,
+        firstName,
+        lastName: rest.join(' '),
+        country: 'gb',
+        ...extractRequestUserData(request),
+      },
+      customData: {
+        currency: 'GBP',
+        value: 0, // lead signal, not the £500/learner value
+        contentName: 'gym_partnership',
+        contentCategory: 'b2b_partner',
+      },
+    });
+
+    return NextResponse.json({ success: true, lead: true });
   } catch (err) {
     console.error('[gym-partnership]', err);
     return NextResponse.json({ success: false, error: 'Server error.' }, { status: 500 });

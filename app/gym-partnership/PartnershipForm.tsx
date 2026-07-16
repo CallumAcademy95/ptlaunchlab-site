@@ -22,13 +22,28 @@ export default function PartnershipForm() {
     setStatus("loading");
     setError("");
     try {
+      // Shared id so the browser fbq Lead below and the server-side CAPI Lead
+      // (fired in /api/gym-partnership) dedup on Meta's side.
+      const eventId =
+        window.crypto?.randomUUID?.() ??
+        `gym-lead-${Date.now()}-${Math.random().toString(36).slice(2)}`;
       const res = await fetch("/api/gym-partnership", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
+        body: JSON.stringify({ ...form, event_id: eventId, [sec.SEC_KEY]: sec.payload() }),
       });
       const data = await res.json();
       if (data.success) {
+        // Only fire for a genuinely captured lead — the server returns
+        // lead:false for honeypot/junk so we don't inflate the Lead signal.
+        if (data.lead !== false && typeof window.fbq === "function") {
+          window.fbq(
+            "track",
+            "Lead",
+            { content_category: "gym_partnership", content_name: "partner_application" },
+            { eventID: eventId },
+          );
+        }
         setStatus("success");
         return;
       }
@@ -135,4 +150,10 @@ export default function PartnershipForm() {
       <p className="text-[#4A6280] text-xs text-center">One partner per area · Reviewed within 24 hours · No cost to apply</p>
     </form>
   );
+}
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
 }
