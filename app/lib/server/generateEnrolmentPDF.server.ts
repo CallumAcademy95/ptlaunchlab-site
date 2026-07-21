@@ -34,7 +34,7 @@ export interface EnrolmentPDFServerData {
     signatureType: "drawn" | "typed";
     signedAt: string;
   };
-  paymentChoice: "full" | "deposit";
+  paymentChoice: "full" | "deposit" | "manual";
   submittedAt: string;
   gymReferral?: string;
   promoCode?: string;
@@ -66,8 +66,9 @@ export function generateEnrolmentPDFServer(
 
     const displayDate = dt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
     const refNum      = `PTLL-${dt.getTime().toString().slice(-7)}`;
-    const paymentLabel = data.paymentChoice === "full"
-      ? `Full Payment — £${data.amountPaid ?? "1,599"}`
+    const paymentLabel =
+      data.paymentChoice === "manual" ? "Manual entry — admin/NCFE capture (no site payment)"
+      : data.paymentChoice === "full" ? `Full Payment — £${data.amountPaid ?? "1,599"}`
       : `Deposit Plan — £${data.amountPaid ?? "599"} deposit + 5×£200`;
 
     let y = 0;

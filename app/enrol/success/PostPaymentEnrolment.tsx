@@ -22,6 +22,12 @@ import {
 
 const TERMS_URL = "/terms";
 
+// "postpay" — the default pay-first flow: buyer lands here after Stripe.
+// "manual"  — no-payment learner-detail capture (e.g. sending an already-paid
+//             learner a link to gather their NCFE record). Drops all payment
+//             framing and skips revenue/conversion analytics.
+type EnrolMode = "postpay" | "manual";
+
 type Step = 1 | 2 | 3;
 const STEPS = [
   { num: 1, label: "Details" },
@@ -66,7 +72,8 @@ function ProgressBar({ step }: { step: Step }) {
 }
 
 // ─── Success view — shown once the enrolment form is submitted ───────────────
-function CompletedView({ firstName }: { firstName: string }) {
+function CompletedView({ firstName, mode = "postpay" }: { firstName: string; mode?: EnrolMode }) {
+  const manual = mode === "manual";
   return (
     <>
       <section className="pt-[128px] pb-16 md:pb-24 px-6">
@@ -76,14 +83,14 @@ function CompletedView({ firstName }: { firstName: string }) {
               <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-4">Enrolment complete</p>
+          <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-4">{manual ? "Details received" : "Enrolment complete"}</p>
           <h1 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-[0.95] tracking-tight mb-6">
             You&apos;re in{firstName ? `, ${firstName}` : ""}.
           </h1>
           <p className="text-lg md:text-xl text-soft/85 mb-10 leading-relaxed">
-            Your payment is confirmed and your enrolment paperwork is signed and
-            on file. We&apos;re getting your account set up — keep an eye on your
-            inbox over the next 24 hours.
+            {manual
+              ? "Thanks — your enrolment details are saved and on file. Your tutor will be in touch to walk you through the next steps."
+              : "Your payment is confirmed and your enrolment paperwork is signed and on file. We’re getting your account set up — keep an eye on your inbox over the next 24 hours."}
           </p>
         </div>
       </section>
@@ -99,7 +106,7 @@ function CompletedView({ firstName }: { firstName: string }) {
               <div>
                 <p className="text-white font-semibold mb-1">Welcome email (within minutes)</p>
                 <p className="text-soft text-sm leading-relaxed">
-                  Confirmation, receipt, and your signed enrolment paperwork — all in
+                  {manual ? "Confirmation" : "Confirmation, receipt,"} and your signed enrolment paperwork — all in
                   one email from <strong className="text-white/80">info@ptlaunchlab.co.uk</strong>.
                   Check spam if you don&apos;t see it.
                 </p>
@@ -154,7 +161,8 @@ function CompletedView({ firstName }: { firstName: string }) {
 }
 
 // ─── Main component ──────────────────────────────────────────────────────────
-export default function PostPaymentEnrolment() {
+export default function PostPaymentEnrolment({ mode = "postpay" }: { mode?: EnrolMode }) {
+  const manual = mode === "manual";
   const params = useSearchParams();
   const sessionId = params.get("session_id") ?? "";
 
@@ -342,10 +350,10 @@ export default function PostPaymentEnrolment() {
         signatureType: signMode,
         signedAt: new Date().toISOString(),
       },
-      paymentChoice: ctx?.plan ?? "full",
+      paymentChoice: (manual ? "manual" : (ctx?.plan ?? "full")) as "full" | "deposit" | "manual",
       submittedAt: new Date().toISOString(),
-      source: "website-enrolment-flow-v2-postpay",
-      amountPaid: ctx?.amount ?? (ctx?.plan === "deposit" ? 599 : 1599),
+      source: manual ? "admin-manual-ncfe-capture" : "website-enrolment-flow-v2-postpay",
+      amountPaid: manual ? 0 : (ctx?.amount ?? (ctx?.plan === "deposit" ? 599 : 1599)),
       stripeSessionId: sessionId || undefined,
       ...(ctx?.gymReferral     && { gymReferral: ctx.gymReferral }),
       ...(ctx?.promoCode       && { promoCode: ctx.promoCode, discountApplied: ctx.discountApplied }),
@@ -377,13 +385,17 @@ export default function PostPaymentEnrolment() {
       return;
     }
 
-    trackEvent('enrolment_complete', {
-      payment_type: record.paymentChoice,
-      amount: record.amountPaid,
-      currency: 'GBP',
-      ...(ctx?.promoCode && { promo_code: ctx.promoCode }),
-      ...(ctx?.gymReferral && { gym_referral: ctx.gymReferral }),
-    });
+    // Manual admin captures are not a website conversion — don't inflate the
+    // enrolment_complete / revenue analytics with a form that took no payment.
+    if (!manual) {
+      trackEvent('enrolment_complete', {
+        payment_type: record.paymentChoice,
+        amount: record.amountPaid,
+        currency: 'GBP',
+        ...(ctx?.promoCode && { promo_code: ctx.promoCode }),
+        ...(ctx?.gymReferral && { gym_referral: ctx.gymReferral }),
+      });
+    }
 
     try { localStorage.removeItem(ENROLMENT_CONTEXT_KEY); } catch (_) {}
     setDone(true);
@@ -392,7 +404,7 @@ export default function PostPaymentEnrolment() {
 
   const firstName = (learner.fullName || ctx?.fullName || "").trim().split(" ")[0];
 
-  if (done) return <CompletedView firstName={firstName} />;
+  if (done) return <CompletedView firstName={firstName} mode={mode} />;
 
   // ─── Form ─────────────────────────────────────────────────────────────
   return (
@@ -400,14 +412,14 @@ export default function PostPaymentEnrolment() {
       <div className="max-w-2xl mx-auto">
         <sec.Honeypot />
 
-        {/* Payment confirmed banner */}
+        {/* Intro banner */}
         <div className="bg-gold/10 border border-gold/30 rounded-2xl px-5 py-4 mb-8 flex items-center gap-3">
           <span className="flex-shrink-0 w-9 h-9 rounded-full bg-gold/20 text-gold flex items-center justify-center">
             <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </span>
           <div>
-            <p className="text-gold font-bold text-sm">Payment received — you&apos;re almost done.</p>
-            <p className="text-soft text-xs mt-0.5">One last step: complete your enrolment paperwork below to confirm your place.</p>
+            <p className="text-gold font-bold text-sm">{manual ? "Complete your enrolment details." : "Payment received — you’re almost done."}</p>
+            <p className="text-soft text-xs mt-0.5">{manual ? "Fill in your learner record below so we can register you with NCFE." : "One last step: complete your enrolment paperwork below to confirm your place."}</p>
           </div>
         </div>
 

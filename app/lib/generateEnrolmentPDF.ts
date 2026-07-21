@@ -19,7 +19,7 @@ export interface EnrolmentPDFData {
     signatureType: "drawn" | "typed";
     signedAt: string;
   };
-  paymentChoice: "full" | "deposit";
+  paymentChoice: "full" | "deposit" | "manual";
   submittedAt: string;
 }
 
@@ -55,7 +55,7 @@ async function buildEnrolmentPDF(data: EnrolmentPDFData) {
   );
   doc.text(`Ref: PTLL-${dt.getTime().toString().slice(-7)}`, PW - M, 20, { align: "right" });
   doc.text(
-    `Payment: ${data.paymentChoice === "full" ? "Full Payment \u2014 \u00a31,399" : "Deposit Plan \u2014 \u00a3599 + 5\u00d7\u00a3200"}`,
+    `Payment: ${data.paymentChoice === "manual" ? "Manual entry (admin/NCFE capture)" : data.paymentChoice === "full" ? "Full Payment \u2014 \u00a31,399" : "Deposit Plan \u2014 \u00a3599 + 5\u00d7\u00a3200"}`,
     PW - M, 26, { align: "right" }
   );
 

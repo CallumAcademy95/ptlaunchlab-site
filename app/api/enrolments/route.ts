@@ -42,8 +42,9 @@ export async function POST(req: NextRequest) {
       timeZone: "Europe/London",
     });
 
-    const paymentLabel = paymentChoice === "full"
-      ? `Full Payment — £${amountPaid ?? "1,599"}`
+    const paymentLabel =
+      paymentChoice === "manual" ? "Manual entry — admin/NCFE capture (no site payment)"
+      : paymentChoice === "full" ? `Full Payment — £${amountPaid ?? "1,599"}`
       : `Deposit Plan — £${amountPaid ?? "599"} deposit`;
 
     // ── Zapier → Google Sheets ─────────────────────────────────────────────
@@ -320,7 +321,9 @@ export async function POST(req: NextRequest) {
     }
 
     // ── GA4 server-side conversion event ──────────────────────────────────
-    if (GA4_MEASUREMENT_ID && GA4_API_SECRET) {
+    // Skip for manual admin captures — no payment was taken, so counting it as
+    // an enrolment conversion would inflate revenue/conversion reporting.
+    if (paymentChoice !== "manual" && GA4_MEASUREMENT_ID && GA4_API_SECRET) {
       fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
         method: "POST",
         body: JSON.stringify({
