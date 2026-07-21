@@ -82,14 +82,19 @@ export async function POST(req: NextRequest) {
       commit_to_learning:    a.checkboxes.commitToLearning      ? "Yes" : "No",
     };
 
-    const zapierRes = await fetch(ZAPIER_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(zapierPayload),
-    });
-
-    if (!zapierRes.ok) {
-      console.error("Zapier webhook error:", zapierRes.status, await zapierRes.text());
+    // Best-effort — a Sheets/network blip here must not fail the whole request
+    // (the admin email below is a second capture channel for the same data).
+    try {
+      const zapierRes = await fetch(ZAPIER_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(zapierPayload),
+      });
+      if (!zapierRes.ok) {
+        console.error("Zapier webhook error:", zapierRes.status, await zapierRes.text());
+      }
+    } catch (err) {
+      console.error("[enrolments] Zapier sheet webhook threw:", err);
     }
 
     // ── Build signature HTML for emails ───────────────────────────────────
@@ -281,8 +286,14 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Send emails ───────────────────────────────────────────────────────
+    // The learner's data is already captured (Google Sheet row above). Emails,
+    // PDF, Drive and analytics are all best-effort from here — a failure in any
+    // of them must NEVER surface as an error to the learner, or they'll see
+    // "Something went wrong" and abandon a submission that actually saved.
+    // Use allSettled (never rejects) so one failing send can't take out the
+    // other, and log any failure instead of throwing a 500.
     if (process.env.RESEND_API_KEY) {
-      await Promise.all([
+      const [adminRes, studentRes] = await Promise.allSettled([
         resend.emails.send({
           from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
           to: ADMIN_EMAIL,
@@ -298,6 +309,8 @@ export async function POST(req: NextRequest) {
           attachments: pdfAttachment,
         }),
       ]);
+      if (adminRes.status === "rejected") console.error("[enrolments] admin email failed:", adminRes.reason);
+      if (studentRes.status === "rejected") console.error("[enrolments] student email failed:", studentRes.reason);
     } else {
       console.warn("[enrolments] RESEND_API_KEY not set — skipping emails.");
     }
