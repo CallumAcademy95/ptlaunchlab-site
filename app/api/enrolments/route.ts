@@ -290,27 +290,38 @@ export async function POST(req: NextRequest) {
     // PDF, Drive and analytics are all best-effort from here — a failure in any
     // of them must NEVER surface as an error to the learner, or they'll see
     // "Something went wrong" and abandon a submission that actually saved.
-    // Use allSettled (never rejects) so one failing send can't take out the
-    // other, and log any failure instead of throwing a 500.
+    //
+    // Send SEQUENTIALLY, each isolated in its own try/catch:
+    //   • Resend's default limit is 2 requests/sec — firing both at once (the
+    //     old Promise.all) sat right on that limit and intermittently tripped a
+    //     429, which used to bubble up as a 500 to the learner. One-at-a-time
+    //     keeps us safely under it.
+    //   • Isolating each send means a failure on one (e.g. a bad learner email)
+    //     can't stop the other, and never fails the request.
+    const sendEmail = async (label: string, opts: Parameters<typeof resend.emails.send>[0]) => {
+      try {
+        const { error } = await resend.emails.send(opts);
+        if (error) console.error(`[enrolments] ${label} email rejected by Resend:`, error);
+      } catch (err) {
+        console.error(`[enrolments] ${label} email threw:`, err);
+      }
+    };
+
     if (process.env.RESEND_API_KEY) {
-      const [adminRes, studentRes] = await Promise.allSettled([
-        resend.emails.send({
-          from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
-          to: ADMIN_EMAIL,
-          subject: `New Enrolment: ${l.fullName} — ${paymentLabel}`,
-          html: adminHtml,
-          attachments: pdfAttachment,
-        }),
-        resend.emails.send({
-          from: "PT Launch Lab <noreply@ptlaunchlab.co.uk>",
-          to: l.email,
-          subject: "Your PT Launch Lab Enrolment Confirmation",
-          html: studentHtml,
-          attachments: pdfAttachment,
-        }),
-      ]);
-      if (adminRes.status === "rejected") console.error("[enrolments] admin email failed:", adminRes.reason);
-      if (studentRes.status === "rejected") console.error("[enrolments] student email failed:", studentRes.reason);
+      await sendEmail("admin", {
+        from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+        to: ADMIN_EMAIL,
+        subject: `New Enrolment: ${l.fullName} — ${paymentLabel}`,
+        html: adminHtml,
+        attachments: pdfAttachment,
+      });
+      await sendEmail("student", {
+        from: "PT Launch Lab <noreply@ptlaunchlab.co.uk>",
+        to: l.email,
+        subject: "Your PT Launch Lab Enrolment Confirmation",
+        html: studentHtml,
+        attachments: pdfAttachment,
+      });
     } else {
       console.warn("[enrolments] RESEND_API_KEY not set — skipping emails.");
     }
