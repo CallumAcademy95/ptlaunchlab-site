@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { Resend } from "resend";
 import { sendCapiEvent } from "@/app/lib/metaCapi";
 
 // Stripe -> GA4 Measurement Protocol webhook
@@ -26,6 +27,9 @@ import { sendCapiEvent } from "@/app/lib/metaCapi";
 // session and looks the UTMs back up.
 
 export const runtime = "nodejs"; // need crypto + raw body
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 
 // Separate PTLL course sales from anything else on this shared Stripe account
 // (e.g. Ultimate Shred gym memberships) so only course sales fire the PTLL
@@ -316,6 +320,134 @@ async function sendToGymTracker(session: StripeSession) {
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Paid-but-form-not-completed safety net.
+//
+// The pay-first enrolment flow only writes a learner record when the buyer
+// completes the post-payment form on /enrol/success (→ /api/enrolments →
+// Google Sheet + PDF + "New Enrolment" email). If they pay but abandon that
+// form, NOTHING on our side records that a paying customer exists — the sale
+// silently vanishes.
+//
+// This function fires on every confirmed course payment (checkout.session
+// .completed, payment_status=paid, isCourseSale) and does two things:
+//
+//   1. Emails admin a "💳 Payment confirmed" record with the buyer's Stripe
+//      contact details. Guarantees a paid customer ALWAYS lands in the inbox,
+//      independent of whether they finish the enrolment form.
+//   2. Optionally appends a row to a reconciliation Google Sheet (set
+//      PAID_ENROLMENT_ZAPIER_WEBHOOK_URL). Reconcile this "Paid" sheet against
+//      the completed-enrolments sheet: anyone Paid without a matching complete
+//      = paid but never finished the form → chase them.
+//
+// A buyer who DOES complete the form generates both this email and the later
+// "New Enrolment" email — that pairing is the reconciliation signal, not noise.
+// Filter the "💳 Payment confirmed" subject in Gmail if you only want to see
+// the ones missing a follow-up.
+// ─────────────────────────────────────────────────────────────────────────────
+async function sendPaidReconciliation(session: StripeSession) {
+  const amount = (session.amount_total ?? 0) / 100;
+  const currency = (session.currency ?? "gbp").toUpperCase();
+  const email = session.customer_email || session.customer_details?.email || "";
+  const name = session.customer_details?.name || "";
+  const phone = session.customer_details?.phone || "";
+  const planType = amount >= 1300 ? "PIF" : "deposit";
+  const planLabel = planType === "PIF"
+    ? `Pay in Full — £${amount.toLocaleString()}`
+    : `Deposit — £${amount.toLocaleString()}`;
+  const attribution = decodeClientRef(session.client_reference_id);
+  const gymReferral = session.metadata?.gym_referral || attribution.gym || "";
+  const promoCode = session.metadata?.promo_code ?? "";
+  const stripeLink = `https://dashboard.stripe.com/payments/${session.id}`;
+
+  const paidAt = new Date().toLocaleString("en-GB", {
+    day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+    timeZone: "Europe/London",
+  });
+
+  // ── Admin "payment confirmed" email ─────────────────────────────────────
+  if (process.env.RESEND_API_KEY) {
+    const adminHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#061F36;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
+    <div style="background:#072B4A;border-radius:12px 12px 0 0;padding:22px 26px;border-bottom:3px solid #F5C518;">
+      <div style="font-size:19px;font-weight:800;color:#ffffff;">PT Launch Lab</div>
+      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">💳 Payment confirmed via Stripe</div>
+    </div>
+    <div style="background:#0A2A44;padding:22px 26px;border-radius:0 0 12px 12px;">
+      <div style="font-size:17px;font-weight:700;color:#F5C518;margin-bottom:6px;">${name || "(name not captured)"} — £${amount.toLocaleString()}</div>
+      <div style="color:#8CA3BF;font-size:13px;margin-bottom:18px;">${paidAt} &nbsp;·&nbsp; ${planLabel}</div>
+
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;width:120px;">Email</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${email ? `<a href="mailto:${email}" style="color:#F5C518;">${email}</a>` : "—"}</td></tr>
+        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Phone</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${phone || "—"}</td></tr>
+        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Plan</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${planLabel}</td></tr>
+        ${gymReferral ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Gym referral</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${gymReferral}</td></tr>` : ""}
+        ${promoCode ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Promo code</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${promoCode}</td></tr>` : ""}
+        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Stripe</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;"><a href="${stripeLink}" style="color:#F5C518;">${session.id}</a></td></tr>
+      </table>
+
+      <div style="margin-top:18px;padding:14px 16px;background:#061F36;border:1px solid #1A3A5C;border-radius:10px;color:#8CA3BF;font-size:12px;line-height:1.6;">
+        This is the <strong style="color:#ffffff;">money-confirmed</strong> record. You should also get a full
+        <strong style="color:#ffffff;">"New Enrolment"</strong> email once they complete the enrolment form.
+        <br><br>
+        <strong style="color:#F5C518;">If that follow-up never arrives</strong>, this learner paid but didn't finish the
+        form — send them <a href="https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}" style="color:#F5C518;">this completion link</a> to capture their details.
+      </div>
+    </div>
+    <div style="text-align:center;padding:14px;color:#2A4A6C;font-size:11px;">
+      PT Launch Lab · automated payment-confirmed record
+    </div>
+  </div>
+</body>
+</html>`;
+
+    try {
+      await resend.emails.send({
+        from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+        to: ADMIN_EMAIL,
+        subject: `💳 Payment confirmed: ${name || email || session.id} — ${planLabel}`,
+        html: adminHtml,
+      });
+    } catch (err) {
+      console.error("[stripe-webhook] paid-reconciliation email failed:", err);
+    }
+  } else {
+    console.warn("[stripe-webhook] RESEND_API_KEY not set — skipping payment-confirmed alert.");
+  }
+
+  // ── Optional: append a "Paid" row to a reconciliation Google Sheet ───────
+  const reconcileHook = process.env.PAID_ENROLMENT_ZAPIER_WEBHOOK_URL;
+  if (reconcileHook) {
+    try {
+      await fetch(reconcileHook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paid_at: paidAt,
+          full_name: name,
+          email,
+          phone,
+          amount,
+          currency,
+          plan_type: planType,       // "PIF" | "deposit"
+          gym_referral: gymReferral,
+          promo_code: promoCode,
+          stripe_session_id: session.id,
+          stripe_link: stripeLink,
+          completion_link: `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`,
+        }),
+      });
+    } catch (err) {
+      console.error("[stripe-webhook] paid-reconciliation Zapier hook failed:", err);
+    }
+  }
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const payload = await req.text();
@@ -355,6 +487,13 @@ export async function POST(req: NextRequest) {
           await sendToMetaCapi(session);
         } catch (err) {
           console.error("[stripe-webhook] Meta CAPI dispatch failed:", err);
+        }
+        // Safety net: guarantee a paid customer is recorded even if they never
+        // complete the post-payment enrolment form.
+        try {
+          await sendPaidReconciliation(session);
+        } catch (err) {
+          console.error("[stripe-webhook] paid-reconciliation dispatch failed:", err);
         }
       } else {
         console.log(`[stripe-webhook] non-course sale (£${amountGbp}) — skipping PTLL GA4 + Meta Purchase`);
