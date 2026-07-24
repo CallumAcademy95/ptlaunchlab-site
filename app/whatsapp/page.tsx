@@ -4,7 +4,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import WhatsAppEnquiry from "../components/WhatsAppEnquiry";
 
-const BUSINESS_WA = "447822012186";
+const BUSINESS_WA = "447418609039"; // Cloud-API line → Leads Central setter
 const PREFILL = encodeURIComponent(
   "*New PT Launch Lab enquiry*\n\nHi — I'd like to know more about becoming a PT with PT Launch Lab."
 );

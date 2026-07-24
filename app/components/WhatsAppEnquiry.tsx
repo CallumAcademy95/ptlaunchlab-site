@@ -3,13 +3,13 @@
 import { useState } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// WhatsAppEnquiry — USA-style click-to-WhatsApp enquiry.
+// WhatsAppEnquiry — click-to-WhatsApp enquiry.
 // Composes a formatted message and opens the visitor's WhatsApp addressed to the
-// main business number, so enquiries land directly in the normal WhatsApp app
-// (NOT the Cloud API / admin inbox). Mirrors the Ultimate Shred site flow.
+// Cloud-API line, so cold enquiries land in Leads Central and the autonomous
+// setter picks them up. (Post-payment support stays on the app-based number.)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const BUSINESS_WA = "447822012186"; // main business WhatsApp (app-based)
+const BUSINESS_WA = "447418609039"; // Cloud-API line → Leads Central setter
 
 const INTERESTS = [
   { value: "career-change", label: "Changing career into PT" },
