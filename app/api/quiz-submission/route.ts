@@ -4,6 +4,7 @@ import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateQuiz } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
@@ -94,19 +95,10 @@ export async function POST(request: NextRequest) {
       }).catch(err => console.error('[quiz] email server error:', err));
     }
 
-    // Trigger Claude warming email sequence (non-blocking)
-    const baseUrl = request.nextUrl.origin;
-    fetch(`${baseUrl}/api/send-warmup-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        email,
-        result: quizResult,
-        avatar: avatar ?? null,
-        answers: Array.isArray(answers) ? answers.map((a) => a.label) : [],
-      }),
-    }).catch(err => console.error('[warmup-email trigger]', err));
+    // Open a real conversation instead of a one-way drip: the setter sends one
+    // warm, reply-inviting email and takes over the reply. (Replaces the old
+    // warmup sequence; the day-7 nurture above stays as a fallback for non-repliers.)
+    await notifySetter({ name, email, source: 'quiz' });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
 

@@ -4,6 +4,7 @@ import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateProspectus } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/prospectus
@@ -68,6 +69,10 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({ name, email, phone, source: 'prospectus' }),
       }).catch(err => console.error('[prospectus] email server error:', err));
     }
+
+    // Spark a conversation: the setter sends one warm, reply-inviting email and
+    // takes over the reply. (The day-7 nurture above stays as a fallback.)
+    await notifySetter({ name, email, source: 'prospectus' });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
 

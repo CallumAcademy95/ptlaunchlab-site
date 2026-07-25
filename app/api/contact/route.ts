@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateContact } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/contact
@@ -57,6 +58,9 @@ export async function POST(request: NextRequest) {
     } else {
       console.warn('[contact] CONTACT_ZAPIER_WEBHOOK_URL not set — skipping.');
     }
+
+    // Hand the enquiry to the setter — it opens a real conversation by email.
+    await notifySetter({ name, email, message, source: 'contact' });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email ? email.split('@')[1] : null });
     return NextResponse.json({ success: true });
