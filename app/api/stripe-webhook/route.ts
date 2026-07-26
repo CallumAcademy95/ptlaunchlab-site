@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { Resend } from "resend";
 import { sendCapiEvent } from "@/app/lib/metaCapi";
+import { getSubscription, setSubscriptionMetadata, cancelSubscription } from "@/app/lib/stripeCheckout";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -43,7 +44,14 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 // We gate on mode + a £500 floor rather than an amount whitelist so new promo
 // prices don't silently drop out of tracking. Gym memberships are subscriptions
 // (mode='subscription'); instalment top-ups are < £500 — both excluded.
+// Deposit sales became subscriptions when instalments were automated (£599 now
+// + £200/month), so `mode` alone no longer separates a course sale from a gym
+// membership. Sessions created by /api/checkout carry source=api-checkout-session
+// and are ALWAYS ours — trust that first. Everything else falls back to the old
+// mode + £500 floor test, which still covers sales made through raw Payment
+// Links (the fallback path) and keeps USA gym subscriptions out.
 function isCourseSale(session: StripeSession): boolean {
+  if (session.metadata?.source === "api-checkout-session") return true;
   const amountGbp = (session.amount_total ?? 0) / 100;
   return session.mode !== "subscription" && amountGbp >= 500;
 }
@@ -166,10 +174,13 @@ async function sendToGa4(session: StripeSession) {
     ],
   };
 
-  // Funnel-promo deposit flag — when a quiz/prospectus lead pays the deposit,
-  // admin needs to cancel the 5th instalment in Stripe Billing to honour the
-  // £200 off. The discounted PIF link is self-handling; deposits aren't.
-  // Log loudly so admin sees it in Vercel logs, and fire a Zapier hook if set.
+  // Funnel-promo redemption marker, logged for visibility only.
+  //
+  // This used to tell admin to cancel the 5th instalment for promo buyers who
+  // chose the deposit plan, honouring £200 off. That practice is retired:
+  // discounts do not apply to deposit plans, because the plan itself is the
+  // concession and the full £1,599 is what gets spread. The promo only ever
+  // discounts pay-in-full. Confirmed by Callum 2026-07-26.
   if (attribution["funnel_promo"]) {
     const isPif = amount >= 1300; // discounted PIF is £1,399; deposit is £599
     console.warn(
@@ -178,7 +189,7 @@ async function sendToGa4(session: StripeSession) {
         `email=${session.customer_email || session.customer_details?.email || "?"} ` +
         `session=${session.id} ` +
         `amount=£${amount}` +
-        (isPif ? "" : " — ADMIN: cancel 5th instalment in Stripe Billing"),
+        (isPif ? "" : " — deposit plan, full £1,599 over 5 instalments (no promo discount)"),
     );
 
     const hookUrl = process.env.FUNNEL_PROMO_ADMIN_WEBHOOK;
@@ -196,7 +207,7 @@ async function sendToGa4(session: StripeSession) {
           stripe_session_id: session.id,
           amount,
           currency,
-          action_required: "Cancel the 5th instalment in Stripe Billing to honour £200 off",
+          action_required: "None — deposit plans take the full £1,599 over 5 instalments; the promo discount applies to pay-in-full only",
         }),
       }).catch((err) => console.error("[stripe-webhook] admin hook failed:", err));
     }
@@ -559,6 +570,150 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Deposit instalment plan — £599 at checkout then 5 × £200/month.
+//
+// The plan has to stop itself. A Stripe subscription runs forever unless told
+// otherwise, and the failure mode here is charging a learner a 6th, 7th, 12th
+// £200 for a course they've already paid off in full — so the counting is
+// deliberately conservative: count only settled instalment invoices, cancel as
+// soon as the target is reached, and cancel on the way past it rather than
+// exactly on it if the count is ever ambiguous.
+//
+// Counting invoices rather than computing an end date matters because Stripe's
+// smart retries push billing dates around on a failed payment, and month-end
+// enrolments (31 Jan → 28 Feb) break naive month arithmetic.
+//
+// Requires `invoice.paid` and `invoice.payment_failed` on the webhook endpoint.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type StripeInvoice = {
+  id: string;
+  subscription?: string | null;
+  // Stripe moved the subscription pointer under `parent` in later API versions;
+  // read both so this doesn't quietly stop counting after an API upgrade.
+  parent?: { subscription_details?: { subscription?: string | null } | null } | null;
+  billing_reason?: string;
+  amount_paid?: number;
+  amount_due?: number;
+  currency?: string;
+  customer_email?: string | null;
+  customer_name?: string | null;
+  hosted_invoice_url?: string | null;
+  attempt_count?: number;
+  next_payment_attempt?: number | null;
+};
+
+function invoiceSubscriptionId(invoice: StripeInvoice): string | null {
+  return invoice.subscription || invoice.parent?.subscription_details?.subscription || null;
+}
+
+async function handleInstalmentPaid(invoice: StripeInvoice) {
+  // 'subscription_create' is the initial invoice carrying the £599 deposit —
+  // that's not an instalment. Only the monthly cycles count toward the balance.
+  if (invoice.billing_reason !== "subscription_cycle") return;
+
+  const subId = invoiceSubscriptionId(invoice);
+  if (!subId) return;
+
+  const sub = await getSubscription(subId);
+  if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return; // not our plan
+
+  const target = Number(sub.metadata?.instalments_target ?? "5");
+  const paid = Number(sub.metadata?.instalments_paid ?? "0") + 1;
+  const name = sub.metadata?.buyer_name || invoice.customer_name || "";
+  const email = sub.metadata?.buyer_email || invoice.customer_email || "";
+  const amount = (invoice.amount_paid ?? 0) / 100;
+
+  await setSubscriptionMetadata(subId, { instalments_paid: String(paid) });
+  console.log(`[stripe-webhook] instalment ${paid}/${target} collected — £${amount} ${email} (${subId})`);
+
+  if (paid < target) return;
+
+  // Balance settled — stop the mandate before another month comes round.
+  const cancelled = await cancelSubscription(subId);
+  const total = 599 + paid * 200;
+  console.log(
+    cancelled
+      ? `[stripe-webhook] plan complete for ${email} — cancelled ${subId} after ${paid} instalments`
+      : `[stripe-webhook] PLAN COMPLETE BUT CANCEL FAILED for ${email} (${subId}) — cancel it by hand`,
+  );
+
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await resend.emails.send({
+        from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+        to: ADMIN_EMAIL,
+        subject: cancelled
+          ? `✅ Course paid in full: ${name || email} — £${total.toLocaleString()}`
+          : `🚨 ACTION NEEDED: cancel subscription for ${name || email} (${subId})`,
+        html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
+          <p style="font-size:15px;">${name || email} has now paid <strong>£${total.toLocaleString()}</strong> in full
+          (£599 deposit + ${paid} × £200).</p>
+          <p style="font-size:14px;color:#4A6280;">Email: ${email}<br>Subscription: ${subId}</p>
+          ${cancelled
+            ? `<p style="font-size:14px;">The instalment plan has been cancelled automatically — no further payments will be taken.</p>`
+            : `<p style="font-size:14px;color:#b00;"><strong>The automatic cancellation failed.</strong> Cancel
+               <a href="https://dashboard.stripe.com/subscriptions/${subId}">${subId}</a> in Stripe now, or they will be
+               charged £200 again next month.</p>`}
+        </div>`,
+      });
+    } catch (err) {
+      console.error("[stripe-webhook] plan-complete email failed:", err);
+    }
+  }
+}
+
+async function handleInstalmentFailed(invoice: StripeInvoice) {
+  const subId = invoiceSubscriptionId(invoice);
+  if (!subId) return;
+
+  const sub = await getSubscription(subId);
+  if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return;
+
+  const target = Number(sub.metadata?.instalments_target ?? "5");
+  const paid = Number(sub.metadata?.instalments_paid ?? "0");
+  const name = sub.metadata?.buyer_name || invoice.customer_name || "";
+  const email = sub.metadata?.buyer_email || invoice.customer_email || "";
+  const amount = (invoice.amount_due ?? 0) / 100;
+  const attempt = invoice.attempt_count ?? 1;
+  const nextAttempt = invoice.next_payment_attempt
+    ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString("en-GB", {
+        day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London",
+      })
+    : null;
+
+  console.warn(`[stripe-webhook] instalment FAILED — ${email} attempt ${attempt} (${subId})`);
+
+  if (!process.env.RESEND_API_KEY) return;
+  try {
+    await resend.emails.send({
+      from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+      to: ADMIN_EMAIL,
+      subject: nextAttempt
+        ? `⚠️ Instalment failed: ${name || email} — £${amount} (retrying ${nextAttempt})`
+        : `🚨 Instalment failed — no retries left: ${name || email} — £${amount}`,
+      html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
+        <p style="font-size:15px;">Instalment ${paid + 1} of ${target} failed for <strong>${name || email}</strong>.</p>
+        <table style="font-size:14px;color:#4A6280;">
+          <tr><td style="padding:2px 12px 2px 0;">Amount</td><td>£${amount}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Email</td><td><a href="mailto:${email}">${email}</a></td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Attempt</td><td>${attempt}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Collected so far</td><td>£${(599 + paid * 200).toLocaleString()} of £${(599 + target * 200).toLocaleString()}</td></tr>
+        </table>
+        ${nextAttempt
+          ? `<p style="font-size:14px;">Stripe will retry on <strong>${nextAttempt}</strong> and has emailed them to update their card. No action needed yet.</p>`
+          : `<p style="font-size:14px;color:#b00;"><strong>Stripe has stopped retrying.</strong> Chase this one directly.</p>`}
+        <p style="font-size:13px;"><a href="https://dashboard.stripe.com/subscriptions/${subId}">View subscription</a>
+        ${invoice.hosted_invoice_url ? ` · <a href="${invoice.hosted_invoice_url}">View invoice</a>` : ""}</p>
+        <p style="font-size:13px;color:#4A6280;">Course access is unaffected — this is a billing alert only.</p>
+      </div>`,
+    });
+  } catch (err) {
+    console.error("[stripe-webhook] instalment-failure email failed:", err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const payload = await req.text();
@@ -623,6 +778,18 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         console.error("[stripe-webhook] gym tracker dispatch failed:", err);
       }
+    }
+  }
+
+  // Deposit instalment plan lifecycle — see handleInstalmentPaid for why the
+  // 5-payment cap is enforced by counting invoices rather than by a date.
+  if (event.type === "invoice.paid" || event.type === "invoice.payment_failed") {
+    const invoice = event.data?.object as unknown as StripeInvoice;
+    try {
+      if (event.type === "invoice.paid") await handleInstalmentPaid(invoice);
+      else await handleInstalmentFailed(invoice);
+    } catch (err) {
+      console.error(`[stripe-webhook] ${event.type} handling failed:`, err);
     }
   }
 

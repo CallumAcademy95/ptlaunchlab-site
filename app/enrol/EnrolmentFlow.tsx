@@ -4,6 +4,7 @@ import { trackEvent } from "@/app/lib/gtag";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
+import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
 import {
   type PartnerConfig,
   ENROLMENT_CONTEXT_KEY,
@@ -277,6 +278,14 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }
 
   const firstName = fullName.trim().split(" ")[0];
+  // Deposit plan maths, kept in one place so the headline price, the instalment
+  // count and the disclosure line can never contradict each other.
+  const instalmentCount = activePromo
+    ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200)
+    : 5;
+  const depositTotal = activePromo
+    ? activePromo.depositPrice + instalmentCount * 200
+    : 1599;
 
   // ─── Render ───────────────────────────────────────────────────────────
   return (
@@ -407,12 +416,21 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                 ) : (
                   <p className="text-gold text-4xl font-bold mb-1">£599</p>
                 )}
-                <p className="text-soft text-xs mb-3">then £200 × {activePromo ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200) : 5} monthly payments</p>
+                <p className="text-soft text-xs mb-3">then £200 × {instalmentCount} monthly payments</p>
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Start today with a deposit</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments to follow</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> {INSTALMENTS_ENABLED ? "Monthly payments collected automatically" : "Monthly payments to follow"}</li>
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full access from day one</li>
                 </ul>
+                {/* Taking a recurring mandate means saying so before they pay,
+                    not after. Shown only when instalments are actually live. */}
+                {INSTALMENTS_ENABLED && (
+                  <p className="text-faint text-[11px] leading-relaxed mb-4">
+                    Your card is securely saved and £200 is taken automatically each month for{" "}
+                    {instalmentCount} months, starting 30 days from today. Total £{depositTotal.toLocaleString()}.
+                    Payments stop on their own once the course is paid in full.
+                  </p>
+                )}
                 <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
                   {submitting ? "Taking you to checkout…" : `Pay £${activePromo ? activePromo.depositPrice : "599"} Deposit →`}
                 </div>

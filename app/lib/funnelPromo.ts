@@ -97,7 +97,10 @@ export const STRIPE_LINKS = {
   discountedPif:
     process.env.STRIPE_PAYMENT_LINK_FULL_DISCOUNTED ||
     "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06",                    // £1,399 one-off (funnel only)
-  deposit: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",             // £599 + 5×£200 (admin cancels 5th for funnel users)
+  // £599 + 5×£200 = £1,599. Funnel promo buyers get NO discount on the deposit
+  // plan — the plan itself is the concession and the full price is what gets
+  // spread. The promo only ever applies to pay-in-full (discountedPif above).
+  deposit: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 } as const;
 
 // client_reference_id encoder — mirrors the format the existing stripe-webhook

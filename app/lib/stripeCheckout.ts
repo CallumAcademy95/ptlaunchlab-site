@@ -28,7 +28,30 @@
 //   at Dashboard → Developers → API keys → [key] → Edit permissions, or this
 //   silently falls back to Payment Links on every request.
 
+import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments";
+
 export const SITE_URL = "https://ptlaunchlab.co.uk";
+
+// ─── Deposit instalments ─────────────────────────────────────────────────────
+// The deposit plan is £599 up front then 5 × £200/month (£1,599 total). Those
+// £200s used to be collected by hand — someone had to remember to send a
+// one-off payment link every month, and nothing in Stripe recorded that the
+// £1,000 balance was even owed. Charging them on a subscription mandate taken
+// at checkout makes the balance self-collecting.
+//
+// The recurring price already existed in the account, unused by any flow.
+// Overridable by env so it can be pointed at a test price without a deploy.
+export const INSTALMENT_PRICE_ID =
+  process.env.STRIPE_INSTALMENT_PRICE_ID || "price_1RxmdG99z9lThumnilf7YD2e"; // £200/month GBP
+
+// The flag and the instalment counts live in app/lib/instalments.ts so the
+// enrol page can read them without pulling this module's Stripe API helpers
+// into the browser bundle. Ships dark: with the flag unset the deposit stays a
+// one-off £599 charge exactly as before.
+
+// Days before the first £200 is taken. 30 days from the deposit, so each
+// learner's dates are their own rather than a shared billing date.
+const INSTALMENT_TRIAL_DAYS = 30;
 
 // The buyer lands here after paying and completes the enrolment record.
 // {CHECKOUT_SESSION_ID} is substituted by Stripe.
@@ -138,6 +161,61 @@ export interface CheckoutSessionResult {
   url: string;
 }
 
+// ─── Subscription helpers (instalment plan management) ───────────────────────
+// Used by /api/stripe-webhook to count collected instalments and stop the plan
+// once the balance is settled.
+
+async function stripeRequest<T>(
+  path: string,
+  init: { method: "GET" | "POST" | "DELETE"; body?: string },
+): Promise<T | null> {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    console.error("[stripeCheckout] STRIPE_SECRET_KEY not set");
+    return null;
+  }
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/${path}`, {
+      method: init.method,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      ...(init.body ? { body: init.body } : {}),
+    });
+    const json = (await res.json()) as T & { error?: { message?: string } };
+    if (!res.ok) {
+      console.error(`[stripeCheckout] ${init.method} ${path} failed (${res.status}): ${json.error?.message}`);
+      return null;
+    }
+    return json;
+  } catch (err) {
+    console.error(`[stripeCheckout] ${init.method} ${path} threw:`, err);
+    return null;
+  }
+}
+
+export interface StripeSubscription {
+  id: string;
+  status?: string;
+  metadata?: Record<string, string>;
+  customer?: string;
+}
+
+export function getSubscription(id: string) {
+  return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "GET" });
+}
+
+export function setSubscriptionMetadata(id: string, metadata: Record<string, string>) {
+  const body = encodeForm({ metadata }).join("&");
+  return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "POST", body });
+}
+
+/** Ends the plan immediately — used once the final instalment clears. */
+export function cancelSubscription(id: string) {
+  return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "DELETE" });
+}
+
 /**
  * Creates a Stripe Checkout Session with the return URL baked in.
  * Returns null on ANY failure — callers must fall back to `paymentLink`.
@@ -164,9 +242,42 @@ export async function createCheckoutSession(
 
   const cancelPath = input.cancelPath && input.cancelPath.startsWith("/") ? input.cancelPath : "/enrol";
 
+  // Deposit buyers get the £200/month mandate taken alongside the £599 so the
+  // balance collects itself. The recurring price sits behind a 30-day trial,
+  // so checkout charges the £599 only and `amount_total` stays £599 — which is
+  // what /api/stripe-webhook keys its deposit-value uplift on. PIF buyers are
+  // unaffected: nothing recurring, still a plain one-off payment.
+  const isDeposit = config.amount < 1300;
+  const withInstalments = isDeposit && INSTALMENTS_ENABLED && !!INSTALMENT_PRICE_ID;
+  const target = instalmentTarget();
+
   const body = encodeForm({
-    mode: "payment",
-    line_items: [{ price: config.price, quantity: 1 }],
+    mode: withInstalments ? "subscription" : "payment",
+    line_items: withInstalments
+      ? [
+          { price: config.price, quantity: 1 },            // £599 deposit, charged now
+          { price: INSTALMENT_PRICE_ID, quantity: 1 },     // £200/month, starts after the trial
+        ]
+      : [{ price: config.price, quantity: 1 }],
+    ...(withInstalments && {
+      subscription_data: {
+        trial_period_days: INSTALMENT_TRIAL_DAYS,
+        // The webhook reads these off each invoice's subscription to know when
+        // to stop. Counting invoices beats computing an end date: month-end
+        // enrolments and Stripe's retry-shifted billing dates both break date
+        // arithmetic, and overcharging a learner is the worst failure here.
+        metadata: {
+          ptll_plan: "deposit_instalments",
+          instalments_target: String(target),
+          instalments_paid: "0",
+          buyer_name: input.name?.trim().slice(0, 200),
+          buyer_email: input.email?.trim().toLowerCase(),
+          gym_referral: input.gymReferral,
+          promo_code: input.promoCode,
+          funnel_promo: input.funnelPromo,
+        },
+      },
+    }),
     success_url: ENROL_SUCCESS_URL,
     cancel_url: `${SITE_URL}${cancelPath}`,
     // Prefills the email on Stripe's page, same as the old ?prefilled_email=
@@ -182,7 +293,12 @@ export async function createCheckoutSession(
       gym_referral: input.gymReferral,
       promo_code: input.promoCode,
       funnel_promo: input.funnelPromo,
+      // `source` is how the webhook tells OUR course sales apart from the
+      // Ultimate Shred gym memberships sharing this account. It used to key on
+      // mode !== 'subscription', which stops working the moment deposits become
+      // subscriptions.
       source: "api-checkout-session",
+      instalments: withInstalments ? String(target) : undefined,
     },
   }).join("&");
 
