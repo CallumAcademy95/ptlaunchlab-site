@@ -18,8 +18,11 @@ import { sendCapiEvent } from "@/app/lib/metaCapi";
 //   2. URL: https://ptlaunchlab.co.uk/api/stripe-webhook
 //   3. Events: checkout.session.completed
 //   4. Copy signing secret to STRIPE_WEBHOOK_SECRET on Vercel
-//   5. For each Payment Link, set success_url to:
+//   5. STRIPE_SECRET_KEY needs "Checkout Sessions → write" so /api/checkout can
+//      create sessions with the return URL set in code (app/lib/stripeCheckout.ts).
+//   6. Belt-and-braces: on each Payment Link still set the Dashboard redirect to
 //      https://ptlaunchlab.co.uk/enrol/success?session_id={CHECKOUT_SESSION_ID}
+//      — that's the path a buyer takes if session creation ever falls back.
 //
 // Attribution: the enrolment flow stashes UTMs + a generated client_reference_id
 // against the learner record before redirecting to Stripe (TODO — see
@@ -102,6 +105,14 @@ function decodeClientRef(raw: string | null | undefined): Record<string, string>
   return {};
 }
 
+// Stripe only captures a name when the payment method or billing-address step
+// asks for one, so it can come back empty. /api/checkout puts the name the
+// buyer typed on the enrol form into session metadata as a backstop — it keeps
+// the admin alert readable and the Meta CAPI match quality up.
+function buyerName(session: StripeSession): string {
+  return session.customer_details?.name || session.metadata?.buyer_name || "";
+}
+
 function hash(value: string | undefined | null): string | undefined {
   if (!value) return undefined;
   return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
@@ -181,7 +192,7 @@ async function sendToGa4(session: StripeSession) {
           source: attribution["funnel_promo"],
           email: session.customer_email || session.customer_details?.email || "",
           phone: session.customer_details?.phone || "",
-          name: session.customer_details?.name || "",
+          name: buyerName(session),
           stripe_session_id: session.id,
           amount,
           currency,
@@ -216,7 +227,7 @@ async function sendToMetaCapi(session: StripeSession) {
   const currency = (session.currency ?? "gbp").toUpperCase();
   const email = session.customer_email || session.customer_details?.email || undefined;
   const phone = session.customer_details?.phone || undefined;
-  const fullName = session.customer_details?.name || "";
+  const fullName = buyerName(session);
   const [firstName, ...rest] = fullName.split(/\s+/);
   const lastName = rest.join(" ");
 
@@ -292,7 +303,7 @@ async function sendToGymTracker(session: StripeSession) {
   if (!isPtllCourseSale) return;
 
   const email = session.customer_email || session.customer_details?.email || "";
-  const name = session.customer_details?.name || "";
+  const name = buyerName(session);
   const phone = session.customer_details?.phone || "";
   // Gym attribution falls back to the client_reference_id payload because all
   // gym Payment Links share the same Stripe URL — metadata isn't per-gym.
@@ -349,7 +360,7 @@ async function sendPaidReconciliation(session: StripeSession) {
   const amount = (session.amount_total ?? 0) / 100;
   const currency = (session.currency ?? "gbp").toUpperCase();
   const email = session.customer_email || session.customer_details?.email || "";
-  const name = session.customer_details?.name || "";
+  const name = buyerName(session);
   const phone = session.customer_details?.phone || "";
   const planType = amount >= 1300 ? "PIF" : "deposit";
   const planLabel = planType === "PIF"
@@ -448,6 +459,106 @@ async function sendPaidReconciliation(session: StripeSession) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Learner-side enrolment recovery email.
+//
+// The admin reconciliation email above tells US that someone paid. This one
+// tells the LEARNER what to do next, and — critically — gives them a permanent
+// link back to their enrolment form.
+//
+// Why it's needed even now the return URL is fixed in code: the redirect only
+// helps a buyer who is still holding the tab. It does nothing for someone who
+// pays on their phone and closes it, loses signal mid-redirect, or has Safari
+// bin the localStorage that prefills the form. An email survives all of that.
+//
+// Sent on every confirmed course payment. Someone who has already finished the
+// form gets a mild duplicate, so the copy says as much up front — that is a
+// far cheaper failure than a paying learner with no signed agreement on file.
+// ─────────────────────────────────────────────────────────────────────────────
+async function sendLearnerCompletionEmail(session: StripeSession) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn("[stripe-webhook] RESEND_API_KEY not set — skipping learner completion email.");
+    return;
+  }
+
+  const email = session.customer_email || session.customer_details?.email || "";
+  if (!email) {
+    console.warn(`[stripe-webhook] no buyer email on ${session.id} — cannot send completion email.`);
+    return;
+  }
+
+  const amount = (session.amount_total ?? 0) / 100;
+  const name = buyerName(session);
+  const firstName = name.trim().split(/\s+/)[0] || "";
+  const planLabel = amount >= 1300
+    ? `Pay in Full — £${amount.toLocaleString()}`
+    : `Deposit — £${amount.toLocaleString()}`;
+  const completionLink = `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#061F36;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
+    <div style="background:#072B4A;border-radius:12px 12px 0 0;padding:26px;border-bottom:3px solid #F5C518;">
+      <div style="font-size:20px;font-weight:800;color:#ffffff;">PT Launch Lab</div>
+      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">Payment received — one last step</div>
+    </div>
+    <div style="background:#0A2A44;padding:26px;border-radius:0 0 12px 12px;color:#C7D6E8;font-size:14px;line-height:1.65;">
+      <p style="margin:0 0 14px;">Hi${firstName ? ` ${firstName}` : ""},</p>
+      <p style="margin:0 0 14px;">
+        Your payment of <strong style="color:#ffffff;">£${amount.toLocaleString()}</strong> (${planLabel}) has gone through —
+        thank you, and welcome to PT Launch Lab.
+      </p>
+      <p style="margin:0 0 20px;">
+        To finish your enrolment we need your NCFE learner details and your signed learner
+        agreement. It takes about two minutes, and we can't register you with NCFE until it's done.
+      </p>
+
+      <div style="text-align:center;margin:26px 0;">
+        <a href="${completionLink}" style="display:inline-block;background:#F5C518;color:#061F36;font-weight:800;font-size:15px;text-decoration:none;padding:15px 32px;border-radius:999px;">
+          Complete my enrolment →
+        </a>
+      </div>
+
+      <p style="margin:0 0 18px;font-size:13px;color:#8CA3BF;">
+        If the button doesn't work, paste this into your browser:<br>
+        <a href="${completionLink}" style="color:#F5C518;word-break:break-all;">${completionLink}</a>
+      </p>
+
+      <div style="padding:14px 16px;background:#061F36;border:1px solid #1A3A5C;border-radius:10px;font-size:13px;color:#8CA3BF;">
+        <strong style="color:#ffffff;">Already filled this in?</strong> Then you're all set — ignore this email.
+        Your tutor will be in touch within 24 hours.
+      </div>
+
+      <p style="margin:20px 0 0;font-size:13px;color:#8CA3BF;">
+        Any problems, just reply to this email or call <strong style="color:#ffffff;">01977 365001</strong>.
+      </p>
+    </div>
+    <div style="text-align:center;padding:14px;color:#2A4A6C;font-size:11px;">
+      PT Launch Lab · NCFE Accredited Centre No. 9002788
+    </div>
+  </div>
+</body>
+</html>`;
+
+  try {
+    await resend.emails.send({
+      from: "PT Launch Lab <enrolments@ptlaunchlab.co.uk>",
+      to: email,
+      replyTo: ADMIN_EMAIL,
+      bcc: ADMIN_EMAIL,
+      subject: firstName
+        ? `${firstName} — one last step to finish your enrolment`
+        : "One last step to finish your enrolment",
+      html,
+    });
+  } catch (err) {
+    console.error("[stripe-webhook] learner completion email failed:", err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   const payload = await req.text();
@@ -494,6 +605,13 @@ export async function POST(req: NextRequest) {
           await sendPaidReconciliation(session);
         } catch (err) {
           console.error("[stripe-webhook] paid-reconciliation dispatch failed:", err);
+        }
+        // Learner-side recovery: gives the buyer a permanent link back to the
+        // enrolment form regardless of what happened to their browser tab.
+        try {
+          await sendLearnerCompletionEmail(session);
+        } catch (err) {
+          console.error("[stripe-webhook] learner completion email dispatch failed:", err);
         }
       } else {
         console.log(`[stripe-webhook] non-course sale (£${amountGbp}) — skipping PTLL GA4 + Meta Purchase`);

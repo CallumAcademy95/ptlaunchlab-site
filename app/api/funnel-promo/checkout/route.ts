@@ -5,6 +5,7 @@ import {
   encodeClientRef,
 } from "@/app/lib/funnelPromo";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
+import { createCheckoutSession } from "@/app/lib/stripeCheckout";
 
 // GET /api/funnel-promo/checkout?plan=full|deposit
 //
@@ -61,10 +62,26 @@ export async function GET(req: NextRequest) {
     dest = STRIPE_LINKS.deposit;
   }
 
-  const url = new URL(dest);
-  url.searchParams.set("client_reference_id", clientRef);
   const email = utm.get("email");
-  if (email) url.searchParams.set("prefilled_email", email);
+
+  // Prefer a server-created Checkout Session so the post-payment return URL
+  // (/enrol/success) comes from code. The Dashboard redirect on the £1,399
+  // funnel link and the £599 deposit link was never set, so buyers using them
+  // landed on stripe.com and skipped the enrolment form. Falls back to the raw
+  // Payment Link if session creation fails — paying must never be blocked.
+  const session = await createCheckoutSession({
+    paymentLink: dest,
+    clientReferenceId: clientRef,
+    email: email ?? undefined,
+    funnelPromo: promo?.source,
+    cancelPath: "/courses",
+  });
+
+  const url = new URL(session?.url ?? dest);
+  if (!session) {
+    url.searchParams.set("client_reference_id", clientRef);
+    if (email) url.searchParams.set("prefilled_email", email);
+  }
 
   // Meta CAPI InitiateCheckout — fires server-side just before the 302 to
   // Stripe. Browser FunnelPricingBlock.handleCheckout fires the matching

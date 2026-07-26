@@ -22,6 +22,10 @@ import {
 
 const TERMS_URL = "/terms";
 
+// Per-Stripe-session marker written once the enrolment form is filed, so the
+// recovery link in the payment-confirmation email is safe to click twice.
+const DONE_KEY = (sessionId: string) => `ptll_enrolment_done:${sessionId}`;
+
 // "postpay" — the default pay-first flow: buyer lands here after Stripe.
 // "manual"  — no-payment learner-detail capture (e.g. sending an already-paid
 //             learner a link to gather their NCFE record). Drops all payment
@@ -187,6 +191,13 @@ export default function PostPaymentEnrolment({ mode = "postpay" }: { mode?: Enro
   // pre-selects the gym referral when the buyer came via a partner page.
   useEffect(() => {
     try {
+      // The Stripe webhook emails every payer a permanent link back to this
+      // page. Someone who already submitted and clicks it again should see the
+      // confirmation, not a blank form that would file a duplicate enrolment.
+      if (sessionId && localStorage.getItem(DONE_KEY(sessionId))) {
+        setDone(true);
+        return;
+      }
       const raw = localStorage.getItem(ENROLMENT_CONTEXT_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as EnrolmentContext;
@@ -196,7 +207,7 @@ export default function PostPaymentEnrolment({ mode = "postpay" }: { mode?: Enro
         setLn(ln => ({ ...ln, heardAbout: `${parsed.gymReferral} (Gym Referral)` }));
       }
     } catch { /* no context — form still works, just unprefilled */ }
-  }, []);
+  }, [sessionId]);
 
   // ─── Canvas signature ─────────────────────────────────────────────────
   useEffect(() => {
@@ -397,7 +408,10 @@ export default function PostPaymentEnrolment({ mode = "postpay" }: { mode?: Enro
       });
     }
 
-    try { localStorage.removeItem(ENROLMENT_CONTEXT_KEY); } catch (_) {}
+    try {
+      localStorage.removeItem(ENROLMENT_CONTEXT_KEY);
+      if (sessionId) localStorage.setItem(DONE_KEY(sessionId), new Date().toISOString());
+    } catch (_) {}
     setDone(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

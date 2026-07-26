@@ -50,7 +50,7 @@ function urlSafeBase64(value: string): string {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
-function appendStripeAttribution(url: string, email: string, gym?: string): string {
+function buildAttributionRef(gym?: string): string {
   try {
     const first = readTouch("ptll_first_touch");
     const last = readTouch("ptll_last_touch");
@@ -76,9 +76,17 @@ function appendStripeAttribution(url: string, email: string, gym?: string): stri
     const gaId = readGaClientId();
     if (gaId) payload.ga_client_id = gaId;
 
-    const ref = urlSafeBase64(JSON.stringify(payload)).slice(0, 200);
-    // Stripe Payment Links accept both `client_reference_id` and `prefilled_email`
-    // as query params.
+    return urlSafeBase64(JSON.stringify(payload)).slice(0, 200);
+  } catch {
+    return "";
+  }
+}
+
+// Fallback path only — the direct-to-Payment-Link redirect used when
+// /api/checkout can't create a session. Stripe Payment Links accept both
+// `client_reference_id` and `prefilled_email` as query params.
+function appendStripeAttribution(url: string, email: string, ref: string): string {
+  try {
     const u = new URL(url);
     if (ref) u.searchParams.set("client_reference_id", ref);
     if (email) u.searchParams.set("prefilled_email", email.trim().toLowerCase());
@@ -230,12 +238,42 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
 
     const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
-    const stripeUrl = appendStripeAttribution(
-      type === "full" ? fullLink : depositLink,
-      email,
-      partner?.gymReferral,
-    );
-    window.location.href = stripeUrl;
+    const paymentLink = type === "full" ? fullLink : depositLink;
+    const ref = buildAttributionRef(partner?.gymReferral);
+
+    // Ask the server to create a Checkout Session so the post-payment return
+    // URL (/enrol/success) is set in code rather than in the Stripe Dashboard.
+    // Dashboard-configured redirects had drifted on two of the three Payment
+    // Links, dropping paying buyers on stripe.com and skipping the enrolment
+    // form entirely — see app/lib/stripeCheckout.ts.
+    //
+    // If that fails for ANY reason we redirect to the raw Payment Link instead:
+    // a buyer must never be blocked from paying. The 5s abort covers a slow or
+    // unreachable API so nobody is left staring at a disabled button.
+    let checkoutUrl = "";
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          paymentLink,
+          clientReferenceId: ref,
+          email: email.trim().toLowerCase(),
+          name: fullName.trim(),
+          gymReferral: partner?.gymReferral,
+          promoCode: appliedPromo ?? undefined,
+          cancelPath: typeof window !== "undefined" ? window.location.pathname : "/enrol",
+        }),
+      });
+      clearTimeout(timeout);
+      const data = (await res.json()) as { url?: string | null };
+      if (data?.url) checkoutUrl = data.url;
+    } catch { /* fall through to the Payment Link */ }
+
+    window.location.href = checkoutUrl || appendStripeAttribution(paymentLink, email, ref);
   }
 
   const firstName = fullName.trim().split(" ")[0];
