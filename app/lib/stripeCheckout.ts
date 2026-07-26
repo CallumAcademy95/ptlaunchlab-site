@@ -216,6 +216,45 @@ export function cancelSubscription(id: string) {
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "DELETE" });
 }
 
+type InvoiceLine = {
+  amount?: number;
+  price?: { id?: string } | null;
+  // Later API versions moved the price pointer under `pricing`.
+  pricing?: { price_details?: { price?: string } | null } | null;
+};
+type InvoiceListEntry = { status?: string; lines?: { data?: InvoiceLine[] } };
+
+function lineIsInstalment(line: InvoiceLine): boolean {
+  const priceId = line.price?.id || line.pricing?.price_details?.price;
+  // A £0 line is the recurring item sitting in its trial on the very first
+  // invoice — that invoice carries the deposit, not an instalment.
+  return priceId === INSTALMENT_PRICE_ID && (line.amount ?? 0) > 0;
+}
+
+/**
+ * How many £200 instalments have actually settled on a plan.
+ *
+ * Derived by asking Stripe rather than by incrementing a counter, because
+ * webhook delivery is at-least-once: a duplicate `invoice.paid` would
+ * double-count and cancel the plan an instalment early, and a failed metadata
+ * write would stall the count and overcharge. Recomputing from the invoice
+ * list makes the handler idempotent — processing the same event ten times
+ * yields the same answer.
+ *
+ * Returns null if the count can't be established, so callers can decline to
+ * act rather than guess. Never cancel a plan on a number you aren't sure of.
+ */
+export async function countSettledInstalments(subscriptionId: string): Promise<number | null> {
+  const res = await stripeRequest<{ data?: InvoiceListEntry[] }>(
+    `invoices?subscription=${encodeURIComponent(subscriptionId)}&limit=100&expand[]=data.lines`,
+    { method: "GET" },
+  );
+  if (!res?.data) return null;
+  return res.data.filter(
+    (inv) => inv.status === "paid" && (inv.lines?.data ?? []).some(lineIsInstalment),
+  ).length;
+}
+
 /**
  * Creates a Stripe Checkout Session with the return URL baked in.
  * Returns null on ANY failure — callers must fall back to `paymentLink`.

@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { Resend } from "resend";
 import { sendCapiEvent } from "@/app/lib/metaCapi";
-import { getSubscription, setSubscriptionMetadata, cancelSubscription } from "@/app/lib/stripeCheckout";
+import {
+  getSubscription,
+  setSubscriptionMetadata,
+  cancelSubscription,
+  countSettledInstalments,
+} from "@/app/lib/stripeCheckout";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -39,11 +44,6 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 // (e.g. Ultimate Shred gym memberships) so only course sales fire the PTLL
 // pixel + GA4 Purchase.
 //
-// Course sales are one-off Checkout payments (mode='payment') — deposit £599,
-// or pay-in-full at the current/promo price (£1,099 / £1,299 / £1,399 / £1,599).
-// We gate on mode + a £500 floor rather than an amount whitelist so new promo
-// prices don't silently drop out of tracking. Gym memberships are subscriptions
-// (mode='subscription'); instalment top-ups are < £500 — both excluded.
 // Deposit sales became subscriptions when instalments were automated (£599 now
 // + £200/month), so `mode` alone no longer separates a course sale from a gym
 // membership. Sessions created by /api/checkout carry source=api-checkout-session
@@ -609,10 +609,6 @@ function invoiceSubscriptionId(invoice: StripeInvoice): string | null {
 }
 
 async function handleInstalmentPaid(invoice: StripeInvoice) {
-  // 'subscription_create' is the initial invoice carrying the £599 deposit —
-  // that's not an instalment. Only the monthly cycles count toward the balance.
-  if (invoice.billing_reason !== "subscription_cycle") return;
-
   const subId = invoiceSubscriptionId(invoice);
   if (!subId) return;
 
@@ -620,11 +616,21 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
   if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return; // not our plan
 
   const target = Number(sub.metadata?.instalments_target ?? "5");
-  const paid = Number(sub.metadata?.instalments_paid ?? "0") + 1;
   const name = sub.metadata?.buyer_name || invoice.customer_name || "";
   const email = sub.metadata?.buyer_email || invoice.customer_email || "";
   const amount = (invoice.amount_paid ?? 0) / 100;
 
+  // Recomputed from Stripe on every delivery rather than incremented, so a
+  // duplicate webhook can't cancel the plan an instalment early. This also
+  // handles plans whose first invoice IS an instalment (hand-built ones that
+  // took the deposit separately) without special-casing billing_reason.
+  const paid = await countSettledInstalments(subId);
+  if (paid === null) {
+    console.error(`[stripe-webhook] could not count instalments for ${subId} — leaving plan running`);
+    return;
+  }
+
+  // Informational: the authoritative count is the invoice list above.
   await setSubscriptionMetadata(subId, { instalments_paid: String(paid) });
   console.log(`[stripe-webhook] instalment ${paid}/${target} collected — £${amount} ${email} (${subId})`);
 
