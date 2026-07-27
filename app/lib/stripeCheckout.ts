@@ -74,24 +74,29 @@ interface LinkConfig {
   allowPromotionCodes: boolean;
 }
 
+// Each price is env-overridable. Test mode is a separate world with none of
+// these ids in it, so without overrides a rehearsal can only ever exercise a
+// hand-written copy of this code rather than this code — which is exactly the
+// kind of gap that lets a bug reach production. Also lets a price be swapped
+// without a deploy.
 export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
   // £1,599 pay-in-full — the shared PIF link used by /enrol and every gym page
   "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f": {
-    price: "price_1SffDN99z9lThumnkdXLn1LW",
+    price: process.env.STRIPE_PIF_PRICE_ID || "price_1SffDN99z9lThumnkdXLn1LW",
     amount: 1599,
     label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
     allowPromotionCodes: true,
   },
-  // £599 deposit (+ 5×£200 collected separately) — the shared deposit link
+  // £599 deposit (+ 5×£200 on the instalment plan) — the shared deposit link
   "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05": {
-    price: "price_1Rxmab99z9lThumnJ1f7EEXb",
+    price: process.env.STRIPE_DEPOSIT_PRICE_ID || "price_1Rxmab99z9lThumnJ1f7EEXb",
     amount: 599,
     label: "DEPOSIT - NCFE LEVEL 2&3 PERSONAL TRAINING DIPLOMA",
     allowPromotionCodes: false,
   },
   // £1,399 pay-in-full — funnel-promo only, never exposed in the client bundle
   "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06": {
-    price: "price_1RxmYD99z9lThumnc9W37CX7",
+    price: process.env.STRIPE_FUNNEL_PIF_PRICE_ID || "price_1RxmYD99z9lThumnc9W37CX7",
     amount: 1399,
     label: "NCFE LEVEL 2&3 PERSONAL TRAINING DIPLOMA",
     allowPromotionCodes: false,
