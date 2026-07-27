@@ -29,11 +29,15 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
           <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-24">
             <div className="flex items-center gap-3 mb-8">
+              {/* Wide wordmarks get a fixed height and auto width — squeezing
+                  one into the 52×52 tile renders it as an unreadable sliver.
+                  Square marks keep the original rounded-tile treatment. */}
               <Image
                 src={c.logoUrl}
                 alt={c.logoAlt ?? c.gymName}
-                width={52} height={52}
-                className="rounded-xl"
+                width={c.logoWidth ?? 52}
+                height={c.logoHeight ?? 52}
+                className={c.logoWidth && c.logoHeight ? "h-11 w-auto object-contain" : "rounded-xl"}
               />
               <div>
                 <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Powered by PT Launch Lab</p>

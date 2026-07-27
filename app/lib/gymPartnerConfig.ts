@@ -7,6 +7,11 @@ export interface GymConfig {
   gymName: string;           // e.g. "6fit Gyms"
   logoUrl: string;           // External logo URL or /public path
   logoAlt?: string;          // Alt text (defaults to gymName)
+  // Set BOTH for a wide wordmark logo — it then renders at a fixed height with
+  // width auto, instead of being forced into the default 52×52 square. Square
+  // marks should omit these and keep the original rounded-tile treatment.
+  logoWidth?: number;        // intrinsic px width of the asset
+  logoHeight?: number;       // intrinsic px height of the asset
 
   // ── Branding
   primaryColor: string;      // Accent for light backgrounds (buttons, check marks on white sections)
