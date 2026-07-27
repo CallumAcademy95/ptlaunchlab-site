@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { Resend } from "resend";
 import { sendCapiEvent } from "@/app/lib/metaCapi";
+import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
 import {
   getSubscription,
   setSubscriptionMetadata,
@@ -382,6 +383,14 @@ async function sendPaidReconciliation(session: StripeSession) {
   const promoCode = session.metadata?.promo_code ?? "";
   const stripeLink = `https://dashboard.stripe.com/payments/${session.id}`;
 
+  // A deposit that arrived as a one-off payment while instalments are switched
+  // on means /api/checkout fell back to the raw Payment Link — so no £200/month
+  // mandate was taken. The buyer was shown a page promising automatic monthly
+  // collection, and there is now no mechanism to collect the £1,000 balance.
+  // Silence here would mean discovering it a month later, or never.
+  const missingMandate =
+    INSTALMENTS_ENABLED && planType === "deposit" && session.mode !== "subscription";
+
   const paidAt = new Date().toLocaleString("en-GB", {
     day: "numeric", month: "long", year: "numeric",
     hour: "2-digit", minute: "2-digit",
@@ -402,6 +411,16 @@ async function sendPaidReconciliation(session: StripeSession) {
     </div>
     <div style="background:#0A2A44;padding:22px 26px;border-radius:0 0 12px 12px;">
       <div style="font-size:17px;font-weight:700;color:#F5C518;margin-bottom:6px;">${name || "(name not captured)"} — £${amount.toLocaleString()}</div>
+      ${missingMandate ? `
+      <div style="margin:12px 0 16px;padding:14px 16px;background:#3A0D0D;border:1px solid #C0392B;border-radius:10px;color:#FFD9D4;font-size:13px;line-height:1.6;">
+        <strong style="color:#ffffff;">⚠️ NO INSTALMENT MANDATE TAKEN</strong><br><br>
+        This deposit arrived as a one-off payment, so checkout fell back to the raw Payment Link and
+        <strong style="color:#ffffff;">no £200/month plan was set up</strong> — but the enrol page told this buyer it would be.
+        The remaining <strong style="color:#ffffff;">£1,000 has no way of collecting itself.</strong><br><br>
+        Contact them to arrange the balance, then check
+        <a href="https://ptlaunchlab.co.uk/api/checkout" style="color:#F5C518;">/api/checkout</a> —
+        a fallback means Stripe session creation is failing.
+      </div>` : ""}
       <div style="color:#8CA3BF;font-size:13px;margin-bottom:18px;">${paidAt} &nbsp;·&nbsp; ${planLabel}</div>
 
       <table style="width:100%;border-collapse:collapse;">
@@ -432,7 +451,9 @@ async function sendPaidReconciliation(session: StripeSession) {
       await resend.emails.send({
         from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
         to: ADMIN_EMAIL,
-        subject: `💳 Payment confirmed: ${name || email || session.id} — ${planLabel}`,
+        subject: missingMandate
+          ? `🚨 Deposit paid with NO instalment plan: ${name || email || session.id} — £1,000 uncollected`
+          : `💳 Payment confirmed: ${name || email || session.id} — ${planLabel}`,
         html: adminHtml,
       });
     } catch (err) {
