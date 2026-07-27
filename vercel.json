@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/gbp-cron", "schedule": "30 9 * * 2" },
+    { "path": "/api/gbp-cron", "schedule": "30 9 * * 5" }
+  ]
+}

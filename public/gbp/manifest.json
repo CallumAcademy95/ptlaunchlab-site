@@ -1,0 +1,369 @@
+[
+  {
+    "file": "gbp/learner-01.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-01.jpg",
+    "source": "public/learner-1.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-02.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-02.jpg",
+    "source": "public/learner-2.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-03.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-03.jpg",
+    "source": "public/learner-3.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-04.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-04.jpg",
+    "source": "public/learner-4.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-05.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-05.jpg",
+    "source": "public/learner-5.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-06.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-06.jpg",
+    "source": "public/learner-6.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-07.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-07.jpg",
+    "source": "public/learner-7.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-08.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-08.jpg",
+    "source": "public/learner-8.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-09.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-09.jpg",
+    "source": "public/learner-9.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-10.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-10.jpg",
+    "source": "public/learner-10.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-11.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-11.jpg",
+    "source": "public/learner-11.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/learner-12.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/learner-12.jpg",
+    "source": "public/learner-12.png",
+    "caption": "Graduate with NCFE Level 3 certificate",
+    "use": "post image + profile photo (People at work)"
+  },
+  {
+    "file": "gbp/team-callum.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/team-callum.jpg",
+    "source": "public/callum.jpg",
+    "caption": "Callum Brown, PT Launch Lab",
+    "use": "post image + profile photo (Team)"
+  },
+  {
+    "file": "gbp/team-ryan.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/team-ryan.jpg",
+    "source": "public/ryan.jpg",
+    "caption": "Ryan Robinson, PT Launch Lab",
+    "use": "post image + profile photo (Team)"
+  },
+  {
+    "file": "gbp/team-miles.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/team-miles.jpg",
+    "source": "public/miles.jpg",
+    "caption": "Miles Halstead, PT Launch Lab",
+    "use": "post image + profile photo (Team)"
+  },
+  {
+    "file": "gbp/brand-og.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/brand-og.jpg",
+    "source": "public/og-image.png",
+    "caption": "PT Launch Lab brand image",
+    "use": "post image (generic fallback)"
+  },
+  {
+    "file": "gbp/brand-logo.jpg",
+    "url": "https://ptlaunchlab.co.uk/gbp/brand-logo.jpg",
+    "source": "public/logo.png",
+    "caption": "PT Launch Lab logo",
+    "use": "post image (generic fallback)"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/vUaye0j8p34/maxresdefault.jpg",
+    "source": "youtube:vUaye0j8p34",
+    "caption": "Ep 33 — Ridge Holland on Big E, Rugby League & Life After WWE",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/ridge-holland-on-big-e-rugby-league-and-life-after-wwe"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/-ZHxWBvBYrw/maxresdefault.jpg",
+    "source": "youtube:-ZHxWBvBYrw",
+    "caption": "Ep 32 — Why In-Person Personal Training Will Be AI-Proof — Sohail Rashid",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/why-in-person-personal-training-will-be-ai-proof-sohail-rashid"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/l5SsHmySSEs/maxresdefault.jpg",
+    "source": "youtube:l5SsHmySSEs",
+    "caption": "Ep 31 — Royal Marines & Afghanistan to Personal Trainer — The Truth About This Industry",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/royal-marines-and-afghanistan-to-personal-trainer-the-truth-about-this-industry"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/vnsAYYOpshg/maxresdefault.jpg",
+    "source": "youtube:vnsAYYOpshg",
+    "caption": "Ep 30 — From Council Estate to Stage with Dizzee Rascal — Now I'm a Personal Trainer",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/from-council-estate-to-stage-with-dizzee-rascal-now-im-a-personal-trainer"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/n4h2p1eE_Qw/maxresdefault.jpg",
+    "source": "youtube:n4h2p1eE_Qw",
+    "caption": "Ep 29 — What 90% of Blood Tests Reveal (Even When You Feel Fine)",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/what-90-of-blood-tests-reveal-even-when-you-feel-fine"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/Z6eogOvRtw0/maxresdefault.jpg",
+    "source": "youtube:Z6eogOvRtw0",
+    "caption": "Ep 28 — From ICU Nurse to Fitness Business: Maria's Career Change",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/from-icu-nurse-to-fitness-business-marias-career-change"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/bpESntFMy0w/maxresdefault.jpg",
+    "source": "youtube:bpESntFMy0w",
+    "caption": "Ep 27 — From Addiction to Full-Time Boxing Coach: Pembo's Story",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/from-addiction-to-full-time-boxing-coach-pembos-story"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/tgDP_hoObwM/maxresdefault.jpg",
+    "source": "youtube:tgDP_hoObwM",
+    "caption": "Ep 26 — Building a Martial Arts Gym from Scratch — Ty Harrison",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/building-a-martial-arts-gym-from-scratch-ty-harrison"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/C8t9nC2HxOM/maxresdefault.jpg",
+    "source": "youtube:C8t9nC2HxOM",
+    "caption": "Ep 25 — World-Class Dancer to Yoga Studio Owner: Laura's Story",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/world-class-dancer-to-yoga-studio-owner-lauras-story"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/agtjiOXMKOg/maxresdefault.jpg",
+    "source": "youtube:agtjiOXMKOg",
+    "caption": "Ep 24 — From 46 Stone to Qualified Personal Trainer — Jack Atkinson",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/from-46-stone-to-qualified-personal-trainer-jack-atkinson"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/70EkHHRizj8/maxresdefault.jpg",
+    "source": "youtube:70EkHHRizj8",
+    "caption": "Ep 23 — The Reality of Running Multiple Fitness Businesses",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/the-reality-of-running-multiple-fitness-businesses"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/4jITjBvGXXU/maxresdefault.jpg",
+    "source": "youtube:4jITjBvGXXU",
+    "caption": "Ep 22 — British Powerlifting Champion to Bodybuilding Burnout — Sam Hincks",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/british-powerlifting-champion-to-bodybuilding-burnout-sam-hincks"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/NrV3eqA3S5Q/maxresdefault.jpg",
+    "source": "youtube:NrV3eqA3S5Q",
+    "caption": "Ep 21 — What Most PTs Get Wrong About Movement — Kim Tomlin",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/what-most-pts-get-wrong-about-movement-kim-tomlin"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/oQhgsNsLd-8/maxresdefault.jpg",
+    "source": "youtube:oQhgsNsLd-8",
+    "caption": "Ep 20 — How Max Clark Opened His Own Boxing Gym at 18",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-max-clark-opened-his-own-boxing-gym-at-18"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/gfA-LCPXpBM/maxresdefault.jpg",
+    "source": "youtube:gfA-LCPXpBM",
+    "caption": "Ep 19 — Super League Debut to Heart Surgery — Kiel's Story",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/super-league-debut-to-heart-surgery-kiels-story"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/8477A4T4HBQ/maxresdefault.jpg",
+    "source": "youtube:8477A4T4HBQ",
+    "caption": "Ep 16 — How to Scale Your PT Business Online — with Miles",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-to-scale-your-pt-business-online-with-miles"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/4r_4ZegftMY/maxresdefault.jpg",
+    "source": "youtube:4r_4ZegftMY",
+    "caption": "Ep 15 — From Addiction to Personal Trainer — Marcus, Mean and Clean",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/from-addiction-to-personal-trainer-marcus-mean-and-clean"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/d8PxJsyje-o/maxresdefault.jpg",
+    "source": "youtube:d8PxJsyje-o",
+    "caption": "Ep 14 — 3 Things I Wish I Knew Before Becoming a Personal Trainer — Luke McCarthy",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/3-things-i-wish-i-knew-before-becoming-a-personal-trainer-luke-mccarthy"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/IDkRUIeXU4E/maxresdefault.jpg",
+    "source": "youtube:IDkRUIeXU4E",
+    "caption": "Ep 13 — How Personal Training Made Me a Better Racing Driver — Zak Meakin",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-personal-training-made-me-a-better-racing-driver-zak-meakin"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/pAm1jvDKRM0/maxresdefault.jpg",
+    "source": "youtube:pAm1jvDKRM0",
+    "caption": "Ep 12 — How Gemma Left Her Corporate Job to Become a Personal Trainer",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-gemma-left-her-corporate-job-to-become-a-personal-trainer"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/ZlZxHBwliIk/maxresdefault.jpg",
+    "source": "youtube:ZlZxHBwliIk",
+    "caption": "Ep 11 — How Running Saved Me from Addiction — Matty Bell",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-running-saved-me-from-addiction-matty-bell"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/S9zcs6P5mn8/maxresdefault.jpg",
+    "source": "youtube:S9zcs6P5mn8",
+    "caption": "Ep 10 — Why I Shut Down My £500K Online PT Business — The Honest Story",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/why-i-shut-down-my-500k-online-pt-business-the-honest-story"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/I1Yrhd9GZZU/maxresdefault.jpg",
+    "source": "youtube:I1Yrhd9GZZU",
+    "caption": "Ep 9 — How We Scaled PT Launch Lab Courses — with Sam, Merve EdTech",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-we-scaled-pt-launch-lab-courses-with-sam-merve-edtech"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/t8yzdFTxZss/maxresdefault.jpg",
+    "source": "youtube:t8yzdFTxZss",
+    "caption": "Ep 8 — What PureGym Looks for When Hiring Personal Trainers — Mac Livock",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/what-puregym-looks-for-when-hiring-personal-trainers-mac-livock"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/brMSj4dfdBE/maxresdefault.jpg",
+    "source": "youtube:brMSj4dfdBE",
+    "caption": "Ep 7 — Is Becoming a Personal Trainer Still Worth It? The Honest Answer",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/is-becoming-a-personal-trainer-still-worth-it-the-honest-answer"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/1HK7woXEWhI/maxresdefault.jpg",
+    "source": "youtube:1HK7woXEWhI",
+    "caption": "Ep 6 — How I Built an Online PT Business to £500K — Ryan's Full Story",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/how-i-built-an-online-pt-business-to-500k-ryans-full-story"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/CDR39D_Esg8/maxresdefault.jpg",
+    "source": "youtube:CDR39D_Esg8",
+    "caption": "Ep ? — Good Clients vs Nightmare Clients — What Every PT Needs to Know",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/good-clients-vs-nightmare-clients-what-every-pt-needs-to-know"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/0rhp9fkBFsU/maxresdefault.jpg",
+    "source": "youtube:0rhp9fkBFsU",
+    "caption": "Ep ? — Sick of the 9–5? How to Build a Fitness Career You Actually Want",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/sick-of-the-9-5-how-to-build-a-fitness-career-you-actually-want"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/LlPK2PzCrRA/maxresdefault.jpg",
+    "source": "youtube:LlPK2PzCrRA",
+    "caption": "Ep ? — The Brutal Reality of a Personal Trainer's Working Hours",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/the-brutal-reality-of-a-personal-trainers-working-hours"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/of0Zf6Jscgo/maxresdefault.jpg",
+    "source": "youtube:of0Zf6Jscgo",
+    "caption": "Ep ? — Why Most Fitness Influencers Are Lying to You",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/why-most-fitness-influencers-are-lying-to-you"
+  },
+  {
+    "file": null,
+    "url": "https://i.ytimg.com/vi/gqp9Grs1rF0/maxresdefault.jpg",
+    "source": "youtube:gqp9Grs1rF0",
+    "caption": "Ep ? — Will AI Replace Personal Trainers? The Honest Answer",
+    "use": "post image (podcast episode, 16:9 so Google will crop)",
+    "episodeUrl": "https://ptlaunchlab.co.uk/podcast/will-ai-replace-personal-trainers-the-honest-answer"
+  }
+]
