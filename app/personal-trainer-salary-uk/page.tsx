@@ -7,7 +7,10 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/personal-trainer-salary-uk";
-const TODAY = new Date().toISOString().split("T")[0];
+// Static dates. Previously computed with new Date() at build time, which told
+// Google the article was published and modified afresh on every deploy.
+const PUBLISHED = "2026-03-15";
+const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
   title: "Personal Trainer Salary UK 2026: The Real Numbers | PT Launch Lab",
@@ -30,8 +33,8 @@ const articleSchema = {
   description:
     "Honest 2026 breakdown of UK personal trainer income — employed, self-employed, and online PT earnings, by postcode and career stage.",
   url: PAGE_URL,
-  datePublished: `${TODAY}T12:00:00Z`,
-  dateModified: `${TODAY}T12:00:00Z`,
+  datePublished: `${PUBLISHED}T12:00:00Z`,
+  dateModified: `${UPDATED}T12:00:00Z`,
   inLanguage: "en-GB",
   author: [
     { "@type": "Person", name: "Callum Brown", jobTitle: "Co-founder, PT Launch Lab", url: "https://ptlaunchlab.co.uk/about" },

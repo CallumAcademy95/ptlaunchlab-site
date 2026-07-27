@@ -12,7 +12,11 @@ const keywordRoutes = [
   "level-3-personal-trainer-course",
 ];
 
-const TODAY = new Date().toISOString().split("T")[0];
+// Static, not computed. Previously this was new Date() at build time, so every
+// deploy told Google that every URL on the site had changed that day. A lastmod
+// that is always "today" is noise, and Google learns to ignore the whole file.
+// Bump this by hand when pages are genuinely revised.
+const TODAY = "2026-07-27";
 
 // Static pages
 const staticPages: MetadataRoute.Sitemap = [

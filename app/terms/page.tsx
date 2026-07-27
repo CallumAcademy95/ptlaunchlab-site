@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LegalPage from "../components/LegalPage";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://ptlaunchlab.co.uk/terms" },
   title: "Terms & Conditions | PT Launch Lab",
   description: "Terms and conditions for PT Launch Lab courses and services.",
 };

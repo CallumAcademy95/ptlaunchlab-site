@@ -5,7 +5,10 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import SalaryCalculatorClient from "./SalaryCalculatorClient";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/pt-salary-calculator";
-const TODAY = new Date().toISOString().split("T")[0];
+// Static dates. Previously computed with new Date() at build time, which told
+// Google the article was published and modified afresh on every deploy.
+const PUBLISHED = "2026-05-12";
+const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
   title: "Personal Trainer Salary Calculator UK 2026 | PT Launch Lab",
@@ -33,8 +36,8 @@ const webApplicationSchema = {
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
   inLanguage: "en-GB",
-  datePublished: `${TODAY}T12:00:00Z`,
-  dateModified: `${TODAY}T12:00:00Z`,
+  datePublished: `${PUBLISHED}T12:00:00Z`,
+  dateModified: `${UPDATED}T12:00:00Z`,
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",

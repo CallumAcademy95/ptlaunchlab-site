@@ -8,7 +8,10 @@ import StickyMobileCTA from "../components/StickyMobileCTA";
 import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/how-to-become-a-personal-trainer-uk";
-const TODAY = new Date().toISOString().split("T")[0];
+// Static dates. Previously computed with new Date() at build time, which told
+// Google the article was published and modified afresh on every deploy.
+const PUBLISHED = "2026-05-11";
+const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
   title: "How to Become a Personal Trainer in the UK (2026 Step-by-Step) | PT Launch Lab",
@@ -143,8 +146,8 @@ const articleSchema = {
   description:
     "The honest 2026 roadmap to becoming a UK personal trainer — 5 steps from decision to earning. Written by gym owners who've hired 500+ PTs.",
   url: PAGE_URL,
-  datePublished: `${TODAY}T12:00:00Z`,
-  dateModified: `${TODAY}T12:00:00Z`,
+  datePublished: `${PUBLISHED}T12:00:00Z`,
+  dateModified: `${UPDATED}T12:00:00Z`,
   inLanguage: "en-GB",
   author: [
     { "@type": "Person", name: "Callum Brown", jobTitle: "Co-founder, PT Launch Lab", url: "https://ptlaunchlab.co.uk/about" },

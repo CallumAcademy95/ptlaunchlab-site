@@ -6,7 +6,10 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import MidContentCTA from "../components/MidContentCTA";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/are-online-pt-qualifications-recognised-by-uk-gyms";
-const TODAY = new Date().toISOString().split("T")[0];
+// Static dates. Previously computed with new Date() at build time, which told
+// Google the article was published and modified afresh on every deploy.
+const PUBLISHED = "2026-05-05";
+const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
   title: "Are Online PT Qualifications Recognised by UK Gyms? The Honest Answer | PT Launch Lab",
@@ -28,8 +31,8 @@ const articleSchema = {
   headline: "Are Online PT Qualifications Recognised by UK Gyms?",
   description: "Direct answer from UK gym hiring managers on whether online-delivered Level 3 PT qualifications get you hired in 2026.",
   url: PAGE_URL,
-  datePublished: `${TODAY}T12:00:00Z`,
-  dateModified: `${TODAY}T12:00:00Z`,
+  datePublished: `${PUBLISHED}T12:00:00Z`,
+  dateModified: `${UPDATED}T12:00:00Z`,
   inLanguage: "en-GB",
   author: [
     { "@type": "Person", name: "Callum Brown", jobTitle: "Co-founder, PT Launch Lab", url: "https://ptlaunchlab.co.uk/about" },

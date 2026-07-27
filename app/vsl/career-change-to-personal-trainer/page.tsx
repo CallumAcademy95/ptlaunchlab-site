@@ -13,7 +13,10 @@ import HeroLeadForm from "../../components/HeroLeadForm";
 import PromoBar from "../../components/PromoBar";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/vsl/career-change-to-personal-trainer";
-const TODAY = new Date().toISOString().split("T")[0];
+// Static dates. Previously computed with new Date() at build time, which told
+// Google the article was published and modified afresh on every deploy.
+const PUBLISHED = "2026-05-31";
+const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
   title: "Career Change to Personal Trainer (UK) — Qualify Without Quitting Your Job | PT Launch Lab",
@@ -118,8 +121,8 @@ const articleSchema = {
   headline: "Career Change to Personal Trainer (UK) — Qualify Without Quitting Your Job",
   description: "Realistic UK route from desk job to PT. Study around work. Business mentorship included. Transition safely.",
   url: PAGE_URL,
-  datePublished: `${TODAY}T12:00:00Z`,
-  dateModified: `${TODAY}T12:00:00Z`,
+  datePublished: `${PUBLISHED}T12:00:00Z`,
+  dateModified: `${UPDATED}T12:00:00Z`,
   inLanguage: "en-GB",
   author: [
     { "@type": "Person", name: "Callum Brown", jobTitle: "Co-founder, PT Launch Lab", url: "https://ptlaunchlab.co.uk/about" },

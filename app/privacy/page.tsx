@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LegalPage from "../components/LegalPage";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://ptlaunchlab.co.uk/privacy" },
   title: "Privacy Policy | PT Launch Lab",
   description: "How PT Launch Lab collects, uses and protects your personal data.",
 };

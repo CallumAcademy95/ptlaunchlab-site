@@ -18,6 +18,7 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 export const metadata = {
   title: "Personal Trainer Course Near Me | Study Online From Anywhere | PT Launch Lab",
   description: "Searching for a personal trainer course near you? PT Launch Lab is 100% online — you can study from anywhere in the UK. No commute. No classroom. Start anytime.",
+  alternates: { canonical: "https://ptlaunchlab.co.uk/personal-trainer-course-near-me" },
 };
 
 export default function Page() {
