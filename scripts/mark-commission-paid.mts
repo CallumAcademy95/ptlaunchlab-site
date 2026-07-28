@@ -1,17 +1,21 @@
 /**
  * Mark partner commission as paid, and record the payout it was paid under.
  *
- *   npx tsx scripts/mark-commission-paid.mts --before=2026-07-26 --label="Settled to 25 July 2026"
- *   ...add --apply to write.
+ *   npx tsx scripts/mark-commission-paid.mts  *     --partner=ebor --paid-at=2026-05-29 --before=2026-07-26 --reference="bank-transfer" --apply
  *
  * Until the Phase 4 payouts UI exists this is how a payment run gets recorded.
  * Without it the portal shows money as "Ready to pay" that has already been
  * sent, which is worse than showing nothing — a partner chases an amount they
  * have had.
  *
- * `--before` is the enrolment date cutoff, exclusive. Only sales whose
- * commission is currently unpaid and not voided are touched, so re-running is
- * safe and a second run reports nothing to do.
+ * Always pass --paid-at with the real transfer date. Partners get paid early:
+ * all four payouts to date went out before the commission had formally
+ * released, so anything inferred from the release date is wrong.
+ *
+ * `--before` is the enrolment date cutoff, exclusive. `--partner` scopes it to
+ * one gym, which is usually what you want since each transfer is per partner.
+ * Only unpaid, non-voided, confirmed sales are touched, so re-running is safe
+ * and a second run reports nothing to do.
  */
 
 import { readFileSync } from "node:fs";
@@ -32,6 +36,7 @@ const BEFORE = args.before;
 const LABEL = args.label ?? "Manual payout";
 const REFERENCE = args.reference ?? null;
 const PAID_AT = args["paid-at"] ?? null;
+const PARTNER_SLUG = args.partner ?? null;
 if (!BEFORE) throw new Error("--before=YYYY-MM-DD is required (enrolment date cutoff, exclusive)");
 
 const URL_BASE = process.env.SUPABASE_URL!;
@@ -55,9 +60,13 @@ interface Partner { id: string; slug: string; gym_name: string }
 const partners = await api<Partner[]>("pp_partners?select=id,slug,gym_name");
 const byId = new Map(partners.map((p) => [p.id, p]));
 
+const scoped = partners.filter((p) => !PARTNER_SLUG || p.slug === PARTNER_SLUG);
+if (PARTNER_SLUG && !scoped.length) throw new Error(`No partner with slug "${PARTNER_SLUG}"`);
+
 const sales = await api<Sale[]>(
   `pp_sales?select=id,partner_id,learner_name,commission_pence,commission_status,commission_release_at,enrolled_at` +
   `&enrolled_at=lt.${BEFORE}&commission_status=neq.paid&commission_status=neq.voided&status=eq.confirmed` +
+  `&partner_id=in.(${scoped.map((p) => p.id).join(",")})` +
   `&order=enrolled_at`
 );
 
@@ -66,28 +75,35 @@ if (!sales.length) {
   process.exit(0);
 }
 
-// Grouped by partner AND release date, not just partner. Each sale's
-// commission_release_at is the date it became payable under that partner's
-// terms, so grouping on it means every payout record carries the real date the
-// money was due rather than the date we happened to reconcile. Where a date
-// isn't known any better than that, it is the most defensible one available.
+// With --paid-at, that one real transfer is the payout: everything in scope
+// goes into a single record on that date. Without it, fall back to grouping by
+// the commission's release date — the day it fell due — which is the best
+// available guess when the actual transfer date isn't known.
+//
+// Prefer --paid-at. Partners are routinely paid early: every one of the first
+// four payouts went out before the commission had formally released, so the
+// inferred dates were all wrong.
 const grouped = new Map<string, Sale[]>();
 for (const s of sales) {
-  const key = `${s.partner_id}|${s.commission_release_at?.slice(0, 10) ?? "unreleased"}`;
+  const key = PAID_AT
+    ? `${s.partner_id}|${PAID_AT}`
+    : `${s.partner_id}|${s.commission_release_at?.slice(0, 10) ?? "unreleased"}`;
   grouped.set(key, [...(grouped.get(key) ?? []), s]);
 }
 
 console.log(`${APPLY ? "APPLYING" : "DRY RUN"} — marking commission paid on ${sales.length} enrolment(s) before ${BEFORE}\n`);
 
 for (const [key, rows] of [...grouped.entries()].sort()) {
-  const [partnerId, dueDate] = key.split("|");
+  const [partnerId, dateKey] = key.split("|");
   const partner = byId.get(partnerId);
   const total = rows.reduce((t, s) => t + s.commission_pence, 0);
-  const due = dueDate === "unreleased" ? null : dueDate;
+  const due = dateKey === "unreleased" ? null : dateKey;
 
-  const label = due
-    ? `Due ${new Date(due).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`
-    : LABEL;
+  const label = args.label
+    ? LABEL
+    : due
+      ? `${PAID_AT ? "Paid" : "Due"} ${new Date(due).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`
+      : LABEL;
 
   console.log(
     `  ${(partner?.gym_name ?? partnerId).padEnd(22)} ${label.padEnd(28)} ` +
@@ -110,7 +126,7 @@ for (const [key, rows] of [...grouped.entries()].sort()) {
       reference: REFERENCE,
       // The date the commission fell due under the agreement. Overridable with
       // --paid-at when the actual transfer date is known and differs.
-      paid_at: PAID_AT ?? (due ? `${due}T00:00:00.000Z` : null),
+      paid_at: due ? `${due}T00:00:00.000Z` : null,
     }),
   });
 
