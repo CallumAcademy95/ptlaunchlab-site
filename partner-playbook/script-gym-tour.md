@@ -19,7 +19,7 @@ If any version of these comes back —
 — reply:
 
 ```
-Interesting. We've actually partnered with PT Launch Lab to help people qualify
+Interesting. We've actually got our own academy here — we help people qualify
 as Personal Trainers.
 
 If that's ever something you want to explore, just say.

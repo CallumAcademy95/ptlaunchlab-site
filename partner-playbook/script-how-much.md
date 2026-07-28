@@ -12,7 +12,7 @@ Never avoid it. Never go awkward. Awkwardness about price tells someone there's 
 It depends which payment option you go for — there are flexible plans, so most
 people spread it.
 
-Rather than me guessing, PT Launch Lab will walk you through the options
+Rather than me guessing, the academy team will walk you through the options
 properly and answer anything you've got.
 ```
 

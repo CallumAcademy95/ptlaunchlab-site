@@ -20,5 +20,5 @@ The person asking the questions is usually the person most interested. The momen
 **Three rules for the whole team**
 
 - **Be curious.** Don't decide in advance who isn't interested. You'll be wrong.
-- **Be honest.** "I'm not sure, but PT Launch Lab can explain that properly" is a complete answer.
+- **Be honest.** "I'm not sure, but the academy team can explain that properly" is a complete answer.
 - **Leave them inspired.** Nobody should walk away feeling sold to. They should walk away thinking *maybe I could actually do this.*

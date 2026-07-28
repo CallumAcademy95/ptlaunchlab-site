@@ -17,4 +17,4 @@ The most important page in this playbook. Never promise something you don't cont
 | "Everyone passes." | "You're supported the whole way through, to give you the best chance." |
 | "You should definitely do it." | "If it's something you've been thinking about, it's worth a conversation." |
 
-**Never advise anyone on finance.** Not on affordability, not on borrowing, not on whether they can manage the payments. Hand that to PT Launch Lab every time, without exception.
+**Never advise anyone on finance.** Not on affordability, not on borrowing, not on whether they can manage the payments. Hand that to the academy team every time, without exception.

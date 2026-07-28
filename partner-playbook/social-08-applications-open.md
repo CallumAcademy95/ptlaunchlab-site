@@ -9,7 +9,7 @@ order: 80
 **Image:** your academy QR poster in the gym, or a coach with a learner.
 
 ```
-Applications are open for our next PT Launch Lab intake.
+Applications are open for our next academy intake.
 
 If you've ever thought "I'd love to work in fitness one day" —
 

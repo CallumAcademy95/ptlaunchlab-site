@@ -9,8 +9,8 @@ order: 10
 Twenty seconds, then stop talking.
 
 ```
-It's our Personal Training Academy. We've partnered with PT Launch Lab to help
-people become qualified Personal Trainers.
+It's our Personal Training Academy. We help people qualify as Personal Trainers,
+here in the gym.
 
 If you've ever thought about working in fitness, it's built so you can study
 around your current job.

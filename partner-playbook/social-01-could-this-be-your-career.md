@@ -16,7 +16,7 @@ became the place you worked?
 Every week we meet members who love fitness, enjoy helping people, and have
 never once imagined they could build a career out of it.
 
-That's why we've partnered with PT Launch Lab.
+That's why we've opened our own Personal Training academy, right here.
 
 If you've ever thought about becoming a Personal Trainer — or just wondered
 whether you'd be any good at it — come and talk to us.

@@ -13,7 +13,7 @@ Subject: Don't miss this one
 
 Hi [First Name],
 
-Applications for our next PT Launch Lab intake close on [DATE].
+Applications for our next academy intake close on [DATE].
 
 If becoming a Personal Trainer has ever crossed your mind, this is a good
 moment to ask the questions you've been putting off.

@@ -21,8 +21,8 @@ Retail. Teaching. Construction. Offices. Healthcare.
 What they had in common wasn't fitness experience. It was wanting to help
 people.
 
-We've partnered with PT Launch Lab to help people qualify while they're still
-working — so it fits around a job rather than replacing one first.
+We run our own Personal Training academy now. You qualify while you're still
+working, so it fits around a job rather than replacing one first.
 
 If a career that's active and actually rewarding sounds like something you'd
 want, we'd love to tell you more.

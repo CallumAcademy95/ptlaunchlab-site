@@ -22,8 +22,7 @@ Not being an influencer. Not competing. Not living in the gym.
 
 Just helping people get healthier, every day.
 
-I ask because we've partnered with PT Launch Lab to help members qualify as
-Personal Trainers.
+I ask because we now run our own Personal Training academy, here in the gym.
 
 The funny thing is, most people who end up brilliant at this never planned on
 it. They were members who loved training.

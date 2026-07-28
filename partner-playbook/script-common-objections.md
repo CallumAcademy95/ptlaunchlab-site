@@ -23,7 +23,7 @@ how to help someone else get there.
 **"I wouldn't know where to start."**
 
 ```
-That's the whole point of PT Launch Lab. They take you through it step by step.
+That's exactly what the academy is for. They take you through it step by step.
 ```
 
 **"I'll think about it."**

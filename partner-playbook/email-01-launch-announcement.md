@@ -17,8 +17,8 @@ You've already invested in your health.
 
 Have you ever thought about investing in your future?
 
-[Gym Name] has partnered with PT Launch Lab to help our members become
-qualified Personal Trainers.
+We've opened our own Personal Training academy here at [Gym Name] — so you
+can qualify without leaving the gym you already train in.
 
 Whether that's a full career change, a second income, or just learning
 properly — we'd like to help you work out what's possible.
