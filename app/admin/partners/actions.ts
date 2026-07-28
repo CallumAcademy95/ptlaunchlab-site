@@ -14,6 +14,103 @@ export interface CreatePartnerUserState {
   success?: string;
 }
 
+export interface MarkPaidState {
+  error?: string;
+  success?: string;
+}
+
+/**
+ * Record a commission payment to a partner.
+ *
+ * Writes one pp_payouts row and attaches every enrolment it covered, so the
+ * partner's Payments page can answer "what was this for" rather than showing an
+ * unexplained lump.
+ *
+ * The date is entered rather than assumed to be today: partners get paid early
+ * — every payout so far went out before the commission had formally released —
+ * and a payment record with the wrong date is worse than no record.
+ */
+export async function markCommissionPaid(
+  _prev: MarkPaidState,
+  formData: FormData
+): Promise<MarkPaidState> {
+  const partnerId = String(formData.get("partnerId") ?? "").trim();
+  const paidOn = String(formData.get("paidOn") ?? "").trim();
+  const reference = String(formData.get("reference") ?? "").trim();
+
+  if (!partnerId) return { error: "Missing partner." };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(paidOn)) return { error: "Enter the date the payment was sent." };
+
+  const admin = getSupabaseAdmin();
+
+  const { data: partner } = await admin
+    .from("pp_partners")
+    .select("id, gym_name")
+    .eq("id", partnerId)
+    .maybeSingle();
+  if (!partner) return { error: "That partner no longer exists." };
+
+  // Only commission that has actually released. Re-reading here rather than
+  // trusting an id list from the form means a sale that released, or got
+  // voided, between page render and submit is handled correctly.
+  const { data: sales, error } = await admin
+    .from("pp_sales")
+    .select("id, commission_pence, commission_release_at")
+    .eq("partner_id", partnerId)
+    .eq("status", "confirmed")
+    .neq("commission_status", "paid")
+    .neq("commission_status", "voided")
+    .not("commission_release_at", "is", null)
+    .lte("commission_release_at", new Date().toISOString());
+
+  if (error) {
+    console.error("[admin/partners] payable lookup failed:", error);
+    return { error: "Could not read what's payable. Nothing was changed." };
+  }
+  if (!sales?.length) return { error: "Nothing is payable for that partner right now." };
+
+  const total = sales.reduce((t, s) => t + (s.commission_pence as number), 0);
+
+  const { data: payout, error: payoutError } = await admin
+    .from("pp_payouts")
+    .insert({
+      partner_id: partnerId,
+      period_label: `Paid ${new Date(paidOn).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`,
+      total_pence: total,
+      status: "paid",
+      reference: reference || null,
+      paid_at: `${paidOn}T00:00:00.000Z`,
+    })
+    .select("id")
+    .single();
+
+  if (payoutError || !payout) {
+    console.error("[admin/partners] payout insert failed:", payoutError);
+    return { error: "Could not record the payment. Nothing was changed." };
+  }
+
+  const { error: linkError } = await admin
+    .from("pp_sales")
+    .update({ commission_status: "paid", payout_id: payout.id })
+    .in("id", sales.map((s) => s.id));
+
+  if (linkError) {
+    // Leave no payout with nothing attached — it would inflate the partner's
+    // "already paid" total against enrolments still showing as owed.
+    await admin.from("pp_payouts").delete().eq("id", payout.id);
+    console.error("[admin/partners] payout link failed, rolled back:", linkError);
+    return { error: "Could not attach the enrolments. Nothing was changed." };
+  }
+
+  revalidatePath("/admin/partners");
+  const amount = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 })
+    .format(total / 100);
+
+  return {
+    success: `Recorded ${amount} paid to ${partner.gym_name} on ${paidOn} — ${sales.length} enrolment${sales.length === 1 ? "" : "s"} settled.`,
+  };
+}
+
 /**
  * URL-safe, no ambiguous characters to misread off a screen or an email.
  * They are forced to change it on first sign-in anyway.

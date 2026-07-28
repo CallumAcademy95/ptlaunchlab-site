@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { formatPence } from "@/app/lib/partner-data";
 import CreateUserForm from "./CreateUserForm";
+import MarkPaidForm from "./MarkPaidForm";
 
 export const metadata: Metadata = {
   title: "Partners — PT Launch Lab admin",
@@ -30,6 +32,30 @@ export default async function AdminPartnersPage() {
 
   const partners = (data ?? []) as unknown as PartnerRow[];
 
+  // What each partner is owed right now: commission that has released and
+  // hasn't been paid. Derived from the release date rather than a status
+  // column, same rule the partner-facing pages use.
+  const nowIso = new Date().toISOString();
+  const { data: payableRows } = await getSupabaseAdmin()
+    .from("pp_sales")
+    .select("partner_id, commission_pence")
+    .eq("status", "confirmed")
+    .neq("commission_status", "paid")
+    .neq("commission_status", "voided")
+    .not("commission_release_at", "is", null)
+    .lte("commission_release_at", nowIso);
+
+  const payable = new Map<string, { total: number; count: number }>();
+  for (const row of (payableRows ?? []) as { partner_id: string; commission_pence: number }[]) {
+    const entry = payable.get(row.partner_id) ?? { total: 0, count: 0 };
+    entry.total += row.commission_pence;
+    entry.count += 1;
+    payable.set(row.partner_id, entry);
+  }
+
+  const today = nowIso.slice(0, 10);
+  const owedTotal = [...payable.values()].reduce((t, e) => t + e.total, 0);
+
   return (
     <div className="min-h-screen bg-deep">
       <div className="mx-auto max-w-5xl px-6 py-10 space-y-8">
@@ -38,6 +64,11 @@ export default async function AdminPartnersPage() {
             PT Launch Lab admin
           </p>
           <h1 className="text-white font-bold text-2xl">Gym partners</h1>
+          <p className="text-soft text-sm mt-1">
+            {owedTotal > 0
+              ? `${formatPence(owedTotal)} in commission is released and unpaid across all partners.`
+              : "All released commission has been paid."}
+          </p>
         </div>
 
         {error && (
@@ -59,6 +90,7 @@ export default async function AdminPartnersPage() {
                 <th className="px-4 py-3 font-bold">Slug</th>
                 <th className="px-4 py-3 font-bold">Terms</th>
                 <th className="px-4 py-3 font-bold">Logins</th>
+                <th className="px-4 py-3 font-bold">Owed now</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
@@ -93,11 +125,23 @@ export default async function AdminPartnersPage() {
                       ))
                     )}
                   </td>
+                  <td className="px-4 py-3">
+                    {payable.has(p.id) ? (
+                      <MarkPaidForm
+                        partnerId={p.id}
+                        amount={formatPence(payable.get(p.id)!.total)}
+                        count={payable.get(p.id)!.count}
+                        today={today}
+                      />
+                    ) : (
+                      <span className="text-soft text-xs">Nothing due</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {partners.length === 0 && !error && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-soft text-sm text-center">
+                  <td colSpan={5} className="px-4 py-6 text-soft text-sm text-center">
                     No partners yet.
                   </td>
                 </tr>

@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
-import { getPartnerSales, commissionState, formatPence } from "@/app/lib/partner-data";
+import { getPartnerSales, getPartnerPayouts, commissionState, formatPence } from "@/app/lib/partner-data";
+
+const dateFmt = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 export default async function PaymentsPage() {
   const { partner } = await requirePartner();
-  const sales = await getPartnerSales(partner.id);
+  const [sales, payouts] = await Promise.all([
+    getPartnerSales(partner.id),
+    getPartnerPayouts(partner.id),
+  ]);
 
   const payable = sales.filter((s) => commissionState(s).key === "payable");
   const held = sales.filter((s) => commissionState(s).key === "held");
@@ -81,6 +87,41 @@ export default async function PaymentsPage() {
                     <span className="text-white font-semibold shrink-0">
                       {formatPence(s.commission_pence)}
                     </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {payouts.length > 0 && (
+            <div>
+              <h3 className="text-white font-bold text-base mb-3">Payment history</h3>
+              <div className="rounded-xl bg-card border border-white/10 divide-y divide-white/10">
+                {payouts.map((p) => (
+                  <div key={p.id} className="px-5 py-4">
+                    <div className="flex items-baseline justify-between gap-4 flex-wrap">
+                      <div>
+                        <p className="text-white font-semibold">
+                          {p.paid_at ? dateFmt(p.paid_at) : p.period_label}
+                        </p>
+                        <p className="text-soft text-xs mt-0.5">
+                          {p.pp_sales.length} enrolment{p.pp_sales.length === 1 ? "" : "s"}
+                          {p.reference ? ` · ${p.reference}` : ""}
+                        </p>
+                      </div>
+                      <span className="text-gold font-bold text-lg shrink-0">
+                        {formatPence(p.total_pence)}
+                      </span>
+                    </div>
+                    {p.pp_sales.length > 0 && (
+                      <p className="text-soft text-xs mt-2 leading-relaxed">
+                        {p.pp_sales
+                          .slice()
+                          .sort((a, b) => a.enrolled_at.localeCompare(b.enrolled_at))
+                          .map((s) => s.learner_name || "—")
+                          .join(" · ")}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

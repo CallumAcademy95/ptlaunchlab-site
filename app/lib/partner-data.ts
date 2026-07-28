@@ -129,6 +129,42 @@ export async function getPartnerSales(partnerId: string): Promise<PartnerSale[]>
   return (data ?? []) as unknown as PartnerSale[];
 }
 
+export interface PartnerPayout {
+  id: string;
+  period_label: string;
+  total_pence: number;
+  status: "draft" | "approved" | "paid";
+  reference: string | null;
+  paid_at: string | null;
+  created_at: string;
+  /** The enrolments this payment covered. Names only — never emails. */
+  pp_sales: { learner_name: string | null; enrolled_at: string }[];
+}
+
+/**
+ * A partner's payment history, most recent first.
+ *
+ * The enrolments each payment covered are embedded so a partner can answer
+ * "what was this £1,500 for" without asking — which is most of what a payments
+ * page is for.
+ */
+export async function getPartnerPayouts(partnerId: string): Promise<PartnerPayout[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_payouts")
+    .select(
+      "id, period_label, total_pence, status, reference, paid_at, created_at, pp_sales(learner_name, enrolled_at)"
+    )
+    .eq("partner_id", partnerId)
+    .eq("status", "paid")
+    .order("paid_at", { ascending: false, nullsFirst: false });
+
+  if (error) {
+    console.error("[partner-data] pp_payouts list failed:", error);
+    return [];
+  }
+  return (data ?? []) as unknown as PartnerPayout[];
+}
+
 export type CommissionState =
   | { key: "paid"; label: string }
   | { key: "payable"; label: string }
