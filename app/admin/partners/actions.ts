@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { getBankDetails } from "@/app/lib/partner-bank";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -17,6 +18,28 @@ export interface CreatePartnerUserState {
 export interface MarkPaidState {
   error?: string;
   success?: string;
+}
+
+/**
+ * Reveal a partner's full bank details for a payment run.
+ *
+ * Behind the admin auth gate like everything under /admin. Deliberately an
+ * action rather than part of the page payload: eight gyms' account numbers
+ * rendered on every page load is one screenshot away from a bad day, and it
+ * would sit in the HTML source whatever the UI showed.
+ */
+export async function revealBankDetails(
+  partnerId: string
+): Promise<{ accountName: string | null; sortCode: string | null; accountNumber: string | null } | null> {
+  const details = await getBankDetails(partnerId);
+  if (!details.sortCode || !details.accountNumber) return null;
+
+  console.log(`[admin/partners] bank details revealed for partner ${partnerId}`);
+  return {
+    accountName: details.accountName,
+    sortCode: details.sortCode.replace(/(\d{2})(\d{2})(\d{2})/, "$1-$2-$3"),
+    accountNumber: details.accountNumber,
+  };
 }
 
 /**

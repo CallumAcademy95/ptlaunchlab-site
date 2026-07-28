@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { formatPence } from "@/app/lib/partner-data";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
+import BankReveal from "./BankReveal";
 
 export const metadata: Metadata = {
   title: "Partners — PT Launch Lab admin",
@@ -18,6 +19,10 @@ interface PartnerRow {
   status: string;
   landing_page_path: string | null;
   commission_terms: string;
+  bank_account_name: string | null;
+  bank_sort_code: string | null;
+  bank_account_number: string | null;
+  bank_details_updated_at: string | null;
   pp_partner_users: { email: string; role: string; must_change_password: boolean; last_login_at: string | null }[];
 }
 
@@ -26,6 +31,7 @@ export default async function AdminPartnersPage() {
     .from("pp_partners")
     .select(
       "id, slug, gym_name, status, landing_page_path, commission_terms, " +
+      "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
       "pp_partner_users(email, role, must_change_password, last_login_at)"
     )
     .order("gym_name");
@@ -55,6 +61,8 @@ export default async function AdminPartnersPage() {
 
   const today = nowIso.slice(0, 10);
   const owedTotal = [...payable.values()].reduce((t, e) => t + e.total, 0);
+  // Read the clock once, outside the render, so the rows stay pure.
+  const recentChangeCutoff = Date.parse(nowIso) - 7 * 86400000;
 
   return (
     <div className="min-h-screen bg-deep">
@@ -90,6 +98,7 @@ export default async function AdminPartnersPage() {
                 <th className="px-4 py-3 font-bold">Slug</th>
                 <th className="px-4 py-3 font-bold">Terms</th>
                 <th className="px-4 py-3 font-bold">Logins</th>
+                <th className="px-4 py-3 font-bold">Bank</th>
                 <th className="px-4 py-3 font-bold">Owed now</th>
               </tr>
             </thead>
@@ -126,6 +135,20 @@ export default async function AdminPartnersPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
+                    <BankReveal
+                      partnerId={p.id}
+                      masked={
+                        p.bank_sort_code && p.bank_account_number
+                          ? `••-••-${p.bank_sort_code.slice(4)} · ••••${p.bank_account_number.slice(-4)}`
+                          : null
+                      }
+                      changedRecently={
+                        Boolean(p.bank_details_updated_at) &&
+                        Date.parse(p.bank_details_updated_at!) > recentChangeCutoff
+                      }
+                    />
+                  </td>
+                  <td className="px-4 py-3">
                     {payable.has(p.id) ? (
                       <MarkPaidForm
                         partnerId={p.id}
@@ -141,7 +164,7 @@ export default async function AdminPartnersPage() {
               ))}
               {partners.length === 0 && !error && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-soft text-sm text-center">
+                  <td colSpan={6} className="px-4 py-6 text-soft text-sm text-center">
                     No partners yet.
                   </td>
                 </tr>

@@ -1,16 +1,26 @@
 import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { getPartnerSales, getPartnerPayouts, commissionState, formatPence } from "@/app/lib/partner-data";
+import { getMaskedBankDetails } from "@/app/lib/partner-bank";
+import BankDetailsForm from "./BankDetailsForm";
 
 const dateFmt = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 export default async function PaymentsPage() {
   const { partner } = await requirePartner();
-  const [sales, payouts] = await Promise.all([
+  const [sales, payouts, bank] = await Promise.all([
     getPartnerSales(partner.id),
     getPartnerPayouts(partner.id),
+    getMaskedBankDetails(partner.id),
   ]);
+
+  // Their actual signed terms, not a generic description. Ebor and a partner
+  // who signs tomorrow are owed different things and should be told so.
+  const releaseRule =
+    partner.commission_terms === "instalment_2"
+      ? "If they pay in full, it's released 30 days after they enrol. If they're on an instalment plan, it's released once their second instalment clears, then paid 30 days after that."
+      : "It's released 30 days after they enrol, whichever way they choose to pay.";
 
   const payable = sales.filter((s) => commissionState(s).key === "payable");
   const held = sales.filter((s) => commissionState(s).key === "held");
@@ -128,15 +138,52 @@ export default async function PaymentsPage() {
             </div>
           )}
 
-          <p className="text-soft text-xs leading-relaxed">
-            Invoices aren&rsquo;t generated here yet — payments are made by bank transfer and confirmed
-            by email, exactly as they are today. Questions about a specific amount?{" "}
-            <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
-              info@ptlaunchlab.co.uk
-            </a>
-          </p>
+          <BankDetailsForm current={bank} />
+
+          <div className="rounded-xl bg-card border border-white/10 p-5">
+            <h3 className="text-white font-bold text-base mb-3">How you get paid</h3>
+            <ul className="space-y-2.5 text-soft text-sm leading-relaxed">
+              <li className="flex gap-3">
+                <span aria-hidden className="text-gold">1.</span>
+                <span>
+                  You earn <strong className="text-white">{formatPence(partner.fee_per_learner_pence)}</strong>{" "}
+                  for every member who enrols and pays through your academy link.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span aria-hidden className="text-gold">2.</span>
+                <span>
+                  It shows here the moment they enrol, as <em>accruing</em>. {releaseRule}
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span aria-hidden className="text-gold">3.</span>
+                <span>
+                  Once released, it&rsquo;s paid by bank transfer to the account above and appears in your
+                  payment history with the date and the learners it covered.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span aria-hidden className="text-gold">4.</span>
+                <span>
+                  If a learner is refunded or cancels, the commission on that enrolment is returned —
+                  offset against your next payment rather than invoiced back to you. It&rsquo;s rare, and
+                  we&rsquo;ll always tell you before it happens.
+                </span>
+              </li>
+            </ul>
+            <p className="text-soft text-xs mt-4 leading-relaxed">
+              Invoices aren&rsquo;t generated here yet — payments are confirmed by email exactly as they
+              are today. Questions about a specific amount?{" "}
+              <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
+                info@ptlaunchlab.co.uk
+              </a>
+            </p>
+          </div>
         </>
       )}
+
+      {sales.length === 0 && <BankDetailsForm current={bank} />}
     </div>
   );
 }

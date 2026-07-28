@@ -8,7 +8,9 @@ import {
   PARTNER_LOGIN_PATH,
 } from "@/app/lib/partner-auth";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { saveBankDetails } from "@/app/lib/partner-bank";
 import { createRateLimiter } from "@/app/lib/rate-limit";
+import { revalidatePath } from "next/cache";
 
 /**
  * Supabase applies its own auth rate limits, but those are per-project and
@@ -101,6 +103,42 @@ export async function partnerSignOut(): Promise<void> {
   const supabase = await createPartnerServerClient();
   if (supabase) await supabase.auth.signOut();
   redirect(PARTNER_LOGIN_PATH);
+}
+
+export async function partnerSaveBankDetails(
+  _prev: PartnerFormState & { success?: string },
+  formData: FormData
+): Promise<PartnerFormState & { success?: string }> {
+  const session = await getPartnerSession();
+  if (!session) return { error: "Your session has expired. Sign in again." };
+
+  const admin = getSupabaseAdmin();
+  // Warn every login on the account, not just the one making the change —
+  // that is the point of the notification.
+  const { data: users } = await admin
+    .from("pp_partner_users")
+    .select("email")
+    .eq("partner_id", session.partner.id);
+
+  const result = await saveBankDetails({
+    partnerId: session.partner.id,
+    accountName: String(formData.get("accountName") ?? ""),
+    sortCode: String(formData.get("sortCode") ?? ""),
+    accountNumber: String(formData.get("accountNumber") ?? ""),
+    updatedBy: session.userId,
+    notifyEmails: (users ?? []).map((u) => u.email as string),
+    gymName: session.partner.gym_name,
+  });
+
+  if (!result.ok) return { error: result.error };
+
+  revalidatePath("/partners");
+  revalidatePath("/partners/payments");
+  return {
+    success: result.wasChange
+      ? "Payment details updated. We've emailed everyone on this account to confirm."
+      : "Payment details saved. Your commission will be paid to this account.",
+  };
 }
 
 export async function partnerSetPassword(

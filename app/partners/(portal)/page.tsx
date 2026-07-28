@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
 import { getPartnerSummary, formatPence } from "@/app/lib/partner-data";
+import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import CopyButton from "./CopyButton";
 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
@@ -14,7 +16,10 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 
 export default async function MyAcademyPage() {
   const { partner } = await requirePartner();
-  const summary = await getPartnerSummary(partner.id);
+  const [summary, bank] = await Promise.all([
+    getPartnerSummary(partner.id),
+    getMaskedBankDetails(partner.id),
+  ]);
   const academyUrl = partnerAcademyUrl(partner);
 
   // The two commission deals behave differently and the difference is money, so
@@ -109,19 +114,41 @@ export default async function MyAcademyPage() {
       </section>
 
       {/* ── Next action ────────────────────────────────────────────────── */}
+      {/* One card, not a list. Missing bank details outrank everything else —
+          without them a partner has earned money we have no way to send. */}
       <section>
-        <div className="rounded-xl border border-gold/40 bg-gold/5 p-5">
-          <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">
-            Do this next
-          </p>
-          <p className="text-white font-semibold">
-            Put your QR code where your members already stand still.
-          </p>
-          <p className="text-soft text-sm mt-1.5 leading-relaxed">
-            The front desk, the changing room mirror and the gym floor noticeboard convert best.
-            Download the QR above and we&rsquo;ll add print-ready posters to Resources shortly.
-          </p>
-        </div>
+        {!bank.isSet ? (
+          <div className="rounded-xl border border-gold/40 bg-gold/5 p-5">
+            <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">
+              Do this next
+            </p>
+            <p className="text-white font-semibold">Add your bank details.</p>
+            <p className="text-soft text-sm mt-1.5 leading-relaxed">
+              {summary.commissionAccruedPence > 0
+                ? `You've earned ${formatPence(summary.commissionAccruedPence)} so far and we have no account to send it to.`
+                : "Two minutes now means your first commission goes out without a chase."}
+            </p>
+            <Link
+              href="/partners/payments"
+              className="inline-block mt-3 px-5 py-2 rounded-full bg-gold text-deep text-sm font-bold hover:brightness-110 transition-all"
+            >
+              Add bank details
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-xl border border-gold/40 bg-gold/5 p-5">
+            <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">
+              Do this next
+            </p>
+            <p className="text-white font-semibold">
+              Put your QR code where your members already stand still.
+            </p>
+            <p className="text-soft text-sm mt-1.5 leading-relaxed">
+              The front desk, the changing room mirror and the gym floor noticeboard convert best.
+              Download the QR above and we&rsquo;ll add print-ready posters to Resources shortly.
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );
