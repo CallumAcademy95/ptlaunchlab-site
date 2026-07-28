@@ -47,7 +47,7 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
 
   const { data, error } = await getSupabaseAdmin()
     .from("pp_sales")
-    .select("commission_pence, commission_status, enrolled_at")
+    .select("commission_pence, commission_status, commission_release_at, enrolled_at")
     .eq("partner_id", partnerId)
     .eq("status", "confirmed");
 
@@ -59,11 +59,13 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
   const rows = (data ?? []) as {
     commission_pence: number;
     commission_status: "accruing" | "due" | "paid" | "voided";
+    commission_release_at: string | null;
     enrolled_at: string;
   }[];
 
   const summary = { ...EMPTY_SUMMARY };
   const monthStartMs = startOfMonth.getTime();
+  const now = Date.now();
 
   for (const row of rows) {
     summary.enrolmentsAllTime++;
@@ -71,9 +73,23 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
 
     if (row.commission_status === "voided") continue;
     summary.commissionAccruedPence += row.commission_pence;
-    if (row.commission_status === "due") summary.commissionDuePence += row.commission_pence;
-    if (row.commission_status === "paid") summary.commissionPaidPence += row.commission_pence;
-    if (row.commission_status === "accruing") summary.commissionHeldPence += row.commission_pence;
+
+    if (row.commission_status === "paid") {
+      summary.commissionPaidPence += row.commission_pence;
+      continue;
+    }
+
+    // Whether commission is payable is derived from the release date, not from
+    // commission_status. Nothing flips 'accruing' → 'due' on a schedule, so a
+    // stored status would sit stale until a payout run touched it and a partner
+    // would see money as held for days after it became payable. The status
+    // column stays authoritative for 'paid' and 'voided', which are real events.
+    const released =
+      row.commission_status === "due" ||
+      (row.commission_release_at !== null && new Date(row.commission_release_at).getTime() <= now);
+
+    if (released) summary.commissionDuePence += row.commission_pence;
+    else summary.commissionHeldPence += row.commission_pence;
   }
 
   return summary;

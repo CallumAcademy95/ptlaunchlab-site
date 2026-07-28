@@ -9,6 +9,7 @@ import {
   cancelSubscription,
   countSettledInstalments,
 } from "@/app/lib/stripeCheckout";
+import { recordPartnerSale, applyInstalmentToPartnerSale } from "@/app/lib/partner-sales";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -90,6 +91,9 @@ type StripeSession = {
   metadata?: Record<string, string>;
   payment_status?: string;
   mode?: string; // "payment" | "subscription" | "setup"
+  // Set when mode is "subscription" — a deposit plan. pp_sales stores it so
+  // later invoice.paid events can find the sale they belong to.
+  subscription?: string | null;
 };
 
 type StripeEvent = {
@@ -106,8 +110,20 @@ function decodeClientRef(raw: string | null | undefined): Record<string, string>
     const padded = raw.replace(/-/g, "+").replace(/_/g, "/");
     const padLen = (4 - (padded.length % 4)) % 4;
     const decoded = Buffer.from(padded + "=".repeat(padLen), "base64").toString("utf8");
-    const parsed = JSON.parse(decoded);
-    if (parsed && typeof parsed === "object") return parsed as Record<string, string>;
+
+    try {
+      const parsed = JSON.parse(decoded);
+      if (parsed && typeof parsed === "object") return parsed as Record<string, string>;
+    } catch {
+      // Stripe caps client_reference_id at 200 characters, so a payload with a
+      // long gym name plus attribution can arrive cut off mid-JSON. JSON.parse
+      // then throws and the gym is silently lost — a real sale reached the Sheet
+      // with a blank gym_referral this way on 2026-07-26. Scrape the complete
+      // key/value pairs out of whatever survived instead of discarding the lot.
+      const out: Record<string, string> = {};
+      for (const [, k, v] of decoded.matchAll(/"([a-z_]+)"\s*:\s*"([^"]*)"/g)) out[k] = v;
+      if (Object.keys(out).length) return out;
+    }
   } catch {
     // fall through — client_reference_id wasn't our encoded payload
   }
@@ -655,6 +671,15 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
   await setSubscriptionMetadata(subId, { instalments_paid: String(paid) });
   console.log(`[stripe-webhook] instalment ${paid}/${target} collected — £${amount} ${email} (${subId})`);
 
+  // Move the partner's payment progress on, and release their commission once
+  // the second instalment has cleared. Reuses `paid` above rather than counting
+  // again — that number is recomputed from Stripe and safe against redelivery.
+  await applyInstalmentToPartnerSale({
+    subscriptionId: subId,
+    settledInstalments: paid,
+    amountPaidPence: invoice.amount_paid ?? 0,
+  });
+
   if (paid < target) return;
 
   // Balance settled — stop the mandate before another month comes round.
@@ -804,6 +829,31 @@ export async function POST(req: NextRequest) {
         await sendToGymTracker(session);
       } catch (err) {
         console.error("[stripe-webhook] gym tracker dispatch failed:", err);
+      }
+
+      // Partner portal's own record. Runs alongside the Sheet, not instead of
+      // it — the Sheet stays the ops mirror, pp_sales is what /partners reads.
+      try {
+        const attribution = decodeClientRef(session.client_reference_id);
+        const result = await recordPartnerSale({
+          stripeSessionId: session.id,
+          stripeSubscriptionId: session.subscription ?? null,
+          // metadata.gym_slug exists from 2026-07-27; `gyms` in the attribution
+          // ref is the same value and survives the 200-char truncation, since
+          // EnrolmentFlow writes it before the display name.
+          gymSlug: session.metadata?.gym_slug || attribution.gyms || null,
+          gymDisplayName: session.metadata?.gym_referral || attribution.gym || null,
+          learnerName: buyerName(session) || null,
+          learnerEmail: session.customer_email || session.customer_details?.email || null,
+          amountTotalPence: session.amount_total ?? 0,
+          mode: session.mode ?? null,
+          promoCode: session.metadata?.promo_code ?? null,
+        });
+        if (!result.ok) {
+          console.error(`[stripe-webhook] partner sale not recorded for ${session.id}: ${result.reason}`);
+        }
+      } catch (err) {
+        console.error("[stripe-webhook] partner sale dispatch failed:", err);
       }
     }
   }
