@@ -1,6 +1,6 @@
 # Gym Partner Platform — Build Plan
 
-**Status:** Phase 0 shipped (`42476b0`); agreement v2.0 shipped. **Migration still not applied.** · 2026-07-28
+**Status:** Phases 0–1 shipped in code; agreement v2.0 shipped. **Migration not applied and `SUPABASE_ANON_KEY` not set — `/partners` cannot run yet.** · 2026-07-28
 **Lives in:** `ptlaunchlab-site` at `/partners`
 **One-liner:** A logged-in hub where each gym partner sees everything they get from the partnership — resources, their academy link, live sales, payments, and a marketing playbook.
 
@@ -34,10 +34,39 @@ Applied to **both** copies of the legal text: the live server generator and the 
 
 **⚠️ Not legally reviewed.** Worth a solicitor's eye on 5.6–5.7 before it goes to a partner with real money behind it.
 
+### ✅ Done — Phase 1, code (2026-07-28)
+
+Auth, middleware gate, portal shell, forced password change and My Academy are all written and building. **Neither the migration nor the new env var is in place, so none of it can run yet** — see "blocked on you" below.
+
+| File | Role |
+|---|---|
+| `app/lib/partner-auth.ts` | `createPartnerServerClient`, `getPartnerSession`, `requirePartner`, `partnerAcademyUrl` |
+| `app/lib/partner-session-edge.ts` | `isProtectedPartnerPath` + `gatePartnerRequest` for middleware (edge-safe) |
+| `app/lib/partner-data.ts` | `getPartnerSummary` + `PARTNER_SALE_COLUMNS` (the §6.2 no-email column list) |
+| `app/partners/actions.ts` | `partnerSignIn` / `partnerSignOut` / `partnerSetPassword` |
+| `app/partners/login`, `app/partners/set-password` | Full-screen, outside the portal shell |
+| `app/partners/(portal)/*` | Shell layout, nav, My Academy, and stubs for the four unbuilt sections |
+| `app/partners/qr/route.ts` | PNG QR of their academy URL, session-derived |
+| `app/admin/partners` | Create a partner login → `auth.admin.createUser` + welcome email |
+
+**Route group, not a plain layout.** Login and set-password sit *outside* `(portal)/` on purpose: the shell layout calls `requirePartner()`, and set-password wrapped in that layout would redirect to itself forever.
+
+**`getPartnerSession` is wrapped in React `cache()`.** The shell layout and the page inside it both resolve the session; without the cache that is two Supabase round trips and two partner lookups per page load.
+
+**Password reset is not built.** Partners who forget their password currently have to email us and get a new login created. Worth adding a Supabase reset flow, but it wasn't in the Phase 1 scope.
+
+**No browser Supabase client anywhere.** All auth happens in server actions and server components, which is why the anon key is `SUPABASE_ANON_KEY` and not `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+### ⛔ Blocked on you — /partners is dead until both of these are done
+
+1. **`SUPABASE_ANON_KEY`** — new env var, needed in `.env.local` and on Vercel (all three environments). It's the anon/publishable key from the same project as `SUPABASE_URL` (`rbbudrdryuokujlsvwgm`). Not a secret, so per [[feedback_vercel_sensitive_env_vars]] **do not mark it Sensitive**. Without it the middleware gate fails closed and every `/partners` URL bounces to `?error=config`.
+2. **Apply `supabase/migrations/20260727_partner_platform.sql`** in the SQL editor for project `rbbudrdryuokujlsvwgm` — the *fitness* org project, not the AlbaCo learner-data one.
+
+Then: `/admin/partners` → create a login for one gym → sign in at `/partners/login` → confirm the forced password change fires and the academy link, QR and promo code render.
+
 ### ▶️ Next session — pick up here
 
-1. **Apply the migration** to the Supabase project the site uses (`SUPABASE_URL`) — note this is the *fitness* org project, not the AlbaCo learner-data one. Nothing reads or writes `pp_*` yet, so this is unblocked but blocks Phase 1.
-2. Then Phase 1 (auth + shell).
+Phase 2 (Resource Drive: private bucket, signed downloads, admin upload) or Phase 3 (tracking: `recordPartnerSale()` in the Stripe webhook + the commission release rules). **Phase 3 is the one partners will ask about first** — the portal currently shows honest zeros on the counters.
 
 ### ⚠️ Watch-outs discovered while building
 

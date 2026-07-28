@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { hubSlugs, getHubForLocation } from "./app/lib/ukLocations";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "./app/lib/admin-auth";
 import { isProtectedFormPath, checkFormRequest } from "./app/lib/security/middleware-checks";
+import { isProtectedPartnerPath, gatePartnerRequest } from "./app/lib/partner-session-edge";
 
 // Paths that require a valid admin auth cookie.
 // Webhook is intentionally excluded — Meta hits it without our cookie and
@@ -166,6 +167,14 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     // Authed — fall through to the rest of the middleware (or the route handler)
+  }
+
+  // ─── Partner portal gate ─────────────────────────────────────────────
+  // Separate auth system to the admin gate above: Supabase Auth sessions for
+  // external gym partners. Returns early either way — the redirect rules below
+  // are all for public marketing URLs and none of them can match /partners/*.
+  if (isProtectedPartnerPath(pathname)) {
+    return gatePartnerRequest(request);
   }
 
   // Old /blog and /blog/<slug> URLs from a previous site iteration. The blog
