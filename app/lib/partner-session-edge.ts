@@ -31,9 +31,16 @@ export async function gatePartnerRequest(request: NextRequest): Promise<NextResp
   const anonKey = process.env.SUPABASE_ANON_KEY;
 
   // Fail closed. A misconfigured deploy must not leave /partners wide open.
+  //
+  // The reason is named in the redirect because these two variables fail for
+  // different reasons: only the anon key missing means it wasn't added to this
+  // Vercel project, whereas BOTH missing means the middleware bundle has no env
+  // at all — usually a redeploy that reused the build cache and kept the values
+  // inlined from before the variables existed.
   if (!url || !anonKey) {
-    console.error("[partner-gate] SUPABASE_URL or SUPABASE_ANON_KEY missing — denying /partners.");
-    return NextResponse.redirect(new URL("/partners/login?error=config", request.url));
+    const missing = !url && !anonKey ? "config-both" : !anonKey ? "config-key" : "config-url";
+    console.error(`[partner-gate] denying /partners — ${missing} (SUPABASE_URL: ${Boolean(url)}, SUPABASE_ANON_KEY: ${Boolean(anonKey)})`);
+    return NextResponse.redirect(new URL(`/partners/login?error=${missing}`, request.url));
   }
 
   let response = NextResponse.next({ request });

@@ -12,9 +12,16 @@ export const metadata: Metadata = {
 // Session state differs per request, so this can never be statically rendered.
 export const dynamic = "force-dynamic";
 
+const UNAVAILABLE = "The partner portal is temporarily unavailable. Please try again shortly.";
+
+// config-* variants all read the same to a partner; they differ only in the
+// server log and the query string, which is what we diagnose from.
 const NOTICES: Record<string, string> = {
   paused: "This partner account is paused. Contact info@ptlaunchlab.co.uk.",
-  config: "The partner portal is temporarily unavailable. Please try again shortly.",
+  config: UNAVAILABLE,
+  "config-key": UNAVAILABLE,
+  "config-url": UNAVAILABLE,
+  "config-both": UNAVAILABLE,
 };
 
 export default async function PartnerLoginPage({
