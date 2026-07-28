@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
-import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
+import {
+  generatePartnershipAgreementPDFServer,
+  PARTNERSHIP_AGREEMENT_VERSION,
+} from "@/app/lib/server/generatePartnershipAgreementPDF.server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -82,6 +85,7 @@ export async function POST(req: NextRequest) {
         ${sectionHead("Signature")}
         ${dataRow("Method", signatureType === "drawn" ? "Handwritten (digital canvas)" : "Typed full name")}
         ${dataRow("Date Signed", signedDate)}
+        ${dataRow("Agreement Version", `v${PARTNERSHIP_AGREEMENT_VERSION} — instalment-2 commission hold + clawback`)}
       </table>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #1A3A5C;">
@@ -196,6 +200,9 @@ export async function POST(req: NextRequest) {
           rep_position:       repPosition,
           rep_email:          repEmail,
           signed_at:          signedDate,
+          // Which set of terms this gym actually signed. Partners on v1.0 keep
+          // the original 30-day commission; v2.0+ carry the instalment-2 hold.
+          agreement_version:  PARTNERSHIP_AGREEMENT_VERSION,
           pdf_filename:       pdfFilename,
           pdf_base64:         pdfBase64,
         }),

@@ -162,16 +162,23 @@ export async function generatePartnershipAgreementPDFBase64(
   body("5.1  PT Launch Lab shall pay the Partner Gym:");
   bullet("£500 per successfully enrolled learner (or such amount as agreed in writing)");
   gap(2);
-  body("5.2  Payment shall be made:");
-  bullet("30 days after learner enrolment and payment confirmation");
+  body("5.2  Commission accrues on the date a valid referral completes enrolment in accordance with Clause 4.2. Accrued commission shall become payable:");
+  bullet("Where the learner pays the course fee in full at the point of enrolment: 30 days after enrolment and payment confirmation; or");
+  bullet("Where the learner enrols on a deposit and instalment plan: 30 days after the second scheduled instalment has been successfully collected");
   gap(2);
-  body("5.3  All payments shall be made:");
+  body("5.3  The Partner Gym may view its accrued and released commission at any time via the PT Launch Lab partner portal. Commission shown as accrued is not payable until released in accordance with Clause 5.2.");
+  gap(2);
+  body("5.4  All payments shall be made:");
   bullet("To the bank account details supplied in writing by the Partner Gym");
   bullet("By bank transfer unless otherwise agreed");
   gap(2);
-  body("5.4  PT Launch Lab reserves the right to withhold payment where:");
-  bullet("A refund has been issued; or");
+  body("5.5  PT Launch Lab reserves the right to withhold payment where:");
+  bullet("A refund has been issued, or a cancellation, payment reversal or chargeback has occurred; or");
   bullet("Fraudulent or invalid enrolment is identified");
+  gap(2);
+  body("5.6  Clawback — Where commission has already been paid in respect of a learner who is subsequently refunded, who cancels within any statutory cooling-off period, or whose payment is reversed or charged back, the Partner Gym shall repay the corresponding commission. Where the learner is refunded in part, the sum repayable shall be reduced in the same proportion as the refund bears to the total course fee.");
+  gap(2);
+  body("5.7  PT Launch Lab may recover any sum due under Clause 5.6 by offsetting it against commission otherwise payable to the Partner Gym, and shall notify the Partner Gym in writing of any offset applied. Where no further commission is expected to become payable within 60 days, the Partner Gym shall repay the sum within 30 days of written demand.");
   gap(3);
 
   // ── 6. IP ──────────────────────────────────────────────────────────────────

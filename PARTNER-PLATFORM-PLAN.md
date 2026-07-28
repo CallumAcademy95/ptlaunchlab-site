@@ -1,6 +1,6 @@
 # Gym Partner Platform — Build Plan
 
-**Status:** Phase 0 code complete, **not committed, not deployed, migration not applied** · 2026-07-27
+**Status:** Phase 0 shipped (`42476b0`); agreement v2.0 shipped. **Migration still not applied.** · 2026-07-28
 **Lives in:** `ptlaunchlab-site` at `/partners`
 **One-liner:** A logged-in hub where each gym partner sees everything they get from the partnership — resources, their academy link, live sales, payments, and a marketing playbook.
 
@@ -24,12 +24,20 @@
 
 Grandfathering is modelled as `pp_partners.commission_terms`: all 8 existing partners seed as `on_enrolment` (their signed terms); the column defaults to `instalment_2` so new partners get the new deal automatically.
 
+### ✅ Done — agreement v2.0 (2026-07-28)
+
+`PARTNERSHIP_AGREEMENT_VERSION = "2.0"`, exported from the server PDF generator and stamped into the PDF header, the admin notification email, and the Zapier→Drive payload as `agreement_version`. Bump it whenever the legal text changes — it is how you tell later which terms a gym actually signed.
+
+Clause 5 rewritten: 5.2 splits release by plan (PIF → 30 days after enrolment; deposit → 30 days after the **2nd** instalment clears), 5.3 points at the portal and states accrued ≠ payable, 5.5 widens withholding to cancellations/reversals/chargebacks, and **5.6–5.7 are new** — clawback with pro-rata partial refunds, recovered by offset against future commission or repayment within 30 days of demand.
+
+Applied to **both** copies of the legal text: the live server generator and the unused client `app/lib/generatePartnershipAgreementPDF.ts` (jspdf, no callers — kept in sync so they can't silently diverge). Renders at 3 pages, same as v1.0.
+
+**⚠️ Not legally reviewed.** Worth a solicitor's eye on 5.6–5.7 before it goes to a partner with real money behind it.
+
 ### ▶️ Next session — pick up here
 
-1. **Commit and deploy Phase 0.** Until it ships, every sale still lands without a slug and will need the legacy display-name backfill. This is the time-sensitive bit.
-2. **Apply the migration** to the Supabase project the site uses (`SUPABASE_URL`) — note this is the *fitness* org project, not the AlbaCo learner-data one.
-3. **Update the agreement template** — `app/lib/server/generatePartnershipAgreementPDF.server.ts` needs the instalment-2 commission clause + a refund clawback clause, for new partners only.
-4. Then Phase 1 (auth + shell).
+1. **Apply the migration** to the Supabase project the site uses (`SUPABASE_URL`) — note this is the *fitness* org project, not the AlbaCo learner-data one. Nothing reads or writes `pp_*` yet, so this is unblocked but blocks Phase 1.
+2. Then Phase 1 (auth + shell).
 
 ### ⚠️ Watch-outs discovered while building
 
