@@ -5,6 +5,7 @@ import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
 import BankReveal from "./BankReveal";
 import UploadResourceForm from "./UploadResourceForm";
+import ResetPasswordButton from "./ResetPasswordButton";
 
 export const metadata: Metadata = {
   title: "Partners — PT Launch Lab admin",
@@ -24,7 +25,7 @@ interface PartnerRow {
   bank_sort_code: string | null;
   bank_account_number: string | null;
   bank_details_updated_at: string | null;
-  pp_partner_users: { email: string; role: string; must_change_password: boolean; last_login_at: string | null }[];
+  pp_partner_users: { id: string; email: string; role: string; must_change_password: boolean; last_login_at: string | null }[];
 }
 
 export default async function AdminPartnersPage() {
@@ -33,7 +34,7 @@ export default async function AdminPartnersPage() {
     .select(
       "id, slug, gym_name, status, landing_page_path, commission_terms, " +
       "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
-      "pp_partner_users(email, role, must_change_password, last_login_at)"
+      "pp_partner_users(id, email, role, must_change_password, last_login_at)"
     )
     .order("gym_name");
 
@@ -128,11 +129,14 @@ export default async function AdminPartnersPage() {
                       <span className="text-soft text-xs">No login yet</span>
                     ) : (
                       p.pp_partner_users.map((u) => (
-                        <div key={u.email} className="text-soft text-xs">
-                          {u.email}
-                          {u.must_change_password && (
-                            <span className="text-amber-300"> · not signed in yet</span>
-                          )}
+                        <div key={u.email} className="text-soft text-xs mb-1.5">
+                          <div>
+                            {u.email}
+                            {u.must_change_password && (
+                              <span className="text-amber-300"> · not signed in yet</span>
+                            )}
+                          </div>
+                          <ResetPasswordButton userId={u.id} />
                         </div>
                       ))
                     )}

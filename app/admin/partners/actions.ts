@@ -26,6 +26,67 @@ export interface UploadResourceState {
   success?: string;
 }
 
+export interface ResetPasswordState {
+  error?: string;
+  success?: string;
+}
+
+/**
+ * Issue a partner a fresh temporary password and email it.
+ *
+ * There is no self-serve reset yet, so without this a locked-out gym owner
+ * needs a trip to the Supabase dashboard — which in practice means they wait.
+ * Sets must_change_password so the temporary one stops working the moment they
+ * choose their own.
+ */
+export async function resetPartnerPassword(
+  _prev: ResetPasswordState,
+  formData: FormData
+): Promise<ResetPasswordState> {
+  const userId = String(formData.get("userId") ?? "").trim();
+  if (!userId) return { error: "Missing user." };
+
+  const admin = getSupabaseAdmin();
+
+  const { data: user } = await admin
+    .from("pp_partner_users")
+    .select("id, email, full_name, partner:pp_partners!inner(gym_name)")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!user) return { error: "That login no longer exists." };
+  const partner = Array.isArray(user.partner) ? user.partner[0] : user.partner;
+
+  const password = generateTempPassword();
+
+  const { error: updateError } = await admin.auth.admin.updateUserById(userId, { password });
+  if (updateError) {
+    console.error("[admin/partners] password reset failed:", updateError);
+    return { error: updateError.message || "Could not reset that password." };
+  }
+
+  const { error: flagError } = await admin
+    .from("pp_partner_users")
+    .update({ must_change_password: true })
+    .eq("id", userId);
+  if (flagError) console.error("[admin/partners] must_change_password not set:", flagError);
+
+  const emailed = await sendWelcomeEmail({
+    to: user.email as string,
+    firstName: String(user.full_name ?? "").split(" ")[0] || null,
+    gymName: (partner as { gym_name: string }).gym_name,
+    password,
+    isReset: true,
+  });
+
+  revalidatePath("/admin/partners");
+  return {
+    success: emailed
+      ? `New password emailed to ${user.email}.`
+      : `Password reset but the email failed. Temporary password: ${password}`,
+  };
+}
+
 const MAX_RESOURCE_BYTES = 50 * 1024 * 1024;
 
 /** Keep storage keys predictable and safe — the original name is kept as the title. */
@@ -322,6 +383,8 @@ async function sendWelcomeEmail(args: {
   firstName: string | null;
   gymName: string;
   password: string;
+  /** A reset reads differently to a first welcome — say which it is. */
+  isReset?: boolean;
 }): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn("[admin/partners] RESEND_API_KEY not set — skipping welcome email.");
@@ -338,13 +401,15 @@ async function sendWelcomeEmail(args: {
   <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
     <div style="background:#072B4A;border-radius:12px 12px 0 0;padding:24px 28px;border-bottom:3px solid #F5C518;">
       <div style="font-size:20px;font-weight:800;color:#ffffff;">PT Launch Lab</div>
-      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">Your partner portal is ready</div>
+      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">${args.isReset ? "Your password has been reset" : "Your partner portal is ready"}</div>
     </div>
 
     <div style="background:#0A2A44;padding:28px;border-radius:0 0 12px 12px;">
       <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        ${greeting} your partner portal for <strong style="color:#ffffff;">${args.gymName}</strong> is now live.
-        It has your academy link and QR code, your enrolments as they come in, and what you're owed.
+        ${greeting} ${args.isReset
+          ? `we've set a new temporary password on your <strong style="color:#ffffff;">${args.gymName}</strong> partner portal login.`
+          : `your partner portal for <strong style="color:#ffffff;">${args.gymName}</strong> is now live.
+             It has your academy link and QR code, your enrolments as they come in, and what you're owed.`}
       </p>
 
       <div style="background:#061F36;border:1px solid #1A3A5C;border-radius:10px;padding:20px;margin-bottom:20px;">
@@ -382,7 +447,9 @@ async function sendWelcomeEmail(args: {
     await new Resend(process.env.RESEND_API_KEY).emails.send({
       from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
       to: args.to,
-      subject: "Your PT Launch Lab partner portal",
+      subject: args.isReset
+        ? "Your PT Launch Lab portal password has been reset"
+        : "Your PT Launch Lab partner portal",
       html,
     });
     return true;
