@@ -9,7 +9,7 @@ import {
   cancelSubscription,
   countSettledInstalments,
 } from "@/app/lib/stripeCheckout";
-import { recordPartnerSale, applyInstalmentToPartnerSale } from "@/app/lib/partner-sales";
+import { recordPartnerSale, applyInstalmentToPartnerSale, isDepositSale } from "@/app/lib/partner-sales";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -338,7 +338,13 @@ async function sendToGymTracker(session: StripeSession) {
   const attribution = decodeClientRef(session.client_reference_id);
   const gym_referral = session.metadata?.gym_referral || attribution.gym || "";
   const promo_code = session.metadata?.promo_code ?? "";
-  const plan_type = amount >= 1300 ? "PIF" : "deposit";
+  // Was `amount >= 1300`, which called every discounted gym pay-in-full (£1,099)
+  // a deposit — 8 of the 9 gym sales in the Sheet were labelled wrong. Shares
+  // the partner portal's rule now so the two records agree. Rows written before
+  // 2026-07-28 still carry the old label.
+  const plan_type = isDepositSale({ mode: session.mode, amountTotalPence: session.amount_total ?? 0 })
+    ? "deposit"
+    : "PIF";
 
   await fetch(url, {
     method: "POST",

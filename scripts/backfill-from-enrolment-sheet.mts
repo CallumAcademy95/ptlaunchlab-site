@@ -155,7 +155,28 @@ while (url) {
 const paid = sessions.filter((s) => s.status === "complete");
 const claimed = new Set<string>();
 
+/**
+ * Joins the automatic matcher couldn't make, adjudicated by hand.
+ *
+ * kimearljude@gmail.com filled the enrolment form as "Earl Moreland" and paid as
+ * "k Stapleton" from kimnearl@hotmail.co.uk — same person, same gym, same day,
+ * nothing in common for the matcher to work from. Confirmed by Callum
+ * 2026-07-28. The sheet records it as a £1,599 pay-in-full; Stripe took £599, so
+ * the Stripe record wins and it is treated as a deposit plan.
+ */
+const MANUAL_SESSION_MATCHES: Record<string, string> = {
+  "kimearljude@gmail.com":
+    "cs_live_a19Nbm0VWgPAmYNtVSGbyPjp6N3S1lLLIU541DuIOJ6buGLAkSDtKk3Pnu",
+};
+
 function matchStripe(e: Enrolment): { session: any; how: string } | null {
+  const manualId = MANUAL_SESSION_MATCHES[e.email];
+  if (manualId) {
+    const s = paid.find((x) => x.id === manualId);
+    if (s) return { session: s, how: "manual" };
+    console.warn(`  ! manual match for ${e.email} points at a session that no longer exists`);
+  }
+
   const candidates = paid.filter((s) => !claimed.has(s.id));
 
   const byEmail = candidates.find(
@@ -202,7 +223,7 @@ for (const e of deduped) {
       conflict = `sheet says "${e.paymentLabel}" but Stripe took £${((m.session.amount_total ?? 0) / 100).toFixed(0)}`;
     }
     const sEmail = (m.session.customer_email || m.session.customer_details?.email || "").toLowerCase();
-    if (m.how !== "email" && sEmail && sEmail !== e.email) {
+    if (m.how === "surname+date" && sEmail && sEmail !== e.email) {
       conflict = (conflict ? conflict + "; " : "") + `matched on name+date — Stripe email is ${sEmail}`;
     }
   } else if (!labelIsManual) {

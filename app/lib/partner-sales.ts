@@ -15,6 +15,18 @@ const DEPOSIT_CEILING_PENCE = 70_000;
 /** Deposit plan total: £599 + 5 × £200. */
 const DEPOSIT_PLAN_TOTAL_PENCE = 159_900;
 
+/**
+ * Is this sale a deposit plan rather than a pay-in-full?
+ *
+ * Decided by the shape of the sale, never by whether the amount clears £1,300.
+ * A gym pay-in-full is discounted to £1,099, so an amount test calls it a
+ * deposit — which is what the Sheet tracker did until 2026-07-28, mislabelling
+ * every discounted gym PIF it ever wrote.
+ */
+export function isDepositSale(args: { mode?: string | null; amountTotalPence: number }): boolean {
+  return args.mode === "subscription" || args.amountTotalPence <= DEPOSIT_CEILING_PENCE;
+}
+
 export interface PartnerSaleInput {
   stripeSessionId: string;
   stripeSubscriptionId?: string | null;
@@ -104,11 +116,7 @@ export async function recordPartnerSale(
 
     const enrolledAt = input.enrolledAt ?? new Date();
 
-    // Plan type comes from the shape of the sale, not the amount paid. A gym
-    // pay-in-full is discounted to £1,099, so an "is it under £1,300" test would
-    // read it as a deposit — which is exactly what the Sheet tracker does today.
-    const isDeposit =
-      input.mode === "subscription" || input.amountTotalPence <= DEPOSIT_CEILING_PENCE;
+    const isDeposit = isDepositSale(input);
 
     const row = {
       partner_id: partner.id,
