@@ -4,6 +4,7 @@ import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generateEnrolmentPDFServer } from "@/app/lib/server/generateEnrolmentPDF.server";
 import { validateEnrolmentSec } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
+import { recordPartnerSale } from "@/app/lib/partner-sales";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -95,6 +96,49 @@ export async function POST(req: NextRequest) {
       }
     } catch (err) {
       console.error("[enrolments] Zapier sheet webhook threw:", err);
+    }
+
+    // ── Partner portal ────────────────────────────────────────────────────
+    // The Stripe webhook already records attributed sales, so for a normal
+    // card payment this is a no-op upsert. It exists for the cases the webhook
+    // cannot cover:
+    //
+    //   - manual enrolments, which never touch Stripe at all;
+    //   - sales whose Stripe session carries no gym, where the learner named
+    //     the gym on this form instead — that is how every historical Ebor
+    //     sale was attributed.
+    //
+    // heardAbout arrives as "Ebor Fitness (Gym Referral)"; the suffix is a
+    // display convention from the enrol page, not part of the gym's name.
+    try {
+      const heardGym = /\(Gym Referral\)/i.test(ln.heardAbout ?? "")
+        ? String(ln.heardAbout).replace(/\s*\(Gym Referral\)\s*/i, "").trim()
+        : null;
+      const gymDisplayName = gymReferral || heardGym;
+
+      if (gymDisplayName) {
+        const enrolledAt = new Date(submittedAt);
+        const amountPence = Math.round(Number(amountPaid ?? 0) * 100);
+        const result = await recordPartnerSale({
+          // Manual enrolments have no session id, so key them on the learner —
+          // stable enough that a resubmission updates rather than duplicates.
+          stripeSessionId: stripeSessionId || `enrolment:${String(l.email).toLowerCase()}`,
+          gymDisplayName,
+          learnerName: l.fullName,
+          learnerEmail: l.email,
+          amountTotalPence: amountPence,
+          mode: paymentChoice === "deposit" ? "subscription" : null,
+          promoCode: promoCode || null,
+          enrolledAt: Number.isNaN(enrolledAt.getTime()) ? undefined : enrolledAt,
+        });
+        if (!result.ok || result.reason === "unknown-partner") {
+          console.error(
+            `[enrolments] partner sale not recorded for ${l.email}: ${result.reason} (gym "${gymDisplayName}")`
+          );
+        }
+      }
+    } catch (err) {
+      console.error("[enrolments] partner sale dispatch threw:", err);
     }
 
     // ── Build signature HTML for emails ───────────────────────────────────

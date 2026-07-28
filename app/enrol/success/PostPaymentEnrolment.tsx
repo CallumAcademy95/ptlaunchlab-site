@@ -209,6 +209,30 @@ export default function PostPaymentEnrolment({ mode = "postpay" }: { mode?: Enro
     } catch { /* no context — form still works, just unprefilled */ }
   }, [sessionId]);
 
+  // Recover the gym from Stripe as well as from localStorage.
+  //
+  // localStorage is per-browser: pay on a phone and finish this form on a
+  // laptop and the partner is silently lost, which means the enrolment record
+  // — and therefore the Sheet and the partner's commission — has no gym on it.
+  // Stripe holds the same attribution durably, so it wins when the two differ
+  // and fills in when localStorage is empty. Runs after the effect above; both
+  // only ever set heardAbout, so the later write is the one that sticks.
+  useEffect(() => {
+    if (!sessionId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as { gymReferral?: string | null };
+        if (cancelled || !data.gymReferral) return;
+        setCtx(c => (c ? { ...c, gymReferral: data.gymReferral! } : c));
+        setLn(ln => ({ ...ln, heardAbout: `${data.gymReferral} (Gym Referral)` }));
+      } catch { /* offline or Stripe unreachable — localStorage prefill stands */ }
+    })();
+    return () => { cancelled = true; };
+  }, [sessionId]);
+
   // ─── Canvas signature ─────────────────────────────────────────────────
   useEffect(() => {
     if (step !== 3 || signMode !== "drawn") return;

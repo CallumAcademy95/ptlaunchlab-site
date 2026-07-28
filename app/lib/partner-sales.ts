@@ -43,6 +43,9 @@ export interface PartnerSaleInput {
   enrolledAt?: Date;
 }
 
+/** What `_gym-template` ships with. A live page carrying this is a mistake. */
+export const PLACEHOLDER_SLUG = "GYM-SLUG-HERE";
+
 /**
  * Resolve a partner from the slug, falling back to the legacy display name.
  *
@@ -56,6 +59,16 @@ async function resolvePartner(
 ): Promise<{ id: string; fee_per_learner_pence: number; commission_terms: string; payout_terms_days: number } | null> {
   const admin = getSupabaseAdmin();
   const columns = "id, fee_per_learner_pence, commission_terms, payout_terms_days";
+
+  // A gym page copied from _gym-template without editing its config ships this
+  // literal placeholder. Treat it as no attribution rather than letting it
+  // reach the lookup and read as a mystery partner.
+  if (gymSlug === PLACEHOLDER_SLUG) {
+    console.error(
+      "[partner-sales] a live enrol page is still using the _gym-template placeholder slug — its sales are unattributed"
+    );
+    gymSlug = null;
+  }
 
   if (gymSlug) {
     const { data } = await admin.from("pp_partners").select(columns).eq("slug", gymSlug).maybeSingle();
@@ -109,9 +122,19 @@ export async function recordPartnerSale(
   try {
     const partner = await resolvePartner(input.gymSlug, input.gymDisplayName);
     if (!partner) {
-      // Overwhelmingly this is a direct sale with no gym attached, which is
-      // normal and not worth an error.
-      return { ok: true, reason: input.gymSlug || input.gymDisplayName ? "unknown-partner" : "no-gym" };
+      // A sale with no gym at all is a direct sale — normal, and silent.
+      if (!input.gymSlug && !input.gymDisplayName) return { ok: true, reason: "no-gym" };
+
+      // A sale that names a gym we can't resolve is different: someone is owed
+      // £500 and nothing will show it. Loud, because the fix is a one-line
+      // addition to pp_partners.legacy_referral_names and nobody will make it
+      // if this only ever appears as a return value.
+      console.error(
+        `[partner-sales] UNATTRIBUTED SALE ${input.stripeSessionId} — no partner matches ` +
+        `slug "${input.gymSlug ?? "-"}" or name "${input.gymDisplayName ?? "-"}". ` +
+        `Add it to pp_partners.legacy_referral_names and re-run the backfill.`
+      );
+      return { ok: true, reason: "unknown-partner" };
     }
 
     const enrolledAt = input.enrolledAt ?? new Date();

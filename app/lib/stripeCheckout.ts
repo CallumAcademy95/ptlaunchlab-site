@@ -213,6 +213,30 @@ export function getSubscription(id: string) {
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "GET" });
 }
 
+export interface StripeCheckoutSession {
+  id: string;
+  amount_total?: number;
+  mode?: string;
+  payment_status?: string;
+  client_reference_id?: string | null;
+  metadata?: Record<string, string>;
+  subscription?: string | null;
+  customer_email?: string | null;
+  customer_details?: { email?: string | null; name?: string | null };
+}
+
+/**
+ * Read a completed Checkout Session back.
+ *
+ * Used by /enrol/success to recover the gym the buyer came through. That was
+ * previously read from localStorage, which is empty if they pay on a phone and
+ * finish the form on a laptop, or clear their storage — and then the enrolment
+ * record loses the partner even though Stripe knew it all along.
+ */
+export function getCheckoutSession(id: string) {
+  return stripeRequest<StripeCheckoutSession>(`checkout/sessions/${id}`, { method: "GET" });
+}
+
 export function setSubscriptionMetadata(id: string, metadata: Record<string, string>) {
   const body = encodeForm({ metadata }).join("&");
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "POST", body });
