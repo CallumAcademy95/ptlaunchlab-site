@@ -1,6 +1,16 @@
 # Gym Partner Platform — Build Plan
 
-**Status:** Phases 0–1 shipped in code; agreement v2.0 shipped. **Migration not applied and `SUPABASE_ANON_KEY` not set — `/partners` cannot run yet.** · 2026-07-28
+**Status:** v1 complete and live. All five portal sections built, 9 sales backfilled, £4,000 of commission reconciled, 27 playbook entries written. **One migration outstanding: `20260728_pp_playbook_entries.sql`.** · 2026-07-28
+
+> **Picking this up?** Read `PARTNER-PLAYBOOK-BRIEF.md` for the content spec, and
+> `partner-playbook/idea-its-your-academy.md` before writing any partner-facing
+> copy — the academy belongs to the gym, and naming ourselves in front of a
+> member is the easiest mistake to make here.
+>
+> **Next task:** convert Chapters 7 and 8 of `PLAYBOOK FILE.docx` into
+> `type: campaign` and `type: idea` entries. Both chapters are complete in the
+> document and need nothing from Callum. The document only contains Chapters
+> 6–8, and spells the brand "PT Launch Labs" — it has no S.
 **Lives in:** `ptlaunchlab-site` at `/partners`
 **One-liner:** A logged-in hub where each gym partner sees everything they get from the partnership — resources, their academy link, live sales, payments, and a marketing playbook.
 
