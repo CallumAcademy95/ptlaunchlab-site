@@ -95,6 +95,74 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
   return summary;
 }
 
+export interface PartnerSale {
+  id: string;
+  learner_name: string | null;
+  plan_type: "PIF" | "deposit";
+  amount_paid_pence: number;
+  amount_due_pence: number;
+  promo_code: string | null;
+  status: "confirmed" | "cancelled" | "refunded";
+  commission_pence: number;
+  commission_status: "accruing" | "due" | "paid" | "voided";
+  commission_release_at: string | null;
+  enrolled_at: string;
+}
+
+/**
+ * Every enrolment attributed to this partner, newest first.
+ *
+ * Selects PARTNER_SALE_COLUMNS, which omits learner_email — see the note at the
+ * top of this file. Returns an empty list rather than throwing.
+ */
+export async function getPartnerSales(partnerId: string): Promise<PartnerSale[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_sales")
+    .select(PARTNER_SALE_COLUMNS)
+    .eq("partner_id", partnerId)
+    .order("enrolled_at", { ascending: false });
+
+  if (error) {
+    console.error("[partner-data] pp_sales list failed:", error);
+    return [];
+  }
+  return (data ?? []) as unknown as PartnerSale[];
+}
+
+export type CommissionState =
+  | { key: "paid"; label: string }
+  | { key: "payable"; label: string }
+  | { key: "held"; label: string }
+  | { key: "voided"; label: string };
+
+/**
+ * How a partner should read the commission on one sale.
+ *
+ * "Payable" is derived from the release date rather than commission_status,
+ * because nothing flips accruing → due on a schedule. A held sale always states
+ * WHEN it releases, or what it is waiting for — a bare pending balance with no
+ * explanation is the thing that generates emails.
+ */
+export function commissionState(sale: PartnerSale): CommissionState {
+  if (sale.commission_status === "voided" || sale.status === "refunded") {
+    return { key: "voided", label: "Not payable" };
+  }
+  if (sale.commission_status === "paid") return { key: "paid", label: "Paid" };
+
+  if (!sale.commission_release_at) {
+    return { key: "held", label: "Releases after 2nd instalment" };
+  }
+
+  const release = new Date(sale.commission_release_at);
+  if (sale.commission_status === "due" || release.getTime() <= Date.now()) {
+    return { key: "payable", label: "Ready to pay" };
+  }
+  return {
+    key: "held",
+    label: `Releases ${release.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`,
+  };
+}
+
 export function formatPence(pence: number): string {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
