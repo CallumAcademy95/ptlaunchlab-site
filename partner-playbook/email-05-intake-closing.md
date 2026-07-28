@@ -1,7 +1,7 @@
 ---
 title: Intake closing
 type: email
-channel: Anyone who has enquired
+channel: Enquirers
 when_to_use: Five to seven days before an intake closes
 order: 50
 ---

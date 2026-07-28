@@ -1,7 +1,7 @@
 ---
 title: The graduate story email
 type: email
-channel: Whole member list
+channel: Whole list
 when_to_use: The moment you have your first graduate willing to be named
 order: 40
 ---

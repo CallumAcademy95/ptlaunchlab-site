@@ -1,7 +1,7 @@
 ---
 title: The follow-up nobody sends
 type: email
-channel: Anyone who enquired and went quiet
+channel: Enquirers
 when_to_use: Two to three weeks after someone showed interest and stopped replying
 order: 60
 ---

@@ -1,7 +1,7 @@
 ---
 title: The launch announcement
 type: email
-channel: Whole member list
+channel: Whole list
 when_to_use: Once, when you go live. Then again each January.
 order: 10
 ---

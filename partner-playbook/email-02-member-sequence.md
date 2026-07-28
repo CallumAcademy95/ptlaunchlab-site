@@ -1,7 +1,7 @@
 ---
 title: The six-email member sequence
 type: email
-channel: Whole member list
+channel: Whole list
 when_to_use: Over six weeks, one a week, after the launch announcement
 order: 20
 ---

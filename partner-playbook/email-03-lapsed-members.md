@@ -1,7 +1,7 @@
 ---
 title: The lapsed member email
 type: email
-channel: Members who have stopped coming
+channel: Lapsed members
 order: 30
 when_to_use: Any time. Counterintuitively one of the best-performing sends.
 ---
