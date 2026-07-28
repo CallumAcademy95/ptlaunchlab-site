@@ -58,8 +58,8 @@ export default async function PlaybookPage() {
                     dangerouslySetInnerHTML={{ __html: entry.html }}
                   />
 
-                  {entry.snippets.length > 0 && (
-                    <div className="mt-4 flex gap-2 flex-wrap">
+                  {(entry.snippets.length > 0 || entry.downloadId) && (
+                    <div className="mt-4 flex gap-2 flex-wrap items-center">
                       {entry.snippets.map((snippet, i) => (
                         <CopyButton
                           key={i}
@@ -68,6 +68,14 @@ export default async function PlaybookPage() {
                           className="!text-xs !py-1.5"
                         />
                       ))}
+                      {entry.downloadId && (
+                        <a
+                          href={`/partners/download/playbook/${entry.downloadId}`}
+                          className="px-4 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-gold hover:text-gold transition-colors"
+                        >
+                          Download
+                        </a>
+                      )}
                     </div>
                   )}
                 </article>

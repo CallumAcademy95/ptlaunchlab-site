@@ -6,6 +6,7 @@ import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { getBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
+import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -176,6 +177,93 @@ export async function uploadResource(
   return {
     success: `"${title}" added${partnerId ? " for that partner" : " for all partners"}.`,
   };
+}
+
+export interface PlaybookEntryState {
+  error?: string;
+  success?: string;
+}
+
+/**
+ * Add a playbook entry without a deploy.
+ *
+ * The curated entries stay as markdown in the repo — this is for the one-offs:
+ * a seasonal post, a document to share this week. Both render identically at
+ * /partners/playbook, and a repo entry with the same slug wins, so a reviewed
+ * entry can't be quietly replaced from here.
+ */
+export async function addPlaybookEntry(
+  _prev: PlaybookEntryState,
+  formData: FormData
+): Promise<PlaybookEntryState> {
+  const title = String(formData.get("title") ?? "").trim();
+  const type = String(formData.get("type") ?? "").trim();
+  const channel = String(formData.get("channel") ?? "").trim();
+  const whenToUse = String(formData.get("whenToUse") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  const externalUrl = String(formData.get("externalUrl") ?? "").trim();
+  const sortOrder = Number(formData.get("sortOrder") ?? 100);
+  const file = formData.get("file");
+
+  if (!title) return { error: "Give it a title." };
+  if (!PLAYBOOK_TYPES.some((t) => t.key === type)) return { error: "Choose a section." };
+
+  const hasFile = file instanceof File && file.size > 0;
+  if (!body && !hasFile && !externalUrl) {
+    return { error: "Add some text, attach a file, or paste a link." };
+  }
+  if (hasFile && (file as File).size > MAX_RESOURCE_BYTES) return { error: "That file is over 50MB." };
+  if (externalUrl && !/^https:\/\//i.test(externalUrl)) return { error: "Links must start with https://" };
+
+  const slug =
+    title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "entry";
+
+  const admin = getSupabaseAdmin();
+  let storagePath: string | null = null;
+
+  if (hasFile) {
+    const f = file as File;
+    storagePath = `playbook/${randomBytes(6).toString("hex")}-${safeFileName(f.name)}`;
+    const { error: uploadError } = await admin.storage
+      .from(RESOURCE_BUCKET)
+      .upload(storagePath, await f.arrayBuffer(), {
+        contentType: f.type || "application/octet-stream",
+        upsert: false,
+      });
+    if (uploadError) {
+      console.error("[admin/partners] playbook upload failed:", uploadError);
+      return { error: `Upload failed: ${uploadError.message}` };
+    }
+  }
+
+  // Upsert on slug so re-submitting the same title corrects the entry rather
+  // than failing on the unique index or creating a near-duplicate.
+  const { error: insertError } = await admin.from("pp_playbook_entries").upsert(
+    {
+      slug,
+      title,
+      type,
+      channel: channel || null,
+      when_to_use: whenToUse || null,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 100,
+      body_markdown: body || null,
+      storage_path: storagePath,
+      external_url: externalUrl || null,
+      mime: hasFile ? (file as File).type || null : null,
+      file_size: hasFile ? (file as File).size : null,
+    },
+    { onConflict: "slug" }
+  );
+
+  if (insertError) {
+    if (storagePath) await admin.storage.from(RESOURCE_BUCKET).remove([storagePath]);
+    console.error("[admin/partners] playbook insert failed:", insertError);
+    return { error: "Could not save that entry. Nothing was uploaded." };
+  }
+
+  revalidatePath("/admin/partners");
+  revalidatePath("/partners/playbook");
+  return { success: `"${title}" is live in the playbook.` };
 }
 
 /**

@@ -18,17 +18,13 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
+import { getSupabaseAdmin } from "./supabase-admin";
+import { PLAYBOOK_TYPES, type PlaybookType } from "./partner-playbook-types";
 
 const PLAYBOOK_DIR = path.join(process.cwd(), "partner-playbook");
 
-export const PLAYBOOK_TYPES = [
-  { key: "social", label: "Social posts" },
-  { key: "email", label: "Member emails" },
-  { key: "script", label: "In-gym scripts" },
-  { key: "campaign", label: "Campaign plays" },
-] as const;
-
-export type PlaybookType = (typeof PLAYBOOK_TYPES)[number]["key"];
+export { PLAYBOOK_TYPES };
+export type { PlaybookType };
 
 export interface PlaybookEntry {
   slug: string;
@@ -41,6 +37,8 @@ export interface PlaybookEntry {
   html: string;
   /** Fenced code blocks, pulled out so the UI can offer copy-to-clipboard. */
   snippets: string[];
+  /** Set when the entry came from the admin upload and has a file attached. */
+  downloadId?: string;
 }
 
 /** Minimal frontmatter reader — the playbook is ours, so it needn't handle YAML in general. */
@@ -61,12 +59,12 @@ function extractSnippets(body: string): string[] {
 }
 
 /**
- * Every playbook entry, ordered.
+ * The curated core: markdown committed to the repo.
  *
- * Returns an empty list when the directory doesn't exist yet — the page renders
- * its own "coming soon" state rather than this throwing during a build.
+ * Returns an empty list when the directory doesn't exist yet, so the page shows
+ * its own empty state rather than this throwing during a build.
  */
-export async function getPlaybook(): Promise<PlaybookEntry[]> {
+async function getRepoEntries(): Promise<PlaybookEntry[]> {
   let files: string[];
   try {
     files = (await readdir(PLAYBOOK_DIR)).filter((f) => f.endsWith(".md"));
@@ -101,7 +99,53 @@ export async function getPlaybook(): Promise<PlaybookEntry[]> {
     })
   );
 
-  return entries
-    .filter((e): e is PlaybookEntry => e !== null)
-    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+  return entries.filter((e): e is PlaybookEntry => e !== null);
+}
+
+/** Ad-hoc entries added through /admin/partners, no deploy required. */
+async function getUploadedEntries(): Promise<PlaybookEntry[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_playbook_entries")
+    .select("id, slug, title, type, channel, when_to_use, sort_order, body_markdown, storage_path, external_url");
+
+  if (error) {
+    // A missing table (migration not applied) must not take the page down —
+    // the repo entries are the important half.
+    console.error("[playbook] uploaded entries unavailable:", error.message);
+    return [];
+  }
+
+  return Promise.all(
+    (data ?? []).map(async (row): Promise<PlaybookEntry> => {
+      const body = (row.body_markdown as string | null) ?? "";
+      return {
+        slug: row.slug as string,
+        title: row.title as string,
+        type: row.type as PlaybookType,
+        channel: (row.channel as string | null) ?? null,
+        whenToUse: (row.when_to_use as string | null) ?? null,
+        order: Number(row.sort_order ?? 100),
+        html: body ? await marked.parse(body) : "",
+        snippets: extractSnippets(body),
+        downloadId: row.storage_path || row.external_url ? (row.id as string) : undefined,
+      };
+    })
+  );
+}
+
+/**
+ * Every playbook entry, ordered.
+ *
+ * Repo entries win on a slug clash — a reviewed, committed entry should never be
+ * silently replaced by an upload. Returns whatever it can: a missing directory
+ * or an unapplied migration degrades to the other source rather than throwing.
+ */
+export async function getPlaybook(): Promise<PlaybookEntry[]> {
+  const [repo, uploaded] = await Promise.all([getRepoEntries(), getUploadedEntries()]);
+
+  const bySlug = new Map<string, PlaybookEntry>();
+  for (const entry of uploaded) bySlug.set(entry.slug, entry);
+  for (const entry of repo) bySlug.set(entry.slug, entry);
+
+  return [...bySlug.values()].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 }
