@@ -177,17 +177,23 @@ create policy pp_payouts_own on pp_payouts
 create policy pp_resources_own on pp_resources
   for select using (partner_id is null or partner_id = pp_current_partner_id());
 
--- ─── Seed the 9 existing partners ────────────────────────────────────────────
--- slug values MUST match PartnerConfig.gymSlug in app/<gym>/enrol/page.tsx.
--- All 9 signed before the 2026-07-27 variation → grandfathered 'on_enrolment'.
-insert into pp_partners (slug, gym_name, landing_page_path, legacy_referral_names, commission_terms)
+-- ─── Seed the 8 existing partners ────────────────────────────────────────────
+-- slug values MUST match PartnerConfig.gymSlug in app/<gym>/enrol/page.tsx, and
+-- promo_code must match GymConfig.promoCode in app/<gym>/page.tsx — the portal
+-- shows it to the partner as their member discount code.
+--
+-- Ebor Fitness has showDiscount: false and no code, so its promo_code stays
+-- null and the portal simply omits that block for them.
+--
+-- All 8 signed before the 2026-07-27 variation → grandfathered 'on_enrolment'.
+insert into pp_partners (slug, gym_name, landing_page_path, promo_code, legacy_referral_names, commission_terms)
 values
-  ('6fit',         '6fit Gyms',            '/6fit-academy',          array['6fit Gyms'],             'on_enrolment'),
-  ('xcelerate',    'Xcelerate Gyms',       '/xcelerate-academy',     array['Xcelerate Gyms Edgware'],'on_enrolment'),
-  ('gym-n-go',     'Gym n Go',             '/gym-n-go-academy',      array['Gym n Go Forest Hill'],  'on_enrolment'),
-  ('superflex',    'Superflex 2.0 Gym',    '/superflex-academy',     array['Superflex 2.0 Gym'],     'on_enrolment'),
-  ('ebor',         'Ebor Fitness',         '/ebor-fitness',          array['Ebor Fitness'],          'on_enrolment'),
-  ('muscle-bound', 'Muscle Bound Gym',     '/muscle-bound-academy',  array['Muscle Bound Gym'],      'on_enrolment'),
-  ('mof',          'Ministry of Fitness',  '/mof-gym',               array['Ministry of Fitness'],   'on_enrolment'),
-  ('ironwolf',     'Iron Wolf Gym',        '/ironwolf-gym',          array['Iron Wolf Gym'],         'on_enrolment')
+  ('6fit',         '6fit Gyms',            '/6fit-academy',          '6FITPTDISCOUNT', array['6fit Gyms'],             'on_enrolment'),
+  ('xcelerate',    'Xcelerate Gyms',       '/xcelerate-academy',     'XCELERATEPT',    array['Xcelerate Gyms Edgware'],'on_enrolment'),
+  ('gym-n-go',     'Gym n Go',             '/gym-n-go-academy',      'GYMNGOPT',       array['Gym n Go Forest Hill'],  'on_enrolment'),
+  ('superflex',    'Superflex 2.0 Gym',    '/superflex-academy',     'SUPERFLEXPT',    array['Superflex 2.0 Gym'],     'on_enrolment'),
+  ('ebor',         'Ebor Fitness',         '/ebor-fitness',          null,             array['Ebor Fitness'],          'on_enrolment'),
+  ('muscle-bound', 'Muscle Bound Gym',     '/muscle-bound-academy',  'MBGPTDISCOUNT',  array['Muscle Bound Gym'],      'on_enrolment'),
+  ('mof',          'Ministry of Fitness',  '/mof-gym',               'MOFPTDISCOUNT',  array['Ministry of Fitness'],   'on_enrolment'),
+  ('ironwolf',     'Iron Wolf Gym',        '/ironwolf-gym',          'IWGPTDISCOUNT',  array['Iron Wolf Gym'],         'on_enrolment')
 on conflict (slug) do nothing;
