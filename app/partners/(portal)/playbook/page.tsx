@@ -21,43 +21,66 @@ function groupByChannel(entries: PlaybookEntry[]): { channel: string | null; ite
   return groups;
 }
 
+/**
+ * One entry, collapsed by default.
+ *
+ * Native <details> rather than React state: the whole page stays a server
+ * component, it works before hydration, and browser find-in-page can still
+ * reach the closed text — which matters when someone is hunting for a phrase
+ * they half-remember.
+ */
 function EntryCard({ entry }: { entry: PlaybookEntry }) {
   return (
-    <article className="rounded-xl bg-card border border-white/10 p-5">
-      <div className="mb-2">
-        <h4 className="text-white font-semibold">{entry.title}</h4>
-        {entry.whenToUse && (
-          <p className="text-soft text-xs mt-0.5">Use it when: {entry.whenToUse}</p>
+    <details className="group rounded-xl bg-card border border-white/10 open:border-white/20">
+      <summary className="flex items-start gap-3 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <span
+          aria-hidden
+          className="mt-1 text-soft text-xs transition-transform group-open:rotate-90 shrink-0"
+        >
+          ▶
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-white font-semibold group-hover:text-gold transition-colors">
+            {entry.title}
+          </span>
+          {entry.whenToUse && (
+            <span className="block text-soft text-xs mt-0.5">Use it when: {entry.whenToUse}</span>
+          )}
+        </span>
+        {entry.snippets.length > 1 && (
+          <span className="text-soft text-[10px] shrink-0 mt-1">{entry.snippets.length} parts</span>
+        )}
+      </summary>
+
+      <div className="px-5 pb-5 pl-11">
+        {/* Authored by us and committed to the repo — never user input. */}
+        <div
+          className="playbook-body text-soft text-sm leading-relaxed space-y-3"
+          dangerouslySetInnerHTML={{ __html: entry.html }}
+        />
+
+        {(entry.snippets.length > 0 || entry.downloadId) && (
+          <div className="mt-4 flex gap-2 flex-wrap items-center">
+            {entry.snippets.map((snippet, i) => (
+              <CopyButton
+                key={i}
+                value={snippet}
+                label={entry.snippets.length > 1 ? `Copy ${i + 1}` : "Copy"}
+                className="!text-xs !py-1.5"
+              />
+            ))}
+            {entry.downloadId && (
+              <a
+                href={`/partners/download/playbook/${entry.downloadId}`}
+                className="px-4 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-gold hover:text-gold transition-colors"
+              >
+                Download
+              </a>
+            )}
+          </div>
         )}
       </div>
-
-      {/* Authored by us and committed to the repo — never user input. */}
-      <div
-        className="playbook-body text-soft text-sm leading-relaxed space-y-3"
-        dangerouslySetInnerHTML={{ __html: entry.html }}
-      />
-
-      {(entry.snippets.length > 0 || entry.downloadId) && (
-        <div className="mt-4 flex gap-2 flex-wrap items-center">
-          {entry.snippets.map((snippet, i) => (
-            <CopyButton
-              key={i}
-              value={snippet}
-              label={entry.snippets.length > 1 ? `Copy ${i + 1}` : "Copy"}
-              className="!text-xs !py-1.5"
-            />
-          ))}
-          {entry.downloadId && (
-            <a
-              href={`/partners/download/playbook/${entry.downloadId}`}
-              className="px-4 py-1.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-gold hover:text-gold transition-colors"
-            >
-              Download
-            </a>
-          )}
-        </div>
-      )}
-    </article>
+    </details>
   );
 }
 
@@ -156,9 +179,11 @@ export default async function PlaybookPage({
                       <span className="text-soft text-[10px]">{group.items.length}</span>
                     </div>
                   )}
-                  {group.items.map((entry) => (
-                    <EntryCard key={entry.slug} entry={entry} />
-                  ))}
+                  <div className="space-y-2">
+                    {group.items.map((entry) => (
+                      <EntryCard key={entry.slug} entry={entry} />
+                    ))}
+                  </div>
                 </section>
               ))}
             </div>
