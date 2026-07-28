@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { getBankDetails } from "@/app/lib/partner-bank";
+import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -18,6 +19,102 @@ export interface CreatePartnerUserState {
 export interface MarkPaidState {
   error?: string;
   success?: string;
+}
+
+export interface UploadResourceState {
+  error?: string;
+  success?: string;
+}
+
+const MAX_RESOURCE_BYTES = 50 * 1024 * 1024;
+
+/** Keep storage keys predictable and safe — the original name is kept as the title. */
+function safeFileName(name: string): string {
+  const dot = name.lastIndexOf(".");
+  const ext = dot > 0 ? name.slice(dot).toLowerCase().replace(/[^a-z0-9.]/g, "") : "";
+  const stem = (dot > 0 ? name.slice(0, dot) : name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60) || "file";
+  return `${stem}${ext}`;
+}
+
+/**
+ * Add a resource to the drive.
+ *
+ * A file goes into the private bucket; a link is stored as-is. Leaving
+ * partner_id empty shares it with every partner, which is the common case —
+ * per-partner uploads are for their own branded artwork.
+ */
+export async function uploadResource(
+  _prev: UploadResourceState,
+  formData: FormData
+): Promise<UploadResourceState> {
+  const partnerId = String(formData.get("partnerId") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const externalUrl = String(formData.get("externalUrl") ?? "").trim();
+  const file = formData.get("file");
+
+  if (!title) return { error: "Give it a title — that's what the partner sees." };
+  if (!RESOURCE_CATEGORIES.some((c) => c.key === category)) return { error: "Choose a category." };
+
+  const hasFile = file instanceof File && file.size > 0;
+  if (!hasFile && !externalUrl) return { error: "Attach a file or paste a link." };
+  if (hasFile && file.size > MAX_RESOURCE_BYTES) return { error: "That file is over 50MB." };
+  if (externalUrl && !/^https:\/\//i.test(externalUrl)) {
+    return { error: "Links must start with https://" };
+  }
+
+  const admin = getSupabaseAdmin();
+  let storagePath: string | null = null;
+
+  if (hasFile) {
+    const f = file as File;
+    // Namespaced by partner so a shared and a per-gym file can share a name,
+    // and prefixed so re-uploading the same filename never silently replaces
+    // a resource partners may already be linking to.
+    const prefix = partnerId ? `partners/${partnerId}` : "shared";
+    storagePath = `${prefix}/${randomBytes(6).toString("hex")}-${safeFileName(f.name)}`;
+
+    const { error: uploadError } = await admin.storage
+      .from(RESOURCE_BUCKET)
+      .upload(storagePath, await f.arrayBuffer(), {
+        contentType: f.type || "application/octet-stream",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("[admin/partners] resource upload failed:", uploadError);
+      return { error: `Upload failed: ${uploadError.message}` };
+    }
+  }
+
+  const { error: insertError } = await admin.from("pp_resources").insert({
+    partner_id: partnerId || null,
+    category,
+    title,
+    description: description || null,
+    storage_path: storagePath,
+    external_url: externalUrl || null,
+    mime: hasFile ? (file as File).type || null : null,
+    file_size: hasFile ? (file as File).size : null,
+  });
+
+  if (insertError) {
+    // Don't leave an orphan object in the bucket paying for storage nobody can
+    // reach — nothing lists it, so it would never be found again.
+    if (storagePath) await admin.storage.from(RESOURCE_BUCKET).remove([storagePath]);
+    console.error("[admin/partners] resource insert failed:", insertError);
+    return { error: "Could not save that resource. Nothing was uploaded." };
+  }
+
+  revalidatePath("/admin/partners");
+  return {
+    success: `"${title}" added${partnerId ? " for that partner" : " for all partners"}.`,
+  };
 }
 
 /**

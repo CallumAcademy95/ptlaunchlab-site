@@ -7,10 +7,12 @@ import { usePathname } from "next/navigation";
 // nobody opened the chat — punishing mobile LCP and TBT.
 const Chatbot = dynamic(() => import("./Chatbot"), { ssr: false });
 
-// Hide the public visitor chatbot on internal admin routes (it overlaps with
-// the WhatsApp inbox UI and isn't relevant to operators).
+// Hide the public visitor chatbot on internal routes. /admin overlaps with the
+// WhatsApp inbox UI, and /partners is a signed-in business portal — a prospect
+// chat widget there is answering a question its occupants aren't asking, and it
+// covers the corner of every page they use.
 export default function ChatbotLazy() {
   const pathname = usePathname();
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/partners")) return null;
   return <Chatbot />;
 }

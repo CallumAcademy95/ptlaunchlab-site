@@ -4,6 +4,7 @@ import { formatPence } from "@/app/lib/partner-data";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
 import BankReveal from "./BankReveal";
+import UploadResourceForm from "./UploadResourceForm";
 
 export const metadata: Metadata = {
   title: "Partners — PT Launch Lab admin",
@@ -89,6 +90,8 @@ export default async function AdminPartnersPage() {
         )}
 
         <CreateUserForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name, slug: p.slug }))} />
+
+        <UploadResourceForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name }))} />
 
         <div className="rounded-xl bg-card border border-white/10 overflow-hidden">
           <table className="w-full text-left text-sm">

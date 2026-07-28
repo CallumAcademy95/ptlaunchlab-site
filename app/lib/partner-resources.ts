@@ -1,0 +1,109 @@
+// The partner Resource Drive.
+//
+// Files live in the PRIVATE `partner-resources` Supabase Storage bucket. A
+// partner never receives a storage path or a public URL — downloads go through
+// a server route that checks the session, then issues a short-lived signed URL.
+// Public objects would mean a link forwarded once is a link that works forever,
+// including for a gym whose partnership has ended.
+
+import { getSupabaseAdmin } from "./supabase-admin";
+
+export const RESOURCE_BUCKET = "partner-resources";
+
+/** Long enough to start a download, short enough that a shared link is useless. */
+const SIGNED_URL_TTL_SECONDS = 60;
+
+export const RESOURCE_CATEGORIES = [
+  { key: "print", label: "Print & in-gym", blurb: "Posters, QR cards and flyers for the floor" },
+  { key: "digital", label: "Digital & screens", blurb: "Social posts and gym TV adverts" },
+  { key: "branding", label: "Branding", blurb: "Your academy logo pack and colours" },
+  { key: "learner", label: "Learner handouts", blurb: "What to give a member who asks" },
+  { key: "training", label: "Selling the course", blurb: "How you and your staff talk about it" },
+  { key: "legal", label: "Legal", blurb: "Your signed agreement and terms" },
+] as const;
+
+export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number]["key"];
+
+export interface PartnerResource {
+  id: string;
+  partner_id: string | null;
+  category: ResourceCategory;
+  title: string;
+  description: string | null;
+  storage_path: string | null;
+  external_url: string | null;
+  mime: string | null;
+  file_size: number | null;
+  version: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+/**
+ * Everything this partner can see: shared resources (partner_id null) plus
+ * anything uploaded specifically for them.
+ */
+export async function getPartnerResources(partnerId: string): Promise<PartnerResource[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_resources")
+    .select(
+      "id, partner_id, category, title, description, storage_path, external_url, mime, file_size, version, sort_order, created_at"
+    )
+    .or(`partner_id.is.null,partner_id.eq.${partnerId}`)
+    .order("sort_order")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("[partner-resources] list failed:", error);
+    return [];
+  }
+  return (data ?? []) as unknown as PartnerResource[];
+}
+
+/**
+ * Resolve a resource the given partner is actually entitled to.
+ *
+ * The entitlement check is here rather than in the route so it cannot be
+ * skipped: a resource belongs to this partner, or to everyone, or they don't
+ * get it — an id from another gym returns null however it was obtained.
+ */
+export async function getResourceForPartner(
+  resourceId: string,
+  partnerId: string
+): Promise<PartnerResource | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_resources")
+    .select(
+      "id, partner_id, category, title, description, storage_path, external_url, mime, file_size, version, sort_order, created_at"
+    )
+    .eq("id", resourceId)
+    .or(`partner_id.is.null,partner_id.eq.${partnerId}`)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as unknown as PartnerResource;
+}
+
+/** A one-minute URL for a private object. Never store or log the result. */
+export async function createSignedResourceUrl(storagePath: string): Promise<string | null> {
+  const { data, error } = await getSupabaseAdmin()
+    .storage.from(RESOURCE_BUCKET)
+    .createSignedUrl(storagePath, SIGNED_URL_TTL_SECONDS, { download: true });
+
+  if (error || !data?.signedUrl) {
+    console.error("[partner-resources] signing failed:", error);
+    return null;
+  }
+  return data.signedUrl;
+}
+
+export function formatFileSize(bytes: number | null): string | null {
+  if (!bytes) return null;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Added in the last fortnight — worth a badge, past that it's just noise. */
+export function isNewResource(createdAt: string): boolean {
+  return Date.now() - Date.parse(createdAt) < 14 * 86400000;
+}
