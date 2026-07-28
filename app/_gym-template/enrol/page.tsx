@@ -14,6 +14,10 @@ export const metadata: Metadata = {
 };
 
 const PARTNER: PartnerConfig = {
+  // Stable join key for the partner platform — lowercase, no spaces, NEVER
+  // changed once live. Match it to the route folder (e.g. /acme-academy → "acme")
+  // and add the same value as `slug` on the pp_partners row.
+  gymSlug: "GYM-SLUG-HERE",
   gymReferral: "GYM NAME HERE",
   promoCodes: {
     "GYMPROMOCODE": {

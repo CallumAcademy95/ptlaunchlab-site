@@ -155,6 +155,8 @@ export interface CheckoutSessionInput {
   email?: string;
   name?: string;
   gymReferral?: string;
+  /** Stable partner join key. See PartnerConfig.gymSlug — display names aren't safe to join on. */
+  gymSlug?: string;
   promoCode?: string;
   funnelPromo?: string;
   /** Where to send a buyer who backs out of Stripe. Must be a ptlaunchlab.co.uk path. */
@@ -317,6 +319,7 @@ export async function createCheckoutSession(
           buyer_name: input.name?.trim().slice(0, 200),
           buyer_email: input.email?.trim().toLowerCase(),
           gym_referral: input.gymReferral,
+          gym_slug: input.gymSlug,
           promo_code: input.promoCode,
           funnel_promo: input.funnelPromo,
         },
@@ -335,6 +338,9 @@ export async function createCheckoutSession(
       plan: config.amount >= 1300 ? "PIF" : "deposit",
       buyer_name: input.name?.trim().slice(0, 200),
       gym_referral: input.gymReferral,
+      // The partner platform joins on this, NOT on gym_referral. Present from
+      // 2026-07-27 onward; anything older needs the legacy display-name match.
+      gym_slug: input.gymSlug,
       promo_code: input.promoCode,
       funnel_promo: input.funnelPromo,
       // `source` is how the webhook tells OUR course sales apart from the

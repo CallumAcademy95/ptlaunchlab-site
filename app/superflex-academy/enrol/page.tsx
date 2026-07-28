@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 
 // ─── Superflex partner config ─────────────────────────────────────────────────
 const SUPERFLEX_PARTNER = {
+  gymSlug: "superflex",
   gymReferral: "Superflex 2.0 Gym",
   promoCodes: {
     "SUPERFLEXPT": {

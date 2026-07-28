@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 };
 
 const PARTNER: PartnerConfig = {
+  gymSlug: "ironwolf",
   gymReferral: "Iron Wolf Gym",
   promoCodes: {
     "IWGPTDISCOUNT": {

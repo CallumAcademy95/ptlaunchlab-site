@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 // discounts don't apply to deposit plans, and Stripe enforces that independently
 // — the deposit price has allow_promotion_codes off.
 const XCELERATE_PARTNER = {
+  gymSlug: "xcelerate",
   gymReferral: "Xcelerate Gyms Edgware",
   promoCodes: {
     "XCELERATEPT": {

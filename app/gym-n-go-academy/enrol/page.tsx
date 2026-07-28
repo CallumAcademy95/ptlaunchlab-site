@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 // discounts don't apply to deposit plans, and Stripe enforces that independently
 // — the deposit price has allow_promotion_codes off.
 const GYM_N_GO_PARTNER = {
+  gymSlug: "gym-n-go",
   gymReferral: "Gym n Go Forest Hill",
   promoCodes: {
     "GYMNGOPT": {

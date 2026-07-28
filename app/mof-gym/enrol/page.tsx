@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 const MOF_PARTNER = {
+  gymSlug: "mof",
   gymReferral: "Ministry of Fitness",
   promoCodes: {
     "MOFPTDISCOUNT": {

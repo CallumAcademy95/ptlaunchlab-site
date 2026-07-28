@@ -12,7 +12,12 @@ import React from "react";
 
 // ─── Partner config (passed in from gym-specific enrol pages) ───────────────
 export interface PartnerConfig {
-  gymReferral: string;           // e.g. "6fit Gyms"
+  // Stable join key for the partner platform. NEVER change one once it is live
+  // — every sale ever attributed to that gym is keyed on it. Lowercase, no
+  // spaces. `gymReferral` below is a display name and is NOT safe to join on:
+  // it gets reworded, gains trailing spaces, and changes when a gym rebrands.
+  gymSlug: string;               // e.g. "6fit"
+  gymReferral: string;           // e.g. "6fit Gyms" — display only (Sheet, emails)
   stripeFullLink?: string;       // default full-price Stripe link (no promo needed)
   stripeDepositLink?: string;    // default deposit Stripe link (no promo needed)
   promoCodes?: Record<string, {
@@ -52,6 +57,7 @@ export interface EnrolmentContext {
   promoCode?: string;
   discountApplied?: number;
   gymReferral?: string;
+  gymSlug?: string;
   source: string;
   ts: string;
 }

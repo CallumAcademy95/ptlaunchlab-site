@@ -122,6 +122,7 @@ export async function POST(req: NextRequest) {
     email: str(body.email, 200),
     name: str(body.name, 200),
     gymReferral: str(body.gymReferral, 100),
+    gymSlug: str(body.gymSlug, 60),
     promoCode: str(body.promoCode, 60),
     cancelPath: str(body.cancelPath, 200),
   });

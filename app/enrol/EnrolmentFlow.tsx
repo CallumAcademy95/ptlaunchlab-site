@@ -51,12 +51,16 @@ function urlSafeBase64(value: string): string {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
-function buildAttributionRef(gym?: string): string {
+function buildAttributionRef(gym?: string, gymSlug?: string): string {
   try {
     const first = readTouch("ptll_first_touch");
     const last = readTouch("ptll_last_touch");
     // Short keys keep the payload under Stripe's 200-char client_reference_id limit
     const payload: Record<string, string> = {};
+    // `gyms` (slug) is the durable join key for partner attribution; `gym` is the
+    // display name kept for the existing Make → Google Sheet tracker. The slug is
+    // set FIRST so that if the 200-char cap truncates anything, it survives.
+    if (gymSlug) payload.gyms = gymSlug;
     if (gym) payload.gym = gym;
     if (first.utm_source) payload.fts = first.utm_source;
     if (first.utm_medium) payload.ftm = first.utm_medium;
@@ -172,6 +176,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       amount,
       ...(appliedPromo && { promoCode: appliedPromo, discountApplied: activePromo?.discountAmount }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
+      ...(partner?.gymSlug && { gymSlug: partner.gymSlug }),
       source: "website-enrolment-flow-v2",
       ts: new Date().toISOString(),
     };
@@ -240,7 +245,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
     const paymentLink = type === "full" ? fullLink : depositLink;
-    const ref = buildAttributionRef(partner?.gymReferral);
+    const ref = buildAttributionRef(partner?.gymReferral, partner?.gymSlug);
 
     // Ask the server to create a Checkout Session so the post-payment return
     // URL (/enrol/success) is set in code rather than in the Stripe Dashboard.
@@ -265,6 +270,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
           email: email.trim().toLowerCase(),
           name: fullName.trim(),
           gymReferral: partner?.gymReferral,
+          gymSlug: partner?.gymSlug,
           promoCode: appliedPromo ?? undefined,
           cancelPath: typeof window !== "undefined" ? window.location.pathname : "/enrol",
         }),

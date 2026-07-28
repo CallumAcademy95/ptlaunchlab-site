@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 // TODO: Replace placeholder Stripe links with real discounted payment links
 // once created in your Stripe dashboard (£1,399 full / £599 deposit).
 const MUSCLE_BOUND_PARTNER = {
+  gymSlug: "muscle-bound",
   gymReferral: "Muscle Bound Gym",
   promoCodes: {
     "MBGPTDISCOUNT": {

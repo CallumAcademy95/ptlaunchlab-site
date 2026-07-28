@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 // TODO: Replace placeholder Stripe links with real discounted payment links
 // once created in your Stripe dashboard (£1,199 full / £399 deposit).
 const SIXFIT_PARTNER = {
+  gymSlug: "6fit",
   gymReferral: "6fit Gyms",
   promoCodes: {
     "6FITPTDISCOUNT": {
