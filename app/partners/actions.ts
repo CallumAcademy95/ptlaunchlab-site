@@ -54,6 +54,10 @@ export async function partnerSignIn(
   }
 
   const supabase = await createPartnerServerClient();
+  if (!supabase) {
+    return { error: "The partner portal is temporarily unavailable. Please try again shortly." };
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   // Deliberately identical message for a wrong password and an unknown email —
@@ -95,7 +99,7 @@ export async function partnerSignIn(
 
 export async function partnerSignOut(): Promise<void> {
   const supabase = await createPartnerServerClient();
-  await supabase.auth.signOut();
+  if (supabase) await supabase.auth.signOut();
   redirect(PARTNER_LOGIN_PATH);
 }
 
@@ -117,6 +121,10 @@ export async function partnerSetPassword(
   }
 
   const supabase = await createPartnerServerClient();
+  if (!supabase) {
+    return { error: "The partner portal is temporarily unavailable. Please try again shortly." };
+  }
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
     return { error: error.message || "Could not update your password. Try again." };

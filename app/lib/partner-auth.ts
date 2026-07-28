@@ -25,20 +25,25 @@ export const PARTNER_SET_PASSWORD_PATH = "/partners/set-password";
  * There is no browser Supabase client in the partner portal, so this stays a
  * non-public env var rather than NEXT_PUBLIC_.
  */
-export function getPartnerAuthConfig(): { url: string; anonKey: string } {
+export function getPartnerAuthConfig(): { url: string; anonKey: string } | null {
   const url = process.env.SUPABASE_URL;
   const anonKey = process.env.SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
-    throw new Error(
-      "Partner portal auth not configured. Missing SUPABASE_URL or SUPABASE_ANON_KEY."
-    );
-  }
+  if (!url || !anonKey) return null;
   return { url, anonKey };
 }
 
-/** Supabase client bound to the request's cookies. Use in server components and actions. */
+/**
+ * Supabase client bound to the request's cookies. Use in server components and
+ * actions. Returns null when the portal isn't configured — callers treat that
+ * as "nobody is signed in", which fails closed rather than 500-ing the page.
+ */
 export async function createPartnerServerClient() {
-  const { url, anonKey } = getPartnerAuthConfig();
+  const config = getPartnerAuthConfig();
+  if (!config) {
+    console.error("[partner-auth] SUPABASE_ANON_KEY not set — partner portal is disabled.");
+    return null;
+  }
+  const { url, anonKey } = config;
   const cookieStore = await cookies();
 
   return createServerClient(url, anonKey, {
@@ -93,6 +98,8 @@ export interface PartnerSession {
  */
 export const getPartnerSession = cache(async function getPartnerSession(): Promise<PartnerSession | null> {
   const supabase = await createPartnerServerClient();
+  if (!supabase) return null;
+
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) return null;
 
