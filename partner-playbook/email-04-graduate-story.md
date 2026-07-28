@@ -1,12 +1,36 @@
 ---
-title: The graduate story email
+title: The someone-like-you email
 type: email
 channel: Whole list
-when_to_use: The moment you have your first graduate willing to be named
+when_to_use: As soon as one member is enrolled. Upgrade it when they qualify.
 order: 40
 ---
 
-The highest-converting email in the library, and the only one you can't send until you've earned it.
+The highest-converting email in the library. It doesn't need a graduate — it needs somebody recognisable who **started**, and you have those the moment your first member enrols.
+
+**Send this now**
+
+```
+Subject: One of our members is training to be a PT
+
+Hi [First Name],
+
+[Name] has trained here for [HOW LONG].
+
+Works full-time. Comes in after work, same as most of us.
+
+A few months ago they decided to find out what it would take to do this
+professionally — and they're now working towards qualifying as a Personal
+Trainer, around the job they already have.
+
+They didn't change anything about their life to start. They just asked.
+
+If you've ever wondered the same thing, come and ask us.
+
+The [Gym Name] Team
+```
+
+**Send this once they qualify**
 
 ```
 Subject: From gym member to Personal Trainer
@@ -23,13 +47,13 @@ didn't think were realistic.
 
 [One sentence in their own words about why they did it.]
 
-Their story started with one conversation.
+It started with one conversation.
 
 Could yours?
 
 The [Gym Name] Team
 ```
 
-Use a real photo of them coaching in your gym. **Ask permission properly**, and let them read it before it goes out.
+Use a real photo of them in your gym, not a stock image. **Ask permission properly** and let them read it before it goes out — being named in a marketing email is a bigger ask than it feels like when you're the one sending it.
 
-Don't include what they earn, even if they offer — an income figure in a marketing email implies a typical result you can't stand behind.
+Never include what they earn, even if they offer. An income figure in a marketing email implies a typical result nobody can stand behind.
