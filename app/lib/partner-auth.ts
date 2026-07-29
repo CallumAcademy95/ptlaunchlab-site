@@ -109,8 +109,12 @@ export const getPartnerSession = cache(async function getPartnerSession(): Promi
   const admin = getSupabaseAdmin();
   const { data, error: lookupError } = await admin
     .from("pp_partner_users")
+    // Only columns that have always existed. Anything added later is fetched
+    // separately below — a select naming a column an unapplied migration hasn't
+    // created yet fails the whole query, which resolves every partner to "not
+    // signed in" and locks all of them out. That has happened once.
     .select(
-      "id, email, full_name, role, must_change_password, onboarding_dismissed_at, partner:pp_partners!inner(id, slug, gym_name, status, landing_page_path, promo_code, logo_url, primary_color, fee_per_learner_pence, commission_terms)"
+      "id, email, full_name, role, must_change_password, partner:pp_partners!inner(id, slug, gym_name, status, landing_page_path, promo_code, logo_url, primary_color, fee_per_learner_pence, commission_terms)"
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -131,7 +135,6 @@ export const getPartnerSession = cache(async function getPartnerSession(): Promi
     full_name: string | null;
     role: "owner" | "staff";
     must_change_password: boolean;
-    onboarding_dismissed_at: string | null;
     // PostgREST types an embedded join as an array; !inner makes it a single row.
     partner: PartnerRecord | PartnerRecord[];
   };
@@ -139,13 +142,28 @@ export const getPartnerSession = cache(async function getPartnerSession(): Promi
   const partner = Array.isArray(row.partner) ? row.partner[0] : row.partner;
   if (!partner) return null;
 
+  // Optional, and deliberately its own query. If the column isn't there yet the
+  // walkthrough is treated as already seen — a missing nicety is nothing, a
+  // failed sign-in is everything.
+  let onboardingDismissedAt: string | null = new Date(0).toISOString();
+  const { data: onboarding, error: onboardingError } = await admin
+    .from("pp_partner_users")
+    .select("onboarding_dismissed_at")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (onboardingError) {
+    console.error("[partner-auth] onboarding flag unavailable:", onboardingError.message);
+  } else {
+    onboardingDismissedAt = (onboarding?.onboarding_dismissed_at as string | null) ?? null;
+  }
+
   return {
     userId: row.id,
     email: row.email,
     fullName: row.full_name ?? null,
     role: row.role,
     mustChangePassword: Boolean(row.must_change_password),
-    onboardingDismissedAt: row.onboarding_dismissed_at ?? null,
+    onboardingDismissedAt,
     partner,
   };
 });
