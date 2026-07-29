@@ -22,6 +22,11 @@ export default async function MyAcademyPage() {
   ]);
   const academyUrl = partnerAcademyUrl(partner);
 
+  // Commission we still owe: payable now plus still accruing. Excludes anything
+  // already paid, which is the whole point — a partner who has had their money
+  // should never be told we're sitting on it.
+  const unsentPence = summary.commissionDuePence + summary.commissionHeldPence;
+
   // The two commission deals behave differently and the difference is money, so
   // say which one they are on rather than showing a bare held balance.
   const holdExplainer =
@@ -124,8 +129,11 @@ export default async function MyAcademyPage() {
             </p>
             <p className="text-white font-semibold">Add your bank details.</p>
             <p className="text-soft text-sm mt-1.5 leading-relaxed">
-              {summary.commissionAccruedPence > 0
-                ? `You've earned ${formatPence(summary.commissionAccruedPence)} so far and we have no account to send it to.`
+              {/* Only ever name money we actually still owe. Accrued includes
+                  commission already paid, so using it told a partner we were
+                  holding £1,500 we'd sent them months ago. */}
+              {unsentPence > 0
+                ? `You've earned ${formatPence(unsentPence)} that we don't have an account to send to yet.`
                 : "Two minutes now means your first commission goes out without a chase."}
             </p>
             <Link

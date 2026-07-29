@@ -4,7 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
-import { getBankDetails } from "@/app/lib/partner-bank";
+import { getBankDetails, saveBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
 
@@ -268,6 +268,62 @@ export async function addPlaybookEntry(
   revalidatePath("/admin/partners");
   revalidatePath("/partners/playbook");
   return { success: `"${title}" is live in the playbook.` };
+}
+
+export interface SetBankState {
+  error?: string;
+  success?: string;
+}
+
+/**
+ * Record bank details we were given outside the portal.
+ *
+ * Most partners handed these over by email long before the portal existed, so
+ * without this they'd be nagged on their home page to supply something we
+ * already have — and the nag is the thing that makes the portal feel unfinished.
+ *
+ * Goes through saveBankDetails, so a change to details already on file still
+ * emails the partner and the admin. updatedBy is null, which the notification
+ * reads as "changed by PT Launch Lab" rather than by them.
+ */
+export async function setPartnerBankDetails(
+  _prev: SetBankState,
+  formData: FormData
+): Promise<SetBankState> {
+  const partnerId = String(formData.get("partnerId") ?? "").trim();
+  if (!partnerId) return { error: "Choose a partner." };
+
+  const admin = getSupabaseAdmin();
+  const { data: partner } = await admin
+    .from("pp_partners")
+    .select("id, gym_name")
+    .eq("id", partnerId)
+    .maybeSingle();
+  if (!partner) return { error: "That partner no longer exists." };
+
+  const { data: users } = await admin
+    .from("pp_partner_users")
+    .select("email")
+    .eq("partner_id", partnerId);
+
+  const result = await saveBankDetails({
+    partnerId,
+    accountName: String(formData.get("accountName") ?? ""),
+    sortCode: String(formData.get("sortCode") ?? ""),
+    accountNumber: String(formData.get("accountNumber") ?? ""),
+    updatedBy: null,
+    notifyEmails: (users ?? []).map((u) => u.email as string),
+    gymName: partner.gym_name as string,
+  });
+
+  if (!result.ok) return { error: result.error };
+
+  revalidatePath("/admin/partners");
+  return {
+    success: result.wasChange
+      ? `Updated for ${partner.gym_name}. The partner has been emailed about the change.`
+      : `Saved for ${partner.gym_name}.`,
+  };
 }
 
 /**

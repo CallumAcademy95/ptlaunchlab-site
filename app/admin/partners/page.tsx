@@ -7,6 +7,7 @@ import BankReveal from "./BankReveal";
 import UploadResourceForm from "./UploadResourceForm";
 import ResetPasswordButton from "./ResetPasswordButton";
 import AddPlaybookForm from "./AddPlaybookForm";
+import SetBankForm from "./SetBankForm";
 
 export const metadata: Metadata = {
   title: "Partners — PT Launch Lab admin",
@@ -94,6 +95,14 @@ export default async function AdminPartnersPage() {
         <CreateUserForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name, slug: p.slug }))} />
 
         <UploadResourceForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name }))} />
+
+        <SetBankForm
+          partners={partners.map((p) => ({
+            id: p.id,
+            gym_name: p.gym_name,
+            hasBank: Boolean(p.bank_sort_code && p.bank_account_number),
+          }))}
+        />
 
         <AddPlaybookForm />
 

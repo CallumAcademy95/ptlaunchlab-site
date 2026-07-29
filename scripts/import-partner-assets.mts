@@ -29,6 +29,7 @@ const H = { apikey: KEY, Authorization: `Bearer ${KEY}` };
 
 /** Folder name on disk → pp_partners.slug. */
 const FOLDER_TO_SLUG: Record<string, string> = {
+  "6fitgyms": "6fit",
   "ebor": "ebor",
   "gym n go": "gym-n-go",
   "iron wolf": "ironwolf",
@@ -44,6 +45,8 @@ const MIME: Record<string, string> = {
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ".mp4": "video/mp4",
 };
 
 /**
@@ -54,6 +57,23 @@ const MIME: Record<string, string> = {
  */
 function classify(file: string): { category: string; title: string; description: string | null } {
   const lower = file.toLowerCase();
+
+  // The screen assets: a video to loop and the deck it came from, so a gym can
+  // change a date or an offer and re-export rather than asking us to.
+  if (lower.endsWith(".mp4")) {
+    return {
+      category: "digital",
+      title: "Gym screen video",
+      description: "Loop this on your gym TV. Plays from a USB stick or any smart screen.",
+    };
+  }
+  if (lower.endsWith(".pptx")) {
+    return {
+      category: "digital",
+      title: "Gym screen slides (editable)",
+      description: "The PowerPoint version. Change a date or an offer and export it again yourself.",
+    };
+  }
 
   if (lower.includes("partnership-agreement")) {
     return {
