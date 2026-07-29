@@ -186,8 +186,11 @@ for (const [slug, brand] of targets) {
     color: { dark: "#000000FF", light: "#FFFFFFFF" },
   });
 
-  console.log(`\n${brand.gymName}  (${accentFor(brand)})`);
-  for (const [name, html] of slides(brand, qr)) {
+  const photos = photosFor(slug);
+  console.log(
+    `\n${brand.gymName}  (${accentFor(brand)})  ${photos.length ? `${photos.length} photo(s)` : "no photos — solid colour"}`
+  );
+  for (const [name, html] of slides(brand, qr, photos)) {
     const out = path.join(ROOT, "ad-assets", "gym-tv", slug, `${name}.jpg`);
     await renderHtml(html, { width: 1920, height: 1080, out, quality: 92, name: `tv-${slug}-${name}` });
     console.log(`   ${name}`);
