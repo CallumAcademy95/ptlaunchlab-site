@@ -55,73 +55,79 @@ if (!targets.length) {
 
 function html(gymName: string, firstName: string | null) {
   const hi = firstName ? `Hi ${firstName},` : "Hi,";
+  // Light body with a navy header — the layout partners already recognise from
+  // our other mail. The dark-on-dark transactional style is fine for a receipt
+  // and hard work for something this long.
+  const p = `margin:0 0 16px;color:#1E2A38;font-size:15px;line-height:1.65;`;
+  const h = `margin:26px 0 10px;color:#072B4A;font-size:17px;font-weight:700;`;
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#061F36;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
-  <div style="max-width:600px;margin:0 auto;padding:24px 16px;">
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F1F4F8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;">
 
-    <div style="background:#072B4A;border-radius:12px 12px 0 0;padding:24px 28px;border-bottom:3px solid #F5C518;">
-      <div style="font-size:20px;font-weight:800;color:#ffffff;">PT Launch Lab</div>
-      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">Your partner portal is live</div>
+    <div style="background:#0B1F38;padding:22px 32px;">
+      <span style="color:#F5C518;font-size:13px;font-weight:800;letter-spacing:.14em;">PT LAUNCH LAB</span>
     </div>
 
-    <div style="background:#0A2A44;padding:28px;border-radius:0 0 12px 12px;">
-      <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 18px;">${hi}</p>
+    <div style="padding:32px;">
+      <p style="${p}">${hi}</p>
 
-      <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 18px;">
-        We've built something for our gym partners and <strong style="color:#ffffff;">${gymName}</strong>
-        has an account waiting.
+      <p style="${p}">
+        We've built something for our gym partners, and <strong>${gymName}</strong> has an account waiting.
       </p>
 
-      <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 22px;">
+      <p style="${p}">
         Until now, if you wanted to know whether anyone had enrolled through your academy — or when
         your next payment was due — you had to ask us. That's the bit we've fixed.
       </p>
 
-      <div style="background:#061F36;border:1px solid #1A3A5C;border-radius:10px;padding:22px;margin-bottom:22px;">
-        <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">What's in it</div>
-        <p style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 4px;">Your enrolments, live</p>
-        <p style="color:#8CA3BF;font-size:14px;line-height:1.5;margin:0 0 14px;">Every member who enrols through your academy link, as it happens. No waiting for a summary.</p>
-
-        <p style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 4px;">What you're owed, and when</p>
-        <p style="color:#8CA3BF;font-size:14px;line-height:1.5;margin:0 0 14px;">Commission per enrolment, when it becomes payable, and a record of everything already paid.</p>
-
-        <p style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 4px;">Your resources</p>
-        <p style="color:#8CA3BF;font-size:14px;line-height:1.5;margin:0 0 14px;">Posters, your member handout, a video for your gym TV — all branded to ${gymName}. Your signed agreement's in there too.</p>
-
-        <p style="color:#ffffff;font-size:14px;font-weight:600;margin:0 0 4px;">A playbook</p>
-        <p style="color:#8CA3BF;font-size:14px;line-height:1.5;margin:0;">Social posts, member emails and what your team should say when someone asks about it. Copy it, swap your gym's name in, use it.</p>
+      <div style="border-left:4px solid #F5C518;background:#FFFBEC;padding:16px 20px;margin:22px 0;">
+        <div style="color:#072B4A;font-size:15px;font-weight:700;margin-bottom:4px;">Your partner portal</div>
+        <div style="color:#4A5A6B;font-size:14px;line-height:1.55;">
+          One login. Your enrolments, your payments, your resources and a playbook — all in one place.
+        </div>
       </div>
 
-      <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 22px;">
-        <strong style="color:#ffffff;">Nothing about our agreement changes.</strong> Same commission,
-        same terms, no cost. This just means you can see it without emailing us.
+      <div style="${h}">What's in it</div>
+      <ul style="margin:0 0 18px;padding-left:20px;color:#1E2A38;font-size:15px;line-height:1.75;">
+        <li><strong>Your enrolments, live</strong> — every member who joins through your link, as it happens</li>
+        <li><strong>What you're owed, and when</strong> — commission per enrolment, plus everything already paid</li>
+        <li><strong>Your resources</strong> — posters, member handouts and a video for your gym TV, branded to ${gymName}</li>
+        <li><strong>A playbook</strong> — social posts, member emails, and what your team should say when someone asks</li>
+        <li><strong>Your signed agreement</strong> — so you never have to go looking for it</li>
+      </ul>
+
+      <div style="${h}">Nothing about our agreement changes</div>
+      <p style="${p}">
+        Same commission, same terms, no cost to you. This just means you can see it without emailing us.
       </p>
 
-      <div style="text-align:center;margin-bottom:22px;">
-        <a href="https://ptlaunchlab.co.uk/partners/login" style="display:inline-block;padding:14px 32px;background:#F5C518;color:#072B4A;font-weight:700;font-size:15px;border-radius:50px;text-decoration:none;">
+      <div style="text-align:center;margin:30px 0 22px;">
+        <a href="https://ptlaunchlab.co.uk/partners/login"
+           style="display:inline-block;padding:15px 38px;background:#F5C518;color:#0B1F38;font-weight:700;font-size:15px;border-radius:50px;text-decoration:none;">
           Sign in to your portal
         </a>
+        <div style="color:#7A8899;font-size:13px;margin-top:12px;">
+          Your login details are in a separate email.
+        </div>
       </div>
 
-      <p style="color:#8CA3BF;font-size:14px;line-height:1.6;margin:0 0 18px;">
-        Your login details are in a separate email — we've kept them apart from this one on purpose.
-        First time in, you'll be asked to pick your own password, and there's a two-minute walkthrough
-        of where everything is.
+      <p style="${p}">
+        First time in, you'll pick your own password and get a short walkthrough of where everything
+        is. While you're there, it's worth adding your bank details on the Payments page — then
+        nothing ever waits on us chasing you for them.
       </p>
 
-      <p style="color:#8CA3BF;font-size:14px;line-height:1.6;margin:0;">
-        One thing worth doing while you're in: <strong style="color:#ffffff;">add your bank details</strong>
-        on the Payments page, so nothing ever waits on us chasing you for them.
-      </p>
-
-      <p style="color:#4A6280;font-size:13px;line-height:1.6;margin:22px 0 0;">
-        Any questions, just reply — or call <a href="tel:01977365001" style="color:#F5C518;">01977 365001</a>.
+      <p style="margin:26px 0 0;color:#7A8899;font-size:14px;line-height:1.6;">
+        Any questions, just reply to this — or call
+        <a href="tel:01977365001" style="color:#0B1F38;font-weight:600;">01977 365001</a>.
       </p>
     </div>
 
-    <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH
+    <div style="background:#0B1F38;padding:18px 32px;text-align:center;">
+      <div style="color:#7C90A8;font-size:12px;line-height:1.6;">
+        PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH
+      </div>
     </div>
   </div>
 </body></html>`;
