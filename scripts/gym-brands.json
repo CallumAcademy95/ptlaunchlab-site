@@ -158,5 +158,25 @@
       "Inside Xcelerate Gyms"
     ],
     "canonicalPath": "/xcelerate-academy"
+  },
+  "demo": {
+    "gymName": "Northgate Strength",
+    "primaryColor": "#F5C518",
+    "darkAccent": "#F5C518",
+    "heroBg": "#0B1F38",
+    "sectionBg": null,
+    "logoUrl": "/logos/ultimate-shred.png",
+    "promoCode": "NORTHGATEPT",
+    "discountAmount": 200,
+    "fullPrice": 1399,
+    "depositPrice": 599,
+    "location": "Demo",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "Inside Northgate Strength"
+    ],
+    "canonicalPath": "/demo-academy"
   }
 }
