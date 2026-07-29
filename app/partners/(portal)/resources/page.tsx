@@ -5,12 +5,61 @@ import {
   formatFileSize,
   isNewResource,
   isPreviewable,
+  isVideo,
+  fileKind,
   type PartnerResource,
 } from "@/app/lib/partner-resources";
 
 function ResourceRow({ resource, gymName }: { resource: PartnerResource; gymName: string }) {
   const size = formatFileSize(resource.file_size);
   const preview = isPreviewable(resource.mime) && resource.storage_path;
+  const video = isVideo(resource.mime) && resource.storage_path;
+  const kind = fileKind(resource.mime);
+
+  // Video needs the full width to be worth watching, so it sits under the
+  // title rather than squeezed into the thumbnail slot images use.
+  if (video) {
+    return (
+      <div className="px-5 py-4">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-white font-semibold">{resource.title}</p>
+              {isNewResource(resource.created_at) && (
+                <span className="px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/40 text-[10px] font-bold">
+                  New
+                </span>
+              )}
+              {resource.partner_id && (
+                <span className="px-2 py-0.5 rounded-full bg-white/5 text-soft border border-white/15 text-[10px] font-semibold">
+                  Made for {gymName}
+                </span>
+              )}
+            </div>
+            {resource.description && (
+              <p className="text-soft text-sm mt-1 leading-relaxed">{resource.description}</p>
+            )}
+            {size && <p className="text-soft text-xs mt-1">{size}</p>}
+          </div>
+          <a
+            href={`/partners/download/${resource.id}`}
+            className="px-4 py-2 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-gold hover:text-gold transition-colors shrink-0 whitespace-nowrap"
+          >
+            Download
+          </a>
+        </div>
+        {/* preload=metadata so the page doesn't pull 14MB per video on load.
+            Each range request re-hits the route, which re-signs — so playback
+            never dies on an expiring URL. */}
+        <video
+          controls
+          preload="metadata"
+          className="w-full max-w-2xl rounded-lg border border-white/10 bg-deep"
+          src={`/partners/download/${resource.id}?inline=1`}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 py-4 flex items-start justify-between gap-4">
@@ -51,9 +100,9 @@ function ResourceRow({ resource, gymName }: { resource: PartnerResource; gymName
         {resource.description && (
           <p className="text-soft text-sm mt-1 leading-relaxed">{resource.description}</p>
         )}
-        {(size || resource.version) && (
+        {(size || resource.version || kind) && (
           <p className="text-soft text-xs mt-1">
-            {[size, resource.version].filter(Boolean).join(" · ")}
+            {[kind, size, resource.version].filter(Boolean).join(" · ")}
           </p>
         )}
       </div>

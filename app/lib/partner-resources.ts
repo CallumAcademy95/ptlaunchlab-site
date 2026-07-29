@@ -140,9 +140,26 @@ export async function getPackResources(
   return byPack;
 }
 
-/** Images get a thumbnail; everything else is a download button and a name. */
+/** Images get a thumbnail. */
 export function isPreviewable(mime: string | null): boolean {
   return Boolean(mime?.startsWith("image/"));
+}
+
+/** Video plays inline — a screen loop is worth watching before you download 14MB. */
+export function isVideo(mime: string | null): boolean {
+  return Boolean(mime?.startsWith("video/"));
+}
+
+/**
+ * A short label for formats that can't be previewed, so a partner knows what
+ * they're about to download and what will open it.
+ */
+export function fileKind(mime: string | null): string | null {
+  if (!mime) return null;
+  if (mime.includes("presentationml")) return "PowerPoint";
+  if (mime.includes("wordprocessingml")) return "Word";
+  if (mime === "application/pdf") return "PDF";
+  return null;
 }
 
 export function formatFileSize(bytes: number | null): string | null {
