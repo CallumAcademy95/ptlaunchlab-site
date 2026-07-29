@@ -23,6 +23,7 @@ interface PartnerRow {
   status: string;
   landing_page_path: string | null;
   commission_terms: string;
+  is_demo?: boolean;
   bank_account_name: string | null;
   bank_sort_code: string | null;
   bank_account_number: string | null;
@@ -34,7 +35,7 @@ export default async function AdminPartnersPage() {
   const { data, error } = await getSupabaseAdmin()
     .from("pp_partners")
     .select(
-      "id, slug, gym_name, status, landing_page_path, commission_terms, " +
+      "id, slug, gym_name, status, landing_page_path, commission_terms, is_demo, " +
       "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
       "pp_partner_users(id, email, role, must_change_password, last_login_at)"
     )
@@ -64,7 +65,12 @@ export default async function AdminPartnersPage() {
   }
 
   const today = nowIso.slice(0, 10);
-  const owedTotal = [...payable.values()].reduce((t, e) => t + e.total, 0);
+  // Demo accounts carry invented commission so a walkthrough looks like a going
+  // concern. It must never reach a number anyone acts on.
+  const demoIds = new Set(partners.filter((p) => p.is_demo).map((p) => p.id));
+  const owedTotal = [...payable.entries()]
+    .filter(([id]) => !demoIds.has(id))
+    .reduce((t, [, e]) => t + e.total, 0);
   // Read the clock once, outside the render, so the rows stay pure.
   const recentChangeCutoff = Date.parse(nowIso) - 7 * 86400000;
 
@@ -123,6 +129,11 @@ export default async function AdminPartnersPage() {
                 <tr key={p.id}>
                   <td className="px-4 py-3">
                     <span className="text-white font-semibold">{p.gym_name}</span>
+                    {p.is_demo && (
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-white/5 text-soft border border-white/15 text-[10px] font-semibold">
+                        demo
+                      </span>
+                    )}
                     {p.status !== "active" && (
                       <span className="ml-2 text-amber-300 text-xs">({p.status})</span>
                     )}

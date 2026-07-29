@@ -32,8 +32,11 @@ const section = (m: string) => console.log(`\n${m}`);
 
 // ── Partners ────────────────────────────────────────────────────────────────
 section("Partners");
-const partners = await api<any[]>("pp_partners?select=*&order=slug");
-ok(`${partners.length} partners`);
+const allPartners = await api<any[]>("pp_partners?select=*&order=slug");
+const demo = allPartners.filter((p) => p.is_demo);
+const partners = allPartners.filter((p) => !p.is_demo);
+const demoSlugs = new Set(demo.map((p) => p.slug));
+ok(`${partners.length} partners${demo.length ? ` (+${demo.length} demo, excluded)` : ""}`);
 
 for (const p of partners) {
   if (!p.landing_page_path) fail(`${p.slug}: no landing_page_path — My Academy shows no link`);
@@ -53,6 +56,7 @@ for (const dir of readdirSync(path.join(ROOT, "app"))) {
   const m = src.match(/gymSlug:\s*"([^"]*)"/);
   if (!m) continue;
   const slug = m[1];
+  if (demoSlugs.has(slug)) { ok(`${dir}: demo account`); continue; }
   if (slug === "GYM-SLUG-HERE") {
     if (dir === "_gym-template") ok(`${dir}: placeholder slug (template, not live)`);
     else fail(`${dir}: still has the template placeholder slug — its sales will be unattributed`);
@@ -65,8 +69,10 @@ for (const dir of readdirSync(path.join(ROOT, "app"))) {
 
 // ── Sales and money ─────────────────────────────────────────────────────────
 section("Sales and commission");
-const sales = await api<any[]>("pp_sales?select=*,partner:pp_partners(slug)");
-const payouts = await api<any[]>("pp_payouts?select=*");
+const allSales = await api<any[]>("pp_sales?select=*,partner:pp_partners(slug,is_demo)");
+const sales = allSales.filter((s) => !s.partner?.is_demo);
+const allPayouts = await api<any[]>("pp_payouts?select=*,partner:pp_partners(is_demo)");
+const payouts = allPayouts.filter((p) => !p.partner?.is_demo);
 ok(`${sales.length} sales, ${payouts.length} payouts`);
 
 const orphanSales = sales.filter((s) => !s.partner);
