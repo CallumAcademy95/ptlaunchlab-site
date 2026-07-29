@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { getPlaybook, PLAYBOOK_TYPES, type PlaybookEntry } from "@/app/lib/partner-playbook";
+import { getPackResources, formatFileSize, type PartnerResource } from "@/app/lib/partner-resources";
 import CopyButton from "../CopyButton";
 
 /**
@@ -22,6 +23,41 @@ function groupByChannel(entries: PlaybookEntry[]): { channel: string | null; ite
 }
 
 /**
+ * The artwork that belongs to this campaign, shown inside it.
+ *
+ * The whole point of a pack is that a partner opens January and finds the
+ * poster and the screen slide already there, rather than being told to go and
+ * look for them in Resources.
+ */
+function PackFiles({ files }: { files: PartnerResource[] }) {
+  return (
+    <div className="mt-5 rounded-lg border border-gold/30 bg-gold/5 p-4">
+      <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">
+        Everything for this campaign
+      </p>
+      <div className="space-y-2">
+        {files.map((f) => (
+          <div key={f.id} className="flex items-center justify-between gap-3">
+            <span className="min-w-0">
+              <span className="block text-white text-sm font-semibold truncate">{f.title}</span>
+              {formatFileSize(f.file_size) && (
+                <span className="block text-soft text-[10px]">{formatFileSize(f.file_size)}</span>
+              )}
+            </span>
+            <a
+              href={`/partners/download/${f.id}`}
+              className="px-3 py-1.5 rounded-full border border-white/20 text-white text-[11px] font-semibold hover:border-gold hover:text-gold transition-colors shrink-0"
+            >
+              Download
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
  * One entry, collapsed by default.
  *
  * Native <details> rather than React state: the whole page stays a server
@@ -29,7 +65,7 @@ function groupByChannel(entries: PlaybookEntry[]): { channel: string | null; ite
  * reach the closed text — which matters when someone is hunting for a phrase
  * they half-remember.
  */
-function EntryCard({ entry }: { entry: PlaybookEntry }) {
+function EntryCard({ entry, pack }: { entry: PlaybookEntry; pack?: PartnerResource[] }) {
   return (
     <details className="group rounded-xl bg-card border border-white/10 open:border-white/20">
       <summary className="flex items-start gap-3 p-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
@@ -47,9 +83,13 @@ function EntryCard({ entry }: { entry: PlaybookEntry }) {
             <span className="block text-soft text-xs mt-0.5">Use it when: {entry.whenToUse}</span>
           )}
         </span>
-        {entry.snippets.length > 1 && (
+        {pack && pack.length > 0 ? (
+          <span className="text-gold text-[10px] shrink-0 mt-1 whitespace-nowrap">
+            {pack.length} file{pack.length === 1 ? "" : "s"}
+          </span>
+        ) : entry.snippets.length > 1 ? (
           <span className="text-soft text-[10px] shrink-0 mt-1">{entry.snippets.length} parts</span>
-        )}
+        ) : null}
       </summary>
 
       <div className="px-5 pb-5 pl-11">
@@ -79,6 +119,8 @@ function EntryCard({ entry }: { entry: PlaybookEntry }) {
             )}
           </div>
         )}
+
+        {pack && pack.length > 0 && <PackFiles files={pack} />}
       </div>
     </details>
   );
@@ -91,7 +133,7 @@ export default async function PlaybookPage({
 }) {
   const { partner } = await requirePartner();
   const { section } = await searchParams;
-  const entries = await getPlaybook();
+  const [entries, packs] = await Promise.all([getPlaybook(), getPackResources(partner.id)]);
 
   // Only offer sections that actually have something in them — an empty tab is
   // a dead end that makes the whole library look unfinished.
@@ -181,7 +223,7 @@ export default async function PlaybookPage({
                   )}
                   <div className="space-y-2">
                     {group.items.map((entry) => (
-                      <EntryCard key={entry.slug} entry={entry} />
+                      <EntryCard key={entry.slug} entry={entry} pack={packs.get(entry.slug)} />
                     ))}
                   </div>
                 </section>

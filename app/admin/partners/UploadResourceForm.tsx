@@ -87,6 +87,22 @@ export default function UploadResourceForm({
         />
       </div>
 
+      <div>
+        <label htmlFor="res-pack" className="block text-soft text-xs font-semibold mb-1.5">
+          Campaign pack (optional)
+        </label>
+        <input
+          id="res-pack"
+          name="pack"
+          type="text"
+          placeholder="campaign-january-new-career"
+          className={inputClass}
+        />
+        <p className="text-soft text-[10px] mt-1">
+          The playbook entry&rsquo;s filename without .md. Attaches this file inside that campaign.
+        </p>
+      </div>
+
       <div className="flex gap-2">
         {(["file", "link"] as const).map((m) => (
           <button

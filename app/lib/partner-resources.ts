@@ -106,6 +106,40 @@ export async function createSignedResourceUrl(
   return data.signedUrl;
 }
 
+/**
+ * Resources belonging to a campaign pack, keyed by the playbook slug they
+ * belong to. Scoped to the partner, same rule as everything else — a pack is
+ * their own artwork plus anything shared.
+ *
+ * One query for every pack rather than one per campaign: there are nine
+ * campaigns on that page and nine round trips to render it would be silly.
+ */
+export async function getPackResources(
+  partnerId: string
+): Promise<Map<string, PartnerResource[]>> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_resources")
+    .select(
+      "id, partner_id, category, title, description, storage_path, external_url, mime, file_size, version, sort_order, created_at, pack"
+    )
+    .not("pack", "is", null)
+    .or(`partner_id.is.null,partner_id.eq.${partnerId}`)
+    .order("sort_order");
+
+  if (error) {
+    // Most likely the pack column isn't there yet. A campaign without its
+    // artwork is still a usable campaign, so degrade rather than fail.
+    console.error("[partner-resources] pack lookup failed:", error.message);
+    return new Map();
+  }
+
+  const byPack = new Map<string, PartnerResource[]>();
+  for (const row of (data ?? []) as unknown as (PartnerResource & { pack: string })[]) {
+    byPack.set(row.pack, [...(byPack.get(row.pack) ?? []), row]);
+  }
+  return byPack;
+}
+
 /** Images get a thumbnail; everything else is a download button and a name. */
 export function isPreviewable(mime: string | null): boolean {
   return Boolean(mime?.startsWith("image/"));

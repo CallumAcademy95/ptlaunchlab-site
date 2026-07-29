@@ -118,6 +118,7 @@ export async function uploadResource(
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const externalUrl = String(formData.get("externalUrl") ?? "").trim();
+  const pack = String(formData.get("pack") ?? "").trim();
   const file = formData.get("file");
 
   if (!title) return { error: "Give it a title — that's what the partner sees." };
@@ -161,6 +162,9 @@ export async function uploadResource(
     description: description || null,
     storage_path: storagePath,
     external_url: externalUrl || null,
+    // Attaches this file to a campaign in the playbook, so the partner finds it
+    // inside the campaign that needs it rather than hunting through Resources.
+    pack: pack || null,
     mime: hasFile ? (file as File).type || null : null,
     file_size: hasFile ? (file as File).size : null,
   });
