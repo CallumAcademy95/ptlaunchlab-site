@@ -50,3 +50,6 @@ ptlaunchlab.co.uk/
 # the resource drive (Supabase Storage) is what partners actually read from,
 # and these are ~30MB of binaries that would sit in git history forever.
 /Partner Assets/
+
+# Generated TV screen slides — rebuild with scripts/gym-tv-slides.mjs
+/ad-assets/gym-tv/
