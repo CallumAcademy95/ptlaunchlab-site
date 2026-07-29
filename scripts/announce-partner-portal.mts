@@ -2,7 +2,9 @@
  * Announce the partner portal to existing gym partners.
  *
  *   npx tsx scripts/announce-partner-portal.mts                 # dry run, prints who and what
- *   npx tsx scripts/announce-partner-portal.mts --to=ebor       # send yourself one first
+ *   npx tsx scripts/announce-partner-portal.mts --to=ebor       # one partner only
+ *   npx tsx scripts/announce-partner-portal.mts --email=you@x.com --as=ebor
+ *                                                              # test copy to yourself
  *   npx tsx scripts/announce-partner-portal.mts --apply         # send to everyone
  *
  * Sends to the address on each partner's login, because that's the person who
@@ -29,6 +31,9 @@ const args = Object.fromEntries(
 );
 const APPLY = args.apply === "true";
 const ONLY = args.to as string | undefined;
+/** Send a test copy somewhere that isn't a partner, rendered as one of the gyms. */
+const TEST_EMAIL = args.email as string | undefined;
+const TEST_AS = (args.as as string | undefined) ?? "ebor";
 
 const URL_BASE = process.env.SUPABASE_URL!;
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -47,7 +52,16 @@ const rows: Row[] = await (
   )
 ).json();
 
-const targets = rows.filter((r) => !ONLY || r.partner.slug === ONLY);
+let targets = rows.filter((r) => !ONLY || r.partner.slug === ONLY);
+
+if (TEST_EMAIL) {
+  // Borrow a real gym's details so the test shows exactly what they'll get,
+  // then redirect it. Sends immediately — a test nobody receives is useless.
+  const model = rows.find((r) => r.partner.slug === TEST_AS) ?? rows[0];
+  if (!model) { console.error("No partners to model the test on."); process.exit(1); }
+  targets = [{ ...model, email: TEST_EMAIL }];
+}
+
 if (!targets.length) {
   console.error(ONLY ? `No login for "${ONLY}".` : "No partner logins found.");
   process.exit(1);
@@ -138,7 +152,7 @@ for (const t of targets) {
   console.log(`  ${t.partner.gym_name.padEnd(22)} ${t.email}`);
 }
 
-if (!APPLY) {
+if (!APPLY && !TEST_EMAIL) {
   console.log("\nSubject: Your PT Launch Lab partner portal is live");
   console.log("\nNothing sent. Add --apply, or --to=<slug> to send one first.");
   process.exit(0);
