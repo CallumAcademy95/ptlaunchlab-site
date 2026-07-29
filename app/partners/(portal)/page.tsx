@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
 import { getPartnerSummary, formatPence } from "@/app/lib/partner-data";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
+import { getPackResources } from "@/app/lib/partner-resources";
 import CopyButton from "./CopyButton";
 import Welcome from "./Welcome";
 
@@ -18,10 +19,16 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 export default async function MyAcademyPage() {
   const session = await requirePartner();
   const { partner } = session;
-  const [summary, bank] = await Promise.all([
+  const [summary, bank, packs] = await Promise.all([
     getPartnerSummary(partner.id),
     getMaskedBankDetails(partner.id),
+    getPackResources(partner.id),
   ]);
+
+  // A launch offer only exists for gyms we've actually given one to, and it's
+  // the most time-limited thing on their plate — so it outranks everything
+  // except missing bank details, and disappears once it's been used.
+  const launchFiles = packs.get("campaign-launch-promo") ?? [];
   const academyUrl = partnerAcademyUrl(partner);
 
   // Commission we still owe: payable now plus still accruing. Excludes anything
@@ -124,6 +131,46 @@ export default async function MyAcademyPage() {
           </p>
         )}
       </section>
+
+      {/* ── Launch offer ───────────────────────────────────────────────── */}
+      {launchFiles.length > 0 && summary.enrolmentsAllTime === 0 && (
+        <section className="rounded-xl border border-gold/50 bg-gold/10 p-6">
+          <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">
+            You have a launch offer
+          </p>
+          <h2 className="text-white font-bold text-xl mb-2">
+            £500 off for two weeks, then £300 off.
+          </h2>
+          <p className="text-soft text-sm leading-relaxed max-w-2xl">
+            It exists to get your first enrolment while the academy is still new enough that people
+            are asking about it. The drop from £500 to £300 is the bit that works — it tells members
+            the offer is genuinely going.
+          </p>
+          <p className="text-soft text-sm leading-relaxed max-w-2xl mt-2">
+            <strong className="text-white">Pick an end date before you post anything</strong>, tell
+            your team what it is, and stick to it. An offer that quietly extends teaches your members
+            to ignore the next one.
+          </p>
+
+          <div className="flex items-center gap-3 flex-wrap mt-4">
+            <Link
+              href="/partners/playbook?section=campaign"
+              className="px-5 py-2 rounded-full bg-gold text-deep text-sm font-bold hover:brightness-110 transition-all"
+            >
+              How to run it
+            </Link>
+            {launchFiles.map((f) => (
+              <a
+                key={f.id}
+                href={`/partners/download/${f.id}`}
+                className="px-4 py-2 rounded-full border border-white/25 text-white text-xs font-semibold hover:border-gold hover:text-gold transition-colors"
+              >
+                Download the graphic
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Next action ────────────────────────────────────────────────── */}
       {/* One card, not a list. Missing bank details outrank everything else —
