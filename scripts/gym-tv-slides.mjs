@@ -10,11 +10,17 @@
  *
  * Output: ad-assets/gym-tv/<slug>/
  *
+ * PHOTOS: drop real photographs of the gym into partner-photos/<slug>/ and they
+ * are used as slide backgrounds automatically, darkened so the type stays
+ * legible. Without them the slides fall back to solid brand colour, which looks
+ * fine — but a photo of their actual gym is the whole point of "right here, in
+ * this gym", and stock or AI imagery undermines exactly that claim.
+ *
  * Read at distance by someone mid-set: one idea per slide, very few words, and
  * type large enough to land from across a gym floor.
  */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
 import { renderHtml } from "./render-image.mjs";
@@ -31,6 +37,21 @@ function logoSrc(url) {
 }
 
 /**
+ * Real photographs of this gym, if any have been supplied.
+ *
+ * Deliberately no fallback to stock or generated imagery: a member looking at a
+ * gym that isn't theirs is worse than a slide with no photo at all.
+ */
+function photosFor(slug) {
+  const dir = path.join(ROOT, "partner-photos", slug);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort()
+    .map((f) => "file:///" + path.join(dir, f).replace(/\\/g, "/"));
+}
+
+/**
  * Accent that actually shows up.
  *
  * Every slide sits on a near-black background. Ebor's primaryColor is #1A1A1A,
@@ -43,7 +64,7 @@ function accentFor(brand) {
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap');`;
 
-function shell(brand, inner, { bg } = {}) {
+function shell(brand, inner, { bg, photo } = {}) {
   const accent = accentFor(brand);
   const logo = logoSrc(brand.logoUrl);
   return `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -51,6 +72,11 @@ ${FONTS}
 *{margin:0;padding:0;box-sizing:border-box}
 body{width:1920px;height:1080px;background:${bg || brand.heroBg || "#000"};
   font-family:Poppins,sans-serif;color:#fff;overflow:hidden;position:relative}
+.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* Darkest on the left where the type sits, lighter on the right so the gym is
+   still recognisable. A flat overlay kills the photo; a gradient keeps it. */
+.scrim{position:absolute;inset:0;background:
+  linear-gradient(100deg, rgba(0,0,0,.94) 0%, rgba(0,0,0,.88) 42%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.42) 100%)}
 .wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:120px 140px}
 .kicker{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;letter-spacing:.22em;
   text-transform:uppercase;color:${accent};margin-bottom:34px}
@@ -68,6 +94,7 @@ h1 .hl{color:${accent}}
 .qr img{width:186px;height:186px;display:block}
 .qrlabel{font-size:24px;color:#9FB0C4;text-align:center;margin-top:14px;font-weight:500}
 </style></head><body>
+${photo ? `<img class="photo" src="${photo}" alt=""><div class="scrim"></div>` : ""}
 ${logo ? `<img class="logo" src="${logo}" alt="">` : ""}
 <div class="wrap">${inner}</div>
 <div class="bar"></div>
@@ -84,14 +111,21 @@ function footer(brand, qrDataUri, { showQr = true } = {}) {
 }
 
 /** Ten slides. One idea each — a screen gets glanced at, not read. */
-function slides(brand, qr) {
+function slides(brand, qr, photos) {
+  // Rotate through whatever photos exist so ten slides don't repeat one image.
+  let shot = 0;
+  const next = () => (photos.length ? photos[shot++ % photos.length] : null);
   const accent = accentFor(brand);
   const gym = brand.gymName;
   const price = brand.fullPrice;
   const deposit = brand.depositPrice;
 
   const S = (kicker, h1, sub, opts = {}) =>
-    shell(brand, `<div class="kicker">${kicker}</div><h1>${h1}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}${footer(brand, qr, opts)}`, opts);
+    shell(
+      brand,
+      `<div class="kicker">${kicker}</div><h1>${h1}</h1>${sub ? `<div class="sub">${sub}</div>` : ""}${footer(brand, qr, opts)}`,
+      { ...opts, photo: next() }
+    );
 
   return [
     ["01-hero", S(`${gym} Personal Training Academy`,
