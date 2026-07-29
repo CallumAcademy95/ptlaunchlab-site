@@ -105,6 +105,18 @@ export async function partnerSignOut(): Promise<void> {
   redirect(PARTNER_LOGIN_PATH);
 }
 
+/** Mark the first-run walkthrough as seen. Per user, so it stays dismissed across devices. */
+export async function dismissOnboarding(): Promise<void> {
+  const session = await getPartnerSession();
+  if (!session) return;
+  const { error } = await getSupabaseAdmin()
+    .from("pp_partner_users")
+    .update({ onboarding_dismissed_at: new Date().toISOString() })
+    .eq("id", session.userId);
+  if (error) console.error("[partners] could not dismiss onboarding:", error);
+  revalidatePath("/partners");
+}
+
 export async function partnerSaveBankDetails(
   _prev: PartnerFormState & { success?: string },
   formData: FormData

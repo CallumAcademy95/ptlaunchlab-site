@@ -3,6 +3,7 @@ import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
 import { getPartnerSummary, formatPence } from "@/app/lib/partner-data";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import CopyButton from "./CopyButton";
+import Welcome from "./Welcome";
 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
@@ -15,7 +16,8 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 }
 
 export default async function MyAcademyPage() {
-  const { partner } = await requirePartner();
+  const session = await requirePartner();
+  const { partner } = session;
   const [summary, bank] = await Promise.all([
     getPartnerSummary(partner.id),
     getMaskedBankDetails(partner.id),
@@ -34,8 +36,13 @@ export default async function MyAcademyPage() {
       ? "Held until the learner's second instalment clears, then released 30 days later."
       : "Released 30 days after enrolment, per your agreement.";
 
+  const firstName = session.fullName?.trim().split(/\s+/)[0] ?? null;
+
   return (
     <div className="space-y-8">
+      {!session.onboardingDismissedAt && (
+        <Welcome firstName={firstName} gymName={partner.gym_name} />
+      )}
       {/* ── Academy link ───────────────────────────────────────────────── */}
       <section>
         <h2 className="text-white font-bold text-xl mb-1">Your academy link</h2>
