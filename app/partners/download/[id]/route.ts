@@ -12,7 +12,7 @@ import { getResourceForPartner, createSignedResourceUrl } from "@/app/lib/partne
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getPartnerSession();
   if (!session) return NextResponse.json({ error: "Not signed in." }, { status: 401 });
 
@@ -34,7 +34,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "That resource has no file attached." }, { status: 404 });
   }
 
-  const signed = await createSignedResourceUrl(resource.storage_path);
+  // ?inline=1 serves the object for display rather than download, which is what
+  // lets a poster render as a thumbnail on the Resources page instead of
+  // triggering a save dialog. Same object, same 60-second expiry.
+  const inline = req.nextUrl.searchParams.get("inline") === "1";
+
+  const signed = await createSignedResourceUrl(resource.storage_path, { download: !inline });
   if (!signed) {
     return NextResponse.json({ error: "Could not prepare that download." }, { status: 502 });
   }

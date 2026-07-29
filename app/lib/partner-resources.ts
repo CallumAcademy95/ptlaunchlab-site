@@ -84,17 +84,31 @@ export async function getResourceForPartner(
   return data as unknown as PartnerResource;
 }
 
-/** A one-minute URL for a private object. Never store or log the result. */
-export async function createSignedResourceUrl(storagePath: string): Promise<string | null> {
+/**
+ * A one-minute URL for a private object. Never store or log the result.
+ *
+ * `download: false` is what makes an image render in an <img> instead of
+ * triggering a save dialog — same object, same expiry, only the
+ * Content-Disposition differs.
+ */
+export async function createSignedResourceUrl(
+  storagePath: string,
+  opts: { download?: boolean } = {}
+): Promise<string | null> {
   const { data, error } = await getSupabaseAdmin()
     .storage.from(RESOURCE_BUCKET)
-    .createSignedUrl(storagePath, SIGNED_URL_TTL_SECONDS, { download: true });
+    .createSignedUrl(storagePath, SIGNED_URL_TTL_SECONDS, { download: opts.download ?? true });
 
   if (error || !data?.signedUrl) {
     console.error("[partner-resources] signing failed:", error);
     return null;
   }
   return data.signedUrl;
+}
+
+/** Images get a thumbnail; everything else is a download button and a name. */
+export function isPreviewable(mime: string | null): boolean {
+  return Boolean(mime?.startsWith("image/"));
 }
 
 export function formatFileSize(bytes: number | null): string | null {

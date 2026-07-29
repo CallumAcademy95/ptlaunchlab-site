@@ -4,14 +4,37 @@ import {
   RESOURCE_CATEGORIES,
   formatFileSize,
   isNewResource,
+  isPreviewable,
   type PartnerResource,
 } from "@/app/lib/partner-resources";
 
 function ResourceRow({ resource, gymName }: { resource: PartnerResource; gymName: string }) {
   const size = formatFileSize(resource.file_size);
+  const preview = isPreviewable(resource.mime) && resource.storage_path;
+
   return (
     <div className="px-5 py-4 flex items-start justify-between gap-4">
-      <div className="min-w-0">
+      {preview && (
+        <a
+          href={`/partners/download/${resource.id}?inline=1`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 block w-24 h-24 rounded-lg overflow-hidden bg-deep border border-white/10 hover:border-gold transition-colors"
+          title="Open full size"
+        >
+          {/* Plain <img>: the source is a one-minute signed URL, so Next's image
+              optimiser would cache a URL that's dead before it's reused. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/partners/download/${resource.id}?inline=1`}
+            alt={resource.title}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </a>
+      )}
+
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-white font-semibold">{resource.title}</p>
           {isNewResource(resource.created_at) && (
