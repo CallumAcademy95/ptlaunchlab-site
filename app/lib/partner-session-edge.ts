@@ -17,7 +17,11 @@ import { createServerClient } from "@supabase/ssr";
  * so the middleware matcher does not need broadening.
  */
 export function isProtectedPartnerPath(pathname: string): boolean {
+  // Reachable while signed out, by definition — these are how someone who
+  // can't sign in gets back in.
   if (pathname === "/partners/login") return false;
+  if (pathname === "/partners/forgot-password") return false;
+  if (pathname === "/partners/reset-password") return false;
   if (pathname === "/partners") return true;
   return pathname.startsWith("/partners/");
 }

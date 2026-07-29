@@ -61,6 +61,12 @@ export default async function PartnerLoginPage({
 
         <LoginForm next={safeNext} />
 
+        <p className="text-center mt-4">
+          <Link href="/partners/forgot-password" className="text-soft text-xs hover:text-gold">
+            Forgot your password?
+          </Link>
+        </p>
+
         <p className="text-center text-soft text-xs mt-8 leading-relaxed">
           Not set up yet? Email{" "}
           <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">

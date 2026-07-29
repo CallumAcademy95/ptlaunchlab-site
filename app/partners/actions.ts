@@ -9,6 +9,7 @@ import {
 } from "@/app/lib/partner-auth";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { saveBankDetails } from "@/app/lib/partner-bank";
+import { sendPartnerPasswordReset } from "@/app/lib/partner-password-reset";
 import { createRateLimiter } from "@/app/lib/rate-limit";
 import { revalidatePath } from "next/cache";
 
@@ -19,6 +20,8 @@ import { revalidatePath } from "next/cache";
  * trade-off as every other limiter in this codebase.
  */
 const loginLimiter = createRateLimiter(8, 15 * 60_000);
+/** Tighter than sign-in: each attempt sends a real email to someone's inbox. */
+const resetLimiter = createRateLimiter(4, 15 * 60_000);
 
 export interface PartnerFormState {
   error?: string;
@@ -97,6 +100,77 @@ export async function partnerSignIn(
 
   // redirect() throws a control-flow signal — it must not sit inside a try block.
   redirect(safeNextPath(formData.get("next")));
+}
+
+export interface ResetRequestState {
+  error?: string;
+  sent?: boolean;
+}
+
+/**
+ * Ask for a reset link.
+ *
+ * Reports success whether or not the address exists. Anything else lets an
+ * anonymous caller work out which gyms we work with, one guess at a time.
+ */
+export async function requestPasswordReset(
+  _prev: ResetRequestState,
+  formData: FormData
+): Promise<ResetRequestState> {
+  if (!resetLimiter(await clientIP())) {
+    return { error: "Too many attempts. Try again in 15 minutes." };
+  }
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  if (!email.includes("@")) return { error: "Enter your email address." };
+
+  await sendPartnerPasswordReset(email);
+  return { sent: true };
+}
+
+/**
+ * Redeem a reset token and set the new password.
+ *
+ * verifyOtp happens here rather than when the page loads, because it consumes
+ * the token and writes session cookies — neither of which a server component
+ * can do. It also means a link that is merely previewed, by a mail scanner for
+ * instance, doesn't burn the token before its owner clicks it.
+ */
+export async function resetPasswordWithToken(
+  _prev: PartnerFormState,
+  formData: FormData
+): Promise<PartnerFormState> {
+  const token = String(formData.get("token") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirmPassword") ?? "");
+
+  if (!token) return { error: "That link is missing its token. Request a new one." };
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return { error: `Choose a password of at least ${MIN_PASSWORD_LENGTH} characters.` };
+  }
+  if (password !== confirm) return { error: "The two passwords don't match." };
+
+  const supabase = await createPartnerServerClient();
+  if (!supabase) {
+    return { error: "The partner portal is temporarily unavailable. Please try again shortly." };
+  }
+
+  const { data, error } = await supabase.auth.verifyOtp({ type: "recovery", token_hash: token });
+  if (error || !data?.user) {
+    return { error: "That link has expired or has already been used. Request a new one." };
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({ password });
+  if (updateError) {
+    return { error: updateError.message || "Could not set that password. Try again." };
+  }
+
+  // They have just chosen their own, so the forced-change flow is done.
+  await getSupabaseAdmin()
+    .from("pp_partner_users")
+    .update({ must_change_password: false })
+    .eq("id", data.user.id);
+
+  redirect("/partners");
 }
 
 export async function partnerSignOut(): Promise<void> {
