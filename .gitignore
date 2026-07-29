@@ -45,3 +45,8 @@ next-env.d.ts
 ptlaunchlab.co.uk/
 
 .vercel
+
+# Partner artwork and signed agreements. Source files live here locally, but
+# the resource drive (Supabase Storage) is what partners actually read from,
+# and these are ~30MB of binaries that would sit in git history forever.
+/Partner Assets/
