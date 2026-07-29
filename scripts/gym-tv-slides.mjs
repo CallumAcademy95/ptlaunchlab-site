@@ -36,19 +36,25 @@ function logoSrc(url) {
   return existsSync(abs) ? "file:///" + abs.replace(/\\/g, "/") : null;
 }
 
-/**
- * Real photographs of this gym, if any have been supplied.
- *
- * Deliberately no fallback to stock or generated imagery: a member looking at a
- * gym that isn't theirs is worse than a slide with no photo at all.
- */
-function photosFor(slug) {
-  const dir = path.join(ROOT, "partner-photos", slug);
+function photosIn(dir) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir)
     .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-    .sort()
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     .map((f) => "file:///" + path.join(dir, f).replace(/\\/g, "/"));
+}
+
+/**
+ * Photographs for this gym.
+ *
+ * A gym's own photographs always win. `_shared` is the generic fallback — it
+ * reads as atmosphere rather than as a claim about their premises, and the
+ * moment real photos land in partner-photos/<slug>/ they take over completely.
+ */
+function photosFor(slug) {
+  const own = photosIn(path.join(ROOT, "partner-photos", slug));
+  if (own.length) return { photos: own, own: true };
+  return { photos: photosIn(path.join(ROOT, "partner-photos", "_shared")), own: false };
 }
 
 /**
@@ -72,12 +78,15 @@ ${FONTS}
 *{margin:0;padding:0;box-sizing:border-box}
 body{width:1920px;height:1080px;background:${bg || brand.heroBg || "#000"};
   font-family:Poppins,sans-serif;color:#fff;overflow:hidden;position:relative}
-.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* Darkest on the left where the type sits, lighter on the right so the gym is
-   still recognisable. A flat overlay kills the photo; a gradient keeps it. */
-.scrim{position:absolute;inset:0;background:
-  linear-gradient(100deg, rgba(0,0,0,.94) 0%, rgba(0,0,0,.88) 42%, rgba(0,0,0,.55) 72%, rgba(0,0,0,.42) 100%)}
+/* Photo occupies the right of the frame, type the left. Source images are
+   square, so full-bleed would crop heads and feet off; a panel uses them whole
+   and keeps the type on clean background rather than fighting a scrim. */
+.photo{position:absolute;top:0;right:0;bottom:0;width:46%;height:100%;object-fit:cover}
+.scrim{position:absolute;top:0;right:0;bottom:0;width:52%;
+  background:linear-gradient(90deg, ${bg || brand.heroBg || "#000"} 0%, rgba(0,0,0,.55) 34%, rgba(0,0,0,0) 100%)}
 .wrap{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:120px 140px}
+.haswide h1{font-size:112px}
+.haswide .sub{max-width:840px;font-size:36px}
 .kicker{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:34px;letter-spacing:.22em;
   text-transform:uppercase;color:${accent};margin-bottom:34px}
 h1{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:130px;line-height:.96;
@@ -86,14 +95,14 @@ h1 .hl{color:${accent}}
 .sub{font-size:40px;line-height:1.4;color:#D6DEE9;margin-top:44px;max-width:1180px;font-weight:400}
 .logo{position:absolute;top:78px;left:140px;height:86px;width:auto;object-fit:contain}
 .foot{position:absolute;bottom:74px;left:140px;right:140px;display:flex;align-items:flex-end;
-  justify-content:space-between;gap:40px}
+  justify-content:space-between;gap:40px;z-index:2}
 .url{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:44px;letter-spacing:.02em;color:#fff}
 .url span{color:${accent}}
 .bar{position:absolute;left:0;right:0;bottom:0;height:14px;background:${accent}}
 .qr{background:#fff;padding:18px;border-radius:18px;line-height:0}
 .qr img{width:186px;height:186px;display:block}
 .qrlabel{font-size:24px;color:#9FB0C4;text-align:center;margin-top:14px;font-weight:500}
-</style></head><body>
+</style></head><body class="${photo ? "haswide" : ""}">
 ${photo ? `<img class="photo" src="${photo}" alt=""><div class="scrim"></div>` : ""}
 ${logo ? `<img class="logo" src="${logo}" alt="">` : ""}
 <div class="wrap">${inner}</div>
@@ -186,9 +195,12 @@ for (const [slug, brand] of targets) {
     color: { dark: "#000000FF", light: "#FFFFFFFF" },
   });
 
-  const photos = photosFor(slug);
+  const { photos, own } = photosFor(slug);
   console.log(
-    `\n${brand.gymName}  (${accentFor(brand)})  ${photos.length ? `${photos.length} photo(s)` : "no photos — solid colour"}`
+    `\n${brand.gymName}  (${accentFor(brand)})  ` +
+      (photos.length
+        ? `${photos.length} photo(s) — ${own ? "their own" : "shared"}`
+        : "no photos — solid colour")
   );
   for (const [name, html] of slides(brand, qr, photos)) {
     const out = path.join(ROOT, "ad-assets", "gym-tv", slug, `${name}.jpg`);
