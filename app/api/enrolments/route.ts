@@ -7,7 +7,18 @@ import { logSec } from "@/app/lib/security/log";
 import { recordPartnerSale } from "@/app/lib/partner-sales";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Constructed lazily on purpose. `new Resend(undefined)` THROWS ("Missing API
+// key"), and at module scope that throw takes the entire route down with a 500 —
+// so an unset RESEND_API_KEY would stop every learner record being saved, not
+// just stop the emails. The sends below are already wrapped in an explicit
+// `if (process.env.RESEND_API_KEY)` guard, which shows email is meant to be
+// optional; this makes the code match that intent.
+let resendClient: Resend | null = null;
+function resend(): Resend {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY);
+  return resendClient;
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID;
 const GA4_API_SECRET = process.env.GA4_API_SECRET;
@@ -342,9 +353,9 @@ export async function POST(req: NextRequest) {
     //     keeps us safely under it.
     //   • Isolating each send means a failure on one (e.g. a bad learner email)
     //     can't stop the other, and never fails the request.
-    const sendEmail = async (label: string, opts: Parameters<typeof resend.emails.send>[0]) => {
+    const sendEmail = async (label: string, opts: Parameters<Resend["emails"]["send"]>[0]) => {
       try {
-        const { error } = await resend.emails.send(opts);
+        const { error } = await resend().emails.send(opts);
         if (error) console.error(`[enrolments] ${label} email rejected by Resend:`, error);
       } catch (err) {
         console.error(`[enrolments] ${label} email threw:`, err);

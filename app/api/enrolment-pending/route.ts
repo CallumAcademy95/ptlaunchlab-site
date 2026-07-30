@@ -27,7 +27,14 @@ import { logSec } from "@/app/lib/security/log";
 //     [SEC_KEY]: {...} }
 // ─────────────────────────────────────────────────────────────────────────────
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy for the same reason as /api/enrolments: `new Resend(undefined)` throws,
+// and at module scope that would 500 this route instead of quietly skipping the
+// alert email as the guard below intends.
+let resendClient: Resend | null = null;
+function resend(): Resend {
+  resendClient ??= new Resend(process.env.RESEND_API_KEY);
+  return resendClient;
+}
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 const PENDING_ZAPIER_WEBHOOK = process.env.PENDING_ENROLMENT_ZAPIER_WEBHOOK_URL;
 
@@ -115,7 +122,7 @@ export async function POST(req: NextRequest) {
 
   if (process.env.RESEND_API_KEY) {
     try {
-      await resend.emails.send({
+      await resend().emails.send({
         from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
         to: ADMIN_EMAIL,
         subject: `⏳ Checkout started: ${name} — ${planLabel}`,

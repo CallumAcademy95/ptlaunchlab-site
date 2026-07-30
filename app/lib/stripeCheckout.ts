@@ -23,14 +23,28 @@
 // admin chases via the /api/stripe-webhook reconciliation email).
 //
 // REQUIRED STRIPE KEY PERMISSIONS
-//   STRIPE_SECRET_KEY needs "Checkout Sessions → write".
-//   The current restricted key (rk_live_…GBxkR2) does NOT have it — enable it
-//   at Dashboard → Developers → API keys → [key] → Edit permissions, or this
-//   silently falls back to Payment Links on every request.
+//   STRIPE_SECRET_KEY needs "Checkout Sessions → write". Without it every
+//   request silently falls back to Payment Links. Granted on the live restricted
+//   key (rk_live_…GBxkR2) on 2026-07-26; verify with GET /api/checkout, which is
+//   a permission health check, or run `npm run test:e2e` (see e2e/README.md).
 
 import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments";
 
-export const SITE_URL = "https://ptlaunchlab.co.uk";
+// The public origin baked into success_url / cancel_url.
+//
+// Overridable ONLY so the end-to-end regression test in e2e/ can point a real
+// Stripe (test-mode) redirect back at its own dev server. Production never sets
+// PTLL_E2E_BASE_URL, so the literal below is always what ships — and
+// e2e/pay-first-enrolment.spec.ts asserts exactly that, so this cannot become a
+// way to quietly repoint live checkout at another origin.
+export const PRODUCTION_SITE_URL = "https://ptlaunchlab.co.uk";
+
+/** Kept as a pure function so the production fallback is directly testable. */
+export function resolveSiteUrl(env: Record<string, string | undefined> = process.env): string {
+  return env.PTLL_E2E_BASE_URL || PRODUCTION_SITE_URL;
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 // ─── Deposit instalments ─────────────────────────────────────────────────────
 // The deposit plan is £599 up front then 5 × £200/month (£1,599 total). Those

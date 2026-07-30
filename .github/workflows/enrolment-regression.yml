@@ -1,0 +1,96 @@
+# Guards the pay-first enrolment return redirect. See e2e/README.md.
+#
+# Two jobs, because the two failure modes have different shapes:
+#
+#   code-regression — runs on every change. Stripe TEST mode only, no live
+#                     credentials. Catches success_url being edited or the
+#                     checkout falling back silently.
+#
+#   live-redirects  — runs on a schedule. The original bug was a Stripe
+#                     Dashboard setting drifting, which no code change can
+#                     trigger and no PR can catch — so it has to be watched on a
+#                     timer instead. Read-only.
+
+name: Enrolment regression
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  schedule:
+    # 07:00 UTC daily — before the UK working day, so drift is found before
+    # a day's worth of buyers hit it.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  code-regression:
+    name: Checkout returns buyers to /enrol/success (test mode)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "1"
+      STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+      # This job intentionally holds no live credentials, so the live Dashboard
+      # check cannot run here. Opting out explicitly keeps the skip visible in
+      # the run log rather than silently absent.
+      PTLL_SKIP_LIVE_REDIRECT_CHECK: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Fail early if the test key is missing
+        run: |
+          if [ -z "$STRIPE_TEST_SECRET_KEY" ]; then
+            echo "::error::STRIPE_TEST_SECRET_KEY is not configured, so the enrolment"
+            echo "::error::redirect is NOT being verified. Add it in Settings → Secrets."
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+  live-redirects:
+    name: Live Payment Links still redirect to /enrol/success
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: "1"
+      STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+      # Read-only use: GET /v1/payment_links. Needs "Payment Links read".
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_LIVE_READONLY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      # Only the live Dashboard check — no payments, no browser journey.
+      # Goes through the npm script so the test-mode prices the shared
+      # playwright config expects are provisioned first.
+      - run: npm run test:e2e:redirects
+
+      - name: Explain a failure
+        if: failure()
+        run: |
+          echo "::error::A live Stripe Payment Link no longer returns buyers to /enrol/success."
+          echo "::error::Buyers who hit the fallback path will pay and never complete enrolment."
+          echo "::error::Fix in Stripe Dashboard → Payment Links → After payment → Redirect."

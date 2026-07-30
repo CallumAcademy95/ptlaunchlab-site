@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "e2e:prices": "node e2e/provision-test-prices.mjs",
+    "e2e:server": "node e2e/dev-server.mjs",
+    "test:e2e": "npm run e2e:prices && playwright test",
+    "test:e2e:redirects": "npm run e2e:prices && playwright test payment-link-redirects"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -28,6 +32,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/qrcode": "^1.5.6",
