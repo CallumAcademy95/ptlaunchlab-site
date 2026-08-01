@@ -1,83 +1,12 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Nav from "@/app/components/Nav";
 import Footer from "@/app/components/Footer";
-
-// ─── Agreement text (mirrors PDF content) ────────────────────────────────────
-const AGREEMENT_CLAUSES = [
-  {
-    heading: "1. Parties",
-    body: `This Agreement is entered into between PT Launch Lab Ltd, a company registered in England and Wales (Company No: 16596168), whose registered office is at Unit 3, Royals Business Park, Pontefract, West Yorkshire, WF8 4AH ("PT Launch Lab"); and the Gym Partner named and identified in the signature block below ("Gym Partner").`,
-  },
-  {
-    heading: "2. Purpose",
-    body: `PT Launch Lab operates an online personal training education programme delivering NCFE-accredited Level 2 and Level 3 qualifications in Gym Instructing and Personal Training. This Agreement sets out the terms on which the Gym Partner will collaborate with PT Launch Lab to support learner development and, where appropriate, facilitate employment or self-employment opportunities for qualified learners at the Gym Partner's facilities.`,
-  },
-  {
-    heading: "3. Gym Partner Commitments",
-    body: `The Gym Partner agrees to: (a) Provide at least one guaranteed interview opportunity to PT Launch Lab learners who have completed and passed all required course modules and assessments, when requested by PT Launch Lab; (b) Engage in good faith with PT Launch Lab learners referred for interview, providing timely responses and professional conduct throughout any recruitment process; (c) Permit PT Launch Lab to reference the Gym Partner by name and use its logo and branding in marketing materials, course content, and learner communications, solely for the purpose of promoting the partnership and the guaranteed interview benefit; (d) Notify PT Launch Lab promptly of any changes to its recruitment capacity, gym operations, or contact details that may affect the terms of this Agreement.`,
-  },
-  {
-    heading: "4. PT Launch Lab Commitments",
-    body: `PT Launch Lab agrees to: (a) Refer only learners who have fully completed and passed all required course modules, assessments, and business preparation activities to the Gym Partner for interview; (b) Ensure all referred learners hold a valid NCFE Level 2 and Level 3 qualification at the point of referral; (c) Prepare learners professionally for gym employment, including CV guidance, client acquisition training, and industry awareness; (d) Seek prior written approval from the Gym Partner before using any new branding, imagery, or materials that have not previously been agreed; (e) Respect the Gym Partner's recruitment processes and not represent or imply guaranteed employment to learners.`,
-  },
-  {
-    heading: "5. Learner Referrals",
-    body: `Referrals will be made on an ongoing basis as learners qualify. PT Launch Lab will provide the Gym Partner with a learner profile and CV in advance of each referral. The Gym Partner is under no obligation to offer employment to any referred learner; this Agreement provides for interview access only. The number of concurrent referrals will be agreed between the parties in advance and kept proportionate to the Gym Partner's reasonable capacity.`,
-  },
-  {
-    heading: "6. Financial Arrangements",
-    body: `No fees are payable by the Gym Partner to PT Launch Lab under this Agreement, and no fees are payable by PT Launch Lab to the Gym Partner in respect of interview access or employment outcomes. Any commercial arrangement outside the scope of this Agreement (including sponsorship, advertising, or revenue sharing) shall be documented in a separate written agreement.`,
-  },
-  {
-    heading: "7. Branding and Intellectual Property",
-    body: `Each party retains ownership of its own intellectual property, including but not limited to trademarks, logos, and branding. The Gym Partner grants PT Launch Lab a non-exclusive, royalty-free licence to use the Gym Partner's name and logo solely in connection with promoting the partnership as described in Clause 3(c). PT Launch Lab grants the Gym Partner a non-exclusive, royalty-free licence to reference the PT Launch Lab name in connection with promoting its status as a PT Launch Lab partner gym. Neither party may sublicence, modify, or use the other's branding outside the scope of this Agreement without prior written consent.`,
-  },
-  {
-    heading: "8. Confidentiality",
-    body: `Each party agrees to keep confidential any non-public information shared by the other party in the course of this Agreement, including but not limited to learner data, business information, and course materials. Neither party shall disclose such information to any third party without the prior written consent of the disclosing party, except where required by law or a regulatory authority. This clause survives termination of this Agreement.`,
-  },
-  {
-    heading: "9. Data Protection",
-    body: `Each party shall comply with all applicable data protection legislation, including the UK GDPR and the Data Protection Act 2018. Learner personal data shared between the parties shall be limited to what is strictly necessary for the purposes of this Agreement and handled in accordance with each party's privacy policy. Each party shall be an independent data controller in respect of any personal data it processes in connection with this Agreement. The parties shall, on request, provide reasonable assistance to each other to ensure compliance with their respective data protection obligations.`,
-  },
-  {
-    heading: "10. Exclusivity",
-    body: `This Agreement is non-exclusive. PT Launch Lab may enter into similar partnership agreements with other gym operators, and the Gym Partner may enter into similar arrangements with other training providers. Nothing in this Agreement prevents either party from operating independently or pursuing other commercial relationships.`,
-  },
-  {
-    heading: "11. Liability",
-    body: `Neither party shall be liable to the other for any indirect, consequential, or economic losses arising out of or in connection with this Agreement, including but not limited to loss of revenue, loss of anticipated profits, or loss of business opportunity. PT Launch Lab's aggregate liability to the Gym Partner under this Agreement shall not exceed £1,000. Nothing in this Agreement shall exclude or limit liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be excluded under applicable law.`,
-  },
-  {
-    heading: "12. Representations and Warranties",
-    body: `Each party represents and warrants that: (a) it has full power and authority to enter into and perform this Agreement; (b) the person signing this Agreement on its behalf is duly authorised to do so; (c) the execution and performance of this Agreement does not conflict with any other agreement, obligation, or applicable law.`,
-  },
-  {
-    heading: "13. Term",
-    body: `This Agreement commences on the date it is signed by both parties and continues until terminated in accordance with Clause 14. There is no fixed end date.`,
-  },
-  {
-    heading: "14. Termination",
-    body: `Either party may terminate this Agreement at any time by providing 30 days' written notice to the other party. Written notice may be given by email to the contact details recorded in this Agreement or as subsequently notified. Either party may terminate this Agreement immediately on written notice if the other party materially breaches this Agreement and (where the breach is capable of remedy) fails to remedy it within 14 days of receiving written notice requiring it to do so; or becomes insolvent, enters administration, or ceases to trade. On termination, each party shall cease using the other's branding and return or destroy any confidential information held.`,
-  },
-  {
-    heading: "15. Variation",
-    body: `No variation to this Agreement shall be effective unless agreed in writing and signed by authorised representatives of both parties.`,
-  },
-  {
-    heading: "16. Entire Agreement",
-    body: `This Agreement constitutes the entire agreement between the parties in relation to its subject matter and supersedes all prior discussions, representations, or agreements. Each party acknowledges that it has not relied on any representation or warranty not set out in this Agreement.`,
-  },
-  {
-    heading: "17. Governing Law",
-    body: `This Agreement and any dispute arising out of or in connection with it shall be governed by and construed in accordance with the laws of England and Wales. Each party submits to the exclusive jurisdiction of the courts of England and Wales to resolve any dispute arising under or in connection with this Agreement.`,
-  },
-  {
-    heading: "18. Notices",
-    body: `Any notice given under this Agreement must be in writing. Notices to PT Launch Lab should be sent to: info@ptlaunchlab.co.uk or Unit 3, Royals Business Park, Pontefract, West Yorkshire, WF8 4AH. Notices to the Gym Partner should be sent to the email address provided in the signature block below.`,
-  },
-];
+import {
+  buildAgreementClauses,
+  KEY_TERMS_FOR_ACKNOWLEDGEMENT,
+  PARTNERSHIP_AGREEMENT_VERSION,
+} from "@/app/lib/partnershipAgreement";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface GymDetails {
@@ -177,10 +106,42 @@ export default function GymPartnershipSignPage() {
   const [signature, setSignature] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  // The signer must reach the end of the agreement and positively tick the
+  // key-terms acknowledgement before the signature is accepted. This is what
+  // gives the onerous clauses (5.8–5.9 clawback, 14 non-solicitation) the fair
+  // notice they need to be incorporated.
+  const [readToEnd, setReadToEnd] = useState(false);
+  const [acknowledged, setAcknowledged] = useState(false);
   const signedAt = useRef(new Date().toISOString());
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const isDrawing = useRef(false);
   const lastPos   = useRef<{ x: number; y: number } | null>(null);
+
+  const gymFullName = details.gymName.toLowerCase().trim().endsWith("ltd")
+    ? details.gymName.trim()
+    : `${details.gymName.trim()} Ltd`;
+
+  const clauses = buildAgreementClauses({
+    gymFullName,
+    companyNumber: details.companyNumber,
+    registeredAddress: details.registeredAddress,
+    repEmail: details.repEmail,
+    signedDate: new Date(signedAt.current).toLocaleDateString("en-GB", {
+      day: "numeric", month: "long", year: "numeric",
+    }),
+  });
+
+  const checkScrolledToEnd = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    // Also true when the content is short enough not to scroll at all.
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 24) setReadToEnd(true);
+  }, []);
+
+  // Content shorter than the box would otherwise never fire a scroll event.
+  useEffect(() => {
+    if (step === 2) checkScrolledToEnd(scrollRef.current);
+  }, [step, checkScrolledToEnd]);
 
   // ─── Canvas signature setup ───────────────────────────────────────────────
   useEffect(() => {
@@ -276,6 +237,10 @@ export default function GymPartnershipSignPage() {
 
   // ─── Submit ───────────────────────────────────────────────────────────────
   async function handleSubmit() {
+    if (!acknowledged) {
+      setErrors({ acknowledged: "Please confirm you have read the agreement before signing" });
+      return;
+    }
     const sig = captureSignature();
     if (!sig || isSignatureEmpty()) {
       setErrors({ signature: "Please add your signature before submitting" });
@@ -298,6 +263,8 @@ export default function GymPartnershipSignPage() {
           gymSignatureType: signMode,
           signatureType: signMode,
           signedAt: signedAt.current,
+          acknowledgedKeyTerms: acknowledged,
+          agreementVersion: PARTNERSHIP_AGREEMENT_VERSION,
         }),
       });
 
@@ -373,21 +340,111 @@ export default function GymPartnershipSignPage() {
   function renderStep2() {
     return (
       <div className="space-y-6">
-        {/* Agreement text */}
-        <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl overflow-hidden">
-          <div className="bg-[#072B4A] px-6 py-4 border-b border-[#1A3A5C]">
-            <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase">PT Launch Lab Gym Partnership Agreement</p>
-            <h2 className="text-white font-bold text-lg mt-1">Review the Agreement</h2>
-            <p className="text-[#4A6280] text-sm mt-1">Read through all clauses before signing. Scroll down to add your signature.</p>
+        {/* Key commercial terms — shown BEFORE the full agreement so the terms
+            that cost the partner money are never buried in the scroll box. */}
+        <div className="bg-[#0A2A44] border-2 border-[#F5C518]/40 rounded-2xl overflow-hidden">
+          <div className="bg-[#F5C518] px-6 py-3">
+            <p className="text-[#072B4A] text-xs font-bold tracking-widest uppercase">
+              Key terms — please read
+            </p>
           </div>
-          <div className="px-6 py-5 max-h-[420px] overflow-y-auto space-y-5 text-[13px] leading-relaxed">
-            {AGREEMENT_CLAUSES.map((clause) => (
-              <div key={clause.heading}>
-                <p className="text-[#F5C518] font-bold mb-1">{clause.heading}</p>
-                <p className="text-[#8CA3BF]">{clause.body}</p>
+          <div className="px-6 py-5 space-y-4">
+            {KEY_TERMS_FOR_ACKNOWLEDGEMENT.map((t) => (
+              <div key={t.clause} className="flex gap-3">
+                <span className="shrink-0 mt-0.5 text-[#F5C518] text-[10px] font-bold tracking-wider uppercase w-20">
+                  {t.clause}
+                </span>
+                <div>
+                  <p className="text-white font-semibold text-sm">{t.title}</p>
+                  <p className="text-[#8CA3BF] text-[13px] leading-relaxed mt-0.5">{t.detail}</p>
+                </div>
               </div>
             ))}
+            <p className="text-[#4A6280] text-xs pt-2 border-t border-[#1A3A5C]">
+              This summary is for convenience only. The full Agreement below sets out the binding terms and takes precedence.
+            </p>
           </div>
+        </div>
+
+        {/* Agreement text — rendered from the same source as the signed PDF */}
+        <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl overflow-hidden">
+          <div className="bg-[#072B4A] px-6 py-4 border-b border-[#1A3A5C]">
+            <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase">
+              PT Launch Lab Gym Partnership Agreement · v{PARTNERSHIP_AGREEMENT_VERSION}
+            </p>
+            <h2 className="text-white font-bold text-lg mt-1">Review the Agreement</h2>
+            <p className="text-[#4A6280] text-sm mt-1">
+              This is the full agreement. The PDF emailed to you is this document, word for word.
+              Scroll to the end to continue.
+            </p>
+          </div>
+          <div
+            ref={scrollRef}
+            onScroll={(e) => checkScrolledToEnd(e.currentTarget)}
+            className="px-6 py-5 max-h-[420px] overflow-y-auto space-y-5 text-[13px] leading-relaxed"
+          >
+            {clauses.map((clause) => (
+              <div key={clause.number}>
+                <p className="text-[#F5C518] font-bold mb-1.5">
+                  {clause.number}. {clause.title}
+                </p>
+                <div className="space-y-1.5">
+                  {clause.blocks.map((block, i) => {
+                    if (block.kind === "bullet")
+                      return (
+                        <p key={i} className="text-[#8CA3BF] pl-4 relative">
+                          <span className="absolute left-0 text-[#F5C518]/60">•</span>
+                          {block.text}
+                        </p>
+                      );
+                    if (block.kind === "sub")
+                      return (
+                        <p key={i} className="text-[#6A82A0] pl-8 relative text-xs">
+                          <span className="absolute left-4 text-[#F5C518]/40">◦</span>
+                          {block.text}
+                        </p>
+                      );
+                    return <p key={i} className="text-[#8CA3BF]">{block.text}</p>;
+                  })}
+                </div>
+              </div>
+            ))}
+            <p className="text-[#4A6280] text-xs pt-3 border-t border-[#1A3A5C]">
+              End of agreement — version {PARTNERSHIP_AGREEMENT_VERSION}.
+            </p>
+          </div>
+          {!readToEnd && (
+            <div className="bg-[#072B4A] px-6 py-2.5 border-t border-[#1A3A5C]">
+              <p className="text-[#F5C518] text-xs">↓ Scroll to the end of the agreement to continue</p>
+            </div>
+          )}
+        </div>
+
+        {/* Acknowledgement */}
+        <div className={`rounded-2xl border p-5 transition-colors ${
+          acknowledged ? "bg-[#0A2A44] border-[#F5C518]/40" : "bg-[#0A2A44] border-[#1A3A5C]"
+        }`}>
+          <label className={`flex gap-3 ${readToEnd ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}>
+            <input
+              type="checkbox"
+              disabled={!readToEnd}
+              checked={acknowledged}
+              onChange={(e) => {
+                setAcknowledged(e.target.checked);
+                if (errors.acknowledged) setErrors(prev => { const n = { ...prev }; delete n.acknowledged; return n; });
+              }}
+              className="mt-0.5 w-4 h-4 shrink-0 accent-[#F5C518]"
+            />
+            <span className="text-[#8CA3BF] text-sm leading-relaxed">
+              I have read the full Agreement, including{" "}
+              <strong className="text-white">Clause 5</strong> (the £500 fee, that it is inclusive of VAT,
+              when it is released, and the clawback if a learner is refunded) and{" "}
+              <strong className="text-white">Clause 14</strong> (learner non-solicitation). I confirm I am
+              authorised to sign on behalf of{" "}
+              <strong className="text-white">{details.gymName || "the gym"}</strong>.
+            </span>
+          </label>
+          {errors.acknowledged && <p className="text-red-400 text-xs mt-2">⚠ {errors.acknowledged}</p>}
         </div>
 
         {/* Signature */}
@@ -467,7 +524,7 @@ export default function GymPartnershipSignPage() {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting || !acknowledged}
             className="flex-1 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/20 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? "Sending agreement…" : "Sign & Submit Agreement →"}

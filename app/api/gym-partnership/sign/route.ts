@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
 import {
-  generatePartnershipAgreementPDFServer,
   PARTNERSHIP_AGREEMENT_VERSION,
-} from "@/app/lib/server/generatePartnershipAgreementPDF.server";
+  PARTNERSHIP_AGREEMENT_SUMMARY,
+} from "@/app/lib/partnershipAgreement";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
       gymName, companyNumber, registeredAddress,
       repName, repPosition, repEmail,
       signatureType, signedAt,
+      acknowledgedKeyTerms,
     } = body;
 
     if (!gymName || !repName || !repEmail) {
@@ -35,6 +37,7 @@ export async function POST(req: NextRequest) {
       gymSignature: body.gymSignature ?? "",
       gymSignatureType: body.gymSignatureType ?? "typed",
       signedAt,
+      acknowledgedKeyTerms: acknowledgedKeyTerms === true,
     });
     const pdfBase64 = pdfBuffer.toString("base64");
     const pdfAttachment = [{ filename: pdfFilename, content: pdfBuffer }];
@@ -85,7 +88,8 @@ export async function POST(req: NextRequest) {
         ${sectionHead("Signature")}
         ${dataRow("Method", signatureType === "drawn" ? "Handwritten (digital canvas)" : "Typed full name")}
         ${dataRow("Date Signed", signedDate)}
-        ${dataRow("Agreement Version", `v${PARTNERSHIP_AGREEMENT_VERSION} — instalment-2 commission hold + clawback`)}
+        ${dataRow("Agreement Version", `v${PARTNERSHIP_AGREEMENT_VERSION} — ${PARTNERSHIP_AGREEMENT_SUMMARY}`)}
+        ${dataRow("Key Terms Acknowledged", acknowledgedKeyTerms === true ? "Yes — ticked before signing" : "NO — check how this was submitted")}
       </table>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #1A3A5C;">
@@ -132,13 +136,23 @@ export async function POST(req: NextRequest) {
         </table>
       </div>
 
-      <div style="background:#061F36;border:1px solid #F5C518;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <div style="background:#061F36;border:1px solid #F5C518;border-radius:10px;padding:20px;margin-bottom:20px;">
+        <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Commercial Terms</div>
+        <ul style="color:#8CA3BF;font-size:14px;line-height:1.8;padding-left:20px;margin:0;">
+          <li><strong style="color:#ffffff;">£500 for every learner who enrols through your gym</strong> — inclusive of VAT, nothing added on top (Clause 5.1–5.2)</li>
+          <li>Paid 30 days after enrolment if the learner pays in full. If they are on an instalment plan, it is held until their second instalment clears, then paid 30 days after that (Clause 5.4)</li>
+          <li>If a learner is refunded, cancels or their payment is reversed, the commission on that enrolment is returned — normally offset against your next payment (Clauses 5.8–5.9)</li>
+          <li>You can see accrued, released and paid commission any time in your partner portal</li>
+        </ul>
+      </div>
+
+      <div style="background:#061F36;border:1px solid #1A3A5C;border-radius:10px;padding:20px;margin-bottom:24px;">
         <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">What Happens Next</div>
         <ul style="color:#8CA3BF;font-size:14px;line-height:1.8;padding-left:20px;margin:0;">
-          <li>The PT Launch Lab team will be in touch shortly to confirm the partnership details</li>
-          <li>We will notify you when learners are approaching qualification and ready for referral</li>
-          <li>Learner CVs and profiles will be shared with you in advance of any interview introduction</li>
-          <li>Your gym will be featured in our learner-facing materials as a partner employer</li>
+          <li>Send us your logo and brand assets — we build your white-label academy page, tracking link and QR code within 14 days (Clause 3.2)</li>
+          <li>You will receive partner portal login details to track referrals, enrolments and commission</li>
+          <li>Send us your bank details so commission can be paid when it is released</li>
+          <li>Promote your academy link and QR code in your gym and across your socials — every enrolment through it earns you £500</li>
         </ul>
       </div>
 
@@ -203,6 +217,7 @@ export async function POST(req: NextRequest) {
           // Which set of terms this gym actually signed. Partners on v1.0 keep
           // the original 30-day commission; v2.0+ carry the instalment-2 hold.
           agreement_version:  PARTNERSHIP_AGREEMENT_VERSION,
+          acknowledged_key_terms: acknowledgedKeyTerms === true,
           pdf_filename:       pdfFilename,
           pdf_base64:         pdfBase64,
         }),
