@@ -13,6 +13,15 @@ export interface EpisodeIndex {
 
 export const episodesIndex: EpisodeIndex[] = [
   {
+    "id": "pekkJVhEY8w",
+    "slug": "ai-glp-1s-and-the-death-of-the-20-personal-trainer",
+    "ep": 34,
+    "title": "AI, GLP-1s and the Death of the £20 Personal Trainer — PT Launch Lab LIVE",
+    "date": "2026-08-04",
+    "category": "industry",
+    "wordCount": 15522
+  },
+  {
     "id": "vUaye0j8p34",
     "slug": "ridge-holland-on-big-e-rugby-league-and-life-after-wwe",
     "ep": 33,

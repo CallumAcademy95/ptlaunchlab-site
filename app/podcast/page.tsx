@@ -3,7 +3,12 @@ import Breadcrumbs from "../components/Breadcrumbs";
 
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
 const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
-const RSS_FEED_URL = "https://feeds.buzzsprout.com/2615411.rss";
+// Canonical feed. The show moved from Buzzsprout to Riverside, and the old
+// Buzzsprout URL now 301s here. Apple, Spotify and Podchaser were all submitted
+// with the Buzzsprout address, so THAT REDIRECT MUST STAY ALIVE — letting the
+// Buzzsprout account lapse would break every directory listing and every link
+// they point at us. Pointing our own pages at the real feed avoids the extra hop.
+const RSS_FEED_URL = "https://api.riverside.com/hosting/WXwoGTza.rss";
 const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@ptlaunchlab";
 const PODCAST_INDEX_URL = "https://podcastindex.org/podcast/7846674";
 const PODCHASER_URL = "https://www.podchaser.com/podcasts/pt-launch-lab-podcast-6471336";
@@ -29,6 +34,15 @@ export const metadata = {
 };
 
 const episodes: Episode[] = [
+  {
+    id: "pekkJVhEY8w",
+    slug: "ai-glp-1s-and-the-death-of-the-20-personal-trainer",
+    ep: 34,
+    title: "AI, GLP-1s and the Death of the £20 Personal Trainer — PT Launch Lab LIVE",
+    desc: "Six industry leaders — including the Operations Director of The Gym Group, an independent gym owner and two investors — on whether AI will replace personal trainers, what GLP-1s mean for the industry, and whether becoming a PT is still worth it in 2026.",
+    date: "2026-08",
+    category: "industry",
+  },
   {
     id: "vUaye0j8p34",
     slug: "ridge-holland-on-big-e-rugby-league-and-life-after-wwe",

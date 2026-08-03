@@ -7,7 +7,9 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 import MidContentCTA from "../../components/MidContentCTA";
 import { episodesIndex, getEpisodeIndex } from "../transcripts/_index";
 
-const RSS_FEED_URL = "https://feeds.buzzsprout.com/2615411.rss";
+// Canonical feed — see the note in ../page.tsx. The Buzzsprout URL 301s here and
+// must keep doing so, because the directories were submitted with it.
+const RSS_FEED_URL = "https://api.riverside.com/hosting/WXwoGTza.rss";
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
 const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
 
@@ -48,6 +50,12 @@ type Transcript = {
   category: string;
   wordCount: number;
   paragraphs: string[];
+  // Optional. Offsets are on the PUBLISHED VIDEO's timeline, which may differ
+  // from the audio master if a hook was prepended — see the episode's SEO pack.
+  chapters?: { start: number; end: number; title: string }[];
+  // Optional. MUST also be rendered visibly on the page — Google's structured
+  // data guidelines prohibit FAQPage markup for content the user can't see.
+  faqs?: { q: string; a: string }[];
 };
 
 async function loadTranscript(slug: string): Promise<Transcript | null> {
@@ -99,6 +107,20 @@ export default async function EpisodePage({
       uploadDate: datePublished,
       contentUrl: ytUrl,
       embedUrl: ytEmbedUrl,
+      // Chapters as Clips. This is what makes the episode citable at passage
+      // level rather than as one 90-minute blob, and it feeds Google's
+      // key-moments treatment.
+      ...(transcript.chapters?.length
+        ? {
+            hasPart: transcript.chapters.map((c) => ({
+              "@type": "Clip",
+              name: c.title,
+              startOffset: c.start,
+              endOffset: c.end,
+              url: `${ytUrl}&t=${c.start}s`,
+            })),
+          }
+        : {}),
     },
     transcript: transcript.paragraphs.join("\n\n"),
     publisher: {
@@ -134,6 +156,20 @@ export default async function EpisodePage({
     wordCount: meta.wordCount,
   };
 
+  // Only emitted when the episode actually has FAQs, and the same copy is
+  // rendered visibly below — schema-only FAQs breach Google's guidelines.
+  const faqSchema = transcript.faqs?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: transcript.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      }
+    : null;
+
   // Surface the next + previous episodes for internal linking
   const idx = episodesIndex.findIndex((e) => e.slug === slug);
   const prev = idx > 0 ? episodesIndex[idx - 1] : null;
@@ -143,6 +179,9 @@ export default async function EpisodePage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(podcastSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      {faqSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      )}
       <Breadcrumbs
         trail={[
           { name: "Podcast", url: "https://ptlaunchlab.co.uk/podcast" },
@@ -222,6 +261,25 @@ export default async function EpisodePage({
             </div>
           </div>
         </section>
+
+        {/* KEY QUESTIONS — visible counterpart to the FAQPage schema above */}
+        {transcript.faqs?.length ? (
+          <section className="bg-surface py-14 md:py-20 px-6 border-t border-blue/15">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="font-display font-extrabold text-2xl md:text-4xl text-white leading-none tracking-tight mb-8">
+                Key questions answered in this episode
+              </h2>
+              <div className="space-y-7">
+                {transcript.faqs.map((f) => (
+                  <div key={f.q}>
+                    <h3 className="text-white font-semibold text-lg mb-2">{f.q}</h3>
+                    <p className="text-soft/85 text-base leading-relaxed">{f.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {/* TRANSCRIPT */}
         <section className="bg-base py-14 md:py-20 px-6">
