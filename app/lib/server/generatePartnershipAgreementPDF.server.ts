@@ -251,7 +251,7 @@ export function generatePartnershipAgreementPDFServer(
     if (data.acknowledgedKeyTerms) {
       doc.fillColor(BODY).font("Helvetica").fontSize(7.5)
          .text(
-           `Before signing, ${data.repName} was shown a summary of the key commercial terms and confirmed having read the full Agreement, including Clause 5 (fee, VAT treatment, release timing and clawback) and Clause 14 (learner non-solicitation).`,
+           `Before signing, ${data.repName} was shown a summary of the key commercial terms — Clause 5 (fee, VAT treatment, release timing and clawback) and Clause 14 (learner non-solicitation) — was required to scroll to the end of the Agreement, and confirmed having read it and being authorised to sign.`,
            M, y, { width: CW }
          );
       y = doc.y + 4;

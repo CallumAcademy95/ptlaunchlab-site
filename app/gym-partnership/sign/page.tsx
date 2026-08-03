@@ -436,11 +436,7 @@ export default function GymPartnershipSignPage() {
               className="mt-0.5 w-4 h-4 shrink-0 accent-[#F5C518]"
             />
             <span className="text-[#8CA3BF] text-sm leading-relaxed">
-              I have read the full Agreement, including{" "}
-              <strong className="text-white">Clause 5</strong> (the £500 fee, that it is inclusive of VAT,
-              when it is released, and the clawback if a learner is refunded) and{" "}
-              <strong className="text-white">Clause 14</strong> (learner non-solicitation). I confirm I am
-              authorised to sign on behalf of{" "}
+              I have read the Agreement and I am authorised to sign on behalf of{" "}
               <strong className="text-white">{details.gymName || "the gym"}</strong>.
             </span>
           </label>
