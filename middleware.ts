@@ -56,6 +56,38 @@ const SLUG_REDIRECTS: Record<string, string> = {
   "personal-training-course-business-support":   "personal-training-course-with-business-support",
 };
 
+// Wix-era blog posts. The old site published articles under /post/<slug>; those
+// URLs still 404 and several are the same stories the podcast now covers, so each
+// one points at its closest live equivalent rather than dumping them all on
+// /podcast. Anything under /post/ not listed here falls back to /podcast below.
+const POST_REDIRECTS: Record<string, string> = {
+  "how-to-become-an-online-personal-trainer-even-if-you-re-starting-from-scratch":
+    "/online-personal-trainer-course-uk",
+  "do-you-need-qualifications-to-become-an-online-coach":
+    "/are-online-pt-qualifications-recognised-by-uk-gyms",
+  "how-to-become-a-personal-trainer-in-yorkshire-2025-guide":
+    "/level-3-personal-trainer-course/yorkshire",
+  "best-gyms-in-yorkshire-for-new-personal-trainers":
+    "/level-3-personal-trainer-course/yorkshire",
+  // These map to the episode telling the same story.
+  "from-corporate-to-startup-building-an-edtech-platform-and-what-it-teaches-about-personal-trainer-bu":
+    "/podcast/how-we-scaled-pt-launch-lab-courses-with-sam-merve-edtech",
+  "from-corporate-burnout-to-fitness-success-a-personal-trainer-s-complete-transformation-business":
+    "/podcast/how-gemma-left-her-corporate-job-to-become-a-personal-trainer",
+  "from-addiction-to-achievement-how-running-transformed-a-life-and-built-a-personal-trainer-business":
+    "/podcast/how-running-saved-me-from-addiction-matty-bell",
+  "how-to-become-an-online-personal-trainer-luke-story":
+    "/podcast/3-things-i-wish-i-knew-before-becoming-a-personal-trainer-luke-mccarthy",
+  "why-more-people-in-yorkshire-are-switching-from-9-5-to-fitness-careers":
+    "/podcast/sick-of-the-9-5-how-to-build-a-fitness-career-you-actually-want",
+  "why-being-a-personal-trainer-beats-the-9-5":
+    "/podcast/sick-of-the-9-5-how-to-build-a-fitness-career-you-actually-want",
+  "why-80-of-personal-trainers-quit-within-2-years":
+    "/podcast/is-becoming-a-personal-trainer-still-worth-it-the-honest-answer",
+  // No clear successor — the topic is the whole podcast.
+  "buildingasuccessfulpersonaltrainerbusinesscareer": "/podcast",
+};
+
 // Base routes that exist only as /[slug]/[location] with no root page.tsx.
 // Visiting without a location slug would 404 — redirect to the main course page.
 const BASE_ONLY_REDIRECTS: Record<string, string> = {
@@ -185,6 +217,31 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/podcast";
     return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // Wix published the same articles under /post/<slug>, which the /blog rule
+  // above never caught. Send each to its mapped equivalent, everything else to
+  // /podcast.
+  if (pathname === "/post" || pathname.startsWith("/post/")) {
+    const slug = pathname.slice("/post/".length).toLowerCase().replace(/\/$/, "");
+    const url = request.nextUrl.clone();
+    url.pathname = POST_REDIRECTS[slug] ?? "/podcast";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // Retired lead magnet. /career-blueprint is the live successor and the only
+  // external link to the old URL should land somewhere real.
+  if (pathname === "/5k-a-month-blueprint") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/career-blueprint";
+    return NextResponse.redirect(url, { status: 301 });
+  }
+
+  // Wix member-area paths (/account/blank-1 … /account/settings). Deleted with
+  // no successor and no inbound links, so 410 rather than a redirect — it tells
+  // Google to drop them instead of leaving 12 soft-404s in the crawl budget.
+  if (pathname === "/account" || pathname.startsWith("/account/")) {
+    return new NextResponse(null, { status: 410 });
   }
 
   // Redirect base-only routes that have no root page.tsx (exact match, no location)

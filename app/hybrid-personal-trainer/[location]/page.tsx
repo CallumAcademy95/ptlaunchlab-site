@@ -34,6 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     title: `Hybrid Personal Trainer Course in ${loc.name} | PT Launch Lab`,
     description: `Want to be a hybrid PT near ${loc.name}? Train clients in person and online. PT Launch Lab's Level 3 PT qualification teaches you how to build a hybrid coaching business from scratch.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
+    // Duplicate keyword template. Google was ignoring the canonical above and
+    // indexing these variants against the canonical page, so this is explicit.
+    robots: { index: false, follow: true },
   };
 }
 

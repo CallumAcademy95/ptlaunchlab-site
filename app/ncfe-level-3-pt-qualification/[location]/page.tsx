@@ -34,6 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     title: `NCFE Level 3 PT Qualification in ${loc.name} | Ofqual Regulated | PT Launch Lab`,
     description: `NCFE Level 3 PT qualification in ${loc.name} — the qualification UK gym managers ask for by name. £1,599 includes our £500 business mentorship community. Ofqual regulated. Qualify in 12–16 weeks.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
+    // Duplicate keyword template. Google was ignoring the canonical above and
+    // indexing these variants against the canonical page, so this is explicit.
+    robots: { index: false, follow: true },
   };
 }
 
