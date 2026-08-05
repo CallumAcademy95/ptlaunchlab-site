@@ -34,6 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     title: `Become a Qualified Personal Trainer in ${loc.name} | NCFE Level 3 | PT Launch Lab`,
     description: `Become a qualified personal trainer from ${loc.name}. NCFE Level 3, 100% online, with business mentorship built in. Qualify in 12–16 weeks and go self-employed.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
+    // Duplicate keyword template. Google was ignoring the canonical above and
+    // indexing these variants against the canonical page, so this is explicit.
+    robots: { index: false, follow: true },
   };
 }
 
