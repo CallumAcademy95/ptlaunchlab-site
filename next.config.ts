@@ -82,6 +82,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "www.muscleboundgymuk.co.uk" },
       { protocol: "https", hostname: "6fitgyms.co.uk" },
       { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "www.hitiogym.com" },
     ],
   },
   async headers() {
