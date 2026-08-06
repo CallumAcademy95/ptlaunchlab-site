@@ -861,9 +861,41 @@ Build `Partner Assets/hitio-orpington/` containing:
 
 Every asset places the logo on dark or omits it.
 
-- [ ] **Step 2: Write the launch graphics against the playbook**
+- [ ] **Step 2: Write the launch graphics — SLOTS, not dates**
 
-The £500 and £300 graphics must carry a **real end date**, not "limited time" — `partner-playbook/campaign-launch-promo.md` is explicit that a date converts and a vague phrase does not, and that an offer quietly extended teaches members to ignore every future one. Get the intended dates from Callum before rendering; do not invent them.
+**Callum's ruling, 2026-08-06: HITIO's launch promo has no end dates. It is
+limited by places instead — 3 slots at £500 off, then 2 slots at £300 off.**
+Five discounted places in total, and that is the whole offer.
+
+Write the graphics to that mechanic. The number of remaining places is the
+scarcity; do not put a deadline on them, and do not write "limited time" as a
+substitute.
+
+**Note the divergence from the playbook.** `partner-playbook/campaign-launch-promo.md`
+tells every partner to run this on a real end date, and warns that a vague
+phrase converts nobody. Slot-based scarcity satisfies the underlying reason for
+that rule — it is concrete, countable, and cannot be quietly extended without
+the partner noticing they have run out. But the playbook entry is shared with
+all nine partners and still says "dates". Do not edit it; flag the mismatch in
+your report so Callum can decide whether the playbook should offer both
+mechanics.
+
+**The partner sets their own end date if they want one** (Callum, 2026-08-06).
+The slots are the offer; a deadline on top is HITIO's call, not ours. So:
+
+- **Member-facing graphics carry the slots only** — "3 places at £500 off". Leave
+  the date off the artwork entirely, because we do not know it and a wrong date
+  on a printed poster cannot be taken back.
+- **Owner-facing guidance tells them the choice is theirs**, and that if they do
+  set a date they must honour it — the playbook's warning about quietly
+  extending an offer applies to a date they chose just as much as one we gave
+  them. Point them at `campaign-launch-promo.md` for the reasoning.
+
+Counting the slots is manual at HITIO's end — nothing in the platform enforces
+it. `HITIO500` and `HITIO300` have **no redemption cap and no expiry set on
+them**, so they keep working until somebody deactivates them in Stripe. Say that
+plainly in the owner-facing guidance: a gym owner who assumes the codes
+self-expire after three uses will keep discounting indefinitely without knowing.
 
 - [ ] **Step 3: Dry-run the import**
 
