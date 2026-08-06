@@ -14,6 +14,18 @@
 
 Every task's requirements implicitly include these.
 
+- **NO LIVE WRITES. This is absolute.** Implementers write code and run
+  **dry-runs only**. Never run a command with `--apply`. Never create,
+  update or delete a row in Supabase, a coupon or promotion code in Stripe,
+  an object in Storage, or an auth user. Never create a partner login and
+  never send an email. Every such step below is marked **[GATED]**: prepare
+  it, run the dry-run, paste the output into your report, and stop there.
+  Callum approves each write himself. HITIO signed today and Manisha Nagpal
+  is a real person at a real company — a mistake that reaches them is not
+  recoverable by editing a file. `npm run test:e2e` is exempt and safe: its
+  harness forces the Stripe **test** key, blanks `RESEND_API_KEY` so no mail
+  can send, and blanks the Zapier sheet hook.
+
 - **White-label rule.** Member-facing copy never names PT Launch Lab. It is HITIO's academy. Staff hand off to "the academy team". Credibility comes from "nationally recognised, regulated qualification", never from our name. Read `partner-playbook/idea-its-your-academy.md` before writing any partner-facing copy. The audit script enforces this on playbook files (`scripts/audit-partner-platform.mts:170`).
 - **`gymSlug` is immutable once live.** It is `hitio-orpington` everywhere. Every sale ever attributed to this partner joins on it. `gymReferral` ("HITIO Gym Orpington") is display-only and is NOT safe to join on.
 - **Never mint new Stripe payment links.** Use the two shared links below. An unmapped link falls through `priceForLink()` to the raw Payment Link fallback, skipping the code-controlled `success_url` and dropping the buyer on stripe.com without ever reaching the enrolment form. That cost eight paying customers between Nov 2025 and Jul 2026.
@@ -174,27 +186,35 @@ Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts`
 
 Expected: prints `DRY RUN — HITIO Gym Orpington (/hitio-orpington)`, says the partner row will be CREATED, and writes nothing. Confirm with a re-run of the audit that `hitio-orpington` still does not appear.
 
-- [ ] **Step 4: Apply it**
+- [ ] **Step 4: [GATED] STOP — do not apply**
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts --apply`
+**Do not run `--apply`.** Callum runs it himself after reviewing your dry-run.
 
-Expected: `partner created: <uuid>` followed by `commission_terms: instalment_2`. If it prints `WRONG TERMS` and exits 1, stop — the column default has changed and that needs understanding before going further.
+Paste the full dry-run output into your report, and state what you expect
+`--apply` to produce: `partner created: <uuid>` followed by
+`commission_terms: instalment_2`. Note in the report that if it ever prints
+`WRONG TERMS` and exits 1, the column default has changed and that needs
+understanding before going further — the guard exists precisely so this cannot
+pass silently.
 
-- [ ] **Step 5: Verify with the audit**
+The idempotence path (re-running updates in place rather than creating a second
+row) is likewise a claim for your report, not something to demonstrate against
+production.
+
+- [ ] **Step 5: Verify the script reads the live state correctly**
 
 Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/audit-partner-platform.mts`
 
-Expected: still `0 failures`. Warnings rise by exactly two, both correct and both cleared later:
-- `hitio-orpington: no bank details — partner is nagged on their home page` (partner enters these themselves)
-- `hitio-orpington: no login yet` (cleared in Task 8)
+This is read-only and safe. Expected: unchanged from Step 1 — `0 failures`, and
+still no `hitio-orpington`, because nothing has been written. Confirming the
+audit is unchanged is how you prove the dry run wrote nothing.
 
-- [ ] **Step 6: Re-run to prove idempotence**
+State in your report that after Callum applies, the audit should show `0
+failures` with exactly two new warnings, both correct and both cleared later:
+- `hitio-orpington: no bank details` (the partner enters these themselves)
+- `hitio-orpington: no login yet` (cleared in Task 7)
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts --apply`
-
-Expected: `partner row EXISTS (<uuid>) — will update in place`, then `partner updated`. The audit must still report the same partner count — a second row would mean the slug uniqueness assumption is wrong.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add scripts/onboard-hitio.mts
@@ -294,13 +314,18 @@ for (const c of CODES) {
 }
 ```
 
-- [ ] **Step 3: Apply**
+- [ ] **Step 3: [GATED] STOP — do not apply**
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts --apply`
+**Do not run `--apply`.** Creating promotion codes mutates the live Stripe
+account. Callum runs it.
 
-Expected: three `created` lines. The partner section reports `updated`, which is correct — the script is idempotent.
+Run the dry run instead and paste its output into your report:
+`NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts`
 
-- [ ] **Step 4: Verify the codes exist and are active**
+State in your report that `--apply` should produce three `created` lines, and
+that a re-run should report all three as `already exists (active) — skipped`.
+
+- [ ] **Step 4: Confirm the three codes do NOT already exist**
 
 Run:
 
@@ -315,15 +340,16 @@ fetch('https://api.stripe.com/v1/promotion_codes?limit=100',{headers:H}).then(r=
 });"
 ```
 
-Expected: exactly three lines — `HITIOPT ACTIVE £200 off`, `HITIO500 ACTIVE £500 off`, `HITIO300 ACTIVE £300 off`.
+Expected **now, before any apply**: no output at all. A `HITIO*` code already
+existing would mean someone created it by hand — report that rather than
+proceeding, because the script would then skip it and the coupon behind it is
+unverified.
 
-- [ ] **Step 5: Re-run to prove idempotence**
+After Callum applies, the same command should print exactly three lines:
+`HITIOPT ACTIVE £200 off`, `HITIO500 ACTIVE £500 off`, `HITIO300 ACTIVE £300 off`.
+Put that expectation in your report.
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/onboard-hitio.mts --apply`
-
-Expected: all three report `already exists (active) — skipped`. Re-verify with Step 4 that there are still exactly three, not six.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add scripts/onboard-hitio.mts
@@ -567,7 +593,12 @@ Create `e2e/hitio-attribution.spec.ts`:
 
 ```ts
 import { test, expect, type APIRequestContext } from "@playwright/test";
-import { BASE_URL, stripeGet, testKey, type StripeSession } from "./helpers";
+import { BASE_URL, readTestSession } from "./helpers";
+
+// `StripeSession` in helpers.ts does not declare `mode` — it was written for
+// the redirect tests, which never needed it. Widen locally rather than editing
+// the shared type, so this spec cannot change what the existing specs see.
+type SessionWithMode = { mode?: string; metadata?: Record<string, string> };
 
 // ════════════════════════════════════════════════════════════════════════════
 // WHAT THIS PROTECTS
@@ -625,29 +656,49 @@ test.describe("HITIO Orpington attribution", () => {
       "pif",
     );
 
-    const { body } = await stripeGet<StripeSession>(testKey(), `checkout/sessions/${id}`);
+    const { body } = await readTestSession(id);
     expect(body.metadata?.gym_slug).toBe(SLUG);
     expect(body.metadata?.plan).toBe("PIF");
   });
 
-  test("deposit checkout carries gym_slug in subscription_data metadata", async ({ request }) => {
+  // WHY THIS ASSERTS A PROXY, AND NOT subscription_data DIRECTLY
+  //
+  // subscription_data is a CREATE-only parameter. Retrieving a Checkout
+  // Session does not return it, and `subscription` is null until the payment
+  // actually completes — so there is nothing to read back on an open session.
+  //
+  // In createCheckoutSession a single flag, `withInstalments`, gates BOTH
+  // `mode: "subscription"` and the `subscription_data.metadata` block
+  // (app/lib/stripeCheckout.ts:338-365), and `metadata.instalments` is set
+  // from the same condition. So a session that comes back with
+  // mode === "subscription" AND metadata.instalments set is proof that the
+  // subscription_data block was sent with it. Asserting the proxy is honest
+  // here; asserting subscription_data directly would be asserting a field
+  // Stripe never returns, which passes or fails for the wrong reasons.
+  test("deposit checkout takes the instalment-mandate path with the slug attached", async ({ request }) => {
     const id = await createSession(
       request,
       "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
       "deposit",
     );
 
-    const { body } = await stripeGet<StripeSession & {
-      subscription_data?: { metadata?: Record<string, string> };
-    }>(testKey(), `checkout/sessions/${id}`);
+    const { body } = await readTestSession(id);
+    const session = body as unknown as SessionWithMode;
 
-    expect(body.metadata?.gym_slug).toBe(SLUG);
-    // The one that actually matters: without this the instalment webhook
-    // cannot attribute the sale, and commission release goes to nobody.
+    expect(session.metadata?.gym_slug).toBe(SLUG);
+    expect(session.metadata?.plan).toBe("deposit");
+
+    // Both come from `withInstalments`, the same flag that attaches
+    // subscription_data.metadata. Without that block the instalment webhook
+    // cannot attribute the sale, and the commission released at instalment 2
+    // belongs to nobody.
+    expect(session.mode, "deposit did not become a subscription — no instalment mandate").toBe(
+      "subscription",
+    );
     expect(
-      body.subscription_data?.metadata?.gym_slug,
-      "deposit sale would lose its partner at instalment 2",
-    ).toBe(SLUG);
+      session.metadata?.instalments,
+      "instalment count absent — subscription_data was not sent",
+    ).toBeTruthy();
   });
 });
 ```
@@ -789,23 +840,29 @@ Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/import-partner-assets.mts`
 
 Expected: lists the HITIO files as new, scoped to `hitio-orpington`, and uploads nothing.
 
-- [ ] **Step 4: Apply**
+- [ ] **Step 4: [GATED] STOP — do not apply**
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/import-partner-assets.mts --apply`
+**Do not run `--apply`.** Uploading writes to the production storage bucket and
+inserts `pp_resources` rows. Callum runs it.
 
-- [ ] **Step 5: Verify isolation and storage**
+Paste the dry-run listing into your report. Every line must be scoped to
+`hitio-orpington` — anything landing at the shared/root scope would be visible
+to all nine partners and must be reported, not applied.
+
+- [ ] **Step 5: Verify the audit is still clean**
 
 Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/audit-partner-platform.mts`
 
-Expected: a new isolation line `ok    hitio-orpington  <n> resources · 0 sales`, `all <n> resource files exist in storage`, and still `0 failures`. A `can see N resource(s) belonging to another gym` failure means a file landed at the wrong scope — fix immediately; one partner seeing another's material is the single most embarrassing failure this platform has.
+Read-only and safe. Expected: `0 failures` and no HITIO resources yet.
 
-- [ ] **Step 6: Re-run to prove idempotence**
+State in your report what should be true after Callum applies: a new isolation
+line `ok    hitio-orpington  <n> resources · 0 sales`, `all <n> resource files
+exist in storage`, and still `0 failures`. Flag prominently that a `can see N
+resource(s) belonging to another gym` failure means a file landed at the wrong
+scope and must be fixed immediately — one partner seeing another's material is
+the single most embarrassing failure this platform has.
 
-Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/import-partner-assets.mts --apply`
-
-Expected: everything skipped. The resource count in the audit is unchanged.
-
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 Only the script changes, if any — `Partner Assets/` is gitignored.
 
@@ -820,40 +877,54 @@ next one."
 
 ---
 
-### Task 7: Portal login
+### Task 7: [GATED] Portal login — CALLUM ONLY, NOT FOR A SUBAGENT
 
-Last of the access work, so the partner's first sign-in lands on a portal that already has their materials in it rather than an empty Resources tab.
+**This entire task is Callum's.** It creates an auth user and sends a welcome
+email to Manisha Nagpal, a real director at a real company who signed today.
+No subagent creates the login and no subagent sends the email.
 
-**Files:**
-- None — this is done through the running admin UI.
+Sequenced last of the access work so the partner's first sign-in lands on a
+portal that already has their materials in it rather than an empty Resources tab.
+
+**Files:** none.
 
 **Interfaces:**
 - Consumes: the partner row from Task 1.
 - Produces: a `pp_partner_users` row, clearing the audit's `no login yet` warning.
 
+The steps below are the runbook for Callum, not subagent instructions.
+
 - [ ] **Step 1: Create the login**
 
-Go to `/admin/partners`, select HITIO Gym Orpington, create a login for `manisha.nagpal@hitiogym.com` as `owner`.
+`/admin/partners` → HITIO Gym Orpington → create a login for
+`manisha.nagpal@hitiogym.com` as `owner`.
 
-- [ ] **Step 2: Confirm the welcome email arrived**
+- [ ] **Step 2: Read the welcome email before trusting it**
 
-Check it sent, and read it. It must state the £500 inclusive of VAT, the release timing and the clawback — the confirmation email used to describe the old interview deal and never mention money.
+Confirm it sent, and read it. It must state the £500 inclusive of VAT, the
+release timing and the clawback. The confirmation email previously described the
+old interview deal and never mentioned money at all.
 
 - [ ] **Step 3: Verify the forced password change**
 
-Sign in as the new account in a private window. Expected: redirected to set-password before reaching the portal, and after setting one, My Academy shows the HITIO academy link, QR and `HITIOPT`.
+Sign in as the new account in a private window. Expected: redirected to
+set-password before reaching the portal; after setting one, My Academy shows the
+HITIO academy link, QR and `HITIOPT`.
 
-**Do not skip this.** Password reset exists now, but a login that cannot complete first sign-in is the worst possible first impression for a partner who signed today.
+**Do not skip this.** Password reset exists now, but a login that cannot complete
+first sign-in is the worst possible first impression for a partner who signed today.
 
 - [ ] **Step 4: Verify partner isolation in the live portal**
 
-While signed in as HITIO, confirm Resources shows only HITIO material and Enrolments shows zero — not another gym's learners.
+Signed in as HITIO, confirm Resources shows only HITIO material and Enrolments
+shows zero — not another gym's learners.
 
 - [ ] **Step 5: Verify with the audit**
 
 Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/audit-partner-platform.mts`
 
-Expected: `10 partner login(s)`, the `hitio-orpington: no login yet` warning gone, `0 failures`. The bank-details warning correctly remains.
+Expected: `10 partner login(s)`, the `hitio-orpington: no login yet` warning gone,
+`0 failures`. The bank-details warning correctly remains.
 
 ---
 
@@ -962,9 +1033,13 @@ Open `/hitio-orpington-academy/enrol`, complete the form, click through to Strip
 
 Do not complete a live payment. The e2e suite covers the paid path in test mode.
 
-- [ ] **Step 5: Walk the partner portal**
+- [ ] **Step 5: [GATED] Walk the partner portal — Callum**
 
-Sign in as `manisha.nagpal@hitiogym.com`. Check every section renders: My Academy (link, QR, promo code), Enrolments (honest zero), Payments (no outstanding, bank prompt), Resources (the full imported set, downloads resolve), Playbook (all 48 entries).
+Requires the login from Task 7, so this is Callum's step. Sign in as
+`manisha.nagpal@hitiogym.com` and check every section renders: My Academy (link,
+QR, promo code), Enrolments (honest zero), Payments (no outstanding, bank
+prompt), Resources (the full imported set, downloads resolve), Playbook (all 48
+entries).
 
 - [ ] **Step 6: Report**
 
