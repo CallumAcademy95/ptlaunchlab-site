@@ -1,10 +1,5 @@
 import { test, expect, type APIRequestContext } from "@playwright/test";
-import { BASE_URL, readTestSession } from "./helpers";
-
-// `StripeSession` in helpers.ts does not declare `mode` — it was written for
-// the redirect tests, which never needed it. Widen locally rather than editing
-// the shared type, so this spec cannot change what the existing specs see.
-type SessionWithMode = { mode?: string; metadata?: Record<string, string> };
+import { BASE_URL, PAYMENT_LINKS, readTestSession } from "./helpers";
 
 // ════════════════════════════════════════════════════════════════════════════
 // WHAT THIS PROTECTS
@@ -56,53 +51,54 @@ async function createSession(
 
 test.describe("HITIO Orpington attribution", () => {
   test("pay-in-full checkout carries gym_slug in session metadata", async ({ request }) => {
-    const id = await createSession(
-      request,
-      "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      "pif",
-    );
+    const id = await createSession(request, PAYMENT_LINKS.pif, "pif");
 
     const { body } = await readTestSession(id);
     expect(body.metadata?.gym_slug).toBe(SLUG);
     expect(body.metadata?.plan).toBe("PIF");
   });
 
-  // WHY THIS ASSERTS A PROXY, AND NOT subscription_data DIRECTLY
+  // WHAT THIS PROVES, AND WHAT IT DOES NOT
   //
   // subscription_data is a CREATE-only parameter. Retrieving a Checkout
   // Session does not return it, and `subscription` is null until the payment
-  // actually completes — so there is nothing to read back on an open session.
+  // actually completes — so there is nothing to read back on an open session
+  // that would show subscription_data.metadata.gym_slug directly.
   //
   // In createCheckoutSession a single flag, `withInstalments`, gates BOTH
   // `mode: "subscription"` and the `subscription_data.metadata` block
   // (app/lib/stripeCheckout.ts:338-365), and `metadata.instalments` is set
-  // from the same condition. So a session that comes back with
-  // mode === "subscription" AND metadata.instalments set is proof that the
-  // subscription_data block was sent with it. Asserting the proxy is honest
-  // here; asserting subscription_data directly would be asserting a field
-  // Stripe never returns, which passes or fails for the wrong reasons.
+  // from the same condition. So mode === "subscription" AND
+  // metadata.instalments set together prove the subscription_data block was
+  // sent at all — that a real instalment mandate was requested.
+  //
+  // What this does NOT prove: that gym_slug specifically survived inside
+  // that block. subscription_data.metadata.gym_slug (~line 360) and the
+  // top-level metadata.gym_slug (~line 381) are two independent
+  // object-literal entries, both gated by withInstalments but not linked to
+  // each other. A regression that deletes only the nested gym_slug line —
+  // leaving instalments_target, buyer_name, mode, and top-level metadata all
+  // intact — would pass every assertion below undetected. Closing that gap
+  // for real needs a completed test-mode deposit payment plus
+  // getSubscription() to read the subscription back post-payment, which is
+  // heavier than this task warrants.
   test("deposit checkout takes the instalment-mandate path with the slug attached", async ({ request }) => {
-    const id = await createSession(
-      request,
-      "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-      "deposit",
-    );
+    const id = await createSession(request, PAYMENT_LINKS.deposit, "deposit");
 
     const { body } = await readTestSession(id);
-    const session = body as unknown as SessionWithMode;
 
-    expect(session.metadata?.gym_slug).toBe(SLUG);
-    expect(session.metadata?.plan).toBe("deposit");
+    expect(body.metadata?.gym_slug).toBe(SLUG);
+    expect(body.metadata?.plan).toBe("deposit");
 
     // Both come from `withInstalments`, the same flag that attaches
     // subscription_data.metadata. Without that block the instalment webhook
     // cannot attribute the sale, and the commission released at instalment 2
     // belongs to nobody.
-    expect(session.mode, "deposit did not become a subscription — no instalment mandate").toBe(
+    expect(body.mode, "deposit did not become a subscription — no instalment mandate").toBe(
       "subscription",
     );
     expect(
-      session.metadata?.instalments,
+      body.metadata?.instalments,
       "instalment count absent — subscription_data was not sent",
     ).toBeTruthy();
   });
