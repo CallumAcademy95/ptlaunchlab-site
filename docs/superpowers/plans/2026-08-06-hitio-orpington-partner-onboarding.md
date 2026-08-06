@@ -63,7 +63,7 @@ Creates the `pp_partners` row. Ordered first so that the academy page in Task 3 
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: a `pp_partners` row with `slug = "hitio-orpington"`. Task 3's pages join to it via `gymSlug`. Task 5's `gym-brands.json` entry must use the same slug. Task 8's login attaches to its `id`.
+- Produces: a `pp_partners` row with `slug = "hitio-orpington"`. Task 3's pages join to it via `gymSlug`. Task 5's `gym-brands.json` entry must use the same slug. Task 7's login attaches to its `id`.
 
 - [ ] **Step 1: Run the audit to capture the pre-state**
 
