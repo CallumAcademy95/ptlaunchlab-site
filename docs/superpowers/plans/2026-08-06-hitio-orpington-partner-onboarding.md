@@ -558,11 +558,27 @@ Run: `npm run lint`
 
 Expected: clean. The `<img>` in the enrol page needs its `eslint-disable-next-line @next/next/no-img-element` comment; every other partner enrol page carries the same.
 
-- [ ] **Step 5: Verify the page joins to the partner**
+- [ ] **Step 5: Verify the page's slug — expect ONE failure, and read it carefully**
 
 Run: `NODE_OPTIONS=--use-system-ca npx tsx scripts/audit-partner-platform.mts`
 
-Expected: a new line `ok    hitio-orpington-academy → hitio-orpington` under "Gym pages → partner rows", and still `0 failures`. If it reports `has no pp_partners row — sales log as UNATTRIBUTED`, the slug in the enrol page does not match Task 1's row; fix the page, never the row.
+**Expected: exactly one failure**, and it is correct:
+
+```
+FAIL  hitio-orpington-academy: gymSlug "hitio-orpington" has no pp_partners row — sales log as UNATTRIBUTED
+```
+
+Task 1's write is GATED — the partner row does not exist yet, because Callum has
+not run `--apply`. So the page correctly has nothing to join to. What this step
+actually verifies is that the audit sees **your exact slug**: the string it
+quotes back must be `hitio-orpington` character for character.
+
+A failure quoting any other slug means the enrol page is wrong — fix the page,
+never the database.
+
+This failure clears by itself once Callum applies Task 1, at which point the
+line becomes `ok    hitio-orpington-academy → hitio-orpington`. Task 9 re-checks
+it. Do not attempt to make this pass by creating the row.
 
 - [ ] **Step 6: Build**
 
