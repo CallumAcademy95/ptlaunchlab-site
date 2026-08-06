@@ -75,28 +75,28 @@ console.log(`  referral names ${PARTNER.legacy_referral_names.length}`);
 
 if (!APPLY) {
   console.log("\nNothing written. Add --apply.");
-  process.exit(0);
-}
+  process.exitCode = 0;
+} else {
+  const [partner] = existing
+    ? await api(`pp_partners?slug=eq.${SLUG}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(PARTNER),
+      })
+    : await api("pp_partners", {
+        method: "POST",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(PARTNER),
+      });
 
-const [partner] = existing
-  ? await api(`pp_partners?slug=eq.${SLUG}`, {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(PARTNER),
-    })
-  : await api("pp_partners", {
-      method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(PARTNER),
-    });
+  console.log(`\npartner ${existing ? "updated" : "created"}: ${partner.id}`);
+  console.log(`commission_terms: ${partner.commission_terms}`);
 
-console.log(`\npartner ${existing ? "updated" : "created"}: ${partner.id}`);
-console.log(`commission_terms: ${partner.commission_terms}`);
-
-if (partner.commission_terms !== "instalment_2") {
-  console.error(
-    `\n  WRONG TERMS: expected instalment_2 (the v3.0 deal signed 2026-08-06), got "${partner.commission_terms}".` +
-      `\n  on_enrolment is the grandfathered v1.0 deal and belongs only to the original eight partners.`,
-  );
-  process.exit(1);
+  if (partner.commission_terms !== "instalment_2") {
+    console.error(
+      `\n  WRONG TERMS: expected instalment_2 (the v3.0 deal signed 2026-08-06), got "${partner.commission_terms}".` +
+        `\n  on_enrolment is the grandfathered v1.0 deal and belongs only to the original eight partners.`,
+    );
+    process.exitCode = 1;
+  }
 }
