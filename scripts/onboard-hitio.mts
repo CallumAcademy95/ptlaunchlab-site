@@ -104,17 +104,27 @@ if (!APPLY) {
 // ─── Stripe promotion codes ──────────────────────────────────────────────────
 // Three codes, matching the pattern every other partner has: a standing member
 // discount plus the two launch waves described in
-// partner-playbook/campaign-launch-promo.md (£500 for weeks 1-2, £300 for
-// weeks 3-4).
+// partner-playbook/campaign-launch-promo.md.
+//
+// The launch promo is limited PLACES, not a deadline: 3 slots at £500 off,
+// then 2 slots at £300 off (5 discounted places total). Verified against live
+// Stripe that both coupons (vgLNHktz, CDD4796b) have max_redemptions=none and
+// redeem_by=none — the coupon itself enforces nothing. So the slot count has
+// to be enforced on the promotion code via `max_redemptions` below, which
+// Stripe supports independently of the coupon. Skip it and "3 slots" is just
+// a number on a poster: if HITIO500 circulates, every single use takes £500
+// off with nothing stopping it. HITIOPT is the standing, open-ended member
+// discount rather than a launch slot, so it gets no cap — max_redemptions is
+// omitted from its create call entirely rather than sent as empty/zero.
 //
 // Worth knowing while running this: across the eight existing partners the
 // £200 standing codes have ZERO redemptions between them, while the £500/£300
 // launch codes account for every partner sale made to date. The launch promo
 // is the one that actually converts.
-const CODES = [
+const CODES: { code: string; coupon: string; note: string; maxRedemptions?: number }[] = [
   { code: "HITIOPT",  coupon: "buPzSnaF", note: "standing member discount (£200)" },
-  { code: "HITIO500", coupon: "vgLNHktz", note: "launch promo, weeks 1-2 (£500)" },
-  { code: "HITIO300", coupon: "CDD4796b", note: "launch promo, weeks 3-4 (£300)" },
+  { code: "HITIO500", coupon: "vgLNHktz", note: "launch promo, first 3 places (£500)", maxRedemptions: 3 },
+  { code: "HITIO300", coupon: "CDD4796b", note: "launch promo, next 2 places (£300)", maxRedemptions: 2 },
 ];
 
 const stripe = async (path: string, body?: Record<string, string>) => {
@@ -139,12 +149,21 @@ for (const c of CODES) {
     console.log(`  ${c.code.padEnd(10)} already exists (${found.data[0].active ? "active" : "INACTIVE"}) — skipped`);
     continue;
   }
+  // The cap IS the offer — see the block comment above. Show it on every
+  // line (including "would be created") so whoever approves the write can
+  // see exactly what they're approving.
+  const capLabel = c.maxRedemptions ? `max_redemptions=${c.maxRedemptions}` : "uncapped";
   // The create call is a Stripe write, so — same as the partner row above —
   // it is gated behind APPLY. A dry run must only ever report what it would do.
   if (!APPLY) {
-    console.log(`  ${c.code.padEnd(10)} would be created — ${c.note}`);
+    console.log(`  ${c.code.padEnd(10)} would be created — ${c.note} [${capLabel}]`);
     continue;
   }
-  const made = await stripe("promotion_codes", { coupon: c.coupon, code: c.code });
-  console.log(`  ${c.code.padEnd(10)} created — ${c.note} (${made.id})`);
+  // max_redemptions is only sent for codes that have a cap. HITIOPT must NOT
+  // receive an empty or zero value — omitting the key entirely is what tells
+  // Stripe "no limit", matching the standing/open-ended intent.
+  const body: Record<string, string> = { coupon: c.coupon, code: c.code };
+  if (c.maxRedemptions) body.max_redemptions = String(c.maxRedemptions);
+  const made = await stripe("promotion_codes", body);
+  console.log(`  ${c.code.padEnd(10)} created — ${c.note} [${capLabel}] (${made.id})`);
 }
