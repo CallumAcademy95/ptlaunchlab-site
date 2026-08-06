@@ -309,10 +309,23 @@ for (const c of CODES) {
     console.log(`  ${c.code.padEnd(10)} already exists (${found.data[0].active ? "active" : "INACTIVE"}) — skipped`);
     continue;
   }
+  // A dry run must only ever report what it would do. This gate is load-bearing:
+  // process.exitCode (unlike process.exit) does NOT halt execution, so the
+  // dry-run branch above falls through to here — without this check, running
+  // the script with no --apply would create three live promotion codes.
+  if (!APPLY) {
+    console.log(`  ${c.code.padEnd(10)} would be created — ${c.note}`);
+    continue;
+  }
   const made = await stripe("promotion_codes", { coupon: c.coupon, code: c.code });
   console.log(`  ${c.code.padEnd(10)} created — ${c.note} (${made.id})`);
 }
 ```
+
+The existence check matches on the code string alone; it does not confirm that
+an already-present `HITIO*` code points at the right coupon. That is why Step 4
+below treats any pre-existing `HITIO*` code as something to report rather than
+proceed past.
 
 - [ ] **Step 3: [GATED] STOP — do not apply**
 
