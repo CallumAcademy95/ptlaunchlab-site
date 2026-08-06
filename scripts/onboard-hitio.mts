@@ -100,3 +100,51 @@ if (!APPLY) {
     process.exitCode = 1;
   }
 }
+
+// ─── Stripe promotion codes ──────────────────────────────────────────────────
+// Three codes, matching the pattern every other partner has: a standing member
+// discount plus the two launch waves described in
+// partner-playbook/campaign-launch-promo.md (£500 for weeks 1-2, £300 for
+// weeks 3-4).
+//
+// Worth knowing while running this: across the eight existing partners the
+// £200 standing codes have ZERO redemptions between them, while the £500/£300
+// launch codes account for every partner sale made to date. The launch promo
+// is the one that actually converts.
+const CODES = [
+  { code: "HITIOPT",  coupon: "buPzSnaF", note: "standing member discount (£200)" },
+  { code: "HITIO500", coupon: "vgLNHktz", note: "launch promo, weeks 1-2 (£500)" },
+  { code: "HITIO300", coupon: "CDD4796b", note: "launch promo, weeks 3-4 (£300)" },
+];
+
+const stripe = async (path: string, body?: Record<string, string>) => {
+  const r = await fetch(`https://api.stripe.com/v1/${path}`, {
+    method: body ? "POST" : "GET",
+    headers: {
+      Authorization: `Bearer ${SK}`,
+      ...(body ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+    },
+    ...(body ? { body: new URLSearchParams(body).toString() } : {}),
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error(`stripe ${path}: ${j.error?.message}`);
+  return j;
+};
+
+console.log("\nStripe promotion codes:");
+for (const c of CODES) {
+  // Read-only existence check — safe in both dry run and apply.
+  const found = await stripe(`promotion_codes?code=${encodeURIComponent(c.code)}&limit=1`);
+  if (found.data?.length) {
+    console.log(`  ${c.code.padEnd(10)} already exists (${found.data[0].active ? "active" : "INACTIVE"}) — skipped`);
+    continue;
+  }
+  // The create call is a Stripe write, so — same as the partner row above —
+  // it is gated behind APPLY. A dry run must only ever report what it would do.
+  if (!APPLY) {
+    console.log(`  ${c.code.padEnd(10)} would be created — ${c.note}`);
+    continue;
+  }
+  const made = await stripe("promotion_codes", { coupon: c.coupon, code: c.code });
+  console.log(`  ${c.code.padEnd(10)} created — ${c.note} (${made.id})`);
+}
