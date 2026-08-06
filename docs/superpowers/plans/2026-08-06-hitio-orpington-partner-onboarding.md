@@ -622,12 +622,7 @@ Create `e2e/hitio-attribution.spec.ts`:
 
 ```ts
 import { test, expect, type APIRequestContext } from "@playwright/test";
-import { BASE_URL, readTestSession } from "./helpers";
-
-// `StripeSession` in helpers.ts does not declare `mode` — it was written for
-// the redirect tests, which never needed it. Widen locally rather than editing
-// the shared type, so this spec cannot change what the existing specs see.
-type SessionWithMode = { mode?: string; metadata?: Record<string, string> };
+import { BASE_URL, PAYMENT_LINKS, readTestSession } from "./helpers";
 
 // ════════════════════════════════════════════════════════════════════════════
 // WHAT THIS PROTECTS
@@ -681,7 +676,7 @@ test.describe("HITIO Orpington attribution", () => {
   test("pay-in-full checkout carries gym_slug in session metadata", async ({ request }) => {
     const id = await createSession(
       request,
-      "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
+      PAYMENT_LINKS.pif,
       "pif",
     );
 
@@ -690,29 +685,36 @@ test.describe("HITIO Orpington attribution", () => {
     expect(body.metadata?.plan).toBe("PIF");
   });
 
-  // WHY THIS ASSERTS A PROXY, AND NOT subscription_data DIRECTLY
+  // WHY THIS ASSERTS A PROXY, AND WHAT THE PROXY DOES NOT COVER
   //
   // subscription_data is a CREATE-only parameter. Retrieving a Checkout
   // Session does not return it, and `subscription` is null until the payment
   // actually completes — so there is nothing to read back on an open session.
+  // Asserting it directly would assert a field Stripe never returns, which
+  // passes or fails for the wrong reasons.
   //
   // In createCheckoutSession a single flag, `withInstalments`, gates BOTH
-  // `mode: "subscription"` and the `subscription_data.metadata` block
+  // `mode: "subscription"` and the whole `subscription_data` block
   // (app/lib/stripeCheckout.ts:338-365), and `metadata.instalments` is set
-  // from the same condition. So a session that comes back with
-  // mode === "subscription" AND metadata.instalments set is proof that the
-  // subscription_data block was sent with it. Asserting the proxy is honest
-  // here; asserting subscription_data directly would be asserting a field
-  // Stripe never returns, which passes or fails for the wrong reasons.
+  // from the same condition. So mode === "subscription" plus a populated
+  // metadata.instalments proves the subscription_data block WAS SENT.
+  //
+  // It does NOT prove gym_slug survived inside it. The nested
+  // subscription_data.metadata.gym_slug (:360) and the top-level
+  // metadata.gym_slug (:381) are independent object-literal entries sharing
+  // only that outer flag. A regression deleting just the nested line would
+  // pass everything below — which is exactly the failure this test is named
+  // for. Closing that gap honestly needs a completed test-mode deposit
+  // payment plus getSubscription(), which is heavier than this gate warrants.
+  // The residual risk is stated rather than papered over.
   test("deposit checkout takes the instalment-mandate path with the slug attached", async ({ request }) => {
     const id = await createSession(
       request,
-      "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
+      PAYMENT_LINKS.deposit,
       "deposit",
     );
 
-    const { body } = await readTestSession(id);
-    const session = body as unknown as SessionWithMode;
+    const { body: session } = await readTestSession(id);
 
     expect(session.metadata?.gym_slug).toBe(SLUG);
     expect(session.metadata?.plan).toBe("deposit");
