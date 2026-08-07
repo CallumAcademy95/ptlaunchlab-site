@@ -32,6 +32,7 @@ const FOLDER_TO_SLUG: Record<string, string> = {
   "6fitgyms": "6fit",
   "ebor": "ebor",
   "gym n go": "gym-n-go",
+  "hitio-orpington": "hitio-orpington",
   "iron wolf": "ironwolf",
   "ministry of fitness": "mof",
   "musclebound": "muscle-bound",
@@ -118,6 +119,23 @@ function classify(file: string): { category: string; title: string; description:
       category: "training",
       title: path.basename(file, ".docx").replace(/[-_]+/g, " ").trim(),
       description: "Campaign copy written for your gym.",
+    };
+  }
+  // Numbered gym-TV slide JPEGs (01-hero.jpg, 02-already-coaching.jpg, ...),
+  // as produced by gym-tv-slides.mjs. HITIO is the first partner to ship
+  // slides instead of a video + editable deck, so give each its own title
+  // rather than falling through to the generic "01 hero" default — ten
+  // resources sharing one title would collapse the (partner, title)
+  // idempotency key and only the first would ever import.
+  const slideMatch = /^(\d{2})-(.+)\.(jpe?g|png)$/i.exec(file);
+  if (slideMatch) {
+    let label = slideMatch[2].replace(/[-_]+/g, " ").trim();
+    label = label.charAt(0).toUpperCase() + label.slice(1);
+    label = label.replace(/\bcta\b/i, "CTA"); // acronym, not a word
+    return {
+      category: "digital",
+      title: `Gym screen slide ${slideMatch[1]} — ${label}`,
+      description: "One of ten branded slides for your gym TV screen. Loop them from a USB stick or any slideshow app.",
     };
   }
   // Canva and ChatGPT default filenames tell a partner nothing. Give them a

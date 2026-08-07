@@ -2,15 +2,18 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// `dark` is unused by the rendering below (kept for a future light/dark logo
+// swap that was never wired up) — do not rely on it to affect layout.
 const gymPartners = [
-  { name: "Leodis 24/7 Gym",  src: "/logos/leodis-gym.png",          dark: false },
-  { name: "Iron Wolf Gym",     src: "/logos/iron-wolf-gym.png",       dark: false },
-  { name: "1079 Fitness",      src: "/logos/1079-fitness.png",        dark: false },
-  { name: "Ultimate Shred",    src: "/logos/ultimate-shred.png",      dark: true  },
-  { name: "6FitGym",           src: "/logos/6fit-gym.png",            dark: true  },
-  { name: "MOF Gym",           src: "/logos/mof.png",                 dark: true  },
-  { name: "Muscle Bound Gym",  src: "/logos/muscle bound gym.png",    dark: true  },
-  { name: "Ebor Gym",          src: "/logos/EBOR GYM.png",            dark: false },
+  { name: "Leodis 24/7 Gym",       src: "/logos/leodis-gym.png",          dark: false },
+  { name: "Iron Wolf Gym",         src: "/logos/iron-wolf-gym.png",       dark: false },
+  { name: "1079 Fitness",          src: "/logos/1079-fitness.png",        dark: false },
+  { name: "Ultimate Shred",        src: "/logos/ultimate-shred.png",      dark: true  },
+  { name: "6FitGym",               src: "/logos/6fit-gym.png",            dark: true  },
+  { name: "MOF Gym",               src: "/logos/mof.png",                 dark: true  },
+  { name: "Muscle Bound Gym",      src: "/logos/muscle bound gym.png",    dark: true  },
+  { name: "Ebor Gym",              src: "/logos/EBOR GYM.png",            dark: false },
+  { name: "HITIO Gym Orpington",   src: "/logos/hitio-gym.png",           dark: true  },
 ];
 
 const accreditations = [
@@ -40,7 +43,7 @@ export default function GymPartners() {
         </h2>
         <p className="text-soft/60 text-sm mb-12 max-w-xl mx-auto">
           Our qualification is fully accredited and our graduates are welcomed into
-          6 partner gyms across the UK.
+          partner gyms across the UK.
         </p>
 
         {/* Mobile: auto carousel */}

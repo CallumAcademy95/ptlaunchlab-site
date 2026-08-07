@@ -178,5 +178,25 @@
       "Inside Northgate Strength"
     ],
     "canonicalPath": "/demo-academy"
+  },
+  "hitio-orpington": {
+    "gymName": "HITIO Gym Orpington",
+    "primaryColor": "#e70034",
+    "darkAccent": "#ed4b51",
+    "heroBg": "#1a1a23",
+    "sectionBg": null,
+    "logoUrl": "https://www.hitiogym.com/wp-content/uploads/2019/01/hitio_gym_logo1.png",
+    "promoCode": "HITIOPT",
+    "discountAmount": 200,
+    "fullPrice": 1399,
+    "depositPrice": 599,
+    "location": "Orpington, South East London",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "At HITIO Gym\\nOrpington"
+    ],
+    "canonicalPath": "/hitio-orpington-academy"
   }
 }
