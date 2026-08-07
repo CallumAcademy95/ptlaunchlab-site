@@ -3,6 +3,8 @@
  *
  *   npx tsx scripts/import-partner-assets.mts
  *   ...add --apply to upload.
+ *   ...add --replace to let a reissued file overwrite the resource of the same
+ *      title, instead of being skipped as already present.
  *
  * Everything lands in the private `partner-resources` bucket and is scoped to
  * the gym whose folder it came from, so a partner only ever sees their own
@@ -21,6 +23,10 @@ for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8
 }
 
 const APPLY = process.argv.includes("--apply");
+// Without this, a title that already exists is skipped — which is what makes
+// re-running safe. With it, the file on disk wins and the existing row is
+// repointed at it. Needed whenever artwork is reissued rather than added.
+const REPLACE = process.argv.includes("--replace");
 const ROOT = path.join(process.cwd(), "Partner Assets");
 const BUCKET = "partner-resources";
 const URL_BASE = process.env.SUPABASE_URL!;
@@ -203,14 +209,15 @@ const partners: { id: string; slug: string; gym_name: string }[] = await (
 ).json();
 const bySlug = new Map(partners.map((p) => [p.slug, p]));
 
-const existing: { partner_id: string | null; title: string }[] = await (
-  await fetch(`${URL_BASE}/rest/v1/pp_resources?select=partner_id,title`, { headers: H })
-).json();
-const already = new Set(existing.map((e) => `${e.partner_id ?? "shared"}|${e.title}`));
+const existing: { id: string; partner_id: string | null; title: string; storage_path: string | null; file_size: number | null }[] =
+  await (
+    await fetch(`${URL_BASE}/rest/v1/pp_resources?select=id,partner_id,title,storage_path,file_size`, { headers: H })
+  ).json();
+const already = new Map(existing.map((e) => [`${e.partner_id ?? "shared"}|${e.title}`, e]));
 
-console.log(`${APPLY ? "UPLOADING" : "DRY RUN"} — ${filtered.length} file(s)\n`);
+console.log(`${APPLY ? "UPLOADING" : "DRY RUN"} — ${filtered.length} file(s)${REPLACE ? " — REPLACE ON" : ""}\n`);
 
-let done = 0, skipped = 0, failed = 0;
+let done = 0, replaced = 0, skipped = 0, failed = 0;
 for (const item of filtered.sort((a, b) => (a.slug ?? "").localeCompare(b.slug ?? "") || a.category.localeCompare(b.category))) {
   const partner = item.slug ? bySlug.get(item.slug) : null;
   if (item.slug && !partner) {
@@ -220,13 +227,21 @@ for (const item of filtered.sort((a, b) => (a.slug ?? "").localeCompare(b.slug ?
   }
 
   const key = `${partner?.id ?? "shared"}|${item.title}`;
-  if (already.has(key)) {
+  const prior = already.get(key);
+  // Same title AND same byte count: nothing to reissue. Size is a cheap
+  // heuristic, not a checksum — an edit that happens to land on the identical
+  // length would slip through — but it stops --replace from needlessly
+  // re-uploading every unchanged file, including the signed agreement, and
+  // churning storage paths for no reason.
+  const unchanged = prior != null && prior.file_size === item.size;
+  if (prior && (!REPLACE || unchanged)) {
     console.log(`  [have] ${(partner?.slug ?? "shared").padEnd(13)} ${item.category.padEnd(9)} ${item.title}`);
     skipped++;
     continue;
   }
 
-  console.log(`  ${APPLY ? "[add] " : "[dry] "} ${(partner?.slug ?? "shared").padEnd(13)} ${item.category.padEnd(9)} ${item.title.slice(0, 44).padEnd(46)} ${(item.size / 1024).toFixed(0)}KB`);
+  const verb = prior ? (APPLY ? "[swap]" : "[dry~]") : APPLY ? "[add] " : "[dry] ";
+  console.log(`  ${verb} ${(partner?.slug ?? "shared").padEnd(13)} ${item.category.padEnd(9)} ${item.title.slice(0, 44).padEnd(46)} ${(item.size / 1024).toFixed(0)}KB`);
   if (!APPLY) continue;
 
   const ext = path.extname(item.file).toLowerCase();
@@ -244,19 +259,34 @@ for (const item of filtered.sort((a, b) => (a.slug ?? "").localeCompare(b.slug ?
     continue;
   }
 
-  const ins = await fetch(`${URL_BASE}/rest/v1/pp_resources`, {
-    method: "POST",
-    headers: { ...H, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      partner_id: partner?.id ?? null,
-      category: item.category,
-      title: item.title,
-      description: item.description,
-      storage_path: storagePath,
-      mime: MIME[ext] ?? null,
-      file_size: item.size,
-    }),
-  });
+  // Replacing PATCHES the existing row rather than deleting and re-inserting,
+  // so the resource id survives — pp_resources.pack references it, and any
+  // signed URL already handed out keeps resolving to a live row.
+  const ins = prior
+    ? await fetch(`${URL_BASE}/rest/v1/pp_resources?id=eq.${prior.id}`, {
+        method: "PATCH",
+        headers: { ...H, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: item.category,
+          description: item.description,
+          storage_path: storagePath,
+          mime: MIME[ext] ?? null,
+          file_size: item.size,
+        }),
+      })
+    : await fetch(`${URL_BASE}/rest/v1/pp_resources`, {
+        method: "POST",
+        headers: { ...H, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partner_id: partner?.id ?? null,
+          category: item.category,
+          title: item.title,
+          description: item.description,
+          storage_path: storagePath,
+          mime: MIME[ext] ?? null,
+          file_size: item.size,
+        }),
+      });
   if (!ins.ok) {
     // Don't leave an object nothing lists — it would never be found again.
     await fetch(`${URL_BASE}/storage/v1/object/${BUCKET}/${storagePath}`, { method: "DELETE", headers: H });
