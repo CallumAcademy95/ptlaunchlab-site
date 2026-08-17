@@ -12,6 +12,14 @@
  * /learn/c/<courseId> — /learn alone redirects to the induction — and a unit at
  * /learn/<unitId>.
  *
+ * The demo learner must clear BOTH gates before running this, or /learn/*
+ * silently redirects and every shot after that lands on the wrong screen:
+ *   1. The six-module welcome induction — seeded by
+ *      albaco-lms/scripts/seed-partner-guide-progress.mjs.
+ *   2. The course-level "Getting started"/ILP page. There is no seed script
+ *      for this one — it currently has to be completed by hand in a browser
+ *      before capturing.
+ *
  * The two close-ups scroll their subject into view and shoot the viewport
  * rather than an element. Element screenshots need an ancestor selector that
  * happens to be the visual card, and when that guess is wrong it fails
@@ -51,9 +59,30 @@ async function dismissBanners() {
   if (await close.isVisible().catch(() => false)) await close.click().catch(() => {});
 }
 
+/**
+ * Praxel redirects /learn/* to the induction (or the course's "Getting
+ * started"/ILP page) whenever the demo learner hasn't cleared that gate.
+ * Confirm we actually landed on the requested path before shooting —
+ * otherwise a redirect produces a screenshot of the wrong screen with no
+ * error, and nobody notices until it's in the printed PDF.
+ */
+function assertLandedOn(name: string, requestedPath: string) {
+  const landed = new URL(page.url());
+  const expected = new URL(`${HOST}${requestedPath}`);
+  if (landed.pathname !== expected.pathname) {
+    throw new Error(
+      `${name}: expected to land on ${expected.pathname} but landed on ${landed.pathname} ` +
+      `instead. This usually means the demo learner hasn't cleared both gates — the ` +
+      `six-module welcome induction and the course-level "Getting started"/ILP page. ` +
+      `Clear both, then re-run.`,
+    );
+  }
+}
+
 async function shot(name: string, url: string, opts: { fullPage?: boolean } = {}) {
   await page.goto(`${HOST}${url}`);
   await page.waitForLoadState("networkidle");
+  assertLandedOn(name, url);
   await dismissBanners();
   await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: opts.fullPage ?? false });
   console.log(`✓ ${name}.png`);
@@ -63,6 +92,7 @@ async function shot(name: string, url: string, opts: { fullPage?: boolean } = {}
 async function closeUp(name: string, url: string, locator: (p: typeof page) => ReturnType<typeof page.locator>) {
   await page.goto(`${HOST}${url}`);
   await page.waitForLoadState("networkidle");
+  assertLandedOn(name, url);
   await dismissBanners();
   const target = locator(page).first();
   await target.waitFor({ state: "visible", timeout: 15_000 });
