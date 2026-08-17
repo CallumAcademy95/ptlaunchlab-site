@@ -132,3 +132,49 @@ figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
   font-size: 9.5pt;
   color: var(--ink);
 }
+
+/* Page 7: practicals in your gym */
+.practical-units { display: flex; gap: 6mm; margin-top: 5mm; }
+.practical-unit {
+  flex: 1;
+  padding: 4mm 4.5mm;
+  background: #F4F7FB;
+  border: 1px solid #DCE4EE;
+  border-radius: 2mm;
+}
+.practical-unit-tag {
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-size: 7pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.9mm 2.2mm;
+  border-radius: 1mm;
+  margin-bottom: 2.5mm;
+}
+.practical-unit-tag--filmed { background: var(--gold); color: var(--navy); }
+.practical-unit h3 { font-size: 12.5pt; color: var(--navy); margin-bottom: 2mm; line-height: 1.15; }
+.practical-unit p { font-size: 9.5pt; color: var(--ink); }
+.practical-heading { font-size: 15pt; color: var(--navy); margin-top: 8mm; margin-bottom: 3mm; }
+.practical-list { list-style: none; margin: 0 0 6mm; }
+.practical-list li {
+  position: relative;
+  padding-left: 5mm;
+  margin-bottom: 3mm;
+  color: var(--ink);
+}
+.practical-list li::before {
+  content: ''; position: absolute; left: 0; top: 0.55em;
+  width: 1.8mm; height: 1.8mm; background: var(--gold); border-radius: 50%;
+}
+.practical-note {
+  margin-top: 4mm;
+  padding: 3mm 4mm;
+  border-left: 3px solid var(--gold);
+  background: #F4F7FB;
+  font-size: 9.5pt;
+  color: var(--ink);
+}
+.practical-note--muted { border-left-color: var(--soft); background: #fff; border: 1px solid #DCE4EE; border-left-width: 3px; }
