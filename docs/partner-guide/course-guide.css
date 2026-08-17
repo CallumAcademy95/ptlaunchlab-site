@@ -178,3 +178,42 @@ figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
   color: var(--ink);
 }
 .practical-note--muted { border-left-color: var(--soft); background: #fff; border: 1px solid #DCE4EE; border-left-width: 3px; }
+
+/* Page 8: where you fit */
+.role-columns { display: flex; gap: 7mm; margin-top: 5mm; }
+.role-column {
+  flex: 1;
+  padding: 4mm 4.5mm;
+  background: #F4F7FB;
+  border: 1px solid #DCE4EE;
+  border-radius: 2mm;
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+.role-column--help { border-left-color: var(--gold); }
+.role-column--leave { border-left-color: var(--soft); }
+.role-heading { font-size: 13pt; color: var(--navy); margin-bottom: 3mm; line-height: 1.15; }
+.role-list { list-style: none; margin: 0; }
+.role-list li {
+  position: relative;
+  padding-left: 4.5mm;
+  margin-bottom: 2.5mm;
+  font-size: 9.5pt;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.role-list li::before {
+  content: ''; position: absolute; left: 0; top: 0.55em;
+  width: 1.6mm; height: 1.6mm; background: var(--gold); border-radius: 50%;
+}
+.role-note {
+  margin-top: 6mm;
+  padding: 4mm 0;
+  border-top: 1px solid #DCE4EE;
+  border-bottom: 1px solid #DCE4EE;
+  text-align: center;
+}
+.role-note p { font-size: 10pt; font-style: italic; color: var(--navy); }
+.role-contact { margin-top: 6mm; text-align: center; }
+.role-contact p { font-size: 9.5pt; color: var(--soft); }
+.role-contact a { color: var(--navy); font-weight: 600; text-decoration: none; }
