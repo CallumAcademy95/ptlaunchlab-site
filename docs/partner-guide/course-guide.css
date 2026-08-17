@@ -80,3 +80,55 @@ figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
 /* Page 5: what they see */
 .views-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 6mm 8mm; margin-top: 4mm; }
 .views-grid figure { margin: 0; }
+
+/* Page 6: what's in the course */
+.units-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  gap: 4mm 8mm;
+  margin-top: 5mm;
+}
+.units-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 3.5mm;
+  padding: 3mm 3.5mm;
+  background: #F4F7FB;
+  border: 1px solid #DCE4EE;
+  border-radius: 2mm;
+}
+.units-card--gym { border-color: var(--gold); background: #FBF6E2; }
+.units-number {
+  flex: 0 0 auto;
+  width: 8.5mm; height: 8.5mm;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--gold);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 12.5pt;
+  display: flex; align-items: center; justify-content: center;
+}
+.units-body { display: flex; flex-direction: column; gap: 1.5mm; }
+.units-title { font-size: 9.5pt; font-weight: 600; line-height: 1.25; color: var(--navy); }
+.units-tag {
+  align-self: flex-start;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 7pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.7mm 2mm;
+  border-radius: 1mm;
+}
+.units-note {
+  margin-top: 6mm;
+  padding: 3mm 4mm;
+  border-left: 3px solid var(--gold);
+  background: #F4F7FB;
+  font-size: 9.5pt;
+  color: var(--ink);
+}
