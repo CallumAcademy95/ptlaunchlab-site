@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Poppins:wght@400;500;600&display=swap');
+
+@page { size: A4 portrait; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #070D1B;
+  --card: #102342;
+  --gold: #F5C518;
+  --ink: #0B1524;
+  --soft: #5A6B82;
+}
+
+body { font-family: Poppins, sans-serif; color: var(--ink); }
+
+.page {
+  width: 210mm; height: 297mm;
+  padding: 16mm 15mm;
+  page-break-after: always;
+  position: relative;
+  overflow: hidden;          /* a page that overflows silently steals the next one */
+}
+.page:last-child { page-break-after: auto; }
+
+h1, h2, h3 { font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+h2 { font-size: 30pt; line-height: 1; margin-bottom: 6mm; }
+p, li { font-size: 10.5pt; line-height: 1.55; }
+
+.cover { background: var(--navy); color: #fff; }
+.rule { height: 3px; background: var(--gold); width: 28mm; margin: 5mm 0; }
+figure { margin: 4mm 0; }
+figure img { width: 100%; border: 1px solid #DCE4EE; border-radius: 3mm; }
+figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
+
+/* Page 1: cover */
+.cover { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+.cover .brand-mark { height: 14mm; width: auto; }
+.cover .cover-body h1 {
+  font-size: 44pt;
+  line-height: 1.05;
+  max-width: 145mm;
+}
+.cover .cover-body p {
+  font-size: 12.5pt;
+  color: #C7D2E3;
+  max-width: 130mm;
+  margin-top: 5mm;
+}
+.cover-footer { display: flex; align-items: flex-end; justify-content: space-between; }
+.cover-footer .partner-logos { display: flex; align-items: center; gap: 10mm; }
+.cover-footer .partner-logos img { height: 11mm; width: auto; }
+.cover-footer .version { font-size: 9pt; color: #8FA0BC; letter-spacing: 0.04em; }
+
+/* Page 2: the 60-second version */
+.block { margin-bottom: 9mm; }
+.block h3 { font-size: 14pt; color: var(--navy); margin-bottom: 2.5mm; }
+.block p { color: var(--ink); }
