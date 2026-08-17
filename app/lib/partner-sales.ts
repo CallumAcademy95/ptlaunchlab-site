@@ -9,23 +9,14 @@
 // a second commission.
 
 import { getSupabaseAdmin } from "./supabase-admin";
+import { DEPOSIT_PLAN_TOTAL_PENCE, isDepositSale } from "./coursePlan";
 
-/** £599 deposit; every pay-in-full variant (1,099 / 1,299 / 1,399 / 1,599) is above this. */
-const DEPOSIT_CEILING_PENCE = 70_000;
-/** Deposit plan total: £599 + 5 × £200. */
-const DEPOSIT_PLAN_TOTAL_PENCE = 159_900;
-
-/**
- * Is this sale a deposit plan rather than a pay-in-full?
- *
- * Decided by the shape of the sale, never by whether the amount clears £1,300.
- * A gym pay-in-full is discounted to £1,099, so an amount test calls it a
- * deposit — which is what the Sheet tracker did until 2026-07-28, mislabelling
- * every discounted gym PIF it ever wrote.
- */
-export function isDepositSale(args: { mode?: string | null; amountTotalPence: number }): boolean {
-  return args.mode === "subscription" || args.amountTotalPence <= DEPOSIT_CEILING_PENCE;
-}
+// The deposit-vs-PIF rule lives in ./coursePlan (unit-tested, no dependencies)
+// so the portal, the Sheet tracker and every email answer it identically. It
+// used to be duplicated, and the copies drifted: the emails kept an
+// `amount >= 1300` test long after this file stopped using one, and called a
+// settled £1,099 partner pay-in-full a deposit.
+export { isDepositSale };
 
 export interface PartnerSaleInput {
   stripeSessionId: string;
@@ -39,6 +30,8 @@ export interface PartnerSaleInput {
   amountTotalPence: number;
   /** Stripe checkout mode. "subscription" always means a deposit plan. */
   mode?: string | null;
+  /** `metadata.plan` off the session — the deposit-vs-PIF signal a promo code cannot move. */
+  metadataPlan?: string | null;
   promoCode?: string | null;
   enrolledAt?: Date;
 }

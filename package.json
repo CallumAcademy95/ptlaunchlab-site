@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:unit": "node --test \"tests/*.test.mts\"",
     "e2e:prices": "node e2e/provision-test-prices.mjs",
     "e2e:server": "node e2e/dev-server.mjs",
     "test:e2e": "npm run e2e:prices && playwright test",

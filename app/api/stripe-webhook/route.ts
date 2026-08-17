@@ -9,7 +9,15 @@ import {
   cancelSubscription,
   countSettledInstalments,
 } from "@/app/lib/stripeCheckout";
-import { recordPartnerSale, applyInstalmentToPartnerSale, isDepositSale } from "@/app/lib/partner-sales";
+import { recordPartnerSale, applyInstalmentToPartnerSale } from "@/app/lib/partner-sales";
+import {
+  isDepositSale,
+  planTypeForSale,
+  planLabel,
+  outstandingBalancePence,
+  formatGbp,
+  type SaleShape,
+} from "@/app/lib/coursePlan";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -101,6 +109,17 @@ type StripeEvent = {
   type: string;
   data: { object: StripeSession };
 };
+
+// The single place a Stripe session is reduced to what decides deposit-vs-PIF.
+// Everything downstream — the alarm, both emails, the Sheet, Meta — classifies
+// off this, so they cannot disagree with each other again. See app/lib/coursePlan.
+function saleShape(session: StripeSession): SaleShape {
+  return {
+    mode: session.mode,
+    amountTotalPence: session.amount_total ?? 0,
+    metadataPlan: session.metadata?.plan,
+  };
+}
 
 function decodeClientRef(raw: string | null | undefined): Record<string, string> {
   if (!raw) return {};
@@ -199,7 +218,7 @@ async function sendToGa4(session: StripeSession) {
   // concession and the full £1,599 is what gets spread. The promo only ever
   // discounts pay-in-full. Confirmed by Callum 2026-07-26.
   if (attribution["funnel_promo"]) {
-    const isPif = amount >= 1300; // discounted PIF is £1,399; deposit is £599
+    const isPif = !isDepositSale(saleShape(session));
     console.warn(
       `[stripe-webhook] FUNNEL PROMO ${isPif ? "PIF" : "DEPOSIT"} — ` +
         `source=${attribution["funnel_promo"]} ` +
@@ -277,7 +296,11 @@ async function sendToMetaCapi(session: StripeSession) {
   // (e.g. a gym-membership subscription that shares this Stripe account) as a
   // course sale — those keep their real amount.
   const hasFunnelPromo = !!attribution["funnel_promo"];
-  const isPif = amountPaid >= 1300;
+  const isPif = !isDepositSale(saleShape(session));
+  // Still gated on £599 exactly — the uplift below invents contract value, and
+  // only a deposit charged at its undiscounted price has £1,000 to come. The
+  // deposit price carries allow_promotion_codes=false, so a real deposit is
+  // always exactly £599; anything else claiming to be one gets its real amount.
   const isCourseDeposit = amountPaid === 599;
   const courseValue = isCourseDeposit ? (hasFunnelPromo ? 1399 : 1599) : amountPaid;
 
@@ -342,9 +365,7 @@ async function sendToGymTracker(session: StripeSession) {
   // a deposit — 8 of the 9 gym sales in the Sheet were labelled wrong. Shares
   // the partner portal's rule now so the two records agree. Rows written before
   // 2026-07-28 still carry the old label.
-  const plan_type = isDepositSale({ mode: session.mode, amountTotalPence: session.amount_total ?? 0 })
-    ? "deposit"
-    : "PIF";
+  const plan_type = planTypeForSale(saleShape(session));
 
   await fetch(url, {
     method: "POST",
@@ -396,10 +417,9 @@ async function sendPaidReconciliation(session: StripeSession) {
   const email = session.customer_email || session.customer_details?.email || "";
   const name = buyerName(session);
   const phone = session.customer_details?.phone || "";
-  const planType = amount >= 1300 ? "PIF" : "deposit";
-  const planLabel = planType === "PIF"
-    ? `Pay in Full — £${amount.toLocaleString()}`
-    : `Deposit — £${amount.toLocaleString()}`;
+  const sale = saleShape(session);
+  const planType = planTypeForSale(sale);
+  const label = planLabel(sale);
   const attribution = decodeClientRef(session.client_reference_id);
   const gymReferral = session.metadata?.gym_referral || attribution.gym || "";
   const promoCode = session.metadata?.promo_code ?? "";
@@ -408,10 +428,17 @@ async function sendPaidReconciliation(session: StripeSession) {
   // A deposit that arrived as a one-off payment while instalments are switched
   // on means /api/checkout fell back to the raw Payment Link — so no £200/month
   // mandate was taken. The buyer was shown a page promising automatic monthly
-  // collection, and there is now no mechanism to collect the £1,000 balance.
-  // Silence here would mean discovering it a month later, or never.
+  // collection, and there is now no mechanism to collect the balance. Silence
+  // here would mean discovering it a month later, or never.
+  //
+  // `planType` decides this, so it must never be derived from the amount: a
+  // £1,099 partner pay-in-full read as a deposit fires this alarm at a learner
+  // who owes nothing, and a false alarm is how a real one gets ignored.
   const missingMandate =
     INSTALMENTS_ENABLED && planType === "deposit" && session.mode !== "subscription";
+  // Derived, not the flat "£1,000" this used to state — that figure is only
+  // right for a £599 deposit and was wrong on the sale that exposed the bug.
+  const uncollected = formatGbp(outstandingBalancePence(sale));
 
   const paidAt = new Date().toLocaleString("en-GB", {
     day: "numeric", month: "long", year: "numeric",
@@ -438,17 +465,17 @@ async function sendPaidReconciliation(session: StripeSession) {
         <strong style="color:#ffffff;">⚠️ NO INSTALMENT MANDATE TAKEN</strong><br><br>
         This deposit arrived as a one-off payment, so checkout fell back to the raw Payment Link and
         <strong style="color:#ffffff;">no £200/month plan was set up</strong> — but the enrol page told this buyer it would be.
-        The remaining <strong style="color:#ffffff;">£1,000 has no way of collecting itself.</strong><br><br>
+        The remaining <strong style="color:#ffffff;">${uncollected} has no way of collecting itself.</strong><br><br>
         Contact them to arrange the balance, then check
         <a href="https://ptlaunchlab.co.uk/api/checkout" style="color:#F5C518;">/api/checkout</a> —
         a fallback means Stripe session creation is failing.
       </div>` : ""}
-      <div style="color:#8CA3BF;font-size:13px;margin-bottom:18px;">${paidAt} &nbsp;·&nbsp; ${planLabel}</div>
+      <div style="color:#8CA3BF;font-size:13px;margin-bottom:18px;">${paidAt} &nbsp;·&nbsp; ${label}</div>
 
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;width:120px;">Email</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${email ? `<a href="mailto:${email}" style="color:#F5C518;">${email}</a>` : "—"}</td></tr>
         <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Phone</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${phone || "—"}</td></tr>
-        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Plan</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${planLabel}</td></tr>
+        <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Plan</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${label}</td></tr>
         ${gymReferral ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Gym referral</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${gymReferral}</td></tr>` : ""}
         ${promoCode ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Promo code</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${promoCode}</td></tr>` : ""}
         <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Stripe</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;"><a href="${stripeLink}" style="color:#F5C518;">${session.id}</a></td></tr>
@@ -474,8 +501,8 @@ async function sendPaidReconciliation(session: StripeSession) {
         from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
         to: ADMIN_EMAIL,
         subject: missingMandate
-          ? `🚨 Deposit paid with NO instalment plan: ${name || email || session.id} — £1,000 uncollected`
-          : `💳 Payment confirmed: ${name || email || session.id} — ${planLabel}`,
+          ? `🚨 Deposit paid with NO instalment plan: ${name || email || session.id} — ${uncollected} uncollected`
+          : `💳 Payment confirmed: ${name || email || session.id} — ${label}`,
         html: adminHtml,
       });
     } catch (err) {
@@ -544,9 +571,10 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
   const amount = (session.amount_total ?? 0) / 100;
   const name = buyerName(session);
   const firstName = name.trim().split(/\s+/)[0] || "";
-  const planLabel = amount >= 1300
-    ? `Pay in Full — £${amount.toLocaleString()}`
-    : `Deposit — £${amount.toLocaleString()}`;
+  // Buyer-facing, so the amount test that used to be here was the worst copy of
+  // it: a £1,099 partner pay-in-full was told, in writing, that she had paid a
+  // deposit.
+  const label = planLabel(saleShape(session));
   const completionLink = `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`;
 
   const html = `
@@ -562,7 +590,7 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
     <div style="background:#0A2A44;padding:26px;border-radius:0 0 12px 12px;color:#C7D6E8;font-size:14px;line-height:1.65;">
       <p style="margin:0 0 14px;">Hi${firstName ? ` ${firstName}` : ""},</p>
       <p style="margin:0 0 14px;">
-        Your payment of <strong style="color:#ffffff;">£${amount.toLocaleString()}</strong> (${planLabel}) has gone through —
+        Your payment of <strong style="color:#ffffff;">£${amount.toLocaleString()}</strong> (${label}) has gone through —
         thank you, and welcome to PT Launch Lab.
       </p>
       <p style="margin:0 0 20px;">
@@ -853,6 +881,7 @@ export async function POST(req: NextRequest) {
           learnerEmail: session.customer_email || session.customer_details?.email || null,
           amountTotalPence: session.amount_total ?? 0,
           mode: session.mode ?? null,
+          metadataPlan: session.metadata?.plan ?? null,
           promoCode: session.metadata?.promo_code ?? null,
         });
         if (!result.ok) {

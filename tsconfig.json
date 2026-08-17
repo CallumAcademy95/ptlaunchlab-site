@@ -10,6 +10,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // tests/ run on Node's own type stripping (`npm run test:unit`), which needs
+    // the real file extension on a relative import. Safe alongside noEmit.
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
