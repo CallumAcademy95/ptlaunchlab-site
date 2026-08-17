@@ -55,3 +55,28 @@ figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
 .summary-block { margin-bottom: 9mm; }
 .summary-block h3 { font-size: 14pt; color: var(--navy); margin-bottom: 2.5mm; }
 .summary-block p { color: var(--ink); }
+
+/* Page 3: how Praxel works */
+.platform-layout { display: flex; align-items: flex-start; gap: 8mm; margin-top: 4mm; }
+.platform-points { flex: 0 0 78mm; display: flex; flex-direction: column; gap: 6mm; }
+.platform-point h3 { font-size: 12.5pt; color: var(--navy); margin-bottom: 1.5mm; }
+.platform-point p { font-size: 10pt; color: var(--ink); }
+.platform-figure { flex: 1; margin: 0; }
+
+/* Page 4: what a learner actually does */
+.loop-flow { display: flex; gap: 2mm; margin: 6mm 0; }
+.loop-flow div {
+  flex: 1; background: var(--card); color: #fff; border-radius: 2mm;
+  padding: 4mm 2mm; text-align: center; font-size: 8pt; font-weight: 600;
+}
+.loop-flow div:nth-child(odd) { background: var(--navy); }
+.loop-notes { list-style: none; margin: 0 0 6mm; }
+.loop-notes li { position: relative; padding-left: 5mm; margin-bottom: 2.5mm; color: var(--ink); }
+.loop-notes li::before {
+  content: ''; position: absolute; left: 0; top: 0.55em;
+  width: 1.8mm; height: 1.8mm; background: var(--gold); border-radius: 50%;
+}
+
+/* Page 5: what they see */
+.views-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 6mm 8mm; margin-top: 4mm; }
+.views-grid figure { margin: 0; }
