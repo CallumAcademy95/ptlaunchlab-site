@@ -34,24 +34,24 @@ figcaption { font-size: 8.5pt; color: var(--soft); margin-top: 2mm; }
 
 /* Page 1: cover */
 .cover { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
-.cover .brand-mark { height: 14mm; width: auto; }
-.cover .cover-body h1 {
+.cover .cover-mark { height: 14mm; width: auto; }
+.cover .cover-intro h1 {
   font-size: 44pt;
   line-height: 1.05;
   max-width: 145mm;
 }
-.cover .cover-body p {
+.cover .cover-intro p {
   font-size: 12.5pt;
   color: #C7D2E3;
   max-width: 130mm;
   margin-top: 5mm;
 }
-.cover-footer { display: flex; align-items: flex-end; justify-content: space-between; }
-.cover-footer .partner-logos { display: flex; align-items: center; gap: 10mm; }
-.cover-footer .partner-logos img { height: 11mm; width: auto; }
-.cover-footer .version { font-size: 9pt; color: #8FA0BC; letter-spacing: 0.04em; }
+.cover-meta { display: flex; align-items: flex-end; justify-content: space-between; }
+.cover-meta .cover-logos { display: flex; align-items: center; gap: 10mm; }
+.cover-meta .cover-logos img { height: 11mm; width: auto; }
+.cover-meta .cover-version { font-size: 9pt; color: #8FA0BC; letter-spacing: 0.04em; }
 
 /* Page 2: the 60-second version */
-.block { margin-bottom: 9mm; }
-.block h3 { font-size: 14pt; color: var(--navy); margin-bottom: 2.5mm; }
-.block p { color: var(--ink); }
+.summary-block { margin-bottom: 9mm; }
+.summary-block h3 { font-size: 14pt; color: var(--navy); margin-bottom: 2.5mm; }
+.summary-block p { color: var(--ink); }
