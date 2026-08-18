@@ -152,7 +152,9 @@ function html(gymName: string, firstName: string | null) {
 </body></html>`;
 }
 
-console.log(`${APPLY ? "SENDING" : "DRY RUN"} — ${targets.length} partner(s)\n`);
+// --email sends immediately, so the header must not claim otherwise. The
+// portal announcement this was copied from prints "DRY RUN" and then sends.
+console.log(`${APPLY || TEST_EMAIL ? "SENDING" : "DRY RUN"} — ${targets.length} partner(s)\n`);
 for (const t of targets) {
   console.log(`  ${t.partner.gym_name.padEnd(24)} ${t.email}`);
 }
