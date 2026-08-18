@@ -20,6 +20,7 @@ export const RESOURCE_CATEGORIES = [
   { key: "learner", label: "Learner handouts", blurb: "What to give a member who asks" },
   { key: "training", label: "Selling the course", blurb: "How you and your staff talk about it" },
   { key: "legal", label: "Legal", blurb: "Your signed agreement and terms" },
+  { key: "delivery", label: "Supporting your learners", blurb: "What the course involves and how to help" },
 ] as const;
 
 export type ResourceCategory = (typeof RESOURCE_CATEGORIES)[number]["key"];
