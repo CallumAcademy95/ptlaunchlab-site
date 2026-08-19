@@ -1155,7 +1155,9 @@ git commit -m "Build a contact sheet so every ad is reviewed before upload"
 
 - [ ] **Step 5: STOP — get Callum's approval**
 
-Do not continue to Task 8 (upload) until Callum has seen the contact sheet and said yes. Task 7 is independent of approval and may proceed.
+The approval gate binds **Task 9 (upload)** — nothing reaches `pp_resources` until Callum has seen a contact sheet and said yes.
+
+Tasks 7 (playbook copy) and 8 (harvester) are independent of approval and may proceed. Note that Task 8 adds photographs and re-renders, so **the sheet Callum approves is the one built after Task 8**, not this first flat one. This first sheet is for catching layout and branding faults early.
 
 ---
 
