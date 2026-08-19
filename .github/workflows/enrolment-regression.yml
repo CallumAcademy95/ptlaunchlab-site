@@ -2,11 +2,17 @@
 #
 # Three jobs, because the failure modes have different shapes:
 #
-#   unit-tests      — runs on every change. No secrets, no browser. Protects
-#                     the money rules in tests/stripeDiscounts.test.mts and
-#                     tests/promoCodes.test.mts: a deposit is never
-#                     discounted, and a session never carries both `discounts`
-#                     and `allow_promotion_codes`.
+#   unit-tests      — runs on every change. `npm run test:unit` (node --test),
+#                     no secrets, no browser. Protects the money rules in
+#                     tests/stripeDiscounts.test.mts and tests/promoCodes.test.mts
+#                     (a deposit is never discounted, a session never carries
+#                     both `discounts` and `allow_promotion_codes`) and is also
+#                     the only place the ad copy claim gate
+#                     (tests/adCopy.test.mts) runs: without it, the sole check
+#                     on an edit to partner-playbook/campaign-meta-ads.md
+#                     reintroducing job-offer language is someone remembering
+#                     to run tests locally before nine partners paste it into
+#                     Meta Ads Manager.
 #
 #   code-regression — runs on every change. Stripe TEST mode only, no live
 #                     credentials. Catches success_url being edited or the
@@ -31,7 +37,7 @@ on:
 
 jobs:
   unit-tests:
-    name: Unit tests (promo code + discount money rules)
+    name: Unit tests (node --test)
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 10
