@@ -197,10 +197,10 @@ export type PromoResolution =
 /**
  * Pick the promotion code a learner may use.
  *
- * Order matters. Ownership is checked before existence so that a valid code
- * belonging to another gym and a code that does not exist are indistinguishable
- * to the caller — the API returns the same message for both, because confirming
- * that HITIO500 exists tells a stranger a slot-capped code is worth guessing.
+ * Order matters, but not for secrecy: the validate route returns the SAME
+ * message for `unknown` and `wrong-partner`, so a stranger still cannot learn
+ * whether HITIO500 exists. Existence is checked first so the server log tells
+ * the truth about which of the two actually happened.
  */
 export function selectPromoCode(
   list: StripePromotionCode[],
@@ -210,15 +210,19 @@ export function selectPromoCode(
   const wanted = code.trim().toUpperCase();
   if (!wanted) return { ok: false, reason: "unknown" };
 
+  // Existence first, ownership second. Both refusals return the SAME message to
+  // the learner (see the validate route), so the ordering leaks nothing — but it
+  // decides whether the server log says "no such code" or "not this gym's code",
+  // and only one of those is true in each case.
+  const matches = list.filter((p) => p.code.trim().toUpperCase() === wanted);
+  if (matches.length === 0) return { ok: false, reason: "unknown" };
+
   // A list, not a single prefix: Iron Wolf's standing code is IWGPTDISCOUNT but
   // its launch codes are IRONWOLF500/300, and Muscle Bound is MBG/MUSCLEBOUND.
   // A single prefix would refuse those gyms' own codes — the exact bug we are here to fix.
   if (!prefixes.some((p) => wanted.startsWith(p.trim().toUpperCase()))) {
     return { ok: false, reason: "wrong-partner" };
   }
-
-  const matches = list.filter((p) => p.code.trim().toUpperCase() === wanted);
-  if (matches.length === 0) return { ok: false, reason: "unknown" };
 
   // A duplicated string always has exactly one active version and an archived
   // twin — verified across all 18 duplicates in the account. Preferring the
