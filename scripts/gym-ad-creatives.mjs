@@ -77,7 +77,14 @@ body{width:${w}px;height:${h}px;background:${bg};font-family:Poppins,sans-serif;
 .eyebrow{margin-top:${tall ? 40 : 30}px;font-family:Poppins;font-weight:600;letter-spacing:.16em;
   font-size:${tall ? 30 : 26}px;color:${accent}}
 h1{margin-top:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;line-height:.94;
-  font-size:${tall ? 116 : 92}px;letter-spacing:-.01em;text-transform:uppercase}
+  /* Tall stage is 904px wide (1080 - 88px margins each side). At 116px, Barlow
+     Condensed 800's "YOU'RE ALREADY HERE" (concept A's first headline line)
+     measures ~917px, so it wraps mid-thought and strands "HERE" alone on its
+     own line on every gym's already-here-1080x1920.png. 108px measures ~854px
+     for that same string — comfortably inside 904px with margin to spare —
+     while every other headline line (already shorter) fits with room to spare
+     at both sizes, so this is a size-only fix with no wording change. */
+  font-size:${tall ? 108 : 92}px;letter-spacing:-.01em;text-transform:uppercase}
 h1 .accent{color:${accent}}
 .sub{margin-top:${tall ? 34 : 26}px;font-size:${tall ? 32 : 27}px;line-height:1.42;color:#E8EDF4;
   max-width:${tall ? 880 : 820}px}

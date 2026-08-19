@@ -67,14 +67,46 @@ test("the local concept names the gym's own town", () => {
   assert.match(text.accentLine, /WIBSEY/i);
 });
 
-test("headline lines stay short enough to set large", () => {
+// Barlow Condensed 800 headline lines render in a 904px-wide stage (1080px
+// canvas minus 88px margins either side) at 108px on the tall (1080x1920)
+// creative. "YOU'RE ALREADY HERE" — the string that produced the orphaned
+// "HERE" on every gym's already-here-1080x1920.png before the layout fix —
+// measures ~854px there, an average of ~45px per character (854 / 19 chars).
+// 904px of stage / ~45px per char ≈ 20 characters before a line is at real
+// risk of wrapping. The old limit of 34 was 70% looser than that and let the
+// actual regression straight through. 20 is a character-count heuristic, not
+// a pixel measurement, so it stays intentionally tight rather than exact.
+const MAX_HEADLINE_CHARS = 20;
+
+test("headline lines stay short enough to set large on one line", () => {
+  // Only `headline` — each array element is designed to render as exactly one
+  // line. `accentLine` is checked separately below: it is allowed to wrap
+  // onto a second line ("WITHOUT LEAVING" / "<TOWN>.") by design, since the
+  // town name is dynamic per gym and that break reads as an intentional
+  // punchline rather than an orphaned fragment.
   for (const [slug, brand] of REAL) {
     const tokens = tokensForGym(brand, "https://ptlaunchlab.co.uk");
     for (const concept of CONCEPTS) {
       const text = conceptText(concept, tokens);
-      for (const line of [...text.headline, text.accentLine]) {
-        assert.ok(line.length <= 34, `${slug}/${concept.id} line too long (${line.length}): "${line}"`);
+      for (const line of text.headline) {
+        assert.ok(
+          line.length <= MAX_HEADLINE_CHARS,
+          `${slug}/${concept.id} headline line too long (${line.length}): "${line}"`,
+        );
       }
+    }
+  }
+});
+
+test("the accent line stays within a sane length even though it may wrap to a second line", () => {
+  for (const [slug, brand] of REAL) {
+    const tokens = tokensForGym(brand, "https://ptlaunchlab.co.uk");
+    for (const concept of CONCEPTS) {
+      const text = conceptText(concept, tokens);
+      assert.ok(
+        text.accentLine.length <= 34,
+        `${slug}/${concept.id} accent line too long (${text.accentLine.length}): "${text.accentLine}"`,
+      );
     }
   }
 });
