@@ -28,7 +28,7 @@
 //   key (rk_live_…GBxkR2) on 2026-07-26; verify with GET /api/checkout, which is
 //   a permission health check, or run `npm run test:e2e` (see e2e/README.md).
 
-import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments";
+import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments.ts";
 
 // The public origin baked into success_url / cancel_url.
 //
@@ -81,7 +81,7 @@ export const ENROL_SUCCESS_URL = `${SITE_URL}/enrol/success?session_id={CHECKOUT
 // `allowPromotionCodes` likewise mirrors each link's current setting: only the
 // £1,599 PIF link accepts codes at Stripe checkout (that's how the partner gym
 // discounts are applied).
-interface LinkConfig {
+export interface LinkConfig {
   price: string;
   amount: number;                 // GBP, for logging/telemetry only — Stripe charges off the price ID
   label: string;
@@ -172,6 +172,8 @@ export interface CheckoutSessionInput {
   /** Stable partner join key. See PartnerConfig.gymSlug — display names aren't safe to join on. */
   gymSlug?: string;
   promoCode?: string;
+  /** Stripe promotion code id, already resolved server-side. See buildSessionParams. */
+  promoCodeId?: string;
   funnelPromo?: string;
   /** Where to send a buyer who backs out of Stripe. Must be a ptlaunchlab.co.uk path. */
   cancelPath?: string;
@@ -301,6 +303,87 @@ export async function countSettledInstalments(subscriptionId: string): Promise<n
 }
 
 /**
+ * The Checkout Session parameters, as a plain object.
+ *
+ * Extracted from createCheckoutSession so the two money rules below can be
+ * tested without creating real sessions. Everything here was previously inline
+ * and is unchanged except where the discount rules are applied.
+ */
+export function buildSessionParams(
+  input: CheckoutSessionInput,
+  config: LinkConfig,
+  opts: { withInstalments: boolean; target: number; cancelPath: string },
+): Record<string, unknown> {
+  const { withInstalments, target, cancelPath } = opts;
+
+  // A deposit is never discounted. The rule is Callum's, from 2026-07-26, and
+  // the webhook has stated it since — but the enrolment page contradicted it and
+  // promised £1,399 while Stripe billed £1,599. Enforcing it here means the UI
+  // is no longer the only thing standing between a deposit and a discount.
+  const discountable = !withInstalments && config.amount >= 1300;
+  const discountId = discountable ? input.promoCodeId : undefined;
+
+  return {
+    mode: withInstalments ? "subscription" : "payment",
+    line_items: withInstalments
+      ? [
+          { price: config.price, quantity: 1 },            // £599 deposit, charged now
+          { price: INSTALMENT_PRICE_ID, quantity: 1 },     // £200/month, starts after the trial
+        ]
+      : [{ price: config.price, quantity: 1 }],
+    ...(withInstalments && {
+      subscription_data: {
+        trial_period_days: INSTALMENT_TRIAL_DAYS,
+        // The webhook reads these off each invoice's subscription to know when
+        // to stop. Counting invoices beats computing an end date: month-end
+        // enrolments and Stripe's retry-shifted billing dates both break date
+        // arithmetic, and overcharging a learner is the worst failure here.
+        metadata: {
+          ptll_plan: "deposit_instalments",
+          instalments_target: String(target),
+          instalments_paid: "0",
+          buyer_name: input.name?.trim().slice(0, 200),
+          buyer_email: input.email?.trim().toLowerCase(),
+          gym_referral: input.gymReferral,
+          gym_slug: input.gymSlug,
+          promo_code: input.promoCode,
+          funnel_promo: input.funnelPromo,
+        },
+      },
+    }),
+    success_url: ENROL_SUCCESS_URL,
+    cancel_url: `${SITE_URL}${cancelPath}`,
+    // Prefills the email on Stripe's page, same as the old ?prefilled_email=
+    customer_email: input.email?.trim().toLowerCase(),
+    client_reference_id: input.clientReferenceId,
+    ...(discountId && { discounts: [{ promotion_code: discountId }] }),
+    // Stripe rejects a session carrying both `discounts` and
+    // `allow_promotion_codes`, so applying a discount necessarily removes the
+    // second code box — which is the confusion this whole change exists to end.
+    allow_promotion_codes: discountId ? false : config.allowPromotionCodes,
+    // Metadata is the durable, structured home for this — the base64
+    // client_reference_id blob is capped at 200 chars and drops fields when
+    // full. The webhook already prefers metadata over the blob.
+    metadata: {
+      plan: config.amount >= 1300 ? "PIF" : "deposit",
+      buyer_name: input.name?.trim().slice(0, 200),
+      gym_referral: input.gymReferral,
+      // The partner platform joins on this, NOT on gym_referral. Present from
+      // 2026-07-27 onward; anything older needs the legacy display-name match.
+      gym_slug: input.gymSlug,
+      promo_code: input.promoCode,
+      funnel_promo: input.funnelPromo,
+      // `source` is how the webhook tells OUR course sales apart from the
+      // Ultimate Shred gym memberships sharing this account. It used to key on
+      // mode !== 'subscription', which stops working the moment deposits become
+      // subscriptions.
+      source: "api-checkout-session",
+      instalments: withInstalments ? String(target) : undefined,
+    },
+  };
+}
+
+/**
  * Creates a Stripe Checkout Session with the return URL baked in.
  * Returns null on ANY failure — callers must fall back to `paymentLink`.
  */
@@ -335,60 +418,12 @@ export async function createCheckoutSession(
   const withInstalments = isDeposit && INSTALMENTS_ENABLED && !!INSTALMENT_PRICE_ID;
   const target = instalmentTarget();
 
-  const body = encodeForm({
-    mode: withInstalments ? "subscription" : "payment",
-    line_items: withInstalments
-      ? [
-          { price: config.price, quantity: 1 },            // £599 deposit, charged now
-          { price: INSTALMENT_PRICE_ID, quantity: 1 },     // £200/month, starts after the trial
-        ]
-      : [{ price: config.price, quantity: 1 }],
-    ...(withInstalments && {
-      subscription_data: {
-        trial_period_days: INSTALMENT_TRIAL_DAYS,
-        // The webhook reads these off each invoice's subscription to know when
-        // to stop. Counting invoices beats computing an end date: month-end
-        // enrolments and Stripe's retry-shifted billing dates both break date
-        // arithmetic, and overcharging a learner is the worst failure here.
-        metadata: {
-          ptll_plan: "deposit_instalments",
-          instalments_target: String(target),
-          instalments_paid: "0",
-          buyer_name: input.name?.trim().slice(0, 200),
-          buyer_email: input.email?.trim().toLowerCase(),
-          gym_referral: input.gymReferral,
-          gym_slug: input.gymSlug,
-          promo_code: input.promoCode,
-          funnel_promo: input.funnelPromo,
-        },
-      },
-    }),
-    success_url: ENROL_SUCCESS_URL,
-    cancel_url: `${SITE_URL}${cancelPath}`,
-    // Prefills the email on Stripe's page, same as the old ?prefilled_email=
-    customer_email: input.email?.trim().toLowerCase(),
-    client_reference_id: input.clientReferenceId,
-    allow_promotion_codes: config.allowPromotionCodes,
-    // Metadata is the durable, structured home for this — the base64
-    // client_reference_id blob is capped at 200 chars and drops fields when
-    // full. The webhook already prefers metadata over the blob.
-    metadata: {
-      plan: config.amount >= 1300 ? "PIF" : "deposit",
-      buyer_name: input.name?.trim().slice(0, 200),
-      gym_referral: input.gymReferral,
-      // The partner platform joins on this, NOT on gym_referral. Present from
-      // 2026-07-27 onward; anything older needs the legacy display-name match.
-      gym_slug: input.gymSlug,
-      promo_code: input.promoCode,
-      funnel_promo: input.funnelPromo,
-      // `source` is how the webhook tells OUR course sales apart from the
-      // Ultimate Shred gym memberships sharing this account. It used to key on
-      // mode !== 'subscription', which stops working the moment deposits become
-      // subscriptions.
-      source: "api-checkout-session",
-      instalments: withInstalments ? String(target) : undefined,
-    },
-  }).join("&");
+  // buildSessionParams is typed Record<string, unknown> so tests/stripeDiscounts.test.mts
+  // can assert on it without importing encodeForm's internal FormValue type. The
+  // object it builds is the same shape as before extraction, which IS a FormValue.
+  const body = encodeForm(
+    buildSessionParams(input, config, { withInstalments, target, cancelPath }) as Record<string, FormValue>,
+  ).join("&");
 
   try {
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
