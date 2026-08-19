@@ -56,6 +56,23 @@ test("a banned word inside a longer word is not a hit", () => {
   assert.deepEqual(findBannedClaims("we hire coaches"), ["hire"]);
 });
 
+// Stemmed inflections that the original 16-word hand-enumerated list missed —
+// each of these passed findBannedClaims clean before it was switched to stem
+// matching.
+test("inflections the old word list missed are now caught", () => {
+  assert.deepEqual(findBannedClaims("We are interviewing candidates"), ["interviewing"]);
+  assert.deepEqual(findBannedClaims("Everyone we interviewed loved it"), ["interviewed"]);
+  assert.deepEqual(findBannedClaims("The gym hires its own trainers"), ["hires"]);
+  assert.deepEqual(findBannedClaims("We are guaranteeing a spot"), ["guaranteeing"]);
+  assert.deepEqual(findBannedClaims("Our recruiters will be in touch"), ["recruiters"]);
+});
+
+test("stemming 'job' would also catch the surname Jobson, so it is matched as a whole word instead", () => {
+  assert.deepEqual(findBannedClaims("Coach Jobson runs the floor"), []);
+  assert.deepEqual(findBannedClaims("Ask about the job"), ["job"]);
+  assert.deepEqual(findBannedClaims("Ask about the jobs available"), ["jobs"]);
+});
+
 // ── White-label ─────────────────────────────────────────────────────────────
 
 test("our own name in member-facing copy is a leak", () => {

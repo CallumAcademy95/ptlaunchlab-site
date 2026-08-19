@@ -17,34 +17,24 @@
  * a pre-approved list and removes lookalikes — which guts local targeting.
  *
  * Education language ("nationally recognised Level 3 qualification") avoids both.
+ *
+ * A hand-enumerated word list is incomplete by construction: "interviewing",
+ * "hires", "guaranteeing", "recruiters" and "interviewed" all slipped through
+ * the original 16-word list. Stemming closes the class instead of chasing
+ * individual inflections one at a time.
+ *
+ * "job" and "jobs" are matched as exact alternatives rather than stemmed,
+ * because `job\w*` would also match the surname "Jobson" — a false positive
+ * that already has a regression test guarding against it.
  */
-const BANNED = [
-  "interview",
-  "interviews",
-  "guarantee",
-  "guaranteed",
-  "guarantees",
-  "hiring",
-  "hire",
-  "hired",
-  "job",
-  "jobs",
-  "vacancy",
-  "vacancies",
-  "recruit",
-  "recruits",
-  "recruiting",
-  "recruitment",
-];
+const BANNED_STEM = /\b(interview|guarantee|hir|recruit|vacanc)\w*\b|\bjobs?\b/gi;
 
 const BRAND = "PT Launch Lab";
 
 /** Whole-word, case-insensitive. "Coach Jobson" must not trip "job". */
 export function findBannedClaims(text) {
   const hits = new Set();
-  for (const word of BANNED) {
-    if (new RegExp(`\\b${word}\\b`, "i").test(text)) hits.add(word);
-  }
+  for (const match of text.matchAll(BANNED_STEM)) hits.add(match[0].toLowerCase());
   return [...hits];
 }
 
