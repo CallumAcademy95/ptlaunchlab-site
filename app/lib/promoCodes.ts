@@ -70,3 +70,58 @@ export function selectPromoCode(
 
   return { ok: true, promoId: live.id, code: live.code, amountOffPence: live.coupon.amount_off! };
 }
+
+/**
+ * Every active promotion code in the account, paged.
+ *
+ * Listing beats a filtered lookup because Stripe's promotion_codes endpoint
+ * matches `code` exactly and case-sensitively, and learners paste lowercase.
+ * The account holds under 100 codes; if it ever outgrows one page, this follows
+ * `has_more` rather than silently resolving against a truncated list — a
+ * truncated list would read as "unknown code" and quietly deny a real discount.
+ */
+async function listActivePromotionCodes(key: string): Promise<StripePromotionCode[]> {
+  const all: StripePromotionCode[] = [];
+  let startingAfter: string | undefined;
+
+  for (let page = 0; page < 10; page++) {
+    const qs = new URLSearchParams({ limit: "100", active: "true" });
+    if (startingAfter) qs.set("starting_after", startingAfter);
+
+    const res = await fetch(`https://api.stripe.com/v1/promotion_codes?${qs}`, {
+      headers: { Authorization: `Bearer ${key}` },
+    });
+    if (!res.ok) throw new Error(`stripe promotion_codes ${res.status}`);
+
+    const body = await res.json();
+    all.push(...(body.data ?? []));
+    if (!body.has_more || !body.data?.length) break;
+    startingAfter = body.data[body.data.length - 1].id;
+  }
+
+  return all;
+}
+
+/**
+ * Resolve a code for a partner, live.
+ *
+ * Returns "unknown" when Stripe cannot be reached. That is deliberate: the
+ * alternative is applying a discount we have not verified, and the failure this
+ * whole change exists to remove is a page promising a price Stripe will not
+ * charge. Refusing a real code is recoverable; promising £1,399 and billing
+ * £1,599 is not.
+ */
+export async function resolvePromoCode(code: string, prefixes: string[]): Promise<PromoResolution> {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    console.error("[promoCodes] STRIPE_SECRET_KEY not set — refusing the code");
+    return { ok: false, reason: "unknown" };
+  }
+
+  try {
+    return selectPromoCode(await listActivePromotionCodes(key), code, prefixes);
+  } catch (err) {
+    console.error("[promoCodes] lookup failed", err);
+    return { ok: false, reason: "unknown" };
+  }
+}
