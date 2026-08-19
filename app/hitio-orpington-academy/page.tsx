@@ -36,20 +36,20 @@ const config: GymConfig = {
     "Built inside HITIO Gym Orpington — a family-run gym where coaching is already what the place does.",
   whyThisGymHeading: "Learn Inside HITIO Gym Orpington",
   gymIntro:
-    "You qualify on a floor that already runs coached sessions every day, from Brazilian jiu-jitsu to strength and conditioning.",
+    "You qualify on a floor that already runs coached sessions every day, from fitness boxing and kickboxing to strength and conditioning.",
 
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
 
   stats: [
     { value: "5am",     label: "Open From, Seven Days" },
-    { value: "BJJ",     label: "Muay Thai, Boxing, Taekwondo" },
+    { value: "Classes", label: "Fitness Boxing & Kickboxing" },
     { value: "Studio",  label: "Dedicated Group Training Space" },
     { value: "3hrs",    label: "Free Parking On Site" },
   ],
 
   gymHighlights: [
-    "A family-run gym that coaches every day — jiu-jitsu, Muay Thai, kickboxing, boxing, Taekwondo and karate",
+    "A family-run gym that coaches every day — fitness boxing, kickboxing and strength and conditioning",
     "Full free-weight, cardio and functional training zones, plus a dedicated group training studio",
     "Open from 5am seven days a week, so client sessions fit around whatever else you do",
     "Three hours' free parking with EV charging, and strong bus links into Orpington",
