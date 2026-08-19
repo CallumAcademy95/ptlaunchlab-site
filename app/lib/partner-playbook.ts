@@ -21,6 +21,7 @@ import { marked } from "marked";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { PLAYBOOK_TYPES, type PlaybookType } from "./partner-playbook-types";
 import { applyPlaybookTokens, type PlaybookTokens } from "./partner-playbook-tokens";
+import { extractSnippets } from "./partner-playbook-snippets";
 
 const PLAYBOOK_DIR = path.join(process.cwd(), "partner-playbook");
 
@@ -53,10 +54,6 @@ function parseFrontmatter(raw: string): { meta: Record<string, string>; body: st
     if (kv) meta[kv[1].trim()] = kv[2].trim().replace(/^["']|["']$/g, "");
   }
   return { meta, body: match[2] };
-}
-
-function extractSnippets(body: string): string[] {
-  return [...body.matchAll(/```[a-z]*\r?\n([\s\S]*?)```/g)].map((m) => m[1].trimEnd());
 }
 
 /**
