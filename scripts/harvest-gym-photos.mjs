@@ -17,6 +17,14 @@
  * shots make the same point with none of that question attached. sharp has no
  * face detection and filenames tell you nothing, so scoring is a vision call.
  *
+ * Provenance is ranked above the face-free bonus: a Places photo whose
+ * attribution resolves to the gym itself, or a photo the gym published on
+ * its own site, outranks a Places photo credited to a third party (another
+ * business, or a private individual) — a gym's own picture of a face beats
+ * a stranger's clean shot of someone else's gym. Third-party photos are
+ * never excluded outright; they stay in the kept set as lower-ranked
+ * fallbacks for a gym with nothing else usable. See provenanceTierFor().
+ *
  * Nothing is deleted. Rejects land in _rejected/ with the reason, so the
  * ranking can be overruled by hand.
  */
@@ -109,6 +117,50 @@ async function sitePhotos(siteUrl) {
     .map((u) => (u.startsWith("http") ? u : new URL(u, siteUrl).href))
     .filter((u) => /\.(jpe?g|png|webp)(\?|$)/i.test(u))
     .slice(0, 30);
+}
+
+const NAME_STOPWORDS = new Set(["and", "&", "the", "of"]);
+
+/** Lowercase, strip punctuation, drop filler words, split into a word set. */
+function significantWords(s) {
+  return new Set(
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w && !NAME_STOPWORDS.has(w)),
+  );
+}
+
+/**
+ * A tolerant match between a Places contributor's display name and the gym's
+ * own name, so "Muscle Bound Gym Huddersfield" (the gym's own Google listing
+ * name) counts as the gym for "Muscle Bound Gym", and "Superflex Gym And
+ * Fitness Centre" counts as the gym for "Superflex Gym" — while an unrelated
+ * business ("Five Star Sports") or a private individual ("Sejal Patel")
+ * does not. Matches if either side's significant words are a subset of the
+ * other's — deliberately generic, no gym or contributor name is hardcoded,
+ * so it keeps working for the next partner onboarded.
+ */
+function attributionMatchesGym(attribution, gymName) {
+  const a = significantWords(attribution);
+  const g = significantWords(gymName);
+  if (a.size === 0 || g.size === 0) return false;
+  const isSubset = (small, big) => [...small].every((w) => big.has(w));
+  return isSubset(a, g) || isSubset(g, a);
+}
+
+/**
+ * Whether a photo is the gym's own, for ranking purposes. Site-crawled
+ * photos are the gym's own by construction (they published it on their own
+ * site). A Places photo counts as gym-owned only when its attribution
+ * resolves to the gym itself, not a third party — that is exactly the
+ * distinction the owner's provenance ruling turns on.
+ */
+function provenanceTierFor(source, attribution, gymName) {
+  if (source === "site") return "gym-owned";
+  if (source === "places" && attributionMatchesGym(attribution, gymName)) return "gym-owned";
+  return "third-party";
 }
 
 /** Cheap average hash, to drop the same photo arriving from both sources. */
@@ -224,7 +276,8 @@ for (const slug of slugs) {
     if (seen.has(hash)) continue;
     seen.add(hash);
 
-    scored.push({ buf, meta, source, attribution, verdict: await score(buf, brand.gymName) });
+    const provenanceTier = provenanceTierFor(source, attribution, brand.gymName);
+    scored.push({ buf, meta, source, attribution, provenanceTier, verdict: await score(buf, brand.gymName) });
   }
 
   // Google's own Places photo library for a place can itself be contaminated
@@ -262,6 +315,9 @@ for (const slug of slugs) {
     const rank = (s) =>
       (s.verdict.visibleBrandingConflictsWithTarget ? -1000 : 0) +
       (s.source === "places" && placesContaminated ? -500 : 0) +
+      // Provenance outranks the face-free bonus: a gym's own photograph of a
+      // face beats a stranger's clean, face-free shot of someone else's gym.
+      (s.provenanceTier === "gym-owned" ? 200 : 0) +
       (s.verdict.hasIdentifiableFaces ? 0 : 100) +
       (s.verdict.isGymInterior ? 20 : 0) +
       s.verdict.usableAsAdBackground;
@@ -293,6 +349,10 @@ for (const slug of slugs) {
       // was found on for site-crawled photos. NEVER the media URL itself —
       // that embeds the Places API key as a `key=` query parameter.
       attribution: s.attribution,
+      // "gym-owned" | "third-party" — the ranking decision above, made
+      // auditable. Third-party photos are still kept as lower-ranked
+      // fallbacks; this only records which tier won.
+      provenanceTier: s.provenanceTier,
       ...s.verdict,
       width: s.meta.width,
       height: s.meta.height,
