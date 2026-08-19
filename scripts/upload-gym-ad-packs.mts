@@ -19,14 +19,21 @@
  * new logo) does NOT reach a partner's portal on a plain re-run; only
  * `--replace` pushes it live.
  *
- * `--replace` can only ever match a row this script itself would have
- * inserted: the lookup key is `${partnerId}::${title}`, and both halves are
- * always values this file builds — partnerId only ever comes from the 9 gym
- * slugs looped over below, and title is always the literal
- * `Meta ad — <label> (<shape>)` string built a few lines down. There is no
- * code path that looks up an arbitrary title or an arbitrary partner, so a
- * signed agreement, a handbook, or any of the other 74 live resources is
- * structurally unreachable here.
+ * `--replace` only ever PATCHes a row that (a) is in the `digital` category —
+ * the lookup is fetched with `category=eq.digital`, so a legal, training,
+ * print or learner resource (a signed agreement, a handbook) can never enter
+ * the map at all — and (b) whose existing `storage_path` already starts with
+ * `${slug}/meta-ads/`, checked immediately before the PATCH. A title match
+ * that fails that second check is a genuine collision, not a re-render of
+ * something this script made: it is left untouched and printed as a loud
+ * warning naming the partner, the title and the unexpected `storage_path`,
+ * because that is a situation for a human to look at, not one the script
+ * should resolve on its own. The `title` half of the lookup key is always
+ * the literal `Meta ad — <label> (<shape>)` string built a few lines down —
+ * this script has no code path that looks up an arbitrary title — but title
+ * strings are just text a migration or a hand-edit could duplicate, so the
+ * category filter and the storage_path check are what actually keep this
+ * safe, not the title namespace happening to stay clean.
  *
  * On a failed *insert* the just-uploaded object is deleted — nothing would
  * ever reference it otherwise. A failed *replace* does NOT delete the
@@ -36,6 +43,13 @@
  * object just carries updated bytes. Deleting it there would turn a partial
  * metadata failure into the exact "row pointing at a missing object" failure
  * this script exists to avoid.
+ *
+ * Residual, left deliberately unhandled: if a replace's storage PUT succeeds
+ * and the PATCH then fails, the object now carries the new bytes while the
+ * row still reports the old `file_size` and `mime` — until a retry succeeds,
+ * the row is a few fields stale rather than wrong. There is no cleanup for
+ * this that doesn't risk stranding a still-live row, so it's documented
+ * rather than fixed here; a thrown error and a re-run resolve it.
  *
  * Category is `digital` deliberately. A new `ads` key would mean altering a
  * CHECK constraint on the live partner database, and a 201 from the Supabase
@@ -72,8 +86,15 @@ const partnersRes = await fetch(`${URL_BASE}/rest/v1/pp_partners?select=id,slug`
 const partners: { id: string; slug: string }[] = await partnersRes.json();
 const bySlug = new Map(partners.map((p) => [p.slug, p.id]));
 
-const existingRes = await fetch(`${URL_BASE}/rest/v1/pp_resources?select=id,partner_id,title`, { headers: H });
-const existing: { id: string; partner_id: string | null; title: string }[] = await existingRes.json();
+// category=eq.digital: a non-digital resource (a signed agreement, a
+// handbook — legal/training/print/learner) can never even enter this map,
+// let alone be matched for a PATCH below.
+const existingRes = await fetch(
+  `${URL_BASE}/rest/v1/pp_resources?select=id,partner_id,title,storage_path&category=eq.digital`,
+  { headers: H }
+);
+const existing: { id: string; partner_id: string | null; title: string; storage_path: string | null }[] =
+  await existingRes.json();
 const already = new Map(existing.map((r) => [`${r.partner_id}::${r.title}`, r]));
 
 let uploaded = 0;
@@ -106,6 +127,20 @@ for (const slug of GYM_SLUGS) {
       }
 
       const objectPath = `${slug}/meta-ads/${file}`;
+
+      // A title collision that isn't one of our own resources: something in
+      // `digital` matched this exact (partner, title) but its object doesn't
+      // live under this gym's meta-ads/ prefix, so it wasn't created by this
+      // script. Never patch it — surface it and move on.
+      if (prior && REPLACE && !prior.storage_path?.startsWith(`${slug}/meta-ads/`)) {
+        console.warn(
+          `!! COLLISION  ${slug.padEnd(16)} "${title}" already exists (id ${prior.id}, storage_path "${prior.storage_path}") ` +
+            `but that path isn't under ${slug}/meta-ads/ — left untouched, not patched. Needs a human to look at it.`
+        );
+        skipped++;
+        continue;
+      }
+
       const verb = prior ? (APPLY ? "REPLACE" : "would replace") : APPLY ? "UPLOAD" : "would upload";
       console.log(`${verb.padEnd(13)} ${slug.padEnd(16)} ${title}`);
 
