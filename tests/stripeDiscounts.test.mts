@@ -41,6 +41,10 @@ test("a pay-in-full session with no promo keeps Stripe's code box", () => {
   assert.equal(p.allow_promotion_codes, true);
 });
 
+// Covers the flag-ON branch: INSTALMENTS_ENABLED true, deposit buyer on the
+// £200/month mandate (mode: "subscription"). Not the path a real buyer hits
+// today (see the sibling test below) — kept because the flag can be turned on
+// without a deploy, and the guard must hold on both sides of it.
 test("A DEPOSIT IS NEVER DISCOUNTED, even when a promo id is passed", () => {
   const p = buildSessionParams(
     { ...base, promoCodeId: "promo_500" },
@@ -49,6 +53,21 @@ test("A DEPOSIT IS NEVER DISCOUNTED, even when a promo id is passed", () => {
   );
   assert.equal(p.discounts, undefined, "a deposit must never carry a discount");
   assert.equal(p.allow_promotion_codes, false);
+});
+
+test("A DEPOSIT IS NEVER DISCOUNTED with instalments OFF — the live production path", () => {
+  // INSTALMENTS_ENABLED reads NEXT_PUBLIC_STRIPE_INSTALMENTS_ENABLED === "true",
+  // and that variable is unset, so every real deposit today takes this branch:
+  // withInstalments false, one-off £599, no subscription. The sibling test above
+  // covers the flag-ON path. Without this one the rule is untested where it counts.
+  const p = buildSessionParams(
+    { ...base, promoCodeId: "promo_500" },
+    DEPOSIT,
+    { ...opts, withInstalments: false },
+  );
+  assert.equal(p.discounts, undefined, "a deposit must never carry a discount, flag on or off");
+  assert.equal(p.allow_promotion_codes, false);
+  assert.equal(p.mode, "payment");
 });
 
 test("a deposit with no promo is unchanged", () => {
