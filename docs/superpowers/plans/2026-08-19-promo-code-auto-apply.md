@@ -149,10 +149,13 @@ test("a gym with two prefixes accepts codes under both", () => {
   const list = [
     code({ id: "promo_iwg", code: "IWGPTDISCOUNT" }),
     code({ id: "promo_iw500", code: "IRONWOLF500", max_redemptions: 3, coupon: { amount_off: 50000, valid: true } }),
+    // A real, live code belonging to a DIFFERENT gym. Ownership is only
+    // meaningfully tested against a code that actually exists — otherwise the
+    // existence check answers first and the prefix check is never exercised.
+    code({ id: "promo_hitio", code: "HITIO500", max_redemptions: 3, coupon: { amount_off: 50000, valid: true } }),
   ];
   assert.equal(selectPromoCode(list, "IWGPTDISCOUNT", ["IWG", "IRONWOLF"]).ok, true);
   assert.equal(selectPromoCode(list, "IRONWOLF500", ["IWG", "IRONWOLF"]).ok, true);
-  // and still refuses a code belonging to neither
   assert.deepEqual(selectPromoCode(list, "HITIO500", ["IWG", "IRONWOLF"]), { ok: false, reason: "wrong-partner" });
 });
 
