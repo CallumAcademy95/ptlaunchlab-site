@@ -6,14 +6,40 @@
  * Nothing reaches pp_resources until this has been looked at. Opening 36 PNGs
  * one at a time is how a wrong logo or a clipped headline reaches nine gyms.
  */
-import { readFileSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { CONCEPTS, SIZES } from "./lib/ad-concepts.mjs";
 
 const BRANDS = JSON.parse(readFileSync(new URL("./gym-brands.json", import.meta.url), "utf8"));
-const OUT_ROOT = path.join(process.cwd(), "ad-assets", "gym-ads");
+const ROOT = process.cwd();
+const OUT_ROOT = path.join(ROOT, "ad-assets", "gym-ads");
 const REVIEW = path.join(OUT_ROOT, "_review");
 mkdirSync(REVIEW, { recursive: true });
+
+/**
+ * The provenance of the photo actually painted onto this gym's ads.
+ *
+ * `photoFor()` in gym-ad-creatives.mjs takes the alphabetically first file in
+ * partner-photos/<slug>/ — this mirrors that exact selection so the reviewer
+ * sees the attribution for the photo that is actually in use, not just any
+ * photo from the folder. Falls back to null when there's no photo, or when
+ * the reasons.json entry predates the attribution field.
+ */
+function attributionInUse(slug) {
+  const dir = path.join(ROOT, "partner-photos", slug);
+  if (!existsSync(dir)) return null;
+  const files = readdirSync(dir)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  if (!files.length) return null;
+  const inUse = files[0];
+
+  const reasonsPath = path.join(dir, "_rejected", "reasons.json");
+  if (!existsSync(reasonsPath)) return { file: inUse, attribution: null };
+  const reasons = JSON.parse(readFileSync(reasonsPath, "utf8"));
+  const entry = reasons.find((r) => r.file === inUse);
+  return { file: inUse, attribution: entry?.attribution ?? null };
+}
 
 const slugs = Object.keys(BRANDS).filter((s) => s !== "demo");
 const missing = [];
@@ -33,7 +59,13 @@ for (const slug of slugs) {
       cards += `<figure><img src="../${slug}/${file}"><figcaption>${concept.label} · ${w}×${h}</figcaption></figure>`;
     }
   }
-  sections += `<section><h2>${brand.gymName}</h2><p class="meta">${brand.adTown} · accent ${brand.darkAccent || brand.primaryColor} · logo ${brand.logoHasAlpha ? "transparent" : "plated"}</p><div class="row">${cards}</div></section>`;
+
+  const photo = attributionInUse(slug);
+  const photoMeta = photo
+    ? `photo ${photo.file} — ${photo.attribution ? `credit: ${photo.attribution}` : "attribution not recorded (harvested before provenance tracking)"}`
+    : "no photo (flat background)";
+
+  sections += `<section><h2>${brand.gymName}</h2><p class="meta">${brand.adTown} · accent ${brand.darkAccent || brand.primaryColor} · logo ${brand.logoHasAlpha ? "transparent" : "plated"} · ${photoMeta}</p><div class="row">${cards}</div></section>`;
 }
 
 const expected = slugs.length * CONCEPTS.length * SIZES.length;
