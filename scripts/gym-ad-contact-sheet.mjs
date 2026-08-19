@@ -35,10 +35,10 @@ function attributionInUse(slug) {
   const inUse = files[0];
 
   const reasonsPath = path.join(dir, "_rejected", "reasons.json");
-  if (!existsSync(reasonsPath)) return { file: inUse, attribution: null };
+  if (!existsSync(reasonsPath)) return { file: inUse, attribution: null, provenanceTier: null };
   const reasons = JSON.parse(readFileSync(reasonsPath, "utf8"));
   const entry = reasons.find((r) => r.file === inUse);
-  return { file: inUse, attribution: entry?.attribution ?? null };
+  return { file: inUse, attribution: entry?.attribution ?? null, provenanceTier: entry?.provenanceTier ?? null };
 }
 
 const slugs = Object.keys(BRANDS).filter((s) => s !== "demo");
@@ -61,8 +61,16 @@ for (const slug of slugs) {
   }
 
   const photo = attributionInUse(slug);
+  // Surfaced next to the credit so the owner can see, at a glance, whether a
+  // gym is shipping its own photograph ("gym-owned") or a fallback credited
+  // to someone else ("third-party") — the exact distinction the provenance
+  // ruling turns on.
   const photoMeta = photo
-    ? `photo ${photo.file} — ${photo.attribution ? `credit: ${photo.attribution}` : "attribution not recorded (harvested before provenance tracking)"}`
+    ? `photo ${photo.file} — ${
+        photo.attribution
+          ? `credit: ${photo.attribution}${photo.provenanceTier ? ` (${photo.provenanceTier})` : ""}`
+          : "attribution not recorded (harvested before provenance tracking)"
+      }`
     : "no photo (flat background)";
 
   sections += `<section><h2>${brand.gymName}</h2><p class="meta">${brand.adTown} · accent ${brand.darkAccent || brand.primaryColor} · logo ${brand.logoHasAlpha ? "transparent" : "plated"} · ${photoMeta}</p><div class="row">${cards}</div></section>`;
