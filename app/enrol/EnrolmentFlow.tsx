@@ -5,7 +5,6 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
 import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
-import { PHONE_NATIONAL } from "@/app/lib/contactDetails";
 import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
   type PartnerConfig,
@@ -107,7 +106,7 @@ function appendStripeAttribution(url: string, email: string, ref: string): strin
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";
-const SUPPORT_PHONE             = PHONE_NATIONAL;
+const SUPPORT_PHONE             = "01977 365001";
 
 // ─── Main Component — Pre-payment checkout ───────────────────────────────
 // Collects the minimum needed to send the buyer to Stripe (name + email +
