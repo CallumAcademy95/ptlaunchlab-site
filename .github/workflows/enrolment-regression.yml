@@ -1,6 +1,15 @@
 # Guards the pay-first enrolment return redirect. See e2e/README.md.
 #
-# Two jobs, because the two failure modes have different shapes:
+# Three jobs, because the failure modes have different shapes:
+#
+#   unit-tests      — runs on every change. `npm run test:unit` (node --test),
+#                     no secrets, no browser. This is the only place the ad
+#                     copy claim gate (tests/adCopy.test.mts) runs: without it,
+#                     the sole check on an edit to
+#                     partner-playbook/campaign-meta-ads.md reintroducing
+#                     job-offer language is someone remembering to run tests
+#                     locally before nine partners paste it into Meta Ads
+#                     Manager.
 #
 #   code-regression — runs on every change. Stripe TEST mode only, no live
 #                     credentials. Catches success_url being edited or the
@@ -24,6 +33,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  unit-tests:
+    name: Unit tests (node --test)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
+
   code-regression:
     name: Checkout returns buyers to /enrol/success (test mode)
     if: github.event_name != 'schedule'
