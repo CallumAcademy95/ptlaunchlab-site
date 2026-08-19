@@ -71,7 +71,8 @@ body{width:${w}px;height:${h}px;background:${bg};font-family:Poppins,sans-serif;
 .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.85))}
 .stage{position:absolute;left:88px;right:88px;top:${box.top}px;bottom:${h - box.bottom}px;
   display:flex;flex-direction:column;justify-content:${tall ? "center" : "flex-end"}}
-.logo{height:${tall ? 118 : 96}px;object-fit:contain;object-position:left center;align-self:flex-start;
+.logo{height:${tall ? 118 : 96}px;object-fit:contain;object-position:left center;display:block}
+.logo-plate{align-self:flex-start;
   ${plate ? "background:#fff;padding:14px 20px;border-radius:14px;" : ""}}
 .eyebrow{margin-top:${tall ? 40 : 30}px;font-family:Poppins;font-weight:600;letter-spacing:.16em;
   font-size:${tall ? 30 : 26}px;color:${accent}}
@@ -85,7 +86,7 @@ h1 .accent{color:${accent}}
 </style></head><body>
 ${photo ? `<div class="photo"></div><div class="scrim"></div>` : ""}
 <div class="stage">
-  <img class="logo" src="${logo}">
+  <div class="logo-plate"><img class="logo" src="${logo}"></div>
   <div class="eyebrow">${text.eyebrow}</div>
   <h1>${text.headline.join("<br>")}<br><span class="accent">${text.accentLine}</span></h1>
   <div class="sub">${text.sub}</div>
