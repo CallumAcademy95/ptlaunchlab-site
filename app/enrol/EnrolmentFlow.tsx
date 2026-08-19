@@ -5,6 +5,8 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
 import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
+import { PHONE_NATIONAL } from "@/app/lib/contactDetails";
+import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
   type PartnerConfig,
   ENROLMENT_CONTEXT_KEY,
@@ -105,7 +107,7 @@ function appendStripeAttribution(url: string, email: string, ref: string): strin
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
 const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";
-const SUPPORT_PHONE             = "01977 365001";
+const SUPPORT_PHONE             = PHONE_NATIONAL;
 
 // ─── Main Component — Pre-payment checkout ───────────────────────────────
 // Collects the minimum needed to send the buyer to Stripe (name + email +
@@ -118,7 +120,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   const [errors, setErrors]       = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [promoInput, setPromoInput]     = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; amountOffPence: number } | null>(null);
   const [promoError, setPromoError]     = useState("");
   const sec = useFormSecurity();
 
@@ -130,16 +132,40 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }, []);
 
   // ─── Promo code ───────────────────────────────────────────────────────
+  // The partner's standing discount is applied automatically. The page already
+  // advertises the discounted price, so making the learner type a code to reach
+  // the advertised figure was pure friction — and it is what made HITIO think
+  // codes were broken when they typed a launch code the site had never heard of.
+  useEffect(() => {
+    if (!partner?.gymSlug) return;
+    const standing = PARTNER_STANDING_CODE[partner.gymSlug];
+    if (standing) void applyCode(standing, { silent: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [partner?.gymSlug]);
+
+  async function applyCode(code: string, { silent = false } = {}) {
+    const res = await fetch("/api/promo/validate", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ code, gymSlug: partner?.gymSlug }),
+    }).then((r) => r.json()).catch(() => ({ valid: false, message: "" }));
+
+    if (res.valid) {
+      setAppliedPromo({ code: res.code, amountOffPence: res.amountOffPence });
+      setPromoError("");
+      return;
+    }
+    // A failed STANDING code must never shout at the learner — they did not type
+    // it. The page simply shows full price, which is recoverable; showing a
+    // discount we cannot deliver is the fault being removed.
+    if (!silent) setPromoError(res.message || "We don't recognise that code.");
+  }
+
   function applyPromo() {
     const code = promoInput.trim().toUpperCase();
-    if (partner?.promoCodes?.[code]) {
-      setAppliedPromo(code);
-      setPromoError("");
-    } else {
-      setPromoError("Invalid promo code — please check and try again.");
-    }
+    if (!code) return;
+    void applyCode(code);
   }
-  const activePromo = appliedPromo ? partner?.promoCodes?.[appliedPromo] : null;
 
   // ─── Validation ───────────────────────────────────────────────────────
   function validate() {
@@ -163,9 +189,9 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     setErrors({});
     setSubmitting(true);
 
-    const amount = type === "full"
-      ? (activePromo ? activePromo.fullPrice : 1599)
-      : (activePromo ? activePromo.depositPrice : 599);
+    // Pay-in-full is discounted by whatever Stripe says the applied code is
+    // worth; the deposit is NEVER discounted — it is always £599 now.
+    const amount = type === "full" ? fullPricePence / 100 : DEPOSIT_PENCE / 100;
 
     // Stash context so the post-payment form on /enrol/success can prefill the
     // learner's name + email and carry plan / amount / attribution through.
@@ -174,7 +200,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       email: email.trim().toLowerCase(),
       plan: type,
       amount,
-      ...(appliedPromo && { promoCode: appliedPromo, discountApplied: activePromo?.discountAmount }),
+      ...(appliedPromo && { promoCode: appliedPromo.code, discountApplied: appliedPromo.amountOffPence / 100 }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
       ...(partner?.gymSlug && { gymSlug: partner.gymSlug }),
       source: "website-enrolment-flow-v2",
@@ -186,7 +212,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       payment_type: type,
       amount,
       currency: 'GBP',
-      ...(appliedPromo && { promo_code: appliedPromo }),
+      ...(appliedPromo && { promo_code: appliedPromo.code }),
       ...(partner?.gymReferral && { gym_referral: partner.gymReferral }),
     });
 
@@ -206,7 +232,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
           currency: "GBP",
           value: amount,
           content_name: planName,
-          content_category: partner?.gymReferral || (appliedPromo ?? undefined),
+          content_category: partner?.gymReferral || (appliedPromo?.code ?? undefined),
         },
         { eventID: icEventId },
       );
@@ -237,13 +263,13 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
         plan: type,
         amount,
         ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
-        ...(appliedPromo && { promoCode: appliedPromo }),
+        ...(appliedPromo && { promoCode: appliedPromo.code }),
         [sec.SEC_KEY]: sec.payload(),
       }),
     }).catch(() => { /* fire-and-forget — never block Stripe redirect */ });
 
-    const fullLink    = activePromo?.fullStripeLink    ?? partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
-    const depositLink = activePromo?.depositStripeLink ?? partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
+    const fullLink    = partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
+    const depositLink = partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
     const paymentLink = type === "full" ? fullLink : depositLink;
     const ref = buildAttributionRef(partner?.gymReferral, partner?.gymSlug);
 
@@ -271,7 +297,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
           name: fullName.trim(),
           gymReferral: partner?.gymReferral,
           gymSlug: partner?.gymSlug,
-          promoCode: appliedPromo ?? undefined,
+          promoCode: appliedPromo?.code,
           cancelPath: typeof window !== "undefined" ? window.location.pathname : "/enrol",
         }),
       });
@@ -284,14 +310,19 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }
 
   const firstName = fullName.trim().split(" ")[0];
-  // Deposit plan maths, kept in one place so the headline price, the instalment
-  // count and the disclosure line can never contradict each other.
-  const instalmentCount = activePromo
-    ? Math.round((activePromo.fullPrice - activePromo.depositPrice) / 200)
-    : 5;
-  const depositTotal = activePromo
-    ? activePromo.depositPrice + instalmentCount * 200
-    : 1599;
+
+  // Pay-in-full is £1,599 less whatever Stripe says the applied code is worth.
+  const PIF_PENCE = 159_900;
+  const fullPricePence = PIF_PENCE - (appliedPromo?.amountOffPence ?? 0);
+
+  // The deposit is NEVER discounted: £599 now, then 5 × £200. The old code
+  // computed instalments as (fullPrice - depositPrice) / 200, which produced 4
+  // instalments and a £1,399 total against a Stripe charge of £1,599. Delete
+  // that arithmetic; do not adapt it.
+  const DEPOSIT_PENCE = 59_900;
+  const INSTALMENT_PENCE = 20_000;
+  const INSTALMENT_COUNT = 5;
+  const depositTotalPence = DEPOSIT_PENCE + INSTALMENT_COUNT * INSTALMENT_PENCE;
 
   // ─── Render ───────────────────────────────────────────────────────────
   return (
@@ -344,41 +375,32 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
               </div>
             </div>
 
-            {/* Promo code — only shown if partner config has promoCodes */}
-            {partner?.promoCodes && (
+            {/* Launch codes — the partner's own standing discount is already applied
+                automatically above; this box is only for a one-off code from the
+                gym that replaces it. */}
+            {partner?.gymSlug && (
               <div className="bg-deep border border-white/10 rounded-xl p-4">
-                {appliedPromo && activePromo ? (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-gold font-bold text-sm">
-                        ✓ {activePromo.label} applied — £{activePromo.discountAmount} off
-                      </p>
-                      <p className="text-soft text-xs mt-0.5">Enter this code at Stripe checkout to apply your discount</p>
-                    </div>
-                    <button onClick={() => { setAppliedPromo(null); setPromoInput(""); }} className="text-faint text-xs hover:text-soft transition-colors">
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-soft text-sm mb-2 font-semibold">Have a promo code?</p>
-                    <div className="flex gap-2">
-                      <input
-                        value={promoInput}
-                        onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
-                        placeholder="Enter code"
-                        className="flex-1 bg-deep border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/[0.15] text-sm focus:outline-none focus:border-gold/50 transition-colors uppercase"
-                      />
-                      <button
-                        onClick={applyPromo}
-                        className="px-4 py-2 rounded-lg bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
-                  </div>
+                <p className="text-soft text-sm mb-2 font-semibold">Got a launch code from the gym?</p>
+                {appliedPromo && (
+                  <p className="text-gold font-bold text-sm mb-2">
+                    ✓ £{(appliedPromo.amountOffPence / 100).toLocaleString()} off applied
+                  </p>
                 )}
+                <div className="flex gap-2">
+                  <input
+                    value={promoInput}
+                    onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                    placeholder="Enter code"
+                    className="flex-1 bg-deep border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/[0.15] text-sm focus:outline-none focus:border-gold/50 transition-colors uppercase"
+                  />
+                  <button
+                    onClick={applyPromo}
+                    className="px-4 py-2 rounded-lg bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
               </div>
             )}
 
@@ -389,40 +411,38 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
-                {activePromo ? (
+                {appliedPromo ? (
                   <div className="mb-3">
                     <p className="text-faint text-2xl font-bold line-through leading-none">£1,599</p>
-                    <p className="text-gold text-4xl font-bold leading-none">£{activePromo.fullPrice.toLocaleString()}</p>
+                    <p className="text-gold text-4xl font-bold leading-none">£{(fullPricePence / 100).toLocaleString()}</p>
                   </div>
                 ) : (
                   <p className="text-gold text-4xl font-bold mb-3">£1,599</p>
                 )}
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  {activePromo && (
-                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Save £{(1599 - activePromo.fullPrice).toLocaleString()}</li>
+                  {appliedPromo && (
+                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Save £{(appliedPromo.amountOffPence / 100).toLocaleString()}</li>
                   )}
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Immediate course access</li>
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> One single payment</li>
                 </ul>
                 <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay £${activePromo ? activePromo.fullPrice.toLocaleString() : "1,599"} →`}
+                  {submitting ? "Taking you to checkout…" : `Pay £${(fullPricePence / 100).toLocaleString()} →`}
                 </div>
               </button>
 
-              {/* Deposit plan */}
+              {/* Deposit plan — never discounted, whatever code is applied. */}
               <button onClick={() => pay("deposit")} disabled={submitting}
                 className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
                 <p className="text-white font-bold text-2xl mb-1">Deposit Plan</p>
-                {activePromo ? (
-                  <div className="mb-1">
-                    <p className="text-faint text-2xl font-bold line-through leading-none">£599</p>
-                    <p className="text-gold text-4xl font-bold leading-none">£{activePromo.depositPrice}</p>
-                  </div>
-                ) : (
-                  <p className="text-gold text-4xl font-bold mb-1">£599</p>
+                <p className="text-gold text-4xl font-bold mb-1">£{(DEPOSIT_PENCE / 100).toLocaleString()}</p>
+                <p className="text-soft text-xs mb-3">
+                  then {INSTALMENT_COUNT} × £{(INSTALMENT_PENCE / 100).toLocaleString()} monthly — £{(depositTotalPence / 100).toLocaleString()} total
+                </p>
+                {appliedPromo && (
+                  <p className="text-faint text-xs mb-3">Discounts apply to pay-in-full only.</p>
                 )}
-                <p className="text-soft text-xs mb-3">then £200 × {instalmentCount} monthly payments</p>
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Start today with a deposit</li>
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> {INSTALMENTS_ENABLED ? "Monthly payments collected automatically" : "Monthly payments to follow"}</li>
@@ -432,13 +452,13 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                     not after. Shown only when instalments are actually live. */}
                 {INSTALMENTS_ENABLED && (
                   <p className="text-faint text-[11px] leading-relaxed mb-4">
-                    Your card is securely saved and £200 is taken automatically each month for{" "}
-                    {instalmentCount} months, starting 30 days from today. Total £{depositTotal.toLocaleString()}.
+                    Your card is securely saved and £{(INSTALMENT_PENCE / 100).toLocaleString()} is taken automatically each month for{" "}
+                    {INSTALMENT_COUNT} months, starting 30 days from today. Total £{(depositTotalPence / 100).toLocaleString()}.
                     Payments stop on their own once the course is paid in full.
                   </p>
                 )}
                 <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay £${activePromo ? activePromo.depositPrice : "599"} Deposit →`}
+                  {submitting ? "Taking you to checkout…" : `Pay £${(DEPOSIT_PENCE / 100).toLocaleString()} Deposit →`}
                 </div>
               </button>
             </div>
