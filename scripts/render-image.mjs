@@ -13,7 +13,7 @@ import sharp from "sharp";
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 
-export async function renderHtml(html, { width, height, out, quality = 92, name = "render" }) {
+export async function renderHtml(html, { width, height, out, quality = 92, name = "render", format = "jpeg" }) {
   const dir = path.dirname(out);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
@@ -37,7 +37,11 @@ export async function renderHtml(html, { width, height, out, quality = 92, name 
     { stdio: "pipe" },
   );
 
-  await sharp(tmpPng).jpeg({ quality, mozjpeg: true }).toFile(out);
+  // Ad creatives are PNG: they are almost entirely type, and JPEG ringing on
+  // hard edges is visible at 1080px. gbp-* and gym-tv-slides are photographic
+  // and stay on JPEG, so this defaults to jpeg and no existing caller changes.
+  const pipeline = sharp(tmpPng);
+  await (format === "png" ? pipeline.png({ compressionLevel: 9 }) : pipeline.jpeg({ quality, mozjpeg: true })).toFile(out);
   const meta = await sharp(out).metadata();
   unlinkSync(tmpPng);
   return meta;
