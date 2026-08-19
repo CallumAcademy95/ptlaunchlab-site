@@ -20,6 +20,7 @@ import path from "node:path";
 import { marked } from "marked";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { PLAYBOOK_TYPES, type PlaybookType } from "./partner-playbook-types";
+import { applyPlaybookTokens, type PlaybookTokens } from "./partner-playbook-tokens";
 
 const PLAYBOOK_DIR = path.join(process.cwd(), "partner-playbook");
 
@@ -64,7 +65,7 @@ function extractSnippets(body: string): string[] {
  * Returns an empty list when the directory doesn't exist yet, so the page shows
  * its own empty state rather than this throwing during a build.
  */
-async function getRepoEntries(): Promise<PlaybookEntry[]> {
+async function getRepoEntries(tokens: PlaybookTokens | null): Promise<PlaybookEntry[]> {
   let files: string[];
   try {
     files = (await readdir(PLAYBOOK_DIR)).filter((f) => f.endsWith(".md"));
@@ -82,6 +83,10 @@ async function getRepoEntries(): Promise<PlaybookEntry[]> {
           console.error(`[playbook] ${file} has unknown type "${meta.type}" — skipped`);
           return null;
         }
+        // Personalise before rendering AND before snippets are pulled out, so the
+        // copy-to-clipboard panels hand the partner their own gym name and code
+        // rather than a {{token}} they would have to find and replace.
+        const personalised = tokens ? applyPlaybookTokens(body, tokens) : body;
         return {
           slug: file.replace(/\.md$/, ""),
           title: meta.title || file.replace(/\.md$/, ""),
@@ -89,8 +94,8 @@ async function getRepoEntries(): Promise<PlaybookEntry[]> {
           channel: meta.channel || null,
           whenToUse: meta.when_to_use || null,
           order: Number(meta.order ?? 100),
-          html: await marked.parse(body),
-          snippets: extractSnippets(body),
+          html: await marked.parse(personalised),
+          snippets: extractSnippets(personalised),
         };
       } catch (err) {
         console.error(`[playbook] could not read ${file}:`, err);
@@ -103,7 +108,7 @@ async function getRepoEntries(): Promise<PlaybookEntry[]> {
 }
 
 /** Ad-hoc entries added through /admin/partners, no deploy required. */
-async function getUploadedEntries(): Promise<PlaybookEntry[]> {
+async function getUploadedEntries(tokens: PlaybookTokens | null): Promise<PlaybookEntry[]> {
   const { data, error } = await getSupabaseAdmin()
     .from("pp_playbook_entries")
     .select("id, slug, title, type, channel, when_to_use, sort_order, body_markdown, storage_path, external_url");
@@ -117,7 +122,8 @@ async function getUploadedEntries(): Promise<PlaybookEntry[]> {
 
   return Promise.all(
     (data ?? []).map(async (row): Promise<PlaybookEntry> => {
-      const body = (row.body_markdown as string | null) ?? "";
+      const rawBody = (row.body_markdown as string | null) ?? "";
+      const body = tokens ? applyPlaybookTokens(rawBody, tokens) : rawBody;
       return {
         slug: row.slug as string,
         title: row.title as string,
@@ -139,9 +145,13 @@ async function getUploadedEntries(): Promise<PlaybookEntry[]> {
  * Repo entries win on a slug clash — a reviewed, committed entry should never be
  * silently replaced by an upload. Returns whatever it can: a missing directory
  * or an unapplied migration degrades to the other source rather than throwing.
+ *
+ * `tokens` personalises {{gymName}}-style placeholders for the signed-in
+ * partner. Pass `null` for a partner with no matching brand entry — the raw
+ * markdown is shown as-is, which is deliberate (see partner-playbook-tokens.ts).
  */
-export async function getPlaybook(): Promise<PlaybookEntry[]> {
-  const [repo, uploaded] = await Promise.all([getRepoEntries(), getUploadedEntries()]);
+export async function getPlaybook(tokens: PlaybookTokens | null = null): Promise<PlaybookEntry[]> {
+  const [repo, uploaded] = await Promise.all([getRepoEntries(tokens), getUploadedEntries(tokens)]);
 
   const bySlug = new Map<string, PlaybookEntry>();
   for (const entry of uploaded) bySlug.set(entry.slug, entry);

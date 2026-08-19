@@ -2,7 +2,16 @@ import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { getPlaybook, PLAYBOOK_TYPES, type PlaybookEntry } from "@/app/lib/partner-playbook";
 import { getPackResources, formatFileSize, type PartnerResource } from "@/app/lib/partner-resources";
+import { tokensForGym } from "@/app/lib/partner-playbook-tokens";
+import brands from "@/scripts/gym-brands.json";
 import CopyButton from "../CopyButton";
+
+type GymBrandEntry = {
+  gymName: string;
+  adTown?: string;
+  promoCode: string | null;
+  canonicalPath: string;
+};
 
 /**
  * Entries grouped by their channel, preserving the order they arrived in.
@@ -133,7 +142,20 @@ export default async function PlaybookPage({
 }) {
   const { partner } = await requirePartner();
   const { section } = await searchParams;
-  const [entries, packs] = await Promise.all([getPlaybook(), getPackResources(partner.id)]);
+
+  // A brand entry with no `adTown` (the demo tenant) is treated the same as no
+  // brand entry at all — otherwise `town` comes back `undefined` and
+  // `{{town}}` renders literally on screen instead of being substituted.
+  const brand = (brands as Record<string, GymBrandEntry>)[partner.slug];
+  const tokens =
+    brand && brand.adTown
+      ? tokensForGym({ ...brand, adTown: brand.adTown }, "https://ptlaunchlab.co.uk")
+      : null;
+
+  const [entries, packs] = await Promise.all([
+    getPlaybook(tokens),
+    getPackResources(partner.id),
+  ]);
 
   // Only offer sections that actually have something in them — an empty tab is
   // a dead end that makes the whole library look unfinished.

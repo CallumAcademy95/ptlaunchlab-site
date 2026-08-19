@@ -15,7 +15,7 @@ const SIGNED_URL_TTL_SECONDS = 60;
 
 export const RESOURCE_CATEGORIES = [
   { key: "print", label: "Print & in-gym", blurb: "Posters, QR cards and flyers for the floor" },
-  { key: "digital", label: "Digital & screens", blurb: "Social posts and gym TV adverts" },
+  { key: "digital", label: "Digital & screens", blurb: "Meta ad graphics, social posts and gym TV adverts" },
   { key: "branding", label: "Branding", blurb: "Your academy logo pack and colours" },
   { key: "learner", label: "Learner handouts", blurb: "What to give a member who asks" },
   { key: "training", label: "Selling the course", blurb: "How you and your staff talk about it" },
