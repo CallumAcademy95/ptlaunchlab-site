@@ -8,21 +8,9 @@ export const metadata: Metadata = {
 };
 
 // ─── Muscle Bound Gym partner config ─────────────────────────────────────────
-// TODO: Replace placeholder Stripe links with real discounted payment links
-// once created in your Stripe dashboard (£1,399 full / £599 deposit).
 const MUSCLE_BOUND_PARTNER = {
   gymSlug: "muscle-bound",
   gymReferral: "Muscle Bound Gym",
-  promoCodes: {
-    "MBGPTDISCOUNT": {
-      label: "Muscle Bound Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-    },
-  },
 };
 
 export default function MuscleBoundEnrolPage() {

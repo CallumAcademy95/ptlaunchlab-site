@@ -18,16 +18,12 @@ export interface PartnerConfig {
   // it gets reworded, gains trailing spaces, and changes when a gym rebrands.
   gymSlug: string;               // e.g. "6fit"
   gymReferral: string;           // e.g. "6fit Gyms" — display only (Sheet, emails)
-  stripeFullLink?: string;       // default full-price Stripe link (no promo needed)
-  stripeDepositLink?: string;    // default deposit Stripe link (no promo needed)
-  promoCodes?: Record<string, {
-    label: string;               // e.g. "6fit Member Discount"
-    discountAmount: number;      // e.g. 200
-    fullPrice: number;           // discounted full price e.g. 1199
-    depositPrice: number;        // discounted deposit e.g. 399
-    fullStripeLink: string;      // Stripe link for discounted full payment
-    depositStripeLink: string;   // Stripe link for discounted deposit
-  }>;
+  stripeFullLink?: string;       // default full-price Stripe link
+  stripeDepositLink?: string;    // default deposit Stripe link
+  // No promo config here on purpose. Prices and discounts come from Stripe at
+  // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Hardcoding
+  // them here is what let the page advertise £1,399 while Stripe charged
+  // £1,599, and what kept HITIO's launch codes off the site entirely.
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────

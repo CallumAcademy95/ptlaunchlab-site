@@ -8,21 +8,9 @@ export const metadata: Metadata = {
 };
 
 // ─── 6fit partner config ──────────────────────────────────────────────────────
-// TODO: Replace placeholder Stripe links with real discounted payment links
-// once created in your Stripe dashboard (£1,199 full / £399 deposit).
 const SIXFIT_PARTNER = {
   gymSlug: "6fit",
   gymReferral: "6fit Gyms",
-  promoCodes: {
-    "6FITPTDISCOUNT": {
-      label: "6fit Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-    },
-  },
 };
 
 export default function SixFitEnrolPage() {

@@ -8,22 +8,9 @@ export const metadata: Metadata = {
 };
 
 // ─── Xcelerate partner config ─────────────────────────────────────────────────
-// The £200 comes off pay-in-full only (£1,599 → £1,399). Deposit stays £599:
-// discounts don't apply to deposit plans, and Stripe enforces that independently
-// — the deposit price has allow_promotion_codes off.
 const XCELERATE_PARTNER = {
   gymSlug: "xcelerate",
   gymReferral: "Xcelerate Gyms Edgware",
-  promoCodes: {
-    "XCELERATEPT": {
-      label: "Xcelerate Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-    },
-  },
 };
 
 export default function XcelerateEnrolPage() {
