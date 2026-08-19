@@ -5,19 +5,22 @@
     "darkAccent": null,
     "heroBg": "#000000",
     "sectionBg": null,
-    "logoUrl": "https://6fitgyms.co.uk/wp-content/uploads/2022/12/6fit_FF-02.png",
+    "logoUrl": "/gym-logos/6fit.png",
     "promoCode": "6FITPTDISCOUNT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
-    "location": null,
+    "location": "Wibsey, Bradford",
+    "adTown": "Wibsey",
+    "siteUrl": "https://6fitgyms.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside The Best\\nGym In The North"
     ],
-    "canonicalPath": "/6fit-academy"
+    "canonicalPath": "/6fit-academy",
+    "logoHasAlpha": false
   },
   "ebor": {
     "gymName": "Ebor Fitness",
@@ -25,19 +28,22 @@
     "darkAccent": "#FFFFFF",
     "heroBg": "#000000",
     "sectionBg": "#1A1A1A",
-    "logoUrl": "https://static.wixstatic.com/media/b2edc7_5ca945ff5059428e8e2646f8debf33d8~mv2.jpg",
+    "logoUrl": "/gym-logos/ebor.png",
     "promoCode": null,
     "discountAmount": null,
     "fullPrice": 1599,
     "depositPrice": 599,
     "location": "York",
+    "adTown": "York",
+    "siteUrl": "https://www.eborfitness.com",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside York's\\nPremier Gym"
     ],
-    "canonicalPath": "/ebor-fitness"
+    "canonicalPath": "/ebor-fitness",
+    "logoHasAlpha": false
   },
   "gym-n-go": {
     "gymName": "Gym n Go",
@@ -51,13 +57,16 @@
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Forest Hill, South London",
+    "adTown": "Forest Hill",
+    "siteUrl": "https://www.gymngo.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside Gym n Go"
     ],
-    "canonicalPath": "/gym-n-go-academy"
+    "canonicalPath": "/gym-n-go-academy",
+    "logoHasAlpha": true
   },
   "ironwolf": {
     "gymName": "Iron Wolf Gym",
@@ -65,19 +74,22 @@
     "darkAccent": null,
     "heroBg": "#000000",
     "sectionBg": "#0A0A0A",
-    "logoUrl": "/logos/iron-wolf-gym-white.png",
+    "logoUrl": "/gym-logos/ironwolf.png",
     "promoCode": "IWGPTDISCOUNT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Goole",
+    "adTown": "Goole",
+    "siteUrl": "https://www.ironwolfgym.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "At Iron Wolf Gym,\\nGoole"
     ],
-    "canonicalPath": "/ironwolf-gym"
+    "canonicalPath": "/ironwolf-gym",
+    "logoHasAlpha": true
   },
   "mof": {
     "gymName": "Ministry of Fitness",
@@ -85,19 +97,22 @@
     "darkAccent": null,
     "heroBg": "#000000",
     "sectionBg": "#007a1f",
-    "logoUrl": "/logos/mof.png",
+    "logoUrl": "/gym-logos/mof.png",
     "promoCode": "MOFPTDISCOUNT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
-    "location": null,
+    "location": "Bristol",
+    "adTown": "Bristol",
+    "siteUrl": "https://mofgym.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside Bristol's\\nBest Independent Gym"
     ],
-    "canonicalPath": "/mof-gym"
+    "canonicalPath": "/mof-gym",
+    "logoHasAlpha": true
   },
   "muscle-bound": {
     "gymName": "Muscle Bound Gym",
@@ -105,19 +120,22 @@
     "darkAccent": null,
     "heroBg": "#000000",
     "sectionBg": null,
-    "logoUrl": "https://www.muscleboundgymuk.co.uk/images/red-logo-white-text.png",
+    "logoUrl": "/gym-logos/muscle-bound.png",
     "promoCode": "MBGPTDISCOUNT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Bradford & Huddersfield",
+    "adTown": "Huddersfield",
+    "siteUrl": "https://www.muscleboundgymuk.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "At Muscle Bound Gym"
     ],
-    "canonicalPath": "/muscle-bound-academy"
+    "canonicalPath": "/muscle-bound-academy",
+    "logoHasAlpha": true
   },
   "superflex": {
     "gymName": "Superflex Gym",
@@ -125,19 +143,22 @@
     "darkAccent": "#4BD42E",
     "heroBg": "#000000",
     "sectionBg": null,
-    "logoUrl": "https://static.wixstatic.com/media/88602e_b5b0f48fcacd4ae7b459fdc0c0a0c0b8~mv2.png",
+    "logoUrl": "/gym-logos/superflex.png",
     "promoCode": "SUPERFLEXPT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Upton, West Yorkshire",
+    "adTown": "Upton",
+    "siteUrl": "https://www.superflexgym.co.uk",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside Superflex Gym"
     ],
-    "canonicalPath": "/superflex-academy"
+    "canonicalPath": "/superflex-academy",
+    "logoHasAlpha": true
   },
   "xcelerate": {
     "gymName": "Xcelerate Gyms",
@@ -151,13 +172,16 @@
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Edgware, North London",
+    "adTown": "Edgware",
+    "siteUrl": "https://www.xceleratefitness.co.uk",
     "heroSubline": "Made Different. Made Better.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "Inside Xcelerate Gyms"
     ],
-    "canonicalPath": "/xcelerate-academy"
+    "canonicalPath": "/xcelerate-academy",
+    "logoHasAlpha": true
   },
   "demo": {
     "gymName": "Northgate Strength",
@@ -185,18 +209,21 @@
     "darkAccent": "#ed4b51",
     "heroBg": "#1a1a23",
     "sectionBg": null,
-    "logoUrl": "https://www.hitiogym.com/wp-content/uploads/2019/01/hitio_gym_logo1.png",
+    "logoUrl": "/gym-logos/hitio-orpington.png",
     "promoCode": "HITIOPT",
     "discountAmount": 200,
     "fullPrice": 1399,
     "depositPrice": 599,
     "location": "Orpington, South East London",
+    "adTown": "Orpington",
+    "siteUrl": "https://www.hitiogym.com",
     "heroSubline": "Train. Qualify. Earn.",
     "heroHeadline": [
       "Become a Qualified",
       "Personal Trainer",
       "At HITIO Gym\\nOrpington"
     ],
-    "canonicalPath": "/hitio-orpington-academy"
+    "canonicalPath": "/hitio-orpington-academy",
+    "logoHasAlpha": true
   }
 }
