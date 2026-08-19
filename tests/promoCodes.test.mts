@@ -115,3 +115,17 @@ test("a gym with two prefixes accepts codes under both", () => {
 test("whitespace around a pasted code does not break it", () => {
   assert.equal(selectPromoCode(HITIO_LIST, "  HITIO500 ", ["HITIO"]).ok, true);
 });
+
+test("an empty prefix does not match everything — the guard fails closed", () => {
+  // Every string startsWith(""), so a blank entry in a partner's prefix config
+  // would otherwise let any code in the account be used on their page. This is
+  // the single enforcement point for slot-cap ownership, and it must fail closed.
+  const list = [code({ id: "promo_x", code: "SOMECODE" })];
+  assert.deepEqual(selectPromoCode(list, "SOMECODE", [""]), { ok: false, reason: "wrong-partner" });
+  assert.deepEqual(selectPromoCode(list, "SOMECODE", ["  "]), { ok: false, reason: "wrong-partner" });
+});
+
+test("an empty prefix list refuses rather than allows", () => {
+  const list = [code({ id: "promo_x", code: "SOMECODE" })];
+  assert.deepEqual(selectPromoCode(list, "SOMECODE", []), { ok: false, reason: "wrong-partner" });
+});

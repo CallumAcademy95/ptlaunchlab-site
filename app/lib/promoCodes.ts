@@ -49,7 +49,12 @@ export function selectPromoCode(
   // A list of prefixes, not one: Iron Wolf's standing code is IWGPTDISCOUNT but
   // its launch codes are IRONWOLF500/300, and Muscle Bound is MBG vs MUSCLEBOUND.
   // A single prefix would refuse those gyms their own launch discounts.
-  if (!prefixes.some((p) => wanted.startsWith(p.trim().toUpperCase()))) {
+  // Empty prefixes are skipped — a blank entry would match every string (every
+  // string starts with "") and silently disable this ownership check. Fail closed.
+  if (!prefixes.some((p) => {
+    const prefix = p.trim().toUpperCase();
+    return prefix.length > 0 && wanted.startsWith(prefix);
+  })) {
     return { ok: false, reason: "wrong-partner" };
   }
 
