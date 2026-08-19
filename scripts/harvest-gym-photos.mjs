@@ -20,7 +20,7 @@
  * Nothing is deleted. Rejects land in _rejected/ with the reason, so the
  * ranking can be overruled by hand.
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, renameSync, statSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 import Anthropic from "@anthropic-ai/sdk";
@@ -116,9 +116,26 @@ async function score(buf, gymName) {
             text:
               `This may be a photo of ${gymName}, a UK gym. It is a candidate background for a ` +
               `paid advert. Reply with ONLY JSON: {"hasIdentifiableFaces":bool,` +
-              `"isGymInterior":bool,"usableAsAdBackground":1-5,"note":"<12 words"}. ` +
+              `"isGymInterior":bool,"usableAsAdBackground":1-5,"visibleBrandText":"<any readable ` +
+              `FACILITY name — shopfront signage, reception branding, a wall mural/mascot that ` +
+              `identifies who runs the space — else empty. Do NOT report equipment, apparel, ` +
+              `supplement or software brand names here (Nike, Reebok, Technogym, Eleiko, Barfoed, a ` +
+              `weight-plate stamp, a TV/booking-app logo, etc.) — those appear in every gym regardless ` +
+              `of who owns it and are not evidence of anything>",` +
+              `"visibleBrandingConflictsWithTarget":bool,"note":"<12 words"}. ` +
+              `isGymInterior means an actual gym floor, equipment or training space is visible in the ` +
+              `frame — an outdoor scene, a social/event photo, a bare wall, or a shot dominated by a ` +
+              `logo/signage board with no floor or equipment visible is isGymInterior:false. ` +
               `usableAsAdBackground judges whether dark overlaid text would sit on it legibly. ` +
-              `Logos, screenshots, posters and stock collages score 1.`,
+              `Logos, screenshots, posters, signage boards and stock collages score 1 on ` +
+              `usableAsAdBackground even when genuinely photographed on-site. ` +
+              `visibleBrandingConflictsWithTarget is true ONLY when the FACILITY branding — the name ` +
+              `over the door, on reception signage, on a wall mural/mascot, or on staff/reception ` +
+              `uniform — identifies a DIFFERENT gym or fitness business than "${gymName}". A product, ` +
+              `equipment, apparel or supplement brand logo visible on gear inside an otherwise plausible ` +
+              `${gymName} shot is NOT a conflict — that is normal in any gym. This can happen even ` +
+              `when the photo came from what should be the right source, so check the actual pixels, ` +
+              `not just where the file came from.`,
           },
         ],
       },
@@ -128,7 +145,14 @@ async function score(buf, gymName) {
   try {
     return JSON.parse(text.replace(/```json|```/g, "").trim());
   } catch {
-    return { hasIdentifiableFaces: true, isGymInterior: false, usableAsAdBackground: 1, note: "unparseable" };
+    return {
+      hasIdentifiableFaces: true,
+      isGymInterior: false,
+      usableAsAdBackground: 1,
+      visibleBrandText: "",
+      visibleBrandingConflictsWithTarget: false,
+      note: "unparseable",
+    };
   }
 }
 
@@ -140,13 +164,30 @@ for (const slug of slugs) {
   const rejectDir = path.join(outDir, "_rejected");
   mkdirSync(rejectDir, { recursive: true });
 
+  // A rerun writes 01.jpg.. fresh, but if this run keeps fewer photos than a
+  // previous one did, the previous run's extra numbered files would
+  // otherwise sit there untouched and undocumented by the reasons.json this
+  // run is about to write — exactly the kind of stale, silently-still-live
+  // wrong photo the keep-gate fix above exists to prevent. Sweep every
+  // existing file directly in outDir into _rejected (never deleted, never
+  // silently left in the folder photoFor() reads from) before scoring the
+  // new candidates.
+  for (const entry of readdirSync(outDir)) {
+    const full = path.join(outDir, entry);
+    if (statSync(full).isDirectory()) continue;
+    renameSync(full, path.join(rejectDir, `stale-${Date.now()}-${entry}`));
+  }
+
   const placeId = await placeIdFor(slug, brand);
-  const urls = [...(placeId ? await placePhotos(placeId) : []), ...(await sitePhotos(brand.siteUrl))];
+  const urls = [
+    ...(placeId ? await placePhotos(placeId) : []).map((url) => ({ url, source: "places" })),
+    ...(await sitePhotos(brand.siteUrl)).map((url) => ({ url, source: "site" })),
+  ];
   console.log(`${slug}: ${urls.length} candidates`);
 
   const seen = new Set();
   const scored = [];
-  for (const url of urls) {
+  for (const { url, source } of urls) {
     let buf;
     try {
       const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
@@ -164,14 +205,44 @@ for (const slug of slugs) {
     if (seen.has(hash)) continue;
     seen.add(hash);
 
-    scored.push({ buf, meta, verdict: await score(buf, brand.gymName) });
+    scored.push({ buf, meta, source, verdict: await score(buf, brand.gymName) });
+  }
+
+  // Google's own Places photo library for a place can itself be contaminated
+  // with another business's photos (confirmed in practice: a correctly
+  // resolved place id whose entire photo set turned out to belong to a
+  // different partner gym 20 miles away, including shots the model itself
+  // read as conflict-free because a same-brand mural or mascot carried no
+  // legible text). Two OR MORE independently flagged photos from the same
+  // source is treated as evidence the whole batch is untrustworthy, not just
+  // those photos — that pattern only showed up on genuine contamination in
+  // testing. A single flagged photo is far more often the model tripping on
+  // an equipment/supplement product shot despite being told not to (seen in
+  // practice on a pre-workout tub and a locker-room "boxing" sign); that
+  // photo is still excluded on its own via the keep gate below, but it alone
+  // does not condemn the rest of the batch.
+  const placesConflicts = scored.filter(
+    (s) => s.source === "places" && s.verdict.visibleBrandingConflictsWithTarget,
+  );
+  const placesContaminated = placesConflicts.length >= 2;
+  if (placesContaminated) {
+    console.warn(
+      `${slug}: Google Places photos disqualified — ${placesConflicts.length} showed a different gym's branding`,
+    );
+  } else if (placesConflicts.length === 1) {
+    console.warn(`${slug}: one Places photo flagged a branding conflict (excluded on its own, source not disqualified)`);
   }
 
   // Face-free gym interiors first, then by usability. A face is not an outright
   // reject — a gym with nothing else usable is better served by a good photo
   // with a person in it than by no photo at all — but it never outranks one.
+  // A branding conflict sinks a candidate to the bottom regardless of anything
+  // else, so a wrong-gym photo never displaces a genuine one out of the top
+  // KEEP slots.
   scored.sort((a, b) => {
     const rank = (s) =>
+      (s.verdict.visibleBrandingConflictsWithTarget ? -1000 : 0) +
+      (s.source === "places" && placesContaminated ? -500 : 0) +
       (s.verdict.hasIdentifiableFaces ? 0 : 100) +
       (s.verdict.isGymInterior ? 20 : 0) +
       s.verdict.usableAsAdBackground;
@@ -180,11 +251,29 @@ for (const slug of slugs) {
 
   const reasons = [];
   for (const [i, s] of scored.entries()) {
-    const keep = i < KEEP && s.verdict.usableAsAdBackground >= 3;
+    // Kept only if it is a genuine gym interior, usable, ranks in the top
+    // KEEP, nothing in frame names a different business, and — when this
+    // gym's Places photos have proven contaminated — it didn't come from
+    // Places at all. The model's own per-photo verdicts are binding; a high
+    // usability score never overrides them, and neither does an individual
+    // "clean" verdict once its source batch is disqualified.
+    const keep =
+      i < KEEP &&
+      s.verdict.isGymInterior &&
+      s.verdict.usableAsAdBackground >= 3 &&
+      !s.verdict.visibleBrandingConflictsWithTarget &&
+      !(s.source === "places" && placesContaminated);
     const name = `${String(i + 1).padStart(2, "0")}.jpg`;
     const jpg = await sharp(s.buf).jpeg({ quality: 88 }).toBuffer();
     writeFileSync(path.join(keep ? outDir : rejectDir, name), jpg);
-    reasons.push({ file: name, kept: keep, ...s.verdict, width: s.meta.width, height: s.meta.height });
+    reasons.push({
+      file: name,
+      kept: keep,
+      source: s.source,
+      ...s.verdict,
+      width: s.meta.width,
+      height: s.meta.height,
+    });
   }
   writeFileSync(path.join(rejectDir, "reasons.json"), JSON.stringify(reasons, null, 2), "utf8");
   console.log(`${slug}: kept ${reasons.filter((r) => r.kept).length}, rejected ${reasons.filter((r) => !r.kept).length}`);
