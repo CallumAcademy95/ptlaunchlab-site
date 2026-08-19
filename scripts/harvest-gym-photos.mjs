@@ -65,14 +65,31 @@ async function placeIdFor(slug, brand) {
   return id;
 }
 
+/**
+ * Photo candidates from the place's Google-hosted library, with provenance.
+ *
+ * Google Places photos are public-contributed: `authorAttributions` is the
+ * only record of who took each one, so it is requested explicitly in the
+ * field mask and carried through on every candidate — kept or rejected — into
+ * reasons.json. The media URL below embeds the API key as a `key=` query
+ * parameter; that URL is used only to fetch image bytes and MUST NEVER be
+ * logged, returned, or written anywhere. Only `attribution` (author display
+ * names) leaves this function's photo objects.
+ */
 async function placePhotos(placeId) {
-  const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}?fields=photos`, {
-    headers: { "X-Goog-Api-Key": PLACES_KEY },
-  });
-  const body = await res.json();
-  return (body.photos ?? []).slice(0, 12).map(
-    (p) => `https://places.googleapis.com/v1/${p.name}/media?maxWidthPx=1600&key=${PLACES_KEY}`,
+  const res = await fetch(
+    `https://places.googleapis.com/v1/places/${placeId}?fields=photos.name,photos.authorAttributions`,
+    { headers: { "X-Goog-Api-Key": PLACES_KEY } },
   );
+  const body = await res.json();
+  return (body.photos ?? []).slice(0, 12).map((p) => ({
+    url: `https://places.googleapis.com/v1/${p.name}/media?maxWidthPx=1600&key=${PLACES_KEY}`,
+    attribution:
+      (p.authorAttributions ?? [])
+        .map((a) => a.displayName)
+        .filter(Boolean)
+        .join(", ") || "Google Places contributor (name unavailable)",
+  }));
 }
 
 /** Images referenced by the gym's own homepage, both <img> and CSS backgrounds. */
@@ -180,14 +197,16 @@ for (const slug of slugs) {
 
   const placeId = await placeIdFor(slug, brand);
   const urls = [
-    ...(placeId ? await placePhotos(placeId) : []).map((url) => ({ url, source: "places" })),
-    ...(await sitePhotos(brand.siteUrl)).map((url) => ({ url, source: "site" })),
+    ...(placeId ? await placePhotos(placeId) : []).map((p) => ({ ...p, source: "places" })),
+    // Site-crawled photos carry no author metadata at all, so the only
+    // provenance available is the page they were found on.
+    ...(await sitePhotos(brand.siteUrl)).map((url) => ({ url, source: "site", attribution: brand.siteUrl })),
   ];
   console.log(`${slug}: ${urls.length} candidates`);
 
   const seen = new Set();
   const scored = [];
-  for (const { url, source } of urls) {
+  for (const { url, source, attribution } of urls) {
     let buf;
     try {
       const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
@@ -205,7 +224,7 @@ for (const slug of slugs) {
     if (seen.has(hash)) continue;
     seen.add(hash);
 
-    scored.push({ buf, meta, source, verdict: await score(buf, brand.gymName) });
+    scored.push({ buf, meta, source, attribution, verdict: await score(buf, brand.gymName) });
   }
 
   // Google's own Places photo library for a place can itself be contaminated
@@ -270,6 +289,10 @@ for (const slug of slugs) {
       file: name,
       kept: keep,
       source: s.source,
+      // Author display name(s) for Places photos, or the page URL the photo
+      // was found on for site-crawled photos. NEVER the media URL itself —
+      // that embeds the Places API key as a `key=` query parameter.
+      attribution: s.attribution,
       ...s.verdict,
       width: s.meta.width,
       height: s.meta.height,
