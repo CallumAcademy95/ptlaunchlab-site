@@ -320,7 +320,7 @@ export function buildSessionParams(
   // the webhook has stated it since — but the enrolment page contradicted it and
   // promised £1,399 while Stripe billed £1,599. Enforcing it here means the UI
   // is no longer the only thing standing between a deposit and a discount.
-  const discountable = !withInstalments && config.amount >= 1300;
+  const discountable = !withInstalments && config.allowPromotionCodes;
   const discountId = discountable ? input.promoCodeId : undefined;
 
   return {

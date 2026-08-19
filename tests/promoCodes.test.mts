@@ -74,7 +74,8 @@ test("the archived twin of a duplicated code is never resolved", () => {
     code({ id: "promo_archived", code: "GYMNGO500", active: false, coupon: { amount_off: 50000, valid: true } }),
     code({ id: "promo_live", code: "GYMNGO500", active: true, max_redemptions: 3, coupon: { amount_off: 50000, valid: true } }),
   ];
-  assert.equal(selectPromoCode(list, "GYMNGO500", ["GYMNGO"]).ok && selectPromoCode(list, "GYMNGO500", ["GYMNGO"]).promoId, "promo_live");
+  const r = selectPromoCode(list, "GYMNGO500", ["GYMNGO"]);
+  assert.equal(r.ok && r.promoId, "promo_live");
 });
 
 test("an inactive code with no live twin is refused", () => {

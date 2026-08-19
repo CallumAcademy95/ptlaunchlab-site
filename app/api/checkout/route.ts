@@ -122,8 +122,13 @@ export async function POST(req: NextRequest) {
   // again here means a tampered client cannot nominate an arbitrary discount.
   const promoCode = str(body.promoCode, 60);
   const gymSlug = str(body.gymSlug, 60);
+  // Checked by shape, not truthiness — see app/api/promo/validate/route.ts,
+  // whose guard this mirrors. A gymSlug of "constructor" or "__proto__"
+  // resolves to a truthy non-array (an inherited function) that a plain
+  // `prefix ? … : …` check would not catch.
   const prefix = gymSlug ? PARTNER_PROMO_PREFIXES[gymSlug] : undefined;
-  const resolved = promoCode && prefix ? await resolvePromoCode(promoCode, prefix) : null;
+  const validPrefix = Array.isArray(prefix) && prefix.length > 0 ? prefix : undefined;
+  const resolved = promoCode && validPrefix ? await resolvePromoCode(promoCode, validPrefix) : null;
 
   const session = await createCheckoutSession({
     paymentLink,

@@ -19,6 +19,7 @@ import { buildSessionParams, PAYMENT_LINK_PRICES } from "../app/lib/stripeChecko
 
 const PIF = PAYMENT_LINK_PRICES["https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f"];
 const DEPOSIT = PAYMENT_LINK_PRICES["https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05"];
+const FUNNEL = PAYMENT_LINK_PRICES["https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06"];
 
 const base = { paymentLink: "x", email: "a@b.com", name: "A B", gymSlug: "hitio-orpington" };
 const opts = { withInstalments: false, target: 5, cancelPath: "/enrol" };
@@ -73,6 +74,15 @@ test("A DEPOSIT IS NEVER DISCOUNTED with instalments OFF — the live production
 test("a deposit with no promo is unchanged", () => {
   const p = buildSessionParams({ ...base }, DEPOSIT, { ...opts, withInstalments: true });
   assert.equal(p.discounts, undefined);
+  assert.equal(p.allow_promotion_codes, false);
+});
+
+// The £1,399 funnel PIF link is also >= £1,300, so an amount-based guard
+// would discount it too. discountable must key off allowPromotionCodes
+// (structurally: only the £1,599 PIF link is true) not off the price.
+test("the £1,399 funnel link never carries a discount, even with a promo id", () => {
+  const p = buildSessionParams({ ...base, promoCodeId: "promo_500" }, FUNNEL, opts);
+  assert.equal(p.discounts, undefined, "the funnel link must never be discounted");
   assert.equal(p.allow_promotion_codes, false);
 });
 
