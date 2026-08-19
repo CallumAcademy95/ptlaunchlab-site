@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trackEvent } from "@/app/lib/gtag";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -123,6 +123,11 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; amountOffPence: number } | null>(null);
   const [promoError, setPromoError]     = useState("");
   const sec = useFormSecurity();
+  // Guards against a slow response committing stale state. The standing code is
+  // requested on mount; if a learner applies a launch code before that returns,
+  // the late standing response must NOT overwrite the larger discount. Last
+  // request wins, not last response.
+  const promoRequestId = useRef(0);
 
   useEffect(() => {
     trackEvent('enrolment_started', {
@@ -144,11 +149,14 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }, [partner?.gymSlug]);
 
   async function applyCode(code: string, { silent = false } = {}) {
+    const requestId = ++promoRequestId.current;
     const res = await fetch("/api/promo/validate", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ code, gymSlug: partner?.gymSlug }),
     }).then((r) => r.json()).catch(() => ({ valid: false, message: "" }));
+
+    if (requestId !== promoRequestId.current) return; // superseded by a later request — drop it
 
     if (res.valid) {
       setAppliedPromo({ code: res.code, amountOffPence: res.amountOffPence });
@@ -413,11 +421,11 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                 {appliedPromo ? (
                   <div className="mb-3">
-                    <p className="text-faint text-2xl font-bold line-through leading-none">£1,599</p>
+                    <p className="text-faint text-2xl font-bold line-through leading-none">£{(PIF_PENCE / 100).toLocaleString()}</p>
                     <p className="text-gold text-4xl font-bold leading-none">£{(fullPricePence / 100).toLocaleString()}</p>
                   </div>
                 ) : (
-                  <p className="text-gold text-4xl font-bold mb-3">£1,599</p>
+                  <p className="text-gold text-4xl font-bold mb-3">£{(PIF_PENCE / 100).toLocaleString()}</p>
                 )}
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
                   {appliedPromo && (
