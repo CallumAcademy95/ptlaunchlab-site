@@ -72,20 +72,38 @@ export function selectPromoCode(
 }
 
 /**
- * Every active promotion code in the account, paged.
+ * Every promotion code in the account, paged — active AND inactive.
  *
  * Listing beats a filtered lookup because Stripe's promotion_codes endpoint
  * matches `code` exactly and case-sensitively, and learners paste lowercase.
- * The account holds under 100 codes; if it ever outgrows one page, this follows
- * `has_more` rather than silently resolving against a truncated list — a
- * truncated list would read as "unknown code" and quietly deny a real discount.
+ *
+ * The `active` filter is deliberately NOT applied here, even though it looks
+ * like an obvious optimisation. Filtering server-side would mean a genuinely
+ * revoked code with no active twin is never fetched, so `selectPromoCode`
+ * would see an empty match list and return "unknown" instead of "inactive" —
+ * and those two reasons carry different learner-facing copy ("we don't
+ * recognise that code" vs "that code is no longer available"). Several gyms
+ * (6fit, Ebor, MOF, Muscle Bound) have archived launch codes today; a learner
+ * who was told the code by their gym must be told it was withdrawn, not that
+ * we've never heard of it. `selectPromoCode` already filters on `active` and
+ * `coupon.valid` and is tested on both branches — this function's job is only
+ * to hand it the full list.
+ *
+ * The account holds roughly 60 codes including archived ones, still well
+ * inside one page. If it ever outgrows one page, this follows `has_more`
+ * rather than silently resolving against a truncated list — a truncated list
+ * would read as "unknown code" and quietly deny a real discount. If the loop
+ * bound below is ever hit with more still to fetch, that is the exact failure
+ * this guards against, so it logs and throws rather than returning a partial
+ * list.
  */
-async function listActivePromotionCodes(key: string): Promise<StripePromotionCode[]> {
+async function listPromotionCodes(key: string): Promise<StripePromotionCode[]> {
   const all: StripePromotionCode[] = [];
   let startingAfter: string | undefined;
+  let hasMore = false;
 
   for (let page = 0; page < 10; page++) {
-    const qs = new URLSearchParams({ limit: "100", active: "true" });
+    const qs = new URLSearchParams({ limit: "100" });
     if (startingAfter) qs.set("starting_after", startingAfter);
 
     const res = await fetch(`https://api.stripe.com/v1/promotion_codes?${qs}`, {
@@ -95,8 +113,14 @@ async function listActivePromotionCodes(key: string): Promise<StripePromotionCod
 
     const body = await res.json();
     all.push(...(body.data ?? []));
-    if (!body.has_more || !body.data?.length) break;
+    hasMore = Boolean(body.has_more) && Boolean(body.data?.length);
+    if (!hasMore) break;
     startingAfter = body.data[body.data.length - 1].id;
+  }
+
+  if (hasMore) {
+    console.error(`[promoCodes] stopped after 10 pages (${all.length} codes fetched) with more remaining`);
+    throw new Error("stripe promotion_codes: list truncated at page limit");
   }
 
   return all;
@@ -119,7 +143,7 @@ export async function resolvePromoCode(code: string, prefixes: string[]): Promis
   }
 
   try {
-    return selectPromoCode(await listActivePromotionCodes(key), code, prefixes);
+    return selectPromoCode(await listPromotionCodes(key), code, prefixes);
   } catch (err) {
     console.error("[promoCodes] lookup failed", err);
     return { ok: false, reason: "unknown" };
