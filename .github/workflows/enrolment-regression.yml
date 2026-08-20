@@ -1,6 +1,12 @@
 # Guards the pay-first enrolment return redirect. See e2e/README.md.
 #
-# Two jobs, because the two failure modes have different shapes:
+# Three jobs, because the failure modes have different shapes:
+#
+#   unit-tests      — runs on every change. No secrets, no browser. Protects
+#                     the money rules in tests/stripeDiscounts.test.mts and
+#                     tests/promoCodes.test.mts: a deposit is never
+#                     discounted, and a session never carries both `discounts`
+#                     and `allow_promotion_codes`.
 #
 #   code-regression — runs on every change. Stripe TEST mode only, no live
 #                     credentials. Catches success_url being edited or the
@@ -24,6 +30,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  unit-tests:
+    name: Unit tests (promo code + discount money rules)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
+
   code-regression:
     name: Checkout returns buyers to /enrol/success (test mode)
     if: github.event_name != 'schedule'

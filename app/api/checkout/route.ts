@@ -6,6 +6,8 @@ import {
   PAYMENT_LINK_PRICES,
   ENROL_SUCCESS_URL,
 } from "@/app/lib/stripeCheckout";
+import { resolvePromoCode } from "@/app/lib/promoCodes";
+import { PARTNER_PROMO_PREFIXES } from "@/app/lib/partnerPromo";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/checkout
@@ -116,14 +118,27 @@ export async function POST(req: NextRequest) {
   const str = (v: unknown, max = 300) =>
     typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
 
+  // The browser sends the code STRING, never a promotion code id. Resolving it
+  // again here means a tampered client cannot nominate an arbitrary discount.
+  const promoCode = str(body.promoCode, 60);
+  const gymSlug = str(body.gymSlug, 60);
+  // Checked by shape, not truthiness — see app/api/promo/validate/route.ts,
+  // whose guard this mirrors. A gymSlug of "constructor" or "__proto__"
+  // resolves to a truthy non-array (an inherited function) that a plain
+  // `prefix ? … : …` check would not catch.
+  const prefix = gymSlug ? PARTNER_PROMO_PREFIXES[gymSlug] : undefined;
+  const validPrefix = Array.isArray(prefix) && prefix.length > 0 ? prefix : undefined;
+  const resolved = promoCode && validPrefix ? await resolvePromoCode(promoCode, validPrefix) : null;
+
   const session = await createCheckoutSession({
     paymentLink,
     clientReferenceId: str(body.clientReferenceId, 200),
     email: str(body.email, 200),
     name: str(body.name, 200),
     gymReferral: str(body.gymReferral, 100),
-    gymSlug: str(body.gymSlug, 60),
-    promoCode: str(body.promoCode, 60),
+    gymSlug,
+    promoCode,
+    promoCodeId: resolved?.ok ? resolved.promoId : undefined,
     cancelPath: str(body.cancelPath, 200),
   });
 

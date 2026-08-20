@@ -15,7 +15,12 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
   const sectionBg = c.sectionBg ?? c.primaryColor;
   const dark = c.darkAccent ?? c.primaryColor;
   const enrolPath = `${c.canonicalPath}/enrol`;
-  const monthlyPayments = Math.round((c.fullPrice - c.depositPrice) / 200);
+  // Fixed at Stripe: the deposit plan is always the £599 deposit followed by
+  // 5 × £200/month, totalling £1,599 — regardless of what a partner's
+  // (pre-discount) fullPrice config says. Deriving this from fullPrice used
+  // to render "£1,399" on eight of nine pages while Stripe billed £1,599.
+  const monthlyPayments = 5;
+  const depositPlanTotal = 1599;
   const showDiscount = c.showDiscount !== false;
 
   return (
@@ -268,10 +273,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
         {/* ── PRICING ── */}
         <section className="bg-gray-50 py-16 md:py-20">
           <div className="max-w-3xl mx-auto px-6 text-center">
-            <h2 className={`text-3xl md:text-4xl font-black text-black uppercase ${showDiscount ? "mb-3" : "mb-10"}`}>Your Investment</h2>
-            {showDiscount && (
-              <p className="text-gray-500 mb-10">Apply code <span className="font-bold text-black">{c.promoCode}</span> at Stripe checkout to unlock your discount.</p>
-            )}
+            <h2 className={`text-3xl md:text-4xl font-black text-black uppercase mb-10`}>Your Investment</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
                 <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>Best Value</p>
@@ -286,7 +288,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Spread the Cost</p>
                 <p className="text-black font-black text-2xl mb-1">Deposit Plan</p>
                 <p className="font-black text-4xl text-black mb-1">£{c.depositPrice.toLocaleString()}</p>
-                <p className="text-gray-400 text-sm mb-4">then £200 × {monthlyPayments} monthly payments</p>
+                <p className="text-gray-400 text-sm mb-4">then £200 × {monthlyPayments} monthly payments — £{depositPlanTotal.toLocaleString()} total</p>
                 <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
                   Start with Deposit →
                 </a>
@@ -309,9 +311,6 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               style={{ color: c.primaryColor }}>
               Apply Now →
             </a>
-            {showDiscount && (
-              <p className="text-white/50 text-xs">Enter code <span className="text-white font-bold">{c.promoCode}</span> at Stripe checkout to apply your £{c.discountAmount} discount</p>
-            )}
           </div>
         </section>
 

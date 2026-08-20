@@ -10,16 +10,6 @@ export const metadata: Metadata = {
 const MOF_PARTNER = {
   gymSlug: "mof",
   gymReferral: "Ministry of Fitness",
-  promoCodes: {
-    "MOFPTDISCOUNT": {
-      label: "Ministry of Fitness Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-      depositStripeLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-    },
-  },
 };
 
 export default function MofGymEnrolPage() {

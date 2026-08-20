@@ -19,16 +19,9 @@ const PARTNER: PartnerConfig = {
   // and add the same value as `slug` on the pp_partners row.
   gymSlug: "GYM-SLUG-HERE",
   gymReferral: "GYM NAME HERE",
-  promoCodes: {
-    "GYMPROMOCODE": {
-      label: "GYM NAME Member Discount",
-      discountAmount: 200,
-      fullPrice: 1399,
-      depositPrice: 599,
-      fullStripeLink:    "REPLACE_WITH_STRIPE_FULL_LINK",
-      depositStripeLink: "REPLACE_WITH_STRIPE_DEPOSIT_LINK",
-    },
-  },
+  // No promo config here on purpose. Prices and discounts come from Stripe at
+  // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Add this
+  // gym's standing code and prefix(es) there, not here.
 };
 
 const PRIMARY = "#000000"; // match gym primary colour
