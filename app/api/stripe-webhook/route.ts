@@ -18,6 +18,8 @@ import {
   formatGbp,
   type SaleShape,
 } from "@/app/lib/coursePlan";
+import { PHONE_NATIONAL } from "@/app/lib/contactDetails";
+import { buildInviteUrl, invitePostBody, type InvitePayload } from "@/app/lib/enrolmentInvite";
 
 // Stripe -> GA4 Measurement Protocol webhook
 //
@@ -387,13 +389,15 @@ async function sendToGymTracker(session: StripeSession) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Paid-but-form-not-completed safety net.
+// Paid-but-not-enrolled safety net.
 //
-// The pay-first enrolment flow only writes a learner record when the buyer
-// completes the post-payment form on /enrol/success (→ /api/enrolments →
-// Google Sheet + PDF + "New Enrolment" email). If they pay but abandon that
-// form, NOTHING on our side records that a paying customer exists — the sale
-// silently vanishes.
+// The learner record is written on Praxel, when the buyer creates their account
+// there. If they pay and never do, nothing on THIS side records that a paying
+// customer exists — the sale silently vanishes from the inbox.
+//
+// (Praxel keeps its own record of the same gap: every paid sale writes an
+// enrolment_invites row, and the unconsumed ones are the chase list. This email
+// is the belt to that braces, and the one that reaches a human unprompted.)
 //
 // This function fires on every confirmed course payment (checkout.session
 // .completed, payment_status=paid, isCourseSale) and does two things:
@@ -482,11 +486,11 @@ async function sendPaidReconciliation(session: StripeSession) {
       </table>
 
       <div style="margin-top:18px;padding:14px 16px;background:#061F36;border:1px solid #1A3A5C;border-radius:10px;color:#8CA3BF;font-size:12px;line-height:1.6;">
-        This is the <strong style="color:#ffffff;">money-confirmed</strong> record. You should also get a full
-        <strong style="color:#ffffff;">"New Enrolment"</strong> email once they complete the enrolment form.
+        This is the <strong style="color:#ffffff;">money-confirmed</strong> record. Praxel sends a
+        <strong style="color:#ffffff;">"New enrolment"</strong> email once they create their account there.
         <br><br>
         <strong style="color:#F5C518;">If that follow-up never arrives</strong>, this learner paid but didn't finish the
-        form — send them <a href="https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}" style="color:#F5C518;">this completion link</a> to capture their details.
+        account — send them <a href="${praxelEnrolLink(session)}" style="color:#F5C518;">their enrolment link</a> to finish it. It's signed, works once, and only for their email address.
       </div>
     </div>
     <div style="text-align:center;padding:14px;color:#2A4A6C;font-size:11px;">
@@ -531,12 +535,84 @@ async function sendPaidReconciliation(session: StripeSession) {
           promo_code: promoCode,
           stripe_session_id: session.id,
           stripe_link: stripeLink,
-          completion_link: `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`,
+          completion_link: praxelEnrolLink(session),
         }),
       });
     } catch (err) {
       console.error("[stripe-webhook] paid-reconciliation Zapier hook failed:", err);
     }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Praxel hand-off.
+//
+// The learner record lives on Praxel now, not here. A paid sale produces one
+// signed description of itself, used for two things that must agree: the link
+// the buyer is emailed, and the POST that records the sale in Praxel.
+//
+// Required env:
+//   PTLL_INVITE_SECRET    — shared with Praxel, identical value
+//   PRAXEL_ENROL_ORIGIN   — https://ptll.praxel.co.uk
+// ─────────────────────────────────────────────────────────────────────────────
+const PRAXEL_ORIGIN = process.env.PRAXEL_ENROL_ORIGIN ?? "https://ptll.praxel.co.uk";
+
+function invitePayloadFor(session: StripeSession): InvitePayload | null {
+  const email = session.customer_email || session.customer_details?.email || "";
+  if (!email) return null;
+  const attribution = decodeClientRef(session.client_reference_id);
+  return {
+    sid: session.id,
+    email: email.toLowerCase(),
+    name: buyerName(session),
+    // Shape, never amount. A £1,099 partner pay-in-full is a PIF, and calling
+    // it a deposit is a mistake this repo has already made twice.
+    plan: planTypeForSale(saleShape(session)) === "deposit" ? "deposit" : "PIF",
+    amount: (session.amount_total ?? 0) / 100,
+    gym: session.metadata?.gym_slug || attribution.gyms || undefined,
+    promo: session.metadata?.promo_code || undefined,
+    ts: Date.now(),
+  };
+}
+
+// The buyer's way into Praxel. Falls back to the bare enrol page only when the
+// secret is missing, which is a misconfiguration rather than a runtime state —
+// and which Praxel will then refuse, loudly, rather than silently enrolling
+// someone who never paid.
+function praxelEnrolLink(session: StripeSession): string {
+  const secret = process.env.PTLL_INVITE_SECRET;
+  const payload = secret ? invitePayloadFor(session) : null;
+  return payload && secret ? buildInviteUrl(PRAXEL_ORIGIN, payload, secret) : `${PRAXEL_ORIGIN}/enrol`;
+}
+
+// Records the paid sale in Praxel so a buyer who never opens their email still
+// shows up there as "paid, never enrolled".
+//
+// Best-effort by design: the emailed link carries the same signed payload, so
+// enrolment keeps working even when this call fails. What is lost on failure is
+// only the chase-list row — and Praxel rebuilds that from the signature the
+// moment the learner clicks.
+async function sendEnrolmentInvite(session: StripeSession) {
+  const secret = process.env.PTLL_INVITE_SECRET;
+  if (!secret) {
+    console.warn("[stripe-webhook] PTLL_INVITE_SECRET not set — skipping the Praxel invite");
+    return;
+  }
+  const payload = invitePayloadFor(session);
+  if (!payload) {
+    console.warn(`[stripe-webhook] no buyer email on ${session.id} — cannot create a Praxel invite`);
+    return;
+  }
+  const { body, signature } = invitePostBody(payload, secret);
+  const res = await fetch(`${PRAXEL_ORIGIN}/api/enrolment-invites`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-ptll-signature": signature },
+    body,
+  });
+  if (!res.ok) {
+    console.error(`[stripe-webhook] Praxel invite rejected (${res.status}):`, await res.text());
+  } else {
+    console.log(`[stripe-webhook] Praxel invite recorded for ${payload.email} (${session.id})`);
   }
 }
 
@@ -575,7 +651,9 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
   // it: a £1,099 partner pay-in-full was told, in writing, that she had paid a
   // deposit.
   const label = planLabel(saleShape(session));
-  const completionLink = `https://ptlaunchlab.co.uk/enrol/success?session_id=${session.id}`;
+  // Points at Praxel, where the learner record now lives. The link is signed
+  // and works once, so it must not be shared — the copy below says so.
+  const completionLink = praxelEnrolLink(session);
 
   const html = `
 <!DOCTYPE html>
@@ -585,7 +663,7 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
   <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
     <div style="background:#072B4A;border-radius:12px 12px 0 0;padding:26px;border-bottom:3px solid #F5C518;">
       <div style="font-size:20px;font-weight:800;color:#ffffff;">PT Launch Lab</div>
-      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">Payment received — one last step</div>
+      <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">Payment received — create your account</div>
     </div>
     <div style="background:#0A2A44;padding:26px;border-radius:0 0 12px 12px;color:#C7D6E8;font-size:14px;line-height:1.65;">
       <p style="margin:0 0 14px;">Hi${firstName ? ` ${firstName}` : ""},</p>
@@ -594,13 +672,14 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
         thank you, and welcome to PT Launch Lab.
       </p>
       <p style="margin:0 0 20px;">
-        To finish your enrolment we need your NCFE learner details and your signed learner
-        agreement. It takes about two minutes, and we can't register you with NCFE until it's done.
+        One more step: create your account. You'll set a password, give us your NCFE learner details and sign your
+        learner agreement — about five minutes. Your course opens as soon as you're done, and we can't register you
+        with NCFE until it is.
       </p>
 
       <div style="text-align:center;margin:26px 0;">
         <a href="${completionLink}" style="display:inline-block;background:#F5C518;color:#061F36;font-weight:800;font-size:15px;text-decoration:none;padding:15px 32px;border-radius:999px;">
-          Complete my enrolment →
+          Create my account →
         </a>
       </div>
 
@@ -610,12 +689,15 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
       </p>
 
       <div style="padding:14px 16px;background:#061F36;border:1px solid #1A3A5C;border-radius:10px;font-size:13px;color:#8CA3BF;">
-        <strong style="color:#ffffff;">Already filled this in?</strong> Then you're all set — ignore this email.
-        Your tutor will be in touch within 24 hours.
+        <strong style="color:#ffffff;">This link is just for you.</strong> It's tied to your payment, works once, and
+        can only enrol the email address you paid with — so there's no need to forward it on.
+        <br><br>
+        <strong style="color:#ffffff;">Already created your account?</strong> Then you're all set — sign in at
+        <a href="${PRAXEL_ORIGIN}/login" style="color:#F5C518;">${PRAXEL_ORIGIN.replace(/^https?:\/\//, "")}</a>.
       </div>
 
       <p style="margin:20px 0 0;font-size:13px;color:#8CA3BF;">
-        Any problems, just reply to this email or call <strong style="color:#ffffff;">01977 365001</strong>.
+        Any problems, just reply to this email or call <strong style="color:#ffffff;">${PHONE_NATIONAL}</strong>.
       </p>
     </div>
     <div style="text-align:center;padding:14px;color:#2A4A6C;font-size:11px;">
@@ -853,6 +935,14 @@ export async function POST(req: NextRequest) {
           await sendLearnerCompletionEmail(session);
         } catch (err) {
           console.error("[stripe-webhook] learner completion email dispatch failed:", err);
+        }
+        // Records the sale in Praxel. Deliberately AFTER the learner email, so
+        // a slow or down Praxel never delays the email the buyer is waiting on
+        // — the link in it works with or without this call having landed.
+        try {
+          await sendEnrolmentInvite(session);
+        } catch (err) {
+          console.error("[stripe-webhook] Praxel invite dispatch failed:", err);
         }
       } else {
         console.log(`[stripe-webhook] non-course sale (£${amountGbp}) — skipping PTLL GA4 + Meta Purchase`);
