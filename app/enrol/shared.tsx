@@ -1,12 +1,14 @@
-// Shared building blocks for the two-phase enrolment flow.
+// Shared building blocks for the pre-payment enrolment step.
 //
-// Phase 1 (pre-payment) lives in EnrolmentFlow.tsx — collects name + email +
-// plan and sends the buyer to Stripe.
-// Phase 2 (post-payment) lives in success/PostPaymentEnrolment.tsx — collects
-// the full learner record + signed agreement once payment has completed.
+// This file used to serve a two-phase flow: phase 1 collected name + email +
+// plan and sent the buyer to Stripe, phase 2 collected the full NCFE learner
+// record on /enrol/success afterwards. Phase 2 has moved to Praxel, where
+// enrolment and account creation are one act — so only the pre-payment pieces
+// used by EnrolmentFlow.tsx remain here.
 //
-// Both phases reuse the field primitives, styles, types and blank-state
-// constants defined here so the look stays identical across the split.
+// The learner-record types, blank states and form primitives that went with
+// phase 2 were removed with it. `git log app/enrol/` has them if a future
+// on-site form ever needs them back.
 
 import React from "react";
 
@@ -27,24 +29,14 @@ export interface PartnerConfig {
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────
-export interface LearnerDetails {
-  title: string; fullName: string; dateOfBirth: string; gender: string;
-  nationalInsurance: string; mobile: string; email: string;
-  addressLine1: string; addressLine2: string; town: string; county: string; postcode: string;
-}
-export interface LearningDetails {
-  heardAbout: string; highestQualification: string;
-  gcseEnglish: string; gcseMaths: string; gcseICT: string; employmentStatus: string;
-}
-export interface AgreementState {
-  detailsAccurate: boolean; selfFunded: boolean;
-  coolingOffUnderstood: boolean; termsAgreed: boolean; commitToLearning: boolean;
-  signature: string; signatureType: "drawn" | "typed"; signedAt: string;
-}
 
-// The context written to localStorage at the pay step and read back on the
-// success page so the post-payment form can carry plan/amount/attribution and
-// prefill the learner's name + email.
+// Written to localStorage at the pay step so the thank-you page can show the
+// right plan and amount back to the buyer.
+//
+// It no longer prefills a form: the learner's details are collected on Praxel,
+// prefilled from their Stripe session rather than from this browser's storage —
+// which is the whole point, since storage is empty if they pay on a phone and
+// enrol on a laptop.
 export interface EnrolmentContext {
   fullName: string;
   email: string;
@@ -60,24 +52,8 @@ export interface EnrolmentContext {
 
 export const ENROLMENT_CONTEXT_KEY = "ptll_enrolment_context";
 
-export const blankLearner: LearnerDetails = {
-  title: "", fullName: "", dateOfBirth: "", gender: "",
-  nationalInsurance: "", mobile: "", email: "",
-  addressLine1: "", addressLine2: "", town: "", county: "", postcode: "",
-};
-export const blankLearning: LearningDetails = {
-  heardAbout: "", highestQualification: "",
-  gcseEnglish: "", gcseMaths: "", gcseICT: "", employmentStatus: "",
-};
-export const blankAgreement: AgreementState = {
-  detailsAccurate: false, selfFunded: false,
-  coolingOffUnderstood: false, termsAgreed: false, commitToLearning: false,
-  signature: "", signatureType: "drawn", signedAt: "",
-};
-
 // ─── Shared styles ───────────────────────────────────────────────────────────
 export const input = "w-full bg-deep border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/[0.15] focus:outline-none focus:border-gold/50 transition-colors text-sm";
-export const sel = input + " cursor-pointer";
 
 // ─── Field wrapper ───────────────────────────────────────────────────────────
 export function Field({ label, error, required, hint, children }: {
@@ -93,36 +69,5 @@ export function Field({ label, error, required, hint, children }: {
       {hint && !error && <p className="text-faint text-xs mt-1">{hint}</p>}
       {error && <p className="text-red-400 text-xs mt-1">⚠ {error}</p>}
     </div>
-  );
-}
-
-// ─── Card ────────────────────────────────────────────────────────────────────
-export function Card({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-deep border border-white/10 rounded-2xl p-6 space-y-4">
-      <h2 className="text-white font-bold text-lg pb-2 border-b border-white/10">{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-// ─── Checkbox row ────────────────────────────────────────────────────────────
-export function Check({ checked, onChange, error, children }: {
-  checked: boolean; onChange: (v: boolean) => void; error?: boolean; children: React.ReactNode;
-}) {
-  return (
-    <label className={`flex items-start gap-3 cursor-pointer p-4 rounded-xl border transition-all ${
-      checked ? "border-gold/40 bg-gold/5" :
-      error   ? "border-red-500/40 bg-red-500/5" :
-                "border-white/10 hover:border-white/[0.15]"
-    }`}>
-      <div className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center shrink-0 border-2 transition-all ${
-        checked ? "bg-gold border-gold" : "border-white/[0.15]"
-      }`}>
-        {checked && <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5 text-deep"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-      </div>
-      <input type="checkbox" className="sr-only" checked={checked} onChange={e => onChange(e.target.checked)} />
-      <span className="text-soft text-sm leading-relaxed">{children}</span>
-    </label>
   );
 }
