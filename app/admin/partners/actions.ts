@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { getBankDetails, saveBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -580,7 +581,7 @@ async function sendWelcomeEmail(args: {
 
       <p style="color:#4A6280;font-size:13px;line-height:1.6;margin:24px 0 0;">
         Any problems, reply to this email or call
-        <a href="tel:01977365001" style="color:#F5C518;">01977 365001</a>.
+        <a href="tel:${PHONE_TEL}" style="color:#F5C518;">${PHONE_NATIONAL}</a>.
       </p>
     </div>
 

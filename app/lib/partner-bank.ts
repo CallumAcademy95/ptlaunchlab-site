@@ -6,6 +6,7 @@
 
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "./supabase-admin";
+import { PHONE_NATIONAL } from "@/app/lib/contactDetails";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 
@@ -168,7 +169,7 @@ async function notifyBankDetailsChanged(args: {
         <p style="color:#ffffff;font-size:15px;font-weight:600;margin:0;">${args.newMasked.sortCodeMasked} · ${args.newMasked.accountNumberMasked}</p>
       </div>
       <p style="color:#F5C518;font-size:14px;line-height:1.6;margin:0;">
-        <strong>If you didn't make this change, call us on 01977 365001 straight away.</strong>
+        <strong>If you didn't make this change, call us on ${PHONE_NATIONAL} straight away.</strong>
         We'll hold any payment until it's confirmed.
       </p>
     </div>

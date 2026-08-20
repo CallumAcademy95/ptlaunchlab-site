@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 import {
   PARTNERSHIP_AGREEMENT_VERSION,
   PARTNERSHIP_AGREEMENT_SUMMARY,
@@ -159,7 +160,7 @@ export async function POST(req: NextRequest) {
       <p style="color:#4A6280;font-size:13px;line-height:1.6;margin:0 0 20px;">
         Any questions? Contact us at
         <a href="mailto:info@ptlaunchlab.co.uk" style="color:#F5C518;">info@ptlaunchlab.co.uk</a>
-        or call <a href="tel:01977365001" style="color:#F5C518;">01977 365001</a>.
+        or call <a href="tel:${PHONE_TEL}" style="color:#F5C518;">${PHONE_NATIONAL}</a>.
       </p>
 
       <div style="text-align:center;">
@@ -170,7 +171,7 @@ export async function POST(req: NextRequest) {
     </div>
 
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH · 01977 365001
+      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH · ${PHONE_NATIONAL}
     </div>
   </div>
 </body>

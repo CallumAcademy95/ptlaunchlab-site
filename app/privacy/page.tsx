@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage from "../components/LegalPage";
+import { CONTACT_EMAIL, PHONE_NATIONAL } from "@/app/lib/contactDetails";
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://ptlaunchlab.co.uk/privacy" },
@@ -55,7 +56,7 @@ export default function PrivacyPage() {
           content: (
             <>
               {p("PT Launch Lab is the data controller for the personal data you provide when enquiring about or enrolling on our courses.")}
-              {p("Contact: info@ptlaunchlab.co.uk | 01977 365001")}
+              {p(`Contact: ${CONTACT_EMAIL} | ${PHONE_NATIONAL}`)}
               {p("We process personal data in accordance with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.")}
             </>
           ),

@@ -1,5 +1,6 @@
 import Nav from "./Nav";
 import Footer from "./Footer";
+import { CONTACT_EMAIL, PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 interface Section {
   title: string;
@@ -51,12 +52,12 @@ export default function LegalPage({
           <div className="bg-[#0A2A44] border border-[#1A3A5C] rounded-2xl p-6 mt-12">
             <p className="text-[#8CA3BF] text-sm">
               Questions about this policy? Contact us at{" "}
-              <a href="mailto:info@ptlaunchlab.co.uk" className="text-[#F5C518] hover:underline">
-                info@ptlaunchlab.co.uk
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#F5C518] hover:underline">
+                {CONTACT_EMAIL}
               </a>{" "}
               or call{" "}
-              <a href="tel:01977365001" className="text-[#F5C518] hover:underline">
-                01977 365001
+              <a href={`tel:${PHONE_TEL}`} className="text-[#F5C518] hover:underline">
+                {PHONE_NATIONAL}
               </a>.
             </p>
           </div>
