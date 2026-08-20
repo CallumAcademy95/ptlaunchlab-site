@@ -1,3 +1,5 @@
+import { ADDRESS_ONE_LINE, CONTACT_EMAIL, PHONE_NATIONAL } from "@/app/lib/contactDetails";
+
 // Client-side only — call from browser context, not server components/API routes
 
 export interface EnrolmentPDFData {
@@ -151,7 +153,7 @@ async function buildEnrolmentPDF(data: EnrolmentPDFData) {
     doc.setFontSize(6.5);
     doc.setTextColor(140, 163, 191);
     doc.text(
-      "PT Launch Lab  |  Unit 3, Royals Business Park, Pontefract WF8 4AH  |  info@ptlaunchlab.co.uk  |  01977 365001",
+      `PT Launch Lab  |  ${ADDRESS_ONE_LINE}  |  ${CONTACT_EMAIL}  |  ${PHONE_NATIONAL}`,
       PW / 2, PH - 8.5, { align: "center" }
     );
     doc.text(
