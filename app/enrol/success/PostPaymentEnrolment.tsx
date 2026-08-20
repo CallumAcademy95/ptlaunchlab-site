@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { trackEvent } from "@/app/lib/gtag";
 import { generateEnrolmentPDFBase64 } from "@/app/lib/generateEnrolmentPDF";
 import { useFormSecurity } from "@/app/lib/security/client";
+import { WHATSAPP_LINK } from "@/app/lib/contactDetails";
 import {
   type LearnerDetails,
   type LearningDetails,
@@ -155,7 +156,7 @@ function CompletedView({ firstName, mode = "postpay" }: { firstName: string; mod
         <div className="max-w-2xl mx-auto text-center">
           <p className="text-soft text-sm mb-4">Need anything before you hear from us?</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <a href="https://wa.me/447822012186" className="px-6 py-3 rounded-full bg-card border border-white/10 text-white text-sm hover:border-gold/40 transition-colors">WhatsApp us</a>
+            <a href={WHATSAPP_LINK} className="px-6 py-3 rounded-full bg-card border border-white/10 text-white text-sm hover:border-gold/40 transition-colors">WhatsApp us</a>
             <a href="mailto:info@ptlaunchlab.co.uk" className="px-6 py-3 rounded-full bg-card border border-white/10 text-white text-sm hover:border-gold/40 transition-colors">info@ptlaunchlab.co.uk</a>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { generateEnrolmentPDFServer } from "@/app/lib/server/generateEnrolmentPD
 import { validateEnrolmentSec } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
 import { recordPartnerSale } from "@/app/lib/partner-sales";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 const ZAPIER_WEBHOOK = process.env.ENROLMENT_ZAPIER_WEBHOOK_URL!;
 
@@ -306,7 +307,7 @@ export async function POST(req: NextRequest) {
       <p style="color:#4A6280;font-size:13px;line-height:1.6;margin:0 0 20px;">
         If you have any questions before your course access is set up, email us at
         <a href="mailto:info@ptlaunchlab.co.uk" style="color:#F5C518;">info@ptlaunchlab.co.uk</a>
-        or call <a href="tel:01977365001" style="color:#F5C518;">01977 365001</a>.
+        or call <a href="tel:${PHONE_TEL}" style="color:#F5C518;">${PHONE_NATIONAL}</a>.
       </p>
 
       <div style="text-align:center;">
@@ -317,7 +318,7 @@ export async function POST(req: NextRequest) {
     </div>
 
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH · 01977 365001
+      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH · ${PHONE_NATIONAL}
     </div>
   </div>
 </body>

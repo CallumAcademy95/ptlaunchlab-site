@@ -1,5 +1,6 @@
 // Server-side only — runs in API routes, never in the browser
 import PDFDocument from "pdfkit";
+import { ADDRESS_ONE_LINE, CONTACT_EMAIL, PHONE_NATIONAL } from "@/app/lib/contactDetails";
 
 // ── Colours ───────────────────────────────────────────────────────────────────
 const DARK    = "#072B4A";
@@ -89,7 +90,7 @@ export function generateEnrolmentPDFServer(
       doc.rect(0, PH - 28, PW, 2).fill(YELLOW);
       doc.fillColor(MUTED).font("Helvetica").fontSize(7)
          .text(
-           "PT Launch Lab  |  Unit 3, Royals Business Park, Pontefract WF8 4AH  |  info@ptlaunchlab.co.uk  |  01977 365001",
+           `PT Launch Lab  |  ${ADDRESS_ONE_LINE}  |  ${CONTACT_EMAIL}  |  ${PHONE_NATIONAL}`,
            M, PH - 20, { width: CW, align: "center", lineBreak: false }
          );
       doc.fillColor(MUTED).fontSize(6.5)
