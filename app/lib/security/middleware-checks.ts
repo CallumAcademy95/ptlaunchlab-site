@@ -14,17 +14,19 @@ const PROTECTED_PATHS = new Set([
   "/api/quiz-submission",
   "/api/prospectus",
   "/api/gym-partnership",
-  "/api/enrolments",
 ]);
 
-// Max body size in bytes. Enrolments has a multi-step payload with optional
-// promo code + GCSE fields — give it more room than the others.
+// Max body size in bytes.
+//
+// /api/enrolments used to sit here with 32 KB for its multi-step learner
+// payload. That route is gone — the learner record is collected on Praxel now —
+// so the allowance went with it rather than being left as a standing 32 KB door
+// to a path that no longer exists.
 const MAX_BODY: Record<string, number> = {
   "/api/contact":         8 * 1024,
   "/api/quiz-submission": 12 * 1024,
   "/api/prospectus":      4 * 1024,
   "/api/gym-partnership": 6 * 1024,
-  "/api/enrolments":      32 * 1024,
 };
 
 // Origins allowed to POST to form endpoints. Apex + www + any *.vercel.app

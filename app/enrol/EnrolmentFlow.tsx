@@ -111,8 +111,8 @@ const SUPPORT_PHONE             = "01977 365001";
 // ─── Main Component — Pre-payment checkout ───────────────────────────────
 // Collects the minimum needed to send the buyer to Stripe (name + email +
 // plan choice). The full learner record + signed agreement are collected on
-// the /enrol/success page once payment has cleared — see
-// success/PostPaymentEnrolment.tsx.
+// Praxel once payment has cleared, from a signed link that prefills their name
+// and email out of the Stripe session.
 export default function EnrolmentFlow({ partner, standalone }: { partner?: PartnerConfig; standalone?: boolean }) {
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");

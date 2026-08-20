@@ -96,3 +96,27 @@ test("the promo code string still reaches metadata for the webhook", () => {
   );
   assert.equal((p.metadata as Record<string, unknown>).promo_code, "HITIO500");
 });
+
+// ── Invoices ────────────────────────────────────────────────────────────────
+//
+// Pay-in-full buyers get a real Stripe invoice. Deposit plans must NOT ask for
+// one: they are subscription sessions, which already invoice per instalment,
+// and Stripe rejects a subscription session carrying invoice_creation — so
+// getting this wrong doesn't produce a missing PDF, it takes deposit checkout
+// down completely, the same failure mode as rule 2 above.
+
+test("a pay-in-full session asks Stripe to issue an invoice", () => {
+  const p = buildSessionParams({ ...base }, PIF, opts);
+  assert.deepEqual(p.invoice_creation, { enabled: true });
+});
+
+test("a deposit session never carries invoice_creation", () => {
+  const p = buildSessionParams({ ...base }, DEPOSIT, { ...opts, withInstalments: true });
+  assert.equal(p.mode, "subscription");
+  assert.equal(p.invoice_creation, undefined, "Stripe rejects a subscription session that asks for an invoice");
+});
+
+test("the discounted funnel pay-in-full still gets an invoice", () => {
+  const p = buildSessionParams({ ...base }, FUNNEL, opts);
+  assert.deepEqual(p.invoice_creation, { enabled: true });
+});

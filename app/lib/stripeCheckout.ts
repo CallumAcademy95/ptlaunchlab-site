@@ -351,6 +351,13 @@ export function buildSessionParams(
         },
       },
     }),
+    // A proper hosted invoice + PDF for pay-in-full buyers, issued by Stripe so
+    // it always states what was actually charged — including a partner discount,
+    // which an invoice we generated ourselves would have to be told about.
+    //
+    // Payment mode only. Deposit plans are subscriptions, which already invoice
+    // per instalment, and Stripe rejects a session carrying both.
+    ...(!withInstalments && { invoice_creation: { enabled: true } }),
     success_url: ENROL_SUCCESS_URL,
     cancel_url: `${SITE_URL}${cancelPath}`,
     // Prefills the email on Stripe's page, same as the old ?prefilled_email=

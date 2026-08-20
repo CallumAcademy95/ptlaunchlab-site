@@ -13,21 +13,22 @@ import { logSec } from "@/app/lib/security/log";
 // /enrol/success.
 //
 // Why: in the pay-first flow the full learner record + signed agreement are
-// collected AFTER payment. If a buyer pays but closes the tab before
-// finishing that form, the only "New Enrolment" email (from /api/enrolments)
-// never arrives. This endpoint captures name + email + plan up front so admin
-// always has the contact details to chase an incomplete enrolment.
+// collected AFTER payment, on Praxel. If a buyer drops out at Stripe, or pays
+// and never creates their account, nothing else here records that they existed.
+// This endpoint captures name + email + plan up front so admin always has the
+// contact details to chase.
 //
-// Reconciliation: every buyer who triggers this should be followed by a full
-// "New Enrolment" email. Anyone here WITHOUT that follow-up = paid (or
-// dropped) without finishing the form → reach out.
+// Reconciliation: every buyer who triggers this should be followed by a
+// "New enrolment" email from Praxel. Anyone here WITHOUT that follow-up either
+// never paid, or paid and never enrolled — the latter also shows up as an
+// unconsumed row in Praxel's enrolment_invites (the chase list).
 //
 // Body shape:
 //   { name, email, plan: 'full'|'deposit', amount?, gymReferral?, promoCode?,
 //     [SEC_KEY]: {...} }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Lazy for the same reason as /api/enrolments: `new Resend(undefined)` throws,
+// Lazy because `new Resend(undefined)` throws,
 // and at module scope that would 500 this route instead of quietly skipping the
 // alert email as the guard below intends.
 let resendClient: Resend | null = null;

@@ -4,11 +4,8 @@ import {
   PAYMENT_LINKS,
   PRODUCTION_ORIGIN,
   expectedTestPrices,
-  fieldInput,
-  fieldSelect,
   payWithTestCard,
   readTestSession,
-  tickConsent,
 } from "./helpers";
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -17,8 +14,8 @@ import {
 // A Stripe Payment Link's post-payment redirect lives in the Stripe Dashboard,
 // not in this repo. Two of the three links used by the enrolment flow were left
 // on Stripe's default landing page, so buyers paid and were dumped on
-// stripe.com instead of /enrol/success — the page that collects the NCFE learner
-// record and the signed learner agreement.
+// stripe.com instead of /enrol/success — the page that hands them onward to
+// create their account and complete their enrolment.
 //
 // Nothing broke visibly. Money still arrived. It ran for eight months and cost
 // eight paying customers (Nov 2025 – Jul 2026), each of whom had to be chased
@@ -102,8 +99,8 @@ test.describe("pay-first enrolment: the return redirect", () => {
           "record or sign the learner agreement — exactly the failure that lost 8 customers.",
       ).toBe(`${BASE_URL}${SUCCESS_PATH}?session_id={CHECKOUT_SESSION_ID}`);
 
-      // The session id must be passed through, or /enrol/success cannot tie the
-      // learner record to the payment (and the recovery email link is useless).
+      // The session id must be passed through, or /enrol/success cannot read the
+      // sale back and so cannot build the signed hand-off link at all.
       expect(session.success_url).toContain("{CHECKOUT_SESSION_ID}");
       expect(session.metadata.source).toBe("api-checkout-session");
 
@@ -141,17 +138,21 @@ test.describe("pay-first enrolment: the return redirect", () => {
   });
 
   // ── The whole journey, in a real browser, with a real card ────────────────
-  test("a paying buyer lands on the enrolment form and creates an enrolment record", async ({ page }) => {
+  //
+  // The learner record now lives on Praxel, so this test stops where the site's
+  // responsibility stops: the buyer is returned to /enrol/success and handed a
+  // working, SIGNED link onward. What Praxel does with that link is covered on
+  // the other side (albaco-lms: scripts/test-invite-token.mjs plus the browser
+  // walk recorded in its plan).
+  //
+  // The hand-off link is the new shape of the old failure. Before, a buyer could
+  // pay and never reach the form. Now they can pay and be handed a link that
+  // does not verify — same silence, same money taken, same chasing by hand.
+  test("a paying buyer is returned to the site and handed a working Praxel link", async ({ page }) => {
     const learner = {
       name: "E2E Regression Learner",
       email: `e2e-${Date.now()}@ptlaunchlab-test.invalid`,
     };
-
-    // Capture the enrolment submission so we can assert on what was recorded.
-    const enrolmentPost = page.waitForRequest(
-      (r) => r.url().includes("/api/enrolments") && r.method() === "POST",
-      { timeout: 150_000 },
-    );
 
     // ── 1. The pay step: name + email + plan, nothing else ──
     await page.goto("/enrol");
@@ -211,64 +212,47 @@ test.describe("pay-first enrolment: the return redirect", () => {
     expect(session.payment_status).toBe("paid");
     expect(session.amount_total).toBe(159900);
 
-    // ── 4. The form is reachable and prefilled from the paid session ──
-    await expect(page.getByText("Payment received")).toBeVisible();
-    await expect(fieldInput(page, "Full Legal Name")).toHaveValue(learner.name);
-    await expect(fieldInput(page, "Email Address")).toHaveValue(learner.email);
+    // ── 4. The buyer is told the payment landed ──
+    await expect(page.getByRole("heading", { name: /Your place is confirmed/ })).toBeVisible({ timeout: 30_000 });
 
-    // ── 5. Step 1 — personal details ──
-    await fieldSelect(page, "Title").selectOption("Ms");
-    await fieldInput(page, "Date of Birth").fill("1995-06-15");
-    await fieldSelect(page, "Gender").selectOption("Prefer not to say");
-    await fieldInput(page, "National Insurance Number").fill("QQ123456C");
-    await fieldInput(page, "Mobile Number").fill("07700 900000");
-    await fieldInput(page, "Address Line 1").fill("1 Regression Street");
-    await fieldInput(page, "Town / City").fill("Pontefract");
-    await fieldInput(page, "Postcode").fill("WF8 4AH");
-    await page.getByRole("button", { name: /Continue/ }).click();
+    // ── 5. THE NEW REGRESSION: is the onward link real? ──
+    //
+    // "Create my account" must carry a signed d/t pair. A bare /enrol link means
+    // the page could not read the session, or the secret is missing — Praxel
+    // refuses it either way, and the buyer is stranded exactly as they used to be.
+    const cta = page.getByRole("link", { name: /Create my account/ });
+    await expect(
+      cta,
+      "The hand-off button is missing. A buyer who has just paid £1,599 has no route " +
+        "through to Praxel from this page. Check PTLL_INVITE_SECRET is set and that " +
+        "/enrol/success can read the Stripe session.",
+    ).toBeVisible();
 
-    // ── 6. Step 2 — learning info ──
-    await expect(page.getByText("Step 2 of 3")).toBeVisible();
-    const heardAbout = fieldSelect(page, "How did you hear about PT Launch Lab");
-    if (await heardAbout.count()) await heardAbout.selectOption("Google / Online Search");
-    await fieldSelect(page, "Highest qualification achieved").selectOption("A-Level / AS-Level");
-    await fieldSelect(page, "Current employment status").selectOption("Employed full-time");
-    await page.getByRole("button", { name: /Continue/ }).click();
-
-    // ── 7. Step 3 — agreement + signature ──
-    await expect(page.getByText("Step 3 of 3")).toBeVisible();
-    for (const consent of [
-      "I confirm that all information I have provided",
-      "I understand that this is a self-funded course",
-      "I have read and understood the cooling off",
-      "I commit to engaging with the learning process",
-      "I have read and agree to the",
-    ]) {
-      await tickConsent(page, consent);
-    }
-
-    // Typed signature rather than drawing on the canvas — same code path for
-    // the payload, far less brittle than synthesising pointer events.
-    await page.getByRole("button", { name: "Type Name" }).click();
-    await page.getByPlaceholder("Type your full legal name").fill(learner.name);
-
-    await page.getByRole("button", { name: /Confirm Enrolment/ }).click();
-
-    // ── 8. The record exists, and it is tied to the payment ──
-    const submitted = await enrolmentPost;
-    const payload = submitted.postDataJSON() as Record<string, unknown>;
+    const href = await cta.getAttribute("href");
+    expect(href, "the hand-off link has no href").toBeTruthy();
+    const onward = new URL(href!, BASE_URL);
 
     expect(
-      payload.stripeSessionId,
-      "The enrolment record was submitted without a Stripe session id, so there is no\n" +
-        "way to reconcile this learner against the payment they made.",
-    ).toBe(sessionId);
-    expect(payload).toMatchObject({ stripeSessionId: sessionId });
+      onward.pathname,
+      `The hand-off fell back to the bare enrol page (${href}). That page is ` +
+        "invitation-only, so this buyer would be told to wait for an email they may " +
+        "never receive. The signed link is the one that works.",
+    ).toBe("/enrol/complete");
 
-    const response = await submitted.response();
-    expect(response?.status(), "POST /api/enrolments did not succeed").toBe(200);
+    // The signature is what Praxel verifies. Assert both halves are present AND
+    // that the payload describes THIS sale — a link signed over somebody else's
+    // session would enrol the wrong person, or nobody at all.
+    const d = onward.searchParams.get("d");
+    const t = onward.searchParams.get("t");
+    expect(d, "no payload on the hand-off link").toBeTruthy();
+    expect(t, "no signature on the hand-off link").toBeTruthy();
+    expect(t!).toMatch(/^[0-9a-f]{64}$/); // hex HMAC-SHA256
 
-    // And the buyer is told they are done.
-    await expect(page.getByRole("heading", { name: /You're in|You’re in/ })).toBeVisible({ timeout: 30_000 });
+    const payload = JSON.parse(Buffer.from(d!, "base64url").toString("utf8"));
+    expect(payload.sid, "the link is signed over a different Stripe session").toBe(sessionId);
+    expect(payload.email).toBe(learner.email.toLowerCase());
+    // Shape, never amount — a discounted partner pay-in-full is still a PIF.
+    expect(payload.plan).toBe("PIF");
+    expect(payload.amount).toBe(1599);
   });
 });
