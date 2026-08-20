@@ -10,6 +10,7 @@
 
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "./supabase-admin";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 const SITE = "https://ptlaunchlab.co.uk";
 
@@ -103,7 +104,7 @@ function resetEmail(args: { firstName: string | null; gymName: string; link: str
       <p style="margin:24px 0 0;color:#7A8899;font-size:14px;line-height:1.6;">
         <strong style="color:#1E2A38;">If this wasn't you</strong>, ignore this email — nothing has
         changed and your password still works. If it keeps happening, call us on
-        <a href="tel:01977365001" style="color:#0B1F38;font-weight:600;">01977 365001</a>.
+        <a href="tel:${PHONE_TEL}" style="color:#0B1F38;font-weight:600;">${PHONE_NATIONAL}</a>.
       </p>
     </div>
     <div style="background:#0B1F38;padding:18px 32px;text-align:center;">

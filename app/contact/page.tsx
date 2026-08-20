@@ -3,6 +3,7 @@ import { useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -50,7 +51,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-white font-semibold mb-1">Phone</p>
-                    <a href="tel:01977365001" className="text-[#8CA3BF] hover:text-[#F5C518] transition-colors">01977 365001</a>
+                    <a href={`tel:${PHONE_TEL}`} className="text-[#8CA3BF] hover:text-[#F5C518] transition-colors">{PHONE_NATIONAL}</a>
                   </div>
                 </div>
 

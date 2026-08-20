@@ -5,6 +5,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
 import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
+import { CONTACT_EMAIL as SUPPORT_EMAIL, PHONE_NATIONAL as SUPPORT_PHONE, PHONE_TEL } from "@/app/lib/contactDetails";
 import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
   type PartnerConfig,
@@ -105,8 +106,8 @@ function appendStripeAttribution(url: string, email: string, ref: string): strin
 // ─── Configuration ───────────────────────────────────────────────────────
 const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
 const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
-const SUPPORT_EMAIL             = "info@ptlaunchlab.co.uk";
-const SUPPORT_PHONE             = "01977 365001";
+// Contact details come from the shared module — this page had the landline
+// hardcoded, and it is the page a buyer reads immediately before paying £1,599.
 
 // ─── Main Component — Pre-payment checkout ───────────────────────────────
 // Collects the minimum needed to send the buyer to Stripe (name + email +
@@ -489,7 +490,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
                   {SUPPORT_EMAIL}
                 </a>
                 <span className="hidden sm:inline text-white/10">·</span>
-                <a href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`} className="text-gold hover:underline">
+                <a href={`tel:${PHONE_TEL}`} className="text-gold hover:underline">
                   {SUPPORT_PHONE}
                 </a>
               </div>

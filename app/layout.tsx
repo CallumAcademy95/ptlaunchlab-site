@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import Chatbot from "./components/ChatbotLazy";
 import Tracking from "./components/Tracking";
+import { PHONE_SCHEMA } from "@/app/lib/contactDetails";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -107,7 +108,7 @@ export default function RootLayout({
                     { "@type": "Person", name: "Ryan Robinson" },
                   ],
                   email: "info@ptlaunchlab.co.uk",
-                  telephone: "+44 7822 012186",
+                  telephone: PHONE_SCHEMA,
                   address: {
                     "@type": "PostalAddress",
                     streetAddress: "Unit 3, Royals Business Park, King Street",
@@ -145,7 +146,7 @@ export default function RootLayout({
                   name: "PT Launch Lab",
                   url: "https://ptlaunchlab.co.uk",
                   image: "https://ptlaunchlab.co.uk/og-image.png",
-                  telephone: "+44 7822 012186",
+                  telephone: PHONE_SCHEMA,
                   email: "info@ptlaunchlab.co.uk",
                   priceRange: "££",
                   address: {

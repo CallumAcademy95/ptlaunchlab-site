@@ -3,6 +3,7 @@
 import { useState, useRef, FormEvent } from "react";
 import { trackEvent } from "@/app/lib/gtag";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
+import { WHATSAPP_DISPLAY } from "@/app/lib/contactDetails";
 
 const ZAPIER_HOOK = process.env.NEXT_PUBLIC_ZAPIER_PHONE_CALLBACK_HOOK || "";
 
@@ -159,7 +160,7 @@ export default function PhoneCallbackForm() {
       setSubmitted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong.";
-      setError(message + " Please try again, or WhatsApp us at +44 7822 012186.");
+      setError(message + ` Please try again, or WhatsApp us at ${WHATSAPP_DISPLAY}.`);
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +196,7 @@ export default function PhoneCallbackForm() {
             <div>
               <p className="text-white text-sm font-semibold">Within a few hours (business hours)</p>
               <p className="text-soft text-xs leading-relaxed mt-0.5">
-                You&apos;ll get a WhatsApp from <strong className="text-white/80">+44 7822 012186</strong> — that&apos;s us. Save the number so it doesn&apos;t look like spam.
+                You&apos;ll get a WhatsApp from <strong className="text-white/80">{WHATSAPP_DISPLAY}</strong> — that&apos;s us. Save the number so it doesn&apos;t look like spam.
               </p>
             </div>
           </li>
@@ -323,7 +324,7 @@ export default function PhoneCallbackForm() {
       </button>
 
       <p className="text-center text-soft text-xs leading-relaxed">
-        We&apos;ll WhatsApp you within a few hours during business hours from <strong className="text-white/70">+44 7822 012186</strong>. No pressure, no script.
+        We&apos;ll WhatsApp you within a few hours during business hours from <strong className="text-white/70">{WHATSAPP_DISPLAY}</strong>. No pressure, no script.
       </p>
     </form>
   );

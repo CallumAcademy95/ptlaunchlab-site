@@ -132,9 +132,12 @@ function html(gymName: string, firstName: string | null) {
         nothing ever waits on us chasing you for them.
       </p>
 
+      <!-- Phone hardcoded: this is a standalone script, so it does not go
+           through app/lib/contactDetails.ts. Update it by hand when the number
+           changes — see the note at the top of that file. -->
       <p style="margin:26px 0 0;color:#7A8899;font-size:14px;line-height:1.6;">
         Any questions, just reply to this — or call
-        <a href="tel:01977365001" style="color:#0B1F38;font-weight:600;">01977 365001</a>.
+        <a href="tel:+441977285014" style="color:#0B1F38;font-weight:600;">01977 285014</a>.
       </p>
     </div>
 

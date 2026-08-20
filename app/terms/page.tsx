@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPage from "../components/LegalPage";
+import { CONTACT_EMAIL, PHONE_NATIONAL } from "@/app/lib/contactDetails";
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://ptlaunchlab.co.uk/terms" },
@@ -32,7 +33,7 @@ export default function TermsPage() {
           content: (
             <>
               {p("PT Launch Lab provides online personal training education and career development courses, including the NCFE-accredited Level 2 Certificate in Gym Instructing and Level 3 Certificate in Personal Training.")}
-              {p("For the purposes of these terms, \"PT Launch Lab\", \"we\", \"us\" and \"our\" refers to PT Launch Lab. You can contact us at info@ptlaunchlab.co.uk or 01977 365001.")}
+              {p(`For the purposes of these terms, "PT Launch Lab", "we", "us" and "our" refers to PT Launch Lab. You can contact us at ${CONTACT_EMAIL} or ${PHONE_NATIONAL}.`)}
             </>
           ),
         },

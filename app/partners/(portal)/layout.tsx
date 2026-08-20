@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { partnerSignOut } from "../actions";
 import PartnerNav from "./PartnerNav";
+import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 export const metadata: Metadata = {
   title: "Partner portal — PT Launch Lab",
@@ -57,7 +58,7 @@ export default async function PortalLayout({ children }: { children: React.React
         <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
           info@ptlaunchlab.co.uk
         </a>{" "}
-        · <a href="tel:01977365001" className="text-gold hover:underline">01977 365001</a>
+        · <a href={`tel:${PHONE_TEL}`} className="text-gold hover:underline">{PHONE_NATIONAL}</a>
       </footer>
     </div>
   );
