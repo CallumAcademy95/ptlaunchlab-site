@@ -26,7 +26,7 @@ const comparisonRows = [
 
 const howItWorksSteps = [
   { num: "01", icon: "📱", title: "Enrol online today",         body: "Immediate access. No waiting around. Your course, your tutor, and your learning platform are ready the moment you sign up." },
-  { num: "02", icon: "📚", title: "Study around your job",      body: "Everything is in the Merve app. Study mornings, evenings, weekends — whenever fits your life. No classrooms. No fixed schedule." },
+  { num: "02", icon: "📚", title: "Study around your job",      body: "Everything is in the learning app. Study mornings, evenings, weekends — whenever fits your life. No classrooms. No fixed schedule." },
   { num: "03", icon: "🎯", title: "Get mentored",               body: "Ryan and the team work with you throughout. Not a help-desk — real mentorship from people who've built the business themselves." },
   { num: "04", icon: "🏅", title: "Qualify — NCFE Level 3",     body: "Earn your Ofqual-regulated, CIMSPA-recognised Level 3 PT qualification. Every gym and insurer in the UK accepts it." },
   { num: "05", icon: "🤝", title: "Get your gym interviews",    body: "We guarantee you interviews with our partner gyms. No other course in the UK does this. We're the ones who do the hiring." },
@@ -34,7 +34,7 @@ const howItWorksSteps = [
 ];
 
 const features = [
-  { icon: "📱", title: "Learn on your phone",               body: "Everything in the Merve app. Study at your own pace, track your progress — no classrooms or fixed hours.",                                           badge: null },
+  { icon: "📱", title: "Learn on your phone",               body: "Everything in the learning app. Study at your own pace, track your progress — no classrooms or fixed hours.",                                           badge: null },
   { icon: "📚", title: "12 focused modules",                body: "Anatomy, nutrition, programming, client coaching — exactly what you need, nothing you don't. Built to qualify you fast and confidently.",             badge: null },
   { icon: "💼", title: "Business training built in",        body: "How to get clients, price yourself, market your services, and build recurring income. The stuff other courses skip entirely.",                          badge: null },
   { icon: "👤", title: "Your own personal tutor",           body: "They know your name, where you're at, and what you need next. Direct support whenever you need it — not a ticket system.",                            badge: "Included" },

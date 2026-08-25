@@ -51,10 +51,10 @@ const steps = [
     num: "03",
     Icon: RocketIcon,
     title: "Launch",
-    subtitle: "Qualify — and walk straight into guaranteed interviews",
-    body: "When you complete your qualification, we don't hand you a certificate and wish you luck. We activate your guaranteed gym interviews — direct introductions to employers who are actively hiring CIMSPA-recognised PTs. You've done the work. We make sure the right people know about it.",
+    subtitle: "Qualify, then get in front of a gym",
+    body: "When you complete your qualification we arrange your guaranteed gym interview: a direct introduction to a partner gym, rather than a certificate and good luck. Whether you get the job is between you and them, but getting in the room is on us.",
     bullets: [
-      "Guaranteed gym interviews on completion — actual introductions, not job boards",
+      "A guaranteed gym interview on completion, arranged by us",
       "CV and interview preparation included",
       "Ongoing career support from the PT Launch Lab team",
     ],

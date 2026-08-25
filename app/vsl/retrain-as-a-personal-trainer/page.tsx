@@ -51,7 +51,7 @@ const objections = [
   },
   {
     q: "Can I actually do this around the kids?",
-    a: "Yes — and it's how the majority of returner students do it. The course is fully online via the Merve app, fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 12–20 weeks.",
+    a: "Yes — and it's how the majority of returner students do it. The course is fully online and fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 12–20 weeks.",
   },
   {
     q: "I haven't studied in years. What if I can't cope?",
@@ -66,7 +66,7 @@ const objections = [
 const steps = [
   { n: 1, title: "Book a free 15-min chat — no pressure", body: "Tell us your situation: kids' ages, what time you've actually got, what's pulling you towards PT. We'll listen first, then tell you honestly if it's the right move." },
   { n: 2, title: "Enrol on a plan that fits the household", body: "£599 deposit + 5 × £200 monthly, or pay in full. Most returners spread it across school terms." },
-  { n: 3, title: "Study from home, on your hours", body: "100% online via the Merve app. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings — entirely your call." },
+  { n: 3, title: "Study from home, on your hours", body: "100% online. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings — entirely your call." },
   { n: 4, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite — already included in your fee, with full tutor support." },
   { n: 5, title: "Qualify in Level 3 — NCFE, Ofqual regulated", body: "Programming, nutrition, business planning, video-assessed practicals. The qualification UK gyms and insurers both recognise by default." },
   { n: 6, title: "Launch the business YOU want, locally", body: "Mentorship Hub walks you through niching, local marketing, pricing, packaging, and your first 10 clients. Women's strength, postnatal, midlife — your call." },
@@ -83,12 +83,12 @@ const comparisonRows = [
 
 const faqs = [
   { q: "Is 40 too old to retrain as a personal trainer in the UK?", a: "No. The UK PT market has a genuine shortage of qualified coaches who understand busy parents, midlife bodies, and women's specific goals. Clients in their 30s, 40s, and 50s consistently prefer a PT who relates to them. We've put learners through in their late 50s who are now coaching full diaries. The blocker isn't age — it's confidence, and that's exactly what the course and mentorship are built to rebuild." },
-  { q: "Can I really retrain around school hours and family life?", a: "Yes. The course is fully online via the Merve app, fully self-paced. No fixed class times, no commute, no childcare requirements for study. Practical units are video-assessed at any gym. Most returners finish the full Level 2 + Level 3 in 12–20 weeks fitting study around school runs, bedtimes, and weekends." },
+  { q: "Can I really retrain around school hours and family life?", a: "Yes. The course is fully online and fully self-paced. No fixed class times, no commute, no childcare requirements for study. Practical units are video-assessed at any gym. Most returners finish the full Level 2 + Level 3 in 12–20 weeks fitting study around school runs, bedtimes, and weekends." },
   { q: "I haven't studied in years. Will I cope with the assessments?", a: "Yes. Your personal tutor is assigned within 24 hours of enrolment and stays with you throughout. Before you submit any assessment, they review your work and tell you what to tweak. Most learners never fail because the system catches issues before submission. Resubmissions are free if you ever need them." },
-  { q: "Can I do this without ever going to a college or classroom?", a: "Yes — 100%. Theory is delivered online via the Merve app. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
+  { q: "Can I do this without ever going to a college or classroom?", a: "Yes — 100%. Theory is delivered online. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
   { q: "I want to coach women specifically — is that realistic?", a: "It's one of the strongest niches in the UK market. Women-only training, postnatal recovery, midlife strength, perimenopausal fitness, and beginner confidence are all undersupplied and growing. Many female returner-PTs we work with build their entire client base on referrals from one school-gate network. The Mentorship Hub has a dedicated track on niching down, and our community has plenty of women coaching women you can learn from directly." },
   { q: "What's the realistic income for a returner-PT in year one?", a: "Part-time around school hours, year one: £12K–£25K. Full-time self-employed after 2–3 years: £35K–£50K+. Group sessions (4–8 people) push hourly rates significantly higher — common with school-hall classes and postnatal groups. The Mentorship Hub teaches pricing, packaging, and how to fill a small but profitable client base rather than chasing volume." },
-  { q: "When can I start, and what's the total cost?", a: "Start the moment you enrol — full access to the Merve app opens immediately and your tutor introduces themselves within 24 hours. £1,599 covers NCFE Level 2 + Level 3, your tutor, the £500 Mentorship Hub, and our gym pipeline. Most returners use the £599 deposit + 5 × £200 plan so it spreads across a school term." },
+  { q: "When can I start, and what's the total cost?", a: "Start the moment you enrol. Full access opens immediately and your tutor introduces themselves within 24 hours. £1,599 covers NCFE Level 2 + Level 3, your tutor, the £500 Mentorship Hub, and our gym pipeline. Most returners use the £599 deposit + 5 × £200 plan so it spreads across a school term." },
 ];
 
 const founders = [
@@ -312,7 +312,7 @@ export default function RetrainAsAPersonalTrainerPage() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
-                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online via the Merve app. While they're at school, after bedtime, weekend mornings — your hours, your pace. Most returners finish in 12–20 weeks." },
+                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online. While they're at school, after bedtime, weekend mornings — your hours, your pace. Most returners finish in 12–20 weeks." },
                 { tag: "Money", title: "Spread across the school term", body: "£599 deposit + 5 × £200 monthly, or pay in full. Designed to never sit on top of the food shop." },
                 { tag: "Support", title: "A real tutor — not a help desk", body: "Personal tutor introduced within 24 hours. Reviews your work before submission so assessments stop being scary. Resubmissions are free." },
                 { tag: "Confidence", title: "We rebuild it on purpose", body: "The Mentorship Hub doesn't just teach business — it teaches the version of confidence you need when you've been out of the workforce." },
