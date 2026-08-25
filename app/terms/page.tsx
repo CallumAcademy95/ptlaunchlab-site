@@ -76,7 +76,7 @@ export default function TermsPage() {
               {p("Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, you have the right to cancel your enrolment within 14 calendar days of your payment without giving a reason (the \"cooling off period\").")}
               {p("To exercise your right to cancel, contact us at info@ptlaunchlab.co.uk within 14 days of payment. We will acknowledge your cancellation and process a full refund within 14 days of receiving your cancellation request.")}
               {p("After the 14-day cooling off period has expired, cancellations are not eligible for a refund except in exceptional circumstances at our discretion. Your statutory rights under UK consumer law are not affected.")}
-              {p("If you choose a payment plan and cancel after 14 days, the payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged.")}
+              {p("If you choose a payment plan and cancel after 14 days, the payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged. Where the course fee has not been paid in full, your certificate will not be claimed from NCFE.")}
             </>
           ),
         },
@@ -119,6 +119,7 @@ export default function TermsPage() {
               {p("PT Launch Lab is the business mentorship and education provider for this programme. The NCFE-accredited delivery centre is Ultimate Shred Academy (NCFE Centre Number: 9002788). Ultimate Shred Academy and PT Launch Lab share the same directors and operate under the same organisation. Learner registrations with NCFE are processed through Ultimate Shred Academy as the approved centre.")}
               {p("Qualification registration is subject to the learner providing a valid National Insurance number and meeting the entry requirements.")}
               {p("Certificates are issued by NCFE upon successful completion of all required assessments and coursework. PT Launch Lab does not guarantee the outcome of any assessment.")}
+              {p("If you are paying by instalments, your certificate will be claimed from NCFE once the course fee has been paid in full. You may work through the course at whatever pace suits you, and finishing your assessments early does not bring the remaining payments forward — but certification is claimed after the final payment has cleared, not before.")}
             </>
           ),
         },

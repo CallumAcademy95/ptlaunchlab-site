@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { PAYMENT_LINKS, PRODUCTION_ORIGIN, envValue, stripeGet } from "./helpers";
+import { ALL_MAPPED_LINK_URLS, PAYMENT_LINKS, PRODUCTION_ORIGIN, envValue, stripeGet } from "./helpers";
 
 // ════════════════════════════════════════════════════════════════════════════
 // THE SAFETY NET, CHECKED AGAINST LIVE STRIPE (read-only)
@@ -105,14 +105,26 @@ test.describe("live Stripe Payment Links still redirect to the enrolment form", 
     test.skip(!key, "STRIPE_SECRET_KEY unavailable");
 
     const { body } = await stripeGet<{ data?: PaymentLink[] }>(key!, "payment_links?limit=100");
-    const mapped = new Set(Object.values(PAYMENT_LINKS) as string[]);
-    const unmapped = (body.data ?? []).filter((l) => l.active && !mapped.has(l.url));
+    // Read from the app's own map, NOT from the named PAYMENT_LINKS fixture.
+    // That fixture is hand-written and drifted the first time a fourth link was
+    // added: the £99 September link was correctly in PAYMENT_LINK_PRICES and
+    // this check failed anyway, reporting a live link as unknown to code that
+    // knew about it perfectly well.
+    const unmapped = (body.data ?? []).filter((l) => l.active && !ALL_MAPPED_LINK_URLS.has(l.url));
 
-    // Two legacy links are knowingly kept active because real payments came
-    // through them historically; they are not referenced by any enrol page.
+    // Legacy links knowingly kept active. None is referenced by any enrol page.
     const KNOWN_LEGACY = new Set([
       "https://buy.stripe.com/bJecMZ4Ew6de52q4EifEk09",
       "https://buy.stripe.com/7sY5kxb2UgRSfH45ImfEk0d",
+      // £200 one-off, hosted confirmation, no redirect. This is the manual
+      // instalment-collection link from before the £200/month mandate was
+      // automated — someone sent it by hand each month. Deliberately has no
+      // /enrol/success redirect: a buyer using it is settling a balance, not
+      // enrolling, so returning them to the enrolment form would be wrong.
+      // ⚠️ A payment through it is NOT counted by countSettledInstalments(),
+      // which derives from subscription invoices — so a balance collected this
+      // way has to be reconciled by hand.
+      "https://buy.stripe.com/aFafZb0og456dyWdaOfEk0l",
     ]);
     const unexpected = unmapped.filter((l) => !KNOWN_LEGACY.has(l.url));
 

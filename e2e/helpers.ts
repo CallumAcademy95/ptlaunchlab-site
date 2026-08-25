@@ -1,17 +1,38 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page } from "@playwright/test";
+import { PAYMENT_LINK_PRICES } from "../app/lib/stripeCheckout";
 
 export const REPO_ROOT = join(__dirname, "..");
 export const PORT = Number(process.env.PTLL_E2E_PORT || 3100);
 export const BASE_URL = `http://localhost:${PORT}`;
 
-/** The three Payment Links hard-coded in app/lib/stripeCheckout.ts. */
+/**
+ * The Payment Links the browser walks, by name.
+ *
+ * Named because two specs drive them individually (pif / deposit / funnelPif).
+ * Do NOT use this to answer "is every live link known to the app" — it is a
+ * hand-written list and it drifted the first time a fourth link was added: the
+ * £99 September link was in PAYMENT_LINK_PRICES and the completeness check
+ * failed anyway, because it was comparing against this object rather than
+ * against the app. Use ALL_MAPPED_LINK_URLS for that.
+ */
 export const PAYMENT_LINKS = {
   pif: "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
   deposit: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
   funnelPif: "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06",
 } as const;
+
+/**
+ * Every link the app actually maps, read from the app itself.
+ *
+ * One source of truth, so a new price added to PAYMENT_LINK_PRICES is known to
+ * the test the moment it is added, and a live link missing from the app is a
+ * real finding rather than a stale test fixture.
+ */
+export const ALL_MAPPED_LINK_URLS: ReadonlySet<string> = new Set(
+  Object.keys(PAYMENT_LINK_PRICES),
+);
 
 /** The origin live checkout must always return buyers to. */
 export const PRODUCTION_ORIGIN = "https://ptlaunchlab.co.uk";
@@ -140,8 +161,37 @@ export async function payWithTestCard(page: Page, cardholder: string) {
   await page.locator("input#cardExpiry").fill("12/34");
   await page.locator("input#cardCvc").fill("123");
   await page.locator("input#billingName").fill(cardholder);
+
+  // Stripe builds the billing form from the payer's GEOGRAPHY, not from the
+  // price's currency. Run from the UK you get a Postcode field; run from a
+  // US-hosted CI runner you get a ZIP, which strips non-digits — so "WF8 4AH"
+  // became "84", failed validation as incomplete, Pay never submitted, and the
+  // test timed out after 90s. It looked like a redirect regression and was
+  // actually a postcode in the wrong country's field.
+  //
+  // Pin the country so the form is the same shape wherever this runs.
+  const country = page.locator("select#billingCountry");
+  if (await country.count()) {
+    await country.selectOption("GB").catch(() => { /* already GB, or no such option */ });
+  }
+
+  // Ticking Link's "save my information" makes the phone number required, and
+  // it is pre-ticked for some payers. Nothing here needs Link, so clear it
+  // rather than satisfy a field the journey does not depend on.
+  const link = page.locator('input[type="checkbox"]#enableStripePass');
+  if ((await link.count()) && (await link.isChecked().catch(() => false))) {
+    await link.uncheck().catch(() => { /* not interactable — the phone fill below covers it */ });
+  }
+
   const postcode = page.locator("input#billingPostalCode");
   if (await postcode.count()) await postcode.fill("WF8 4AH");
+
+  // Only present if Link stayed on. A valid UK mobile, so it passes whichever
+  // country the form ended up in.
+  const phone = page.locator("input#phoneNumber");
+  if ((await phone.count()) && (await phone.isVisible().catch(() => false))) {
+    await phone.fill("07700900123").catch(() => {});
+  }
 
   await page.getByTestId("hosted-payment-submit-button").click();
 }

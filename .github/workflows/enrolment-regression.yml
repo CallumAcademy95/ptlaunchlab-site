@@ -52,6 +52,12 @@ jobs:
     env:
       CI: "1"
       STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+      # /enrol/success signs the Praxel hand-off link with this. Without it the
+      # page still renders and still says the payment succeeded — it just has no
+      # "Create my account" button, so a buyer who has paid has no route on.
+      # That is precisely what the test asserts, so it is needed here even
+      # though nothing in CI ever follows the link.
+      PTLL_INVITE_SECRET: ${{ secrets.PTLL_INVITE_SECRET }}
       # This job intentionally holds no live credentials, so the live Dashboard
       # check cannot run here. Opting out explicitly keeps the skip visible in
       # the run log rather than silently absent.

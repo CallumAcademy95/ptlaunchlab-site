@@ -157,35 +157,6 @@ export default function SeptemberOfferPage() {
           </ul>
         </section>
 
-        {/* ─── Affordability, answered straight ─────────────────── */}
-        {state !== "closed" && (
-          <section className="mx-auto max-w-3xl px-6 pb-14">
-            <div className="border-l-2 border-gold/50 pl-6">
-              <h2 className="text-2xl font-bold sm:text-3xl">Can you actually afford it?</h2>
-              <div className="mt-5 space-y-4 text-soft">
-                <p>
-                  It is £{SEPT99_MONTHLY} a month for {SEPT99_INSTALMENTS} months after the £{SEPT99_ENTRY}.
-                  Whether that works is something only you can answer, and it is worth answering
-                  now rather than in month three.
-                </p>
-                <p>
-                  The payments are fixed and automatic — once a month, starting thirty days after
-                  you join, on the card you sign up with. No interest, no credit check, no finance
-                  company. It is an agreement directly with us to pay the course off over{" "}
-                  {SEPT99_INSTALMENTS} months, and it runs its course whether you finish the
-                  qualification in three months or ten.
-                </p>
-                <p>
-                  If £{SEPT99_MONTHLY} a month would genuinely stretch you, this is not the right
-                  moment, and we would rather say so than take your £{SEPT99_ENTRY}. This exists for
-                  people who could always have managed £{SEPT99_MONTHLY} a month and never had
-                  £{STANDARD_TOTAL.toLocaleString()} sitting in one place at one time.
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* ─── Closed: the standard route ───────────────────────── */}
         {state === "closed" && (
           <section className="mx-auto max-w-3xl px-6 pb-14">
@@ -207,6 +178,43 @@ export default function SeptemberOfferPage() {
 
         <Accreditation />
         <Reviews />
+
+        {/* ─── What the commitment actually is ──────────────────── */}
+        {/*
+          Deliberately placed AFTER the proof, not before it. An earlier draft
+          put an affordability section third — straight after the offer — which
+          brought the reader back to money worry at the exact moment they were
+          weighing it up, and read as "prove you can afford us". Same facts,
+          same transparency; it just belongs after they believe the thing is
+          worth having.
+        */}
+        {state !== "closed" && (
+          <section className="mx-auto max-w-3xl px-6 py-14">
+            <div className="border-l-2 border-gold/50 pl-6">
+              <h2 className="text-2xl font-bold sm:text-3xl">Know exactly what you are committing to</h2>
+              <div className="mt-5 space-y-4 text-soft">
+                <p>
+                  After the £{SEPT99_ENTRY} you pay today, there are {SEPT99_INSTALMENTS} monthly
+                  payments of £{SEPT99_MONTHLY}, starting 30 days after you enrol. That is
+                  £{SEPT99_TOTAL.toLocaleString()} in total.
+                </p>
+                <p>
+                  No interest, no credit check, no finance company. The payments are collected
+                  automatically from the card you enrol with.
+                </p>
+                <p>
+                  The five payments run whether you finish the course in three months or ten, and
+                  your certificate is claimed from NCFE once the balance is paid.
+                </p>
+                <p className="text-white">
+                  The £{SEPT99_ENTRY} makes it easier to start — but it is still worth being
+                  comfortable with £{SEPT99_MONTHLY} a month for the five months after that. If that
+                  works for you, you can begin without finding £{STANDARD_TOTAL.toLocaleString()} up front.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ─── Final CTA ────────────────────────────────────────── */}
         {state === "open" && (
