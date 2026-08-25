@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "./EnrolmentFlow";
 import Breadcrumbs from "../components/Breadcrumbs";
+import { isSeptemberOfferOpen } from "../lib/septemberOffer";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Launch Lab",
@@ -8,11 +9,26 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://ptlaunchlab.co.uk/enrol" },
 };
 
-export default function EnrolPage() {
+// The September offer changes what this page renders, so it cannot be cached.
+export const dynamic = "force-dynamic";
+
+export default async function EnrolPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ offer?: string }>;
+}) {
+  const { offer } = await searchParams;
+
+  // `?offer=sept99` is honoured only while the offer is actually open. Checked
+  // here as well as in /api/checkout because a page that still shows a £99
+  // button after midnight — even one whose checkout would refuse — is a page
+  // that takes someone's details and then tells them no.
+  const septemberOffer = offer === "sept99" && isSeptemberOfferOpen();
+
   return (
     <>
       <Breadcrumbs trail={[{ name: "Enrol", url: "https://ptlaunchlab.co.uk/enrol" }]} />
-      <EnrolmentFlow />
+      <EnrolmentFlow offer={septemberOffer ? "sept99" : undefined} />
     </>
   );
 }

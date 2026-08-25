@@ -8,6 +8,9 @@ import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
 import { CONTACT_EMAIL as SUPPORT_EMAIL, PHONE_NATIONAL as SUPPORT_PHONE, PHONE_TEL } from "@/app/lib/contactDetails";
 import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
+  SEPT99_PAYMENT_LINK, SEPT99_LANDING_PATH, SEPT99_ENTRY, SEPT99_TOTAL, SEPT99_SAVING,
+} from "@/app/lib/septemberOffer";
+import {
   type PartnerConfig,
   ENROLMENT_CONTEXT_KEY,
   type EnrolmentContext,
@@ -114,7 +117,20 @@ const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk0
 // plan choice). The full learner record + signed agreement are collected on
 // Praxel once payment has cleared, from a signed link that prefills their name
 // and email out of the Stripe session.
-export default function EnrolmentFlow({ partner, standalone }: { partner?: PartnerConfig; standalone?: boolean }) {
+export default function EnrolmentFlow({
+  partner,
+  standalone,
+  offer,
+}: {
+  partner?: PartnerConfig;
+  standalone?: boolean;
+  // Set only by /enrol?offer=sept99, and only while the offer is open — the page
+  // checks the window server-side before passing it. Replaces the two-plan choice
+  // with the single £99 entry; never combined with a partner, who earns nothing
+  // on this price.
+  offer?: "sept99";
+}) {
+  const isSept99 = offer === "sept99" && !partner;
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
@@ -186,7 +202,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
   }
 
   // ─── Payment ──────────────────────────────────────────────────────────
-  async function pay(type: "full" | "deposit") {
+  async function pay(type: "full" | "deposit" | "sept99") {
     if (submitting) return;
     const errs = validate();
     if (Object.keys(errs).length) {
@@ -199,14 +215,24 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
 
     // Pay-in-full is discounted by whatever Stripe says the applied code is
     // worth; the deposit is NEVER discounted — it is always £599 now.
-    const amount = type === "full" ? fullPricePence / 100 : DEPOSIT_PENCE / 100;
+    const amount =
+      type === "sept99" ? SEPT99_ENTRY
+      : type === "full" ? fullPricePence / 100
+      : DEPOSIT_PENCE / 100;
+
+    // Everything downstream classifies a sale as PIF-or-deposit. The September
+    // £99 is a deposit — an entry payment with instalments to follow — so it is
+    // recorded as one. Sending "sept99" here would land it as "full", because
+    // /api/enrolment-pending maps anything that isn't "deposit" to "full".
+    const recordedPlan: "full" | "deposit" = type === "sept99" ? "deposit" : type;
 
     // Stash context so the post-payment form on /enrol/success can prefill the
     // learner's name + email and carry plan / amount / attribution through.
     const context: EnrolmentContext = {
       fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
-      plan: type,
+      plan: recordedPlan,
+      ...(type === "sept99" && { offer: "sept99" as const }),
       amount,
       ...(appliedPromo && { promoCode: appliedPromo.code, discountApplied: appliedPromo.amountOffPence / 100 }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
@@ -228,7 +254,10 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
     // sees the high-intent moment between Lead and Purchase. Browser fbq +
     // server CAPI share one eventID for dedup. Both calls are fire-and-forget
     // so they NEVER delay the Stripe redirect.
-    const planName = type === "full" ? "course_pif" : "course_deposit";
+    const planName =
+      type === "sept99" ? "course_sept99"
+      : type === "full" ? "course_pif"
+      : "course_deposit";
     const icEventId =
       (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
       `ic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -268,7 +297,7 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
       body: JSON.stringify({
         name: fullName.trim(),
         email: email.trim().toLowerCase(),
-        plan: type,
+        plan: recordedPlan,
         amount,
         ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
         ...(appliedPromo && { promoCode: appliedPromo.code }),
@@ -278,7 +307,12 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
 
     const fullLink    = partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
     const depositLink = partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
-    const paymentLink = type === "full" ? fullLink : depositLink;
+    // The September offer is never a partner link — a gym earns nothing on it,
+    // so it must not be reachable from a gym-branded enrolment page.
+    const paymentLink =
+      type === "sept99" ? SEPT99_PAYMENT_LINK
+      : type === "full" ? fullLink
+      : depositLink;
     const ref = buildAttributionRef(partner?.gymReferral, partner?.gymSlug);
 
     // Ask the server to create a Checkout Session so the post-payment return
@@ -310,7 +344,19 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
         }),
       });
       clearTimeout(timeout);
-      const data = (await res.json()) as { url?: string | null };
+      const data = (await res.json()) as { url?: string | null; offerClosed?: boolean };
+      // The ONE case where falling back to the raw Payment Link is wrong.
+      // Every other failure here means "we couldn't mint a session, let them pay
+      // anyway"; this one means "this offer has closed, do not sell it". Falling
+      // through would take £99 for an offer that had ended.
+      if (data?.offerClosed) {
+        // Back to the offer page, which renders the closed state and points at
+        // the standard options. Not an inline error — this component has no
+        // form-level error slot, so one set here would never be shown and the
+        // buyer would sit on a dead button.
+        window.location.href = SEPT99_LANDING_PATH;
+        return;
+      }
       if (data?.url) checkoutUrl = data.url;
     } catch { /* fall through to the Payment Link */ }
 
@@ -412,8 +458,29 @@ export default function EnrolmentFlow({ partner, standalone }: { partner?: Partn
               </div>
             )}
 
+            {/* September weekend offer — a single option, no plan choice. */}
+            {isSept99 && (
+              <button onClick={() => pay("sept99")} disabled={submitting}
+                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes midnight Sunday</p>
+                <p className="text-white font-bold text-2xl mb-1">Start today</p>
+                <p className="text-gold text-4xl font-bold mb-1">£{SEPT99_ENTRY}</p>
+                <p className="text-soft text-xs mb-3">
+                  then {INSTALMENT_COUNT} × £{(INSTALMENT_PENCE / 100).toLocaleString()} monthly — £{SEPT99_TOTAL.toLocaleString()} total
+                </p>
+                <ul className="text-soft text-xs space-y-1.5 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> £{SEPT99_SAVING} less than the £{(PIF_PENCE / 100).toLocaleString()} direct price</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments collected automatically</li>
+                </ul>
+                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                  {submitting ? "Taking you to checkout…" : `Start for £${SEPT99_ENTRY} →`}
+                </div>
+              </button>
+            )}
+
             {/* Payment options */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 ? " hidden" : ""}`}>
               {/* Full payment */}
               <button onClick={() => pay("full")} disabled={submitting}
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">

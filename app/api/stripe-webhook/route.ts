@@ -62,10 +62,21 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 // and are ALWAYS ours — trust that first. Everything else falls back to the old
 // mode + £500 floor test, which still covers sales made through raw Payment
 // Links (the fallback path) and keeps USA gym subscriptions out.
+//
+// The £99 September entry price sits UNDER that floor, so a sale that took the
+// Payment Link fallback would drop out of GA4 and CAPI entirely — silently, and
+// only on the path that runs when something else has already gone wrong. It is
+// admitted by its Payment Link id rather than by its amount: a bare "£99 counts"
+// rule would also admit any unrelated one-off £99 charge on this shared account.
+const SEPT99_PAYMENT_LINK_ID =
+  process.env.STRIPE_SEPT99_PAYMENT_LINK_ID || "plink_1U8Jic99z9lThumnrEWofv3y";
+
 function isCourseSale(session: StripeSession): boolean {
   if (session.metadata?.source === "api-checkout-session") return true;
+  if (session.mode === "subscription") return false;
+  if (session.payment_link === SEPT99_PAYMENT_LINK_ID) return true;
   const amountGbp = (session.amount_total ?? 0) / 100;
-  return session.mode !== "subscription" && amountGbp >= 500;
+  return amountGbp >= 500;
 }
 
 function verifySignature(payload: string, header: string | null, secret: string): boolean {
@@ -101,6 +112,10 @@ type StripeSession = {
   metadata?: Record<string, string>;
   payment_status?: string;
   mode?: string; // "payment" | "subscription" | "setup"
+  // Set when the buyer came through a raw Stripe Payment Link rather than an
+  // API-created session — i.e. the fail-safe fallback path. Lets isCourseSale
+  // recognise the £99 entry price, which sits under its £500 floor.
+  payment_link?: string | null;
   // Set when mode is "subscription" — a deposit plan. pp_sales stores it so
   // later invoice.paid events can find the sale they belong to.
   subscription?: string | null;
@@ -281,30 +296,38 @@ async function sendToMetaCapi(session: StripeSession) {
   const lastName = rest.join(" ");
 
   // Value sent to Meta = the FULL course contract value, not just the cash
-  // collected in this one Stripe session. Why: the deposit plan charges £599
-  // up front and the remaining £1,000 arrives later as Stripe Billing
+  // collected in this one Stripe session. Why: an instalment plan charges only
+  // the entry payment up front and the balance arrives later as Stripe Billing
   // subscription invoices (invoice.paid) which this webhook does NOT forward.
-  // Without this uplift Meta would learn a deposit buyer is worth £599 when
-  // they're really a £1,599 course sale — starving value-based bidding and the
-  // value-based lookalike of ~62% of each deposit enrolment's worth.
+  // Without this uplift Meta learns a £99 buyer is worth £99 when they are
+  // really a £1,099 course sale — starving value-based bidding and the
+  // value-based lookalike of most of each instalment enrolment's worth.
   //
-  //   PIF (single payment ≥ £1,300)  → amount already equals the full value
-  //                                     (£1,599, or £1,399 with the PIF promo)
-  //   Deposit (£599 exactly)         → uplift to the full course value
-  //                                     (£1,399 if a funnel/PIF promo applies,
-  //                                      else £1,599)
+  //   PIF                  → amount already equals the full value
+  //   £599 entry           → uplift to £1,599 (£1,399 with a funnel/PIF promo)
+  //   £99 entry (Sept-26)  → uplift to £1,099
   //
-  // The £599-exact gate keeps this from ever mis-valuing a non-course charge
-  // (e.g. a gym-membership subscription that shares this Stripe account) as a
-  // course sale — those keep their real amount.
+  // The contract value is stamped into session metadata at checkout by
+  // buildSessionParams, so this reads it rather than inferring it from the
+  // amount. The previous `amountPaid === 599` gate would have valued every £99
+  // enrolment at £99 — silently, on the ad account the campaign's audience came
+  // from. Anything with no stamped contract value keeps its real amount, which
+  // is what stops a non-course charge on this shared Stripe account (e.g. a gym
+  // membership) from ever being uplifted.
   const hasFunnelPromo = !!attribution["funnel_promo"];
   const isPif = !isDepositSale(saleShape(session));
-  // Still gated on £599 exactly — the uplift below invents contract value, and
-  // only a deposit charged at its undiscounted price has £1,000 to come. The
-  // deposit price carries allow_promotion_codes=false, so a real deposit is
-  // always exactly £599; anything else claiming to be one gets its real amount.
-  const isCourseDeposit = amountPaid === 599;
-  const courseValue = isCourseDeposit ? (hasFunnelPromo ? 1399 : 1599) : amountPaid;
+  const stampedContractValue = Number(session.metadata?.contract_value);
+  const hasStampedValue = Number.isFinite(stampedContractValue) && stampedContractValue > 0;
+  // Legacy fallback: sessions created before contract_value was stamped, and any
+  // sale that came through the raw Payment Link fallback rather than the API.
+  // £599 exactly is the only entry amount those can be, since the £99 price
+  // post-dates the stamp.
+  const isLegacyDeposit = !hasStampedValue && amountPaid === 599;
+  const courseValue = hasStampedValue
+    ? (hasFunnelPromo && stampedContractValue === 1599 ? 1399 : stampedContractValue)
+    : isLegacyDeposit
+      ? (hasFunnelPromo ? 1399 : 1599)
+      : amountPaid;
 
   await sendCapiEvent({
     eventName: "Purchase",
@@ -350,8 +373,9 @@ async function sendToGymTracker(session: StripeSession) {
   const amount = (session.amount_total ?? 0) / 100;
   const currency = (session.currency ?? "gbp").toUpperCase();
 
-  // Heuristic: PTLL course sales are one-off £599 (deposit) or £1,399 (PIF).
-  // Skip USA-membership monthly subscriptions which land here too.
+  // Heuristic: PTLL course sales are one-off entry payments (£99 or £599) or a
+  // pay-in-full (£1,399/£1,599). Skip USA-membership monthly subscriptions,
+  // which land here too.
   const isPtllCourseSale = amount > 0 && amount <= 1500;
   if (!isPtllCourseSale) return;
 
@@ -761,6 +785,20 @@ function invoiceSubscriptionId(invoice: StripeInvoice): string | null {
   return invoice.subscription || invoice.parent?.subscription_details?.subscription || null;
 }
 
+// What was collected at checkout before the monthly instalments start — £599 on
+// the standard deposit plan, £99 on the September weekend offer.
+//
+// Stamped into subscription metadata by buildSessionParams. Plans created before
+// that stamp existed are all £599, because the £99 price post-dates it — so the
+// fallback is correct rather than merely safe. Everything below reports running
+// totals to admin, and hardcoding 599 told a £99 buyer's record £999 collected
+// when it was £499.
+const LEGACY_ENTRY_AMOUNT = 599;
+function entryAmountFrom(metadata: Record<string, string> | undefined): number {
+  const stamped = Number(metadata?.entry_amount);
+  return Number.isFinite(stamped) && stamped > 0 ? stamped : LEGACY_ENTRY_AMOUNT;
+}
+
 async function handleInstalmentPaid(invoice: StripeInvoice) {
   const subId = invoiceSubscriptionId(invoice);
   if (!subId) return;
@@ -800,7 +838,8 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
 
   // Balance settled — stop the mandate before another month comes round.
   const cancelled = await cancelSubscription(subId);
-  const total = 599 + paid * 200;
+  const entry = entryAmountFrom(sub.metadata);
+  const total = entry + paid * 200;
   console.log(
     cancelled
       ? `[stripe-webhook] plan complete for ${email} — cancelled ${subId} after ${paid} instalments`
@@ -817,7 +856,7 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
           : `🚨 ACTION NEEDED: cancel subscription for ${name || email} (${subId})`,
         html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
           <p style="font-size:15px;">${name || email} has now paid <strong>£${total.toLocaleString()}</strong> in full
-          (£599 deposit + ${paid} × £200).</p>
+          (£${entry.toLocaleString()} to start + ${paid} × £200).</p>
           <p style="font-size:14px;color:#4A6280;">Email: ${email}<br>Subscription: ${subId}</p>
           ${cancelled
             ? `<p style="font-size:14px;">The instalment plan has been cancelled automatically — no further payments will be taken.</p>`
@@ -841,6 +880,7 @@ async function handleInstalmentFailed(invoice: StripeInvoice) {
 
   const target = Number(sub.metadata?.instalments_target ?? "5");
   const paid = Number(sub.metadata?.instalments_paid ?? "0");
+  const entry = entryAmountFrom(sub.metadata);
   const name = sub.metadata?.buyer_name || invoice.customer_name || "";
   const email = sub.metadata?.buyer_email || invoice.customer_email || "";
   const amount = (invoice.amount_due ?? 0) / 100;
@@ -867,7 +907,7 @@ async function handleInstalmentFailed(invoice: StripeInvoice) {
           <tr><td style="padding:2px 12px 2px 0;">Amount</td><td>£${amount}</td></tr>
           <tr><td style="padding:2px 12px 2px 0;">Email</td><td><a href="mailto:${email}">${email}</a></td></tr>
           <tr><td style="padding:2px 12px 2px 0;">Attempt</td><td>${attempt}</td></tr>
-          <tr><td style="padding:2px 12px 2px 0;">Collected so far</td><td>£${(599 + paid * 200).toLocaleString()} of £${(599 + target * 200).toLocaleString()}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Collected so far</td><td>£${(entry + paid * 200).toLocaleString()} of £${(entry + target * 200).toLocaleString()}</td></tr>
         </table>
         ${nextAttempt
           ? `<p style="font-size:14px;">Stripe will retry on <strong>${nextAttempt}</strong> and has emailed them to update their card. No action needed yet.</p>`

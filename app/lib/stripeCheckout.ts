@@ -83,9 +83,27 @@ export const ENROL_SUCCESS_URL = `${SITE_URL}/enrol/success?session_id={CHECKOUT
 // discounts are applied).
 export interface LinkConfig {
   price: string;
-  amount: number;                 // GBP, for logging/telemetry only — Stripe charges off the price ID
+  amount: number;                 // GBP charged at checkout. Telemetry only — Stripe charges off the price ID
   label: string;
   allowPromotionCodes: boolean;
+  /**
+   * Whether this price is an entry payment that takes the £200/month mandate.
+   *
+   * Explicit, NOT derived from `amount`. A price-range test on this exact
+   * decision has already shipped one production bug: `amount >= 1300` classified
+   * every discounted £1,099 partner pay-in-full as a deposit and mislabelled 8 of
+   * 9 sales in the tracker. Adding a third price to a range test is how that
+   * recurs, so each entry states what it is.
+   */
+  takesInstalments: boolean;
+  /**
+   * Full contract value in GBP — what the learner owes in total, which is NOT
+   * what checkout collects on an instalment plan.
+   *
+   * The webhook reports this to Meta as the Purchase value. Without it a £99
+   * entry teaches Meta the buyer is worth £99 rather than £1,099.
+   */
+  contractValue: number;
 }
 
 // Each price is env-overridable. Test mode is a separate world with none of
@@ -100,20 +118,38 @@ export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
     amount: 1599,
     label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
     allowPromotionCodes: true,
+    takesInstalments: false,
+    contractValue: 1599,
   },
   // £599 deposit (+ 5×£200 on the instalment plan) — the shared deposit link
   "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05": {
     price: process.env.STRIPE_DEPOSIT_PRICE_ID || "price_1Rxmab99z9lThumnJ1f7EEXb",
     amount: 599,
-    label: "DEPOSIT - NCFE LEVEL 2&3 PERSONAL TRAINING DIPLOMA",
+    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
     allowPromotionCodes: false,
+    takesInstalments: true,
+    contractValue: 1599,
   },
   // £1,399 pay-in-full — funnel-promo only, never exposed in the client bundle
   "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06": {
     price: process.env.STRIPE_FUNNEL_PIF_PRICE_ID || "price_1RxmYD99z9lThumnc9W37CX7",
     amount: 1399,
-    label: "NCFE LEVEL 2&3 PERSONAL TRAINING DIPLOMA",
+    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
     allowPromotionCodes: false,
+    takesInstalments: false,
+    contractValue: 1399,
+  },
+  // £99 entry (+ 5×£200) = £1,099 — the September weekend offer, email list only.
+  // Same Stripe product as the £599 deposit: same qualification, same shape of
+  // sale, different entry amount. Never linked from a partner gym page — a gym
+  // earns nothing on it, so exposing it there would take a sale off a partner.
+  "https://buy.stripe.com/4gMaER2wocBCdyWfiWfEk0r": {
+    price: process.env.STRIPE_SEPT99_PRICE_ID || "price_1U8JiI99z9lThumnwQlmTIJW",
+    amount: 99,
+    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
+    allowPromotionCodes: false,
+    takesInstalments: true,
+    contractValue: 1099,
   },
 };
 
@@ -327,7 +363,7 @@ export function buildSessionParams(
     mode: withInstalments ? "subscription" : "payment",
     line_items: withInstalments
       ? [
-          { price: config.price, quantity: 1 },            // £599 deposit, charged now
+          { price: config.price, quantity: 1 },            // entry payment, charged now
           { price: INSTALMENT_PRICE_ID, quantity: 1 },     // £200/month, starts after the trial
         ]
       : [{ price: config.price, quantity: 1 }],
@@ -342,6 +378,13 @@ export function buildSessionParams(
           ptll_plan: "deposit_instalments",
           instalments_target: String(target),
           instalments_paid: "0",
+          // What was actually collected at checkout, and what the learner owes in
+          // total. Both are stamped because the two live plans share everything
+          // except these numbers (£599/£1,599 and £99/£1,099) — the instalment
+          // emails used to hardcode 599 and would report the wrong running total
+          // for every £99 buyer.
+          entry_amount: String(config.amount),
+          contract_value: String(config.contractValue),
           buyer_name: input.name?.trim().slice(0, 200),
           buyer_email: input.email?.trim().toLowerCase(),
           gym_referral: input.gymReferral,
@@ -372,7 +415,12 @@ export function buildSessionParams(
     // client_reference_id blob is capped at 200 chars and drops fields when
     // full. The webhook already prefers metadata over the blob.
     metadata: {
-      plan: config.amount >= 1300 ? "PIF" : "deposit",
+      // Classified by what the sale IS, not by what it costs. `amount >= 1300`
+      // called every discounted £1,099 partner pay-in-full a deposit and put 8 of
+      // 9 sales in the tracker under the wrong plan.
+      plan: config.takesInstalments ? "deposit" : "PIF",
+      // The contract value, so the webhook never has to infer it from an amount.
+      contract_value: String(config.contractValue),
       buyer_name: input.name?.trim().slice(0, 200),
       gym_referral: input.gymReferral,
       // The partner platform joins on this, NOT on gym_referral. Present from
@@ -416,13 +464,12 @@ export async function createCheckoutSession(
 
   const cancelPath = input.cancelPath && input.cancelPath.startsWith("/") ? input.cancelPath : "/enrol";
 
-  // Deposit buyers get the £200/month mandate taken alongside the £599 so the
-  // balance collects itself. The recurring price sits behind a 30-day trial,
-  // so checkout charges the £599 only and `amount_total` stays £599 — which is
-  // what /api/stripe-webhook keys its deposit-value uplift on. PIF buyers are
-  // unaffected: nothing recurring, still a plain one-off payment.
-  const isDeposit = config.amount < 1300;
-  const withInstalments = isDeposit && INSTALMENTS_ENABLED && !!INSTALMENT_PRICE_ID;
+  // Instalment buyers get the £200/month mandate taken alongside the entry
+  // payment so the balance collects itself. The recurring price sits behind a
+  // 30-day trial, so checkout charges the entry amount only and `amount_total`
+  // stays at it — which is what /api/stripe-webhook maps to the contract value.
+  // PIF buyers are unaffected: nothing recurring, still a plain one-off payment.
+  const withInstalments = config.takesInstalments && INSTALMENTS_ENABLED && !!INSTALMENT_PRICE_ID;
   const target = instalmentTarget();
 
   // buildSessionParams is typed Record<string, unknown> so tests/stripeDiscounts.test.mts

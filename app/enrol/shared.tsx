@@ -40,7 +40,15 @@ export interface PartnerConfig {
 export interface EnrolmentContext {
   fullName: string;
   email: string;
+  /**
+   * The SHAPE of the sale, which is all any consumer downstream cares about.
+   * The September £99 entry records as "deposit" because that is what it is —
+   * an entry payment with instalments to follow. Its identity lives in `offer`
+   * and in the Stripe metadata, not here.
+   */
   plan: "full" | "deposit";
+  /** Set only for a September-weekend enrolment. */
+  offer?: "sept99";
   amount: number;
   promoCode?: string;
   discountApplied?: number;
