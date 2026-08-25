@@ -161,8 +161,37 @@ export async function payWithTestCard(page: Page, cardholder: string) {
   await page.locator("input#cardExpiry").fill("12/34");
   await page.locator("input#cardCvc").fill("123");
   await page.locator("input#billingName").fill(cardholder);
+
+  // Stripe builds the billing form from the payer's GEOGRAPHY, not from the
+  // price's currency. Run from the UK you get a Postcode field; run from a
+  // US-hosted CI runner you get a ZIP, which strips non-digits — so "WF8 4AH"
+  // became "84", failed validation as incomplete, Pay never submitted, and the
+  // test timed out after 90s. It looked like a redirect regression and was
+  // actually a postcode in the wrong country's field.
+  //
+  // Pin the country so the form is the same shape wherever this runs.
+  const country = page.locator("select#billingCountry");
+  if (await country.count()) {
+    await country.selectOption("GB").catch(() => { /* already GB, or no such option */ });
+  }
+
+  // Ticking Link's "save my information" makes the phone number required, and
+  // it is pre-ticked for some payers. Nothing here needs Link, so clear it
+  // rather than satisfy a field the journey does not depend on.
+  const link = page.locator('input[type="checkbox"]#enableStripePass');
+  if ((await link.count()) && (await link.isChecked().catch(() => false))) {
+    await link.uncheck().catch(() => { /* not interactable — the phone fill below covers it */ });
+  }
+
   const postcode = page.locator("input#billingPostalCode");
   if (await postcode.count()) await postcode.fill("WF8 4AH");
+
+  // Only present if Link stayed on. A valid UK mobile, so it passes whichever
+  // country the form ended up in.
+  const phone = page.locator("input#phoneNumber");
+  if ((await phone.count()) && (await phone.isVisible().catch(() => false))) {
+    await phone.fill("07700900123").catch(() => {});
+  }
 
   await page.getByTestId("hosted-payment-submit-button").click();
 }
