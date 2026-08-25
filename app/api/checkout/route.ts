@@ -8,6 +8,7 @@ import {
 } from "@/app/lib/stripeCheckout";
 import { resolvePromoCode } from "@/app/lib/promoCodes";
 import { PARTNER_PROMO_PREFIXES } from "@/app/lib/partnerPromo";
+import { isSeptemberOfferLink, isSeptemberOfferOpen } from "@/app/lib/septemberOffer";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/checkout
@@ -113,6 +114,22 @@ export async function POST(req: NextRequest) {
   if (!paymentLink || !priceForLink(paymentLink)) {
     // Unknown/absent link — client falls back and goes straight to Stripe.
     return NextResponse.json({ url: null, reason: "unmapped-link" });
+  }
+
+  // ─── The September weekend gate ───────────────────────────────────────────
+  //
+  // This is the ONLY server-side thing standing between a closed offer and a
+  // £99 sale, so it is deliberately NOT a `{ url: null }` soft failure like
+  // every other branch in this route. Those tell the client "fall back to the
+  // raw Payment Link", which for this price would sell the offer after it had
+  // closed — the exact opposite of refusing it.
+  //
+  // 403 + an explicit reason instead. EnrolmentFlow must not fall back on it.
+  if (isSeptemberOfferLink(paymentLink) && !isSeptemberOfferOpen()) {
+    return NextResponse.json(
+      { url: null, reason: "offer-closed", offerClosed: true },
+      { status: 403 },
+    );
   }
 
   const str = (v: unknown, max = 300) =>

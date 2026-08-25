@@ -58,13 +58,14 @@ export default function TermsPage() {
           title: "Pricing & Payment",
           content: (
             <>
-              {p("The following payment options are available at the time of enrolment:")}
+              {p("The standard payment options are:")}
               {ul([
                 "Full Payment: £1,599 — single payment, immediate access",
                 "Deposit Plan: £599 deposit followed by 5 monthly payments of £200 (total £1,599)",
               ])}
+              {p("We also run promotional and partner-referral prices from time to time, including reduced pay-in-full prices and payment plans with a lower starting payment. These are offered for a limited period or through a specific partner gym. Where one applies to you, the price and the payment schedule are shown in full before you pay, and the amount shown at checkout is the amount you will be charged.")}
               {p("All prices are inclusive of VAT where applicable. Payments are processed securely via Stripe. PT Launch Lab does not store your card details.")}
-              {p("If you choose the deposit plan, the monthly payments of £200 are due on the same date each month following your initial deposit. Failure to maintain payments may result in suspension of course access until payments are brought up to date.")}
+              {p("If you choose a payment plan, the monthly payments are due on the same date each month following your initial payment. Failure to maintain payments may result in suspension of course access until payments are brought up to date.")}
             </>
           ),
         },
@@ -75,7 +76,7 @@ export default function TermsPage() {
               {p("Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, you have the right to cancel your enrolment within 14 calendar days of your payment without giving a reason (the \"cooling off period\").")}
               {p("To exercise your right to cancel, contact us at info@ptlaunchlab.co.uk within 14 days of payment. We will acknowledge your cancellation and process a full refund within 14 days of receiving your cancellation request.")}
               {p("After the 14-day cooling off period has expired, cancellations are not eligible for a refund except in exceptional circumstances at our discretion. Your statutory rights under UK consumer law are not affected.")}
-              {p("If you choose the deposit plan and cancel after 14 days, the deposit and any payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged.")}
+              {p("If you choose a payment plan and cancel after 14 days, the payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged.")}
             </>
           ),
         },

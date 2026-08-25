@@ -28,7 +28,15 @@ export type PlanType = "PIF" | "deposit";
 /** £599 deposit; every pay-in-full variant (1,099 / 1,299 / 1,399 / 1,599) sits above this. */
 export const DEPOSIT_CEILING_PENCE = 70_000;
 
-/** What a deposit plan collects in total: £599 up front + 5 × £200. */
+/**
+ * What the standard deposit plan collects in total: £599 up front + 5 × £200.
+ *
+ * ⚠️ This is the DEFAULT, not the only answer. Since the September weekend offer
+ * there are two instalment plans — £599/£1,599 and £99/£1,099 — and they differ
+ * only in these two numbers. Prefer `SaleShape.contractValuePence`, which each
+ * sale carries; this constant is the fallback for sales made before that was
+ * stamped, all of which are £1,599 plans.
+ */
 export const DEPOSIT_PLAN_TOTAL_PENCE = 159_900;
 
 export interface SaleShape {
@@ -37,6 +45,20 @@ export interface SaleShape {
   amountTotalPence: number;
   /** `metadata.plan` off the Checkout Session — "PIF" | "deposit". Absent on raw-link sales. */
   metadataPlan?: string | null;
+  /**
+   * `metadata.contract_value` off the session, in PENCE — the full amount the
+   * learner owes. £1,599 on the standard plan, £1,099 on the September offer.
+   * Absent on raw-link sales and on anything predating the stamp.
+   */
+  contractValuePence?: number | null;
+}
+
+/** The full contract for this sale, falling back to the standard £1,599 plan. */
+export function contractTotalPence(sale: SaleShape): number {
+  const stamped = sale.contractValuePence;
+  return typeof stamped === "number" && Number.isFinite(stamped) && stamped > 0
+    ? stamped
+    : DEPOSIT_PLAN_TOTAL_PENCE;
 }
 
 export function isDepositSale(sale: SaleShape): boolean {
@@ -56,10 +78,15 @@ export function planTypeForSale(sale: SaleShape): PlanType {
  * Zero for a pay-in-full at any discount. Derived, never hardcoded — the alarm
  * used to state a flat "£1,000", which is only right for a £599 deposit and was
  * wrong on the very sale that exposed the bug.
+ *
+ * Derived from THIS sale's contract, not from the standard plan's. Against a
+ * flat £1,599 a £99 entry reads as £1,500 outstanding when £1,000 is owed —
+ * the same mistake in a new place, on the alarm that already once told a
+ * paid-up learner she owed money.
  */
 export function outstandingBalancePence(sale: SaleShape): number {
   if (!isDepositSale(sale)) return 0;
-  return Math.max(0, DEPOSIT_PLAN_TOTAL_PENCE - sale.amountTotalPence);
+  return Math.max(0, contractTotalPence(sale) - sale.amountTotalPence);
 }
 
 /** "£1,099" — pence in, display pounds out. Whole pounds; every price here is one. */
