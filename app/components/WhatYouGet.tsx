@@ -46,19 +46,19 @@ const features = [
   {
     Icon: AwardIcon,
     title: "NCFE Level 3 PT Qualification",
-    body: "Fully accredited, Ofqual-regulated, and CIMSPA-recognised — accepted by every major gym group in the UK. PureGym, David Lloyd, Nuffield, JD Gyms, independents. Other UK academies use Focus Awards or their own in-house brand — when a gym manager scans 50 CVs, they look for NCFE Level 3 first.",
+    body: "Ofqual-regulated under reference 603/4388/6, and CIMSPA-recognised. A regulated qualification rather than an in-house certificate, so what it covers is set by the regulator and not by us.",
     badge: null,
   },
   {
     Icon: PersonIcon,
     title: "Your Own Personal Tutor",
-    body: "One tutor. Assigned to you from day one. They answer your questions, review your work, and keep you on track. No forums, no waiting days for an email. A real person who knows your name and where you're up to.",
+    body: "One tutor, assigned to you from day one. They answer your questions, review your work, and keep you on track. No forums, no waiting days for an email. A real person who knows your name and where you're up to.",
     badge: "Included",
   },
   {
     Icon: ChartIcon,
-    title: "£500 Business Mentorship — Included",
-    body: "Your private Mentorship Hub plus the Skool community — built around one job: walking you from qualifying to your first paying client. You always know the next concrete thing to work on, and Callum's a message away when you're stuck. Most UK academies charge £500–£3,000 to bolt mentorship on after qualification, or skip it entirely. We include it.",
+    title: "£500 Business Mentorship, Included",
+    body: "Your private Mentorship Hub plus the Skool community, both built around one job: walking you from qualifying to your first paying client. You always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee, not sold as an upgrade afterwards.",
     badge: "£500 Included",
   },
   {
@@ -70,13 +70,13 @@ const features = [
   {
     Icon: CalendarIcon,
     title: "Flexible Online Study",
-    body: "100% online. Study in 8–16 weeks at whatever pace fits your life. No fixed lecture times, no commuting to a college. Study at 6am, lunchtime, or midnight — the platform works around you, not the other way around.",
+    body: "100% online. Study in 8–16 weeks at whatever pace fits your life. No fixed lecture times, no commuting to a college. Study at 6am, at lunchtime, or at midnight.",
     badge: null,
   },
   {
     Icon: CardIcon,
     title: "Flexible Payment Options",
-    body: "Pay in full for £1,599, or spread the cost with our deposit plan — £599 upfront then 5 × £200. We'd rather you get started and build a career than let money be the thing that holds you back.",
+    body: "Pay in full for £1,599, or spread the cost with our deposit plan: £599 upfront, then 5 × £200. We'd rather you got started than let the money be the thing that stops you.",
     badge: null,
   },
 ];
@@ -89,12 +89,12 @@ export default function WhatYouGet() {
           Everything inside the programme
         </p>
         <h2 className="font-display font-extrabold text-5xl md:text-7xl text-white text-center leading-none tracking-tight mb-4">
-          We&apos;re not selling you a course.
+          The qualification, and
           <br />
-          <span className="text-gold">We&apos;re building you a career.</span>
+          <span className="text-gold">what to do with it.</span>
         </h2>
         <p className="text-soft/65 text-lg text-center mb-10 md:mb-16 max-w-xl mx-auto">
-          Other courses give you the certificate. We give you the full picture — built by gym owners who&apos;ve hired 500+ trainers and know exactly what it takes to succeed.
+          Built by gym owners who&apos;ve hired over 500 trainers, so the course covers getting work as well as passing the assessments.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
