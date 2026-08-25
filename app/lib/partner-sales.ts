@@ -9,7 +9,7 @@
 // a second commission.
 
 import { getSupabaseAdmin } from "./supabase-admin";
-import { DEPOSIT_PLAN_TOTAL_PENCE, isDepositSale } from "./coursePlan";
+import { contractTotalPence, isDepositSale } from "./coursePlan";
 
 // The deposit-vs-PIF rule lives in ./coursePlan (unit-tested, no dependencies)
 // so the portal, the Sheet tracker and every email answer it identically. It
@@ -28,6 +28,12 @@ export interface PartnerSaleInput {
   learnerName?: string | null;
   learnerEmail?: string | null;
   amountTotalPence: number;
+  /**
+   * `metadata.contract_value` in PENCE — what the learner owes in total.
+   * £1,599 on the standard deposit plan. Absent on older sales, which are all
+   * £1,599 plans, so the fallback is correct rather than merely safe.
+   */
+  contractValuePence?: number | null;
   /** Stripe checkout mode. "subscription" always means a deposit plan. */
   mode?: string | null;
   /** `metadata.plan` off the session — the deposit-vs-PIF signal a promo code cannot move. */
@@ -142,7 +148,7 @@ export async function recordPartnerSale(
       learner_email: input.learnerEmail || null,
       plan_type: isDeposit ? "deposit" : "PIF",
       amount_paid_pence: input.amountTotalPence,
-      amount_due_pence: isDeposit ? DEPOSIT_PLAN_TOTAL_PENCE : input.amountTotalPence,
+      amount_due_pence: isDeposit ? contractTotalPence(input) : input.amountTotalPence,
       promo_code: input.promoCode || null,
       status: "confirmed",
       commission_pence: partner.fee_per_learner_pence,

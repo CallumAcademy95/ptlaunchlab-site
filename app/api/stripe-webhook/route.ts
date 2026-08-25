@@ -131,10 +131,16 @@ type StripeEvent = {
 // Everything downstream — the alarm, both emails, the Sheet, Meta — classifies
 // off this, so they cannot disagree with each other again. See app/lib/coursePlan.
 function saleShape(session: StripeSession): SaleShape {
+  // contract_value is stamped in POUNDS by buildSessionParams; SaleShape works
+  // in pence throughout, so convert here rather than letting two units meet
+  // anywhere near a balance calculation.
+  const contractPounds = Number(session.metadata?.contract_value);
   return {
     mode: session.mode,
     amountTotalPence: session.amount_total ?? 0,
     metadataPlan: session.metadata?.plan,
+    contractValuePence:
+      Number.isFinite(contractPounds) && contractPounds > 0 ? contractPounds * 100 : null,
   };
 }
 
@@ -1010,6 +1016,7 @@ export async function POST(req: NextRequest) {
           learnerName: buyerName(session) || null,
           learnerEmail: session.customer_email || session.customer_details?.email || null,
           amountTotalPence: session.amount_total ?? 0,
+          contractValuePence: saleShape(session).contractValuePence,
           mode: session.mode ?? null,
           metadataPlan: session.metadata?.plan ?? null,
           promoCode: session.metadata?.promo_code ?? null,

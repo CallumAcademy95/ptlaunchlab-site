@@ -21,6 +21,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildSessionParams, PAYMENT_LINK_PRICES } from "../app/lib/stripeCheckout.ts";
 import {
+  isDepositSale,
+  outstandingBalancePence,
+  contractTotalPence,
+  DEPOSIT_PLAN_TOTAL_PENCE,
+} from "../app/lib/coursePlan.ts";
+import {
   septemberOfferState,
   isSeptemberOfferOpen,
   isSeptemberOfferLink,
@@ -155,6 +161,52 @@ test("the two pay-in-full prices contract for exactly what they charge", () => {
   assert.equal(FUNNEL.contractValue, FUNNEL.amount);
   assert.equal(PIF.takesInstalments, false);
   assert.equal(FUNNEL.takesInstalments, false);
+});
+
+// ─── What is still owed ─────────────────────────────────────────────────────
+//
+// outstandingBalancePence feeds the missing-mandate alarm, which has already
+// once told a paid-up learner she owed £1,000. Against a flat £1,599 total a
+// £99 entry reads as £1,500 outstanding when £1,000 is owed.
+
+test("a £99 buyer owes £1,000, not £1,500", () => {
+  const sale = {
+    mode: "subscription",
+    amountTotalPence: 9_900,
+    metadataPlan: "deposit",
+    contractValuePence: 109_900,
+  };
+  assert.equal(isDepositSale(sale), true);
+  assert.equal(outstandingBalancePence(sale), 100_000);
+  assert.equal(contractTotalPence(sale), 109_900);
+});
+
+test("a £599 buyer still owes £1,000", () => {
+  const sale = {
+    mode: "subscription",
+    amountTotalPence: 59_900,
+    metadataPlan: "deposit",
+    contractValuePence: 159_900,
+  };
+  assert.equal(outstandingBalancePence(sale), 100_000);
+});
+
+test("a sale with no stamped contract falls back to the £1,599 plan", () => {
+  // Everything predating the stamp is a £599/£1,599 plan, so this is correct
+  // rather than merely safe.
+  const legacy = { mode: "subscription", amountTotalPence: 59_900, metadataPlan: "deposit" };
+  assert.equal(contractTotalPence(legacy), DEPOSIT_PLAN_TOTAL_PENCE);
+  assert.equal(outstandingBalancePence(legacy), 100_000);
+});
+
+test("a pay-in-full owes nothing, whatever it was discounted to", () => {
+  for (const paid of [109_900, 129_900, 139_900, 159_900]) {
+    assert.equal(
+      outstandingBalancePence({ mode: "payment", amountTotalPence: paid, metadataPlan: "PIF" }),
+      0,
+      `£${paid / 100} pay-in-full must owe nothing`,
+    );
+  }
 });
 
 test("both instalment plans run 5 × £200 and differ only in entry and total", () => {
