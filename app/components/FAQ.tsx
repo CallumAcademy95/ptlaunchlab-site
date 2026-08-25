@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     q: "What does the business mentorship actually do for me?",
-    a: "It walks you from qualifying to your first paying client. You get the Mentorship Hub — your private dashboard built around that one job — plus our Skool community for daily peer contact. On the Hub you always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee rather than sold on afterwards.",
+    a: "It walks you from qualifying to your first paying client. You get the Mentorship Hub, your private dashboard built around that one job, plus our Skool community for daily peer contact. On the Hub you always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee rather than sold on afterwards.",
   },
   {
     q: "I'm in my 30s or 40s — am I too old to start this?",
