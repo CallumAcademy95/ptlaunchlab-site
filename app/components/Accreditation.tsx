@@ -18,7 +18,23 @@ export default function Accreditation() {
           <span className="text-gold">Industry recognised.</span>
         </h2>
         <p className="text-soft/65 text-base mb-12 max-w-xl mx-auto">
-          NCFE Level 3 — Ofqual regulated and accepted by every major gym group in the UK. The qualification name UK gym managers ask for by default — not a self-branded cert, not Focus Awards, not an in-house badge.
+          {/*
+            Two claims were removed here on 2026-08-25, and neither should come back.
+
+            "accepted by every major gym group in the UK" — an objective claim
+            about third parties that we cannot substantiate. "Every" would have
+            to be true of all of them, and one operator saying otherwise is
+            enough to make it false. The regulator status is the provable claim
+            and it is the one that actually reassures a buyer.
+
+            "not Focus Awards" — naming a competing awarding organisation to put
+            it down. It invites a comparison the reader was not making, and the
+            qualification's own credibility does the work without it.
+
+            This component renders on 42 pages, so anything asserted here is
+            asserted site-wide.
+          */}
+          NCFE Level 3 — Ofqual regulated and recognised across the UK fitness industry. A nationally recognised qualification, not an in-house certificate.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">
