@@ -113,7 +113,6 @@ export default function PrivacyPage() {
                 "Stripe — payment processor. Handles card payments securely. PT Launch Lab does not store your card details. Stripe is PCI DSS compliant.",
                 "Zapier — automation platform. Used to transfer enrolment data to our internal records (Google Sheets). Data is processed in transit only.",
                 "Google (Google Sheets / Google Workspace) — enrolment records are stored in a secure, access-controlled Google Sheet.",
-                "Merve — the learning platform through which course content is delivered. Your name and email are shared for course access.",
                 "Vercel — our website hosting provider. Processes web requests and API calls.",
                 "CookieYes — our cookie consent management platform. Stores your cookie preferences to ensure we only set non-essential cookies with your consent. CookieYes processes consent logs in accordance with GDPR.",
               ])}

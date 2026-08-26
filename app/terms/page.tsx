@@ -41,7 +41,7 @@ export default function TermsPage() {
           title: "Your Course",
           content: (
             <>
-              {p("When you enrol you will receive access to the PT Launch Lab online learning programme, delivered via the Merve learning platform. Your course includes:")}
+              {p("When you enrol you will receive access to the PT Launch Lab online learning programme, delivered via our online learning platform. Your course includes:")}
               {ul([
                 "Access to all 12 course modules for the duration of your programme",
                 "A dedicated personal tutor",
@@ -127,7 +127,7 @@ export default function TermsPage() {
           title: "Gym Interview Guarantee",
           content: (
             <>
-              {p("Upon successful qualification, PT Launch Lab will arrange at least one guaranteed interview with a partner gym. This guarantee applies to learners who have:")}
+              {p("Upon successful qualification, PT Launch Lab will arrange at least one interview for you — either with a gym in our partner network, or with a gym local to you that we approach on your behalf. This guarantee applies to learners who have:")}
               {ul([
                 "Completed and passed all course modules and assessments",
                 "Engaged actively with the business and mentorship elements of the programme",
