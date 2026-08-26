@@ -465,7 +465,7 @@ export default function EnrolmentFlow({
             {isSept99 && (
               <button onClick={() => pay("sept99")} disabled={submitting}
                 className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes midnight Sunday</p>
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes 11:59pm Sunday</p>
                 <p className="text-white font-bold text-2xl mb-1">Start today</p>
                 <p className="text-gold text-4xl font-bold mb-1">£{SEPT99_ENTRY}</p>
                 <p className="text-soft text-xs mb-3">
