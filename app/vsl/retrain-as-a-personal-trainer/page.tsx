@@ -39,7 +39,7 @@ const forYouIf = [
   "You've put everyone else first for years and fitness is the one thing you've kept",
   "You're returning to work after kids, caring, illness, or a quiet rebuild",
   "You're 35, 40, 50 and quietly wondering if it's already too late",
-  "You want work that fits the school run — not the other way round",
+  "You want work that fits the school run, not the other way round",
   "You've been the woman who shows up at the gym at 6am or 9:30am consistently",
   "Other women already ask you what you eat, how you train, how you keep going",
 ];
@@ -47,47 +47,47 @@ const forYouIf = [
 const objections = [
   {
     q: "Have I left it too late? I'm in my 40s.",
-    a: "No. Some of the most successful PTs we work with are women in their 30s, 40s, and 50s — and the market actively prefers them for the clients who matter most. A 45-year-old woman who's just had a baby doesn't want a 22-year-old man coaching her squat. She wants someone who's lived a body like hers. Life experience is the unfair advantage, not the obstacle. We've put learners through in their late 50s who are now running thriving local coaching businesses.",
+    a: "No. Some of the most successful PTs we work with are women in their 30s, 40s and 50s, and the market actively prefers them for the clients who matter most. A 45-year-old woman who's just had a baby doesn't want a 22-year-old man coaching her squat. She wants someone who's lived a body like hers. Life experience is the unfair advantage, not the obstacle. We've put learners through in their late 50s who are now running thriving local coaching businesses.",
   },
   {
     q: "Can I actually do this around the kids?",
-    a: "Yes — and it's how the majority of returner students do it. The course is fully online and fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 12–20 weeks.",
+    a: "Yes, and it's how the majority of returner students do it. The course is fully online and fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 12–20 weeks.",
   },
   {
     q: "I haven't studied in years. What if I can't cope?",
-    a: "Your tutor is introduced within 24 hours of enrolment and stays with you for the whole course. You submit each unit when you're ready and your tutor either passes it or sends it back with feedback on what to change, so a unit that isn't quite there yet comes back for another go rather than counting as a fail. Resubmissions are included at no extra cost. You're not relearning how to be a student alone — there's a real person walking with you.",
+    a: "Your tutor is introduced within 24 hours of enrolment and stays with you for the whole course. You submit each unit when you're ready and your tutor either passes it or sends it back with feedback on what to change, so a unit that isn't quite there yet comes back for another go rather than counting as a fail. Resubmissions are included at no extra cost. You're not relearning how to be a student alone. There's a real person walking with you.",
   },
   {
     q: "Do I have to become an Instagram influencer to make this work?",
-    a: "No — and please don't try. The most sustainable returner-PT businesses are built locally on referrals, school-gate trust, and word-of-mouth. The £500 Mentorship Hub (free with your course) teaches you how to build a small, profitable, niched client base — women's strength, postnatal recovery, midlife fitness, beginner confidence — without ever doing a transition reel. You're not building a brand. You're building a practice.",
+    a: "No, and please don't try. The most sustainable returner-PT businesses are built locally on referrals, school-gate trust, and word-of-mouth. The £500 Mentorship Hub (free with your course) teaches you how to build a small, profitable, niched client base in women's strength, postnatal recovery, midlife fitness or beginner confidence, without ever doing a transition reel. You're not building a brand. You're building a practice.",
   },
 ];
 
 const steps = [
-  { n: 1, title: "Book a free 15-min chat — no pressure", body: "Tell us your situation: kids' ages, what time you've actually got, what's pulling you towards PT. We'll listen first, then tell you honestly if it's the right move." },
+  { n: 1, title: "Book a free 15-min chat, no pressure", body: "Tell us your situation: kids' ages, what time you've actually got, what's pulling you towards PT. We'll listen first, then tell you honestly if it's the right move." },
   { n: 2, title: "Enrol on a plan that fits the household", body: "£599 deposit + 5 × £200 monthly, or pay in full. Most returners spread it across school terms." },
-  { n: 3, title: "Study from home, on your hours", body: "100% online. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings — entirely your call." },
-  { n: 4, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite — already included in your fee, with full tutor support." },
-  { n: 5, title: "Qualify in Level 3 — NCFE, Ofqual regulated", body: "Programming, nutrition, business planning, video-assessed practicals. The qualification UK gyms and insurers both recognise by default." },
-  { n: 6, title: "Launch the business YOU want, locally", body: "Mentorship Hub walks you through niching, local marketing, pricing, packaging, and your first 10 clients. Women's strength, postnatal, midlife — your call." },
+  { n: 3, title: "Study from home, on your hours", body: "100% online. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings. Entirely your call." },
+  { n: 4, title: "Smash Level 2: Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite, already included in your fee, with full tutor support." },
+  { n: 5, title: "Qualify in Level 3: NCFE, Ofqual regulated", body: "Programming, nutrition, business planning, video-assessed practicals. The qualification UK gyms and insurers both recognise by default." },
+  { n: 6, title: "Launch the business YOU want, locally", body: "Mentorship Hub walks you through niching, local marketing, pricing, packaging, and your first 10 clients. Women's strength, postnatal, midlife: your call." },
 ];
 
 const comparisonRows = [
-  { other: "Built for 18-year-olds with no kids",         us: "Built for parents and returners — fully online" },
-  { other: "Classroom hours that don't fit family life",   us: "Self-paced from home — school hours, bedtimes, weekends" },
-  { other: "No business support — fend for yourself",      us: "£500 Mentorship Hub bundled free" },
+  { other: "Built for 18-year-olds with no kids",         us: "Built for parents and returners, fully online" },
+  { other: "Classroom hours that don't fit family life",   us: "Self-paced from home: school hours, bedtimes, weekends" },
+  { other: "No business support, so you fend for yourself",      us: "£500 Mentorship Hub bundled free" },
   { other: "Bro-energy, hyper-aggressive branding",        us: "Supportive, kind, built for confidence rebuilding" },
   { other: "'Become an Instagram influencer' marketing",   us: "Local, referral-based, sustainable PT practice" },
   { other: "Help-desk ticket if you fall behind",          us: "A real tutor who knows your name and your goals" },
 ];
 
 const faqs = [
-  { q: "Is 40 too old to retrain as a personal trainer in the UK?", a: "No. The UK PT market has a genuine shortage of qualified coaches who understand busy parents, midlife bodies, and women's specific goals. Clients in their 30s, 40s, and 50s consistently prefer a PT who relates to them. We've put learners through in their late 50s who are now coaching full diaries. The blocker isn't age — it's confidence, and that's exactly what the course and mentorship are built to rebuild." },
+  { q: "Is 40 too old to retrain as a personal trainer in the UK?", a: "No. The UK PT market has a genuine shortage of qualified coaches who understand busy parents, midlife bodies, and women's specific goals. Clients in their 30s, 40s, and 50s consistently prefer a PT who relates to them. We've put learners through in their late 50s who are now coaching full diaries. The blocker is confidence rather than age, and that's exactly what the course and mentorship are built to rebuild." },
   { q: "Can I really retrain around school hours and family life?", a: "Yes. The course is fully online and fully self-paced. No fixed class times, no commute, no childcare requirements for study. Practical units are video-assessed at any gym. Most returners finish the full Level 2 + Level 3 in 12–20 weeks fitting study around school runs, bedtimes, and weekends." },
   { q: "I haven't studied in years. Will I cope with the assessments?", a: "Yes. Your personal tutor is assigned within 24 hours of enrolment and stays with you throughout. You submit each unit when you're ready and your tutor either passes it or sends it back with feedback on what to change, so a unit that isn't quite there yet comes back for another go rather than counting as a fail. Resubmissions are free if you ever need them." },
-  { q: "Can I do this without ever going to a college or classroom?", a: "Yes — 100%. Theory is delivered online. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
-  { q: "I want to coach women specifically — is that realistic?", a: "It's one of the strongest niches in the UK market. Women-only training, postnatal recovery, midlife strength, perimenopausal fitness, and beginner confidence are all undersupplied and growing. Many female returner-PTs we work with build their entire client base on referrals from one school-gate network. The Mentorship Hub has a dedicated track on niching down, and our community has plenty of women coaching women you can learn from directly." },
-  { q: "What's the realistic income for a returner-PT in year one?", a: "Part-time around school hours, year one: £12K–£25K. Full-time self-employed after 2–3 years: £35K–£50K+. Group sessions (4–8 people) push hourly rates significantly higher — common with school-hall classes and postnatal groups. The Mentorship Hub teaches pricing, packaging, and how to fill a small but profitable client base rather than chasing volume." },
+  { q: "Can I do this without ever going to a college or classroom?", a: "Yes, 100%. Theory is delivered online. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
+  { q: "I want to coach women specifically. Is that realistic?", a: "It's one of the strongest niches in the UK market. Women-only training, postnatal recovery, midlife strength, perimenopausal fitness, and beginner confidence are all undersupplied and growing. Many female returner-PTs we work with build their entire client base on referrals from one school-gate network. The Mentorship Hub has a dedicated track on niching down, and our community has plenty of women coaching women you can learn from directly." },
+  { q: "What's the realistic income for a returner-PT in year one?", a: "Part-time around school hours, year one: £12K–£25K. Full-time self-employed after 2–3 years: £35K–£50K+. Group sessions (4–8 people) push hourly rates significantly higher, which is common with school-hall classes and postnatal groups. The Mentorship Hub teaches pricing, packaging, and how to fill a small but profitable client base rather than chasing volume." },
   { q: "When can I start, and what's the total cost?", a: "Start the moment you enrol. Full access opens immediately and your tutor introduces themselves within 24 hours. £1,599 covers NCFE Level 2 + Level 3, your tutor, the £500 Mentorship Hub, and our gym pipeline. Most returners use the £599 deposit + 5 × £200 plan so it spreads across a school term." },
 ];
 
@@ -167,7 +167,7 @@ export default function RetrainAsAPersonalTrainerPage() {
               to <span className="text-gold">retrain.</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              NCFE Level 2 + Level 3, Ofqual regulated, fully online from home. Built for parents and returners — taught with kindness. Take the 60-second quiz to see if PT could fit your life right now. Honest, no-pressure answer either way.
+              NCFE Level 2 + Level 3, Ofqual regulated, fully online from home. Built for parents and returners, taught with kindness. Take the 60-second quiz to see if PT could fit your life right now. Honest, no-pressure answer either way.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
               <Link
@@ -195,19 +195,19 @@ export default function RetrainAsAPersonalTrainerPage() {
         {/* VSL */}
         <section className="bg-surface py-16 px-6 border-y border-white/[0.05]">
           <div className="max-w-4xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first — 4 minutes</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first · 4 minutes</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-3">
               Why our learners
               <br />
               <span className="text-gold">finish what they start.</span>
             </h2>
             <p className="text-soft/75 text-center text-base max-w-2xl mx-auto mb-10">
-              Callum, Miles and Ryan on what makes the course different — and why parents and returners are the learners we&apos;re proudest of.
+              Callum, Miles and Ryan on what makes the course different, and why parents and returners are the learners we&apos;re proudest of.
             </p>
             <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl aspect-video">
               <iframe
                 src="https://www.youtube.com/embed/0rhp9fkBFsU"
-                title="Why PT Launch Lab — from the founders"
+                title="Why PT Launch Lab, from the founders"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full absolute inset-0"
@@ -232,7 +232,7 @@ export default function RetrainAsAPersonalTrainerPage() {
               ))}
             </ul>
             <p className="text-soft/75 text-center text-base mt-10 max-w-2xl mx-auto">
-              If four or more of those felt like reading your own thoughts — keep going. The rest of this page is for you, specifically.
+              If four or more of those felt like reading your own thoughts, keep going. The rest of this page is for you, specifically.
             </p>
           </div>
         </section>
@@ -247,13 +247,13 @@ export default function RetrainAsAPersonalTrainerPage() {
               putting <span className="text-gold">everyone else first.</span>
             </h2>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
-              The kids needed you, the partner needed you, the parents needed you, the job needed you. Somewhere in the middle of all that you stopped being the centre of any decision — and you got quietly good at not being it.
+              The kids needed you, the partner needed you, the parents needed you, the job needed you. Somewhere in the middle of all that you stopped being the centre of any decision, and you got quietly good at not being it.
             </p>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
               And the one thing that didn&apos;t leave was the gym. The 6am session before they wake up. The 9:30 slot when they&apos;re at school. The Sunday morning run that&apos;s yours and yours only. <span className="text-white font-semibold">Fitness has been the place where you&apos;ve quietly stayed yourself.</span>
             </p>
             <p className="text-soft/85 text-lg leading-relaxed">
-              You don&apos;t need to find your identity. You&apos;ve been protecting it the whole time. You just need permission to build a career around it — and someone competent walking with you while you do.
+              You don&apos;t need to find your identity. You&apos;ve been protecting it the whole time. You just need permission to build a career around it, and someone competent walking with you while you do.
             </p>
           </div>
         </section>
@@ -277,7 +277,7 @@ export default function RetrainAsAPersonalTrainerPage() {
         {/* FOUNDERS STRIP */}
         <section className="bg-base py-16 px-6">
           <div className="max-w-5xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Run by gym owners — taught with kindness</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Run by gym owners · taught with kindness</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-10">
               Real people.
               <br />
@@ -308,14 +308,14 @@ export default function RetrainAsAPersonalTrainerPage() {
               <span className="text-gold">No turning your life upside down.</span>
             </h2>
             <p className="text-soft/80 text-lg text-center max-w-2xl mx-auto mb-12">
-              Every piece of this course was built knowing you have school runs, bedtimes, dinners to cook, and a household that doesn&apos;t pause for your study. The course fits around your life — not the other way round.
+              Every piece of this course was built knowing you have school runs, bedtimes, dinners to cook, and a household that doesn&apos;t pause for your study. The course fits around your life, not the other way round.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
-                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online. While they're at school, after bedtime, weekend mornings — your hours, your pace. Most returners finish in 12–20 weeks." },
+                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online. While they're at school, after bedtime, weekend mornings: your hours, your pace. Most returners finish in 12–20 weeks." },
                 { tag: "Money", title: "Spread across the school term", body: "£599 deposit + 5 × £200 monthly, or pay in full. Designed to never sit on top of the food shop." },
-                { tag: "Support", title: "A real tutor — not a help desk", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback. Resubmissions are free." },
-                { tag: "Confidence", title: "We rebuild it on purpose", body: "The Mentorship Hub doesn't just teach business — it teaches the version of confidence you need when you've been out of the workforce." },
+                { tag: "Support", title: "A real tutor, not a help desk", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback. Resubmissions are free." },
+                { tag: "Confidence", title: "We rebuild it on purpose", body: "The Mentorship Hub teaches the version of confidence you need when you've been out of the workforce." },
               ].map((row) => (
                 <div key={row.title} className="bg-card border border-white/[0.06] rounded-2xl p-6">
                   <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-2">{row.tag}</p>
@@ -378,7 +378,7 @@ export default function RetrainAsAPersonalTrainerPage() {
             </h2>
             <ul className="space-y-5 text-lg text-soft/90">
               {[
-                "You drop them off and go straight to your 9:30 client — a woman the same age as you, lifting heavier than she has in a decade.",
+                "You drop them off and go straight to your 9:30 client, a woman the same age as you, lifting heavier than she has in a decade.",
                 "Your second client texts to say she's finally sleeping again. You wrote her a programme three weeks ago. She means it.",
                 "You're home in time for pickup. The bills are paid this month from work you actually believe in.",
                 "Another school-gate mum asks how much you charge. You tell her the price without flinching. She books.",
@@ -427,7 +427,7 @@ export default function RetrainAsAPersonalTrainerPage() {
               <span className="text-gold">No drama. Your pace.</span>
             </h2>
             <p className="text-soft/75 text-center text-lg mb-14 max-w-2xl mx-auto">
-              Most returners finish in 12–20 weeks fitting study around school runs, bedtimes, and weekends. Faster if you&apos;ve got the energy, slower if life gets in the way — your call entirely.
+              Most returners finish in 12–20 weeks fitting study around school runs, bedtimes, and weekends. Faster if you&apos;ve got the energy, slower if life gets in the way. Your call entirely.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {steps.map((step, i) => (
@@ -461,21 +461,21 @@ export default function RetrainAsAPersonalTrainerPage() {
         {/* PRICING */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing — no upsells</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing · no upsells</p>
             <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-6">
               Spread it
               <br />
               <span className="text-gold">across the school term.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and our gym pipeline. Most returners use the £599 deposit + 5 × £200 plan — designed to never sit on top of the food shop.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and the interview we arrange when you qualify. Most returners use the £599 deposit and 5 × £200 plan, designed never to sit on top of the food shop.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>
         </section>
 
         {/* AVATAR-MATCHED PROOF (Proof Engine) */}
-        <ProofStrip avatar="returner" heading="People who came back to fitness — just like you" />
+        <ProofStrip avatar="returner" heading="People who came back to fitness, just like you" />
 
         {/* REVIEWS */}
         <Reviews />

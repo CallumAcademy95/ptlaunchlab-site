@@ -39,7 +39,7 @@ const config: GymConfig = {
   stats: [
     { value: "2006", label: "Family-run since" },
     { value: "24/7", label: "Train, learn & build experience" },
-    { value: "All",  label: "Levels — beginners to athletes" },
+    { value: "All",  label: "Levels, beginners to athletes" },
     { value: "★",    label: "Clean, professional environment" },
   ],
 

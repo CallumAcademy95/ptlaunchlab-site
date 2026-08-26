@@ -47,47 +47,47 @@ const forYouIf = [
 const objections = [
   {
     q: "What if I've never coached anyone before?",
-    a: "You don't need to have. The course starts at the foundations — anatomy, how a squat actually works, how to read a body, how to write a programme. We've put learners through who'd never coached a single person and watched them walk into their first session shaking and walk out with rebookings. The skill is taught. The job is just turning up to learn it.",
+    a: "You don't need to have. The course starts at the foundations: anatomy, how a squat actually works, how to read a body, how to write a programme. We've put learners through who'd never coached a single person and watched them walk into their first session shaking and walk out with rebookings. The skill is taught. The job is just turning up to learn it.",
   },
   {
-    q: "Won't the industry just spit me out — isn't it saturated?",
-    a: "The UK has 11.5 million gym members across 7,200+ gyms. There's no shortage of clients. There's a shortage of PTs who know how to find them — which is why 80% of newly-qualified UK PTs quit inside 18 months. That's the gap the £500 Mentorship Hub (free with your course) is built to close. You don't compete with the cert-only PTs. You out-position them.",
+    q: "Won't the industry just spit me out? Isn't it saturated?",
+    a: "The UK has 11.5 million gym members across 7,200+ gyms. There's no shortage of clients. There's a shortage of PTs who know how to find them, which is why 80% of newly-qualified UK PTs quit inside 18 months. That's the gap the £500 Mentorship Hub (free with your course) is built to close. You don't compete with the cert-only PTs. You out-position them.",
   },
   {
     q: "Am I really qualified enough? I haven't got abs / a degree / a sport science background.",
-    a: "None of that matters. UK gym hiring managers don't ask for abs or a degree — they ask for NCFE Level 3 by default on their job listings. That's exactly what you walk away with. Confidence comes from competence, not aesthetics. Your tutor reviews every unit you submit and either passes it or sends it back with feedback, so the qualification itself stops feeling intimidating fast.",
+    a: "None of that matters. UK gym hiring managers ask for NCFE Level 3 by default on their job listings, not for abs or a degree. That's exactly what you walk away with. Confidence comes from competence, not aesthetics. Your tutor reviews every unit you submit and either passes it or sends it back with feedback, so the qualification itself stops feeling intimidating fast.",
   },
   {
     q: "How do I know this isn't another £29 PDF scam?",
-    a: "Two checks: (1) the qualification is on the Ofqual Register — the UK government's public list of regulated qualifications — under reference 603/4388/6. (2) The awarding body is NCFE, the qualification name UK gym managers list by default on hiring posts. Anything outside Ofqual is CPD, not a qualification. We're the regulated route.",
+    a: "Two checks: (1) the qualification is on the Ofqual Register, the UK government's public list of regulated qualifications, under reference 603/4388/6. (2) The awarding body is NCFE, the qualification name UK gym managers list by default on hiring posts. Anything outside Ofqual is CPD, not a qualification. We're the regulated route.",
   },
 ];
 
 const steps = [
-  { n: 1, title: "Enrol — your tutor lands within 24 hours", body: "Immediate access to the learning app. No cohort start dates. Your tutor is a real person, not a help desk — most learners are messaging them by day two." },
-  { n: 2, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite for Level 3 — already included in your fee, not sold separately." },
-  { n: 3, title: "Move into Level 3 — Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals — film yourself coaching real movements at any gym, tutor reviews the footage." },
-  { n: 4, title: "Qualify — NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
-  { n: 5, title: "Get your warm-introduction gym interview", body: "We've personally hired 500+ PTs across our partner gym network. Direct introductions, not cold CV drops. No other UK course offers this." },
-  { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The £500 PT Launch Lab Mentorship Hub is bundled free — your dashboard from 'qualified' to 'fully booked.'" },
+  { n: 1, title: "Enrol, and your tutor lands within 24 hours", body: "Immediate access to the learning app. No cohort start dates. Your tutor is a real person, not a help desk. Most learners are messaging them by day two." },
+  { n: 2, title: "Smash Level 2: Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite for Level 3, already included in your fee rather than sold separately." },
+  { n: 3, title: "Move into Level 3: Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals: film yourself coaching real movements at any gym and your tutor reviews the footage." },
+  { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
+  { n: 5, title: "Get your warm-introduction gym interview", body: "We've personally hired 500+ PTs across our partner gym network. A warm introduction rather than a cold CV drop." },
+  { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The £500 PT Launch Lab Mentorship Hub is bundled free: your dashboard from 'qualified' to 'fully booked.'" },
 ];
 
 const comparisonRows = [
-  { other: "Just a certificate — figure the rest out yourself", us: "Certificate + personal tutor + business mentorship" },
+  { other: "Just a certificate, and the rest to figure out yourself", us: "Certificate + personal tutor + business mentorship" },
   { other: "No help getting hired",                              us: "Warm intros into our partner gym network" },
   { other: "Run by lecturers, not practitioners",                us: "Run by gym owners who've hired 500+ PTs" },
   { other: "No business training",                               us: "£500 Mentorship Hub bundled free" },
-  { other: "Help-desk ticket if you get stuck",                  us: "Your tutor's a message away — answers in hours, not days" },
+  { other: "Help-desk ticket if you get stuck",                  us: "Your tutor's a message away, with answers in hours rather than days" },
   { other: "Surprise upsell fees post-enrolment",                us: "£1,599 total. Nothing sold as a paid upgrade later" },
 ];
 
 const faqs = [
   { q: "How do you become a personal trainer in the UK?", a: "Two qualifications: NCFE Level 2 Gym Instructor (legal prerequisite) followed by NCFE Level 3 Personal Trainer. Both Ofqual regulated, both bundled in our £1,599 course. Once you've passed Level 3 you register with CIMSPA, get public liability insurance (~£60/year), and you can legally take paying 1-to-1 clients in any UK commercial gym. No degree required. No minimum age above 16." },
-  { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes — Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
-  { q: "Will gyms actually hire me with this qualification?", a: "Yes. NCFE is the awarding body UK gym managers ask for by default on job postings — PureGym, JD Gyms, Nuffield Health, David Lloyd, and every major independent operator. Our team has personally hired 500+ PTs across our partner gym network, so we know exactly what the hiring managers look for. We make warm introductions when you qualify." },
-  { q: "Can I afford it?", a: "You can pay in full, or spread it with our deposit plan — £599 deposit then 5 × £200 monthly. Once qualified, a single PT session at £30 covers a month's payment." },
-  { q: "Can I really do this online from home?", a: "Yes — 100% online. Theory online, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs get hired at every major UK gym every week — what matters is the certificate, not the room you got it in." },
-  { q: "When can I start?", a: "Immediately. Full access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date — many learners are halfway through their first unit by the end of day one." },
+  { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes. Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
+  { q: "Will gyms actually hire me with this qualification?", a: "NCFE Level 3 is regulated by Ofqual under reference 603/4388/6 and sits on the public register, which is what a hiring manager is checking for. Our team has personally hired 500+ PTs, so we know what they look for. When you qualify we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf." },
+  { q: "Can I afford it?", a: "You can pay in full, or spread it with our deposit plan: £599 deposit then 5 × £200 monthly. Once qualified, a single PT session at £30 covers a month's payment." },
+  { q: "Can I really do this online from home?", a: "Yes. 100% online. Theory online, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. What matters is the qualification itself, not the room you were sitting in when you earned it." },
+  { q: "When can I start?", a: "Immediately. Full access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date, and many learners are halfway through their first unit by the end of day one." },
 ];
 
 const founders = [
@@ -166,7 +166,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               into a <span className="text-gold">recognised career.</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              NCFE Level 2 + Level 3, fully online, no degree — taught by gym owners who&apos;ve personally hired 500+ PTs into real gyms across the UK. Take the 60-second quiz to see if PT is actually the right move for you. Honest answer either way.
+              NCFE Level 2 + Level 3, fully online, no degree, taught by gym owners who&apos;ve personally hired 500+ PTs into real gyms across the UK. Take the 60-second quiz to see if PT is actually the right move for you. Honest answer either way.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
               <Link
@@ -194,19 +194,19 @@ export default function BecomeAPersonalTrainerUkPage() {
         {/* VSL — founders explain why */}
         <section className="bg-surface py-16 px-6 border-y border-white/[0.05]">
           <div className="max-w-4xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first — 4 minutes</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first · 4 minutes</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-3">
-              Why 80% of PTs fail —
+              Why 80% of PTs fail,
               <br />
               <span className="text-gold">and exactly how we fix it.</span>
             </h2>
             <p className="text-soft/75 text-center text-base max-w-2xl mx-auto mb-10">
-              Callum, Miles and Ryan on what most courses get wrong, what gym managers actually hire for, and why this one&apos;s built differently.
+              Callum, Miles and Ryan on what gym managers actually hire for, and how this course is built around it.
             </p>
             <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl aspect-video">
               <iframe
                 src="https://www.youtube.com/embed/0rhp9fkBFsU"
-                title="Why PT Launch Lab — from the founders"
+                title="Why PT Launch Lab, from the founders"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full absolute inset-0"
@@ -231,7 +231,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               ))}
             </ul>
             <p className="text-soft/75 text-center text-base mt-10 max-w-2xl mx-auto">
-              If you ticked four or more, you&apos;re not browsing — you&apos;re closer than you think. The next paragraph is for you.
+              If you ticked four or more, you&apos;re not browsing. You&apos;re closer than you think. The next paragraph is for you.
             </p>
           </div>
         </section>
@@ -313,7 +313,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               {[
                 { tag: "Step 1", title: "Level 2 Gym Instructor (legal prerequisite)", body: "Anatomy, physiology, gym floor coaching, client inductions. You can't take Level 3 without it. Included in your fee." },
                 { tag: "Step 2", title: "Level 3 Personal Trainer", body: "Programming, nutrition, business planning, practical coaching. This is the one UK gym managers ask for by name." },
-                { tag: "Awarded by", title: "NCFE — Ofqual reference 603/4388/6", body: "On the UK government's public register of regulated qualifications. The default name on PureGym, JD Gyms, and Nuffield Health hiring posts." },
+                { tag: "Awarded by", title: "NCFE, Ofqual reference 603/4388/6", body: "On the UK government's public register of regulated qualifications, which is what a hiring manager checks." },
                 { tag: "Then", title: "CIMSPA + public liability insurance", body: "Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
               ].map((row) => (
                 <div key={row.title} className="bg-card border border-white/[0.06] rounded-2xl p-6 flex flex-col sm:flex-row gap-5">
@@ -340,7 +340,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               <span className="text-gold">stop at the certificate.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-12 max-w-2xl mx-auto">
-              That&apos;s why 80% of UK PTs quit inside 18 months. They qualified — they just didn&apos;t learn the rest of the job.
+              That&apos;s why 80% of UK PTs quit inside 18 months. They qualified. They just didn&apos;t learn the rest of the job.
             </p>
             <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
               <div className="grid grid-cols-2 bg-card">
@@ -381,7 +381,7 @@ export default function BecomeAPersonalTrainerUkPage() {
             </h2>
             <ul className="space-y-5 text-lg text-soft/90">
               {[
-                "You're walking into a gym you actually want to be in — and you work there.",
+                "You're walking into a gym you actually want to be in, and you work there.",
                 "Your first paying client just rebooked. They're texting you about their week. You're answering as a coach, not a mate.",
                 "Someone at a party asks what you do, and the answer is interesting for once.",
                 "You're earning from the thing you'd be doing on a Sunday anyway.",
@@ -430,7 +430,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               <span className="text-gold">to qualified PT.</span>
             </h2>
             <p className="text-soft/75 text-center text-lg mb-14 max-w-2xl mx-auto">
-              8–16 weeks on average. Faster if you push, slower if life gets in the way — your timeline, your call.
+              8–16 weeks on average. Faster if you push, slower if life gets in the way. Your timeline, your call.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {steps.map((step, i) => (
@@ -469,14 +469,14 @@ export default function BecomeAPersonalTrainerUkPage() {
         {/* PRICING */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing — no upsells</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing · no upsells</p>
             <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-6">
               One fee. Everything in.
               <br />
               <span className="text-gold">£200 off for serious enquiries.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm-introduction interview to our gym network. Most learners use the deposit plan — £599 then 5 × £200.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm-introduction interview to our gym network. Most learners use the deposit plan: £599 then 5 × £200.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>
@@ -556,7 +556,7 @@ export default function BecomeAPersonalTrainerUkPage() {
                 </div>
                 <h3 className="text-white text-2xl font-bold mb-3">I&apos;ve got a few questions first.</h3>
                 <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
-                  Book a free 15-min call. We&apos;ll give straight answers — and if PT isn&apos;t the right move for you, we&apos;ll tell you that too.
+                  Book a free 15-min call. We&apos;ll give straight answers, and if PT isn&apos;t the right move for you, we&apos;ll tell you that too.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["15 minutes, completely free", "Honest answers, zero pressure", "Talk to a real coach", "We'll tell you if it's not right for you"].map((line) => (

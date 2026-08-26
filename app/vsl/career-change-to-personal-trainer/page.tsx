@@ -39,7 +39,7 @@ const forYouIf = [
   "You're burnt out in corporate, hospitality, sales, retail or shift work",
   "You're working hard for a future that isn't yours",
   "Fitness has been the one thing you keep coming back to",
-  "You can't quit yet — there's a mortgage / kids / rent / both",
+  "You can't quit yet, because there's a mortgage or kids or rent",
   "You've thought 'I should be doing this for a living' more than once",
   "You want a believable transition, not a quit-your-job-on-Monday fantasy",
 ];
@@ -47,46 +47,46 @@ const forYouIf = [
 const objections = [
   {
     q: "I can't quit my job to retrain. Is this actually doable around full-time work?",
-    a: "Yes — it's how most of our career-changers do it. The course is fully online, fully self-paced, with no fixed class times. Theory units fit around evenings and lunch breaks; practical units are video-assessed at any gym, on your schedule. Average study load is 8–10 hours a week. Most career-changers finish Level 2 + Level 3 in 8–16 weeks while still earning full-time. You don't quit. You qualify, then you transition.",
+    a: "Yes, and it's how most of our career-changers do it. The course is fully online, fully self-paced, with no fixed class times. Theory units fit around evenings and lunch breaks; practical units are video-assessed at any gym, on your schedule. Average study load is 8–10 hours a week. Most career-changers finish Level 2 + Level 3 in 8–16 weeks while still earning full-time. You don't quit. You qualify, then you transition.",
   },
   {
     q: "Isn't the PT industry saturated? Will there even be space for me?",
-    a: "The industry is saturated with PTs who don't know how to get clients — not with PTs who do. Roughly 80% of newly-qualified UK PTs quit inside 18 months. They didn't fail at training. They failed at marketing, pricing, and client retention — the bit nobody taught them. Our £500 Mentorship Hub is built specifically to close that gap, bundled free with your course. You don't compete with the cert-only PTs. You skip past them.",
+    a: "The industry is saturated with PTs who never learned how to get clients. Roughly 80% of newly-qualified UK PTs quit inside 18 months. They didn't fail at training. They failed at marketing, pricing and client retention, which is the bit nobody taught them. Our £500 Mentorship Hub is built specifically to close that gap, bundled free with your course. You don't compete with the cert-only PTs. You skip past them.",
   },
   {
     q: "I'm not 'salesy.' Will I have to do the cringe gym-floor pitch?",
-    a: "No. Plenty of our most successful learners came from quiet, technical, non-sales backgrounds. The Mentorship Hub walks you through the conversations, the pricing, the messaging, the social posts — as a system, not as a personality. You don't need a sales personality. You need a sales process. We give you one.",
+    a: "No. Plenty of our most successful learners came from quiet, technical, non-sales backgrounds. The Mentorship Hub walks you through the conversations, the pricing, the messaging, the social posts, as a system rather than as a personality. You don't need a sales personality. You need a sales process. We give you one.",
   },
   {
     q: "What if the income doesn't replace my current salary?",
-    a: "Employed-first is the safer bridge. We make warm introductions into our partner gym network when you qualify — PureGym, JD Gyms, Nuffield Health, and independents we've personally hired into. Year one salary: £20K–£28K base plus commission. You stay in your current job long enough to overlap salaries, then transition. Self-employed PTs after 2–3 years routinely hit £35K–£50K+. The pathway is gradual, not a cliff edge.",
+    a: "Employed-first is the safer bridge. We arrange at least one interview for you when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Year one salary: £20K–£28K base plus commission. You stay in your current job long enough to overlap salaries, then transition. Self-employed PTs after 2–3 years routinely hit £35K–£50K+. The pathway is gradual, not a cliff edge.",
   },
 ];
 
 const steps = [
-  { n: 1, title: "Book a free 15-min call", body: "Tell us your situation honestly. Current role, hours, financial pressure, when you want to be out. We'll tell you if the maths actually works — and if it doesn't." },
+  { n: 1, title: "Book a free 15-min call", body: "Tell us your situation honestly. Current role, hours, financial pressure, when you want to be out. We'll tell you if the maths actually works, and if it doesn't." },
   { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: "£599 deposit then 5 × £200 monthly, or pay in full. Payments roughly match a single PT session per week once you qualify." },
-  { n: 3, title: "Study evenings + weekends — keep earning", body: "Tutor introduced within 24 hours. Average 8–10 hours per week alongside full-time work. Level 2 done in ~4 weeks, Level 3 in another ~6–8." },
-  { n: 4, title: "Qualify — NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by name. Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
-  { n: 5, title: "Transition employed-first — warm gym introductions", body: "We've personally hired 500+ PTs through our network. Direct warm intros into salaried PT roles — no cold CV drops. Overlap salaries while you build your client base." },
+  { n: 3, title: "Study evenings and weekends, and keep earning", body: "Tutor introduced within 24 hours. Average 8–10 hours per week alongside full-time work. Level 2 done in ~4 weeks, Level 3 in another ~6–8." },
+  { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by name. Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
+  { n: 5, title: "Transition employed-first, with a warm gym introduction", body: "We've personally hired 500+ PTs through our network. A warm introduction into a salaried PT role rather than a cold CV drop. Overlap salaries while you build your client base." },
   { n: 6, title: "Scale via the Mentorship Hub when ready", body: "When your client roster outgrows your old salary, leave the day job. Hub walks you through pricing, packaging, retention. Most career-changers replace their salary inside 6–12 months." },
 ];
 
 const comparisonRows = [
-  { other: "Built for school-leavers in classrooms",       us: "Built for working adults — online, self-paced" },
+  { other: "Built for school-leavers in classrooms",       us: "Built for working adults: online and self-paced" },
   { other: "Quit your job to study full-time",             us: "Study evenings + weekends while you keep earning" },
-  { other: "Just a certificate — figure clients out alone", us: "£500 Mentorship Hub bundled free" },
+  { other: "Just a certificate, and clients to figure out alone", us: "£500 Mentorship Hub bundled free" },
   { other: "Lecturer telling you the theory",              us: "Gym owners who've personally hired 500+ PTs" },
   { other: "Cold CV drops once you qualify",               us: "Warm intros to salaried roles in our network" },
   { other: "Surprise upsell fees post-enrolment",          us: "£1,599 total. Nothing sold as a paid upgrade later" },
 ];
 
 const faqs = [
-  { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online and fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym — you film yourself coaching real movements, your tutor reviews. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
-  { q: "Is it too late to change careers in my 30s or 40s?", a: "No — and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
+  { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online and fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym: you film yourself coaching real movements and your tutor reviews it. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
+  { q: "Is it too late to change careers in my 30s or 40s?", a: "No, and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
   { q: "How much can I realistically earn as a PT in year one?", a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one." },
-  { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We make warm introductions into our partner gym network — PureGym, JD Gyms, The Gym Group, Nuffield Health, plus independents. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
-  { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course — most UK academies charge £500–£3,000 for this layer or skip it entirely." },
+  { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We arrange at least one interview for you when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
+  { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course, in the fee rather than sold on afterwards." },
   { q: "When can I start?", a: "Immediately. The moment you enrol, your course access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
 ];
 
@@ -166,7 +166,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">you&apos;ve outgrown?</span>
             </h1>
             <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Train as a qualified UK PT around your current job. NCFE Level 2 + Level 3, Ofqual regulated, fully online — with the business mentorship most courses leave out. Take the 60-second quiz to see if PT is a believable next step for your situation. Honest answer either way.
+              Train as a qualified UK PT around your current job. NCFE Level 2 + Level 3, Ofqual regulated and fully online, with the business mentorship included. Take the 60-second quiz to see if PT is a believable next step for your situation. Honest answer either way.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
               <Link
@@ -194,19 +194,19 @@ export default function CareerChangeToPersonalTrainerPage() {
         {/* VSL */}
         <section className="bg-surface py-16 px-6 border-y border-white/[0.05]">
           <div className="max-w-4xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first — 4 minutes</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Watch first · 4 minutes</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-3">
-              Why 80% of PTs fail —
+              Why 80% of PTs fail,
               <br />
               <span className="text-gold">and exactly how we fix it.</span>
             </h2>
             <p className="text-soft/75 text-center text-base max-w-2xl mx-auto mb-10">
-              Callum, Miles and Ryan on what most courses get wrong, what gym managers actually hire for, and why this one&apos;s built differently — specifically for career-changers.
+              Callum, Miles and Ryan on what gym managers actually hire for, and why this one&apos;s built specifically for career-changers.
             </p>
             <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl aspect-video">
               <iframe
                 src="https://www.youtube.com/embed/0rhp9fkBFsU"
-                title="Why PT Launch Lab — from the founders"
+                title="Why PT Launch Lab, from the founders"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="w-full h-full absolute inset-0"
@@ -231,7 +231,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               ))}
             </ul>
             <p className="text-soft/75 text-center text-base mt-10 max-w-2xl mx-auto">
-              If you ticked four or more — you&apos;re not browsing. You&apos;re stuck. The rest of this page is the route out.
+              If you ticked four or more, you&apos;re not browsing. You&apos;re stuck. The rest of this page is the route out.
             </p>
           </div>
         </section>
@@ -249,7 +249,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               The Sunday-night dread is back. The 6:45 alarm has stopped feeling normal. You&apos;re checking your phone in meetings, doing the bare minimum, and wondering when this stopped being your life.
             </p>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
-              And every time it gets bad you do the same thing — you go to the gym. That hour at lunchtime, the early session before work, the late evening when the office finally goes quiet. <span className="text-white font-semibold">Fitness has been the one thing that&apos;s never let you down.</span>
+              And every time it gets bad you do the same thing. You go to the gym. That hour at lunchtime, the early session before work, the late evening when the office finally goes quiet. <span className="text-white font-semibold">Fitness has been the one thing that&apos;s never let you down.</span>
             </p>
             <p className="text-soft/85 text-lg leading-relaxed">
               You&apos;re not going to wake up next year and find that the desk has gotten better. The question stops being &ldquo;should I change careers&rdquo; and starts being &ldquo;what does a realistic exit actually look like.&rdquo;
@@ -307,7 +307,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">No financial freefall.</span>
             </h2>
             <p className="text-soft/80 text-lg text-center max-w-2xl mx-auto mb-12">
-              Every single piece of this course is built to be done on top of a full-time job — including the way it&apos;s priced.
+              Every single piece of this course is built to be done on top of a full-time job, including the way it&apos;s priced.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
@@ -377,10 +377,10 @@ export default function CareerChangeToPersonalTrainerPage() {
             </h2>
             <ul className="space-y-5 text-lg text-soft/90">
               {[
-                "Your alarm goes off and you're walking into a gym you chose — not a job you tolerate.",
+                "Your alarm goes off and you're walking into a gym you chose, rather than a job you tolerate.",
                 "Your 8am client just rebooked for next week. The 10am cancelled and rescheduled. You're booked-out by lunchtime.",
                 "You're paying the mortgage off PT income that finally crossed your old salary.",
-                "Your friends from the old job ask how you did it. You tell them honestly — qualification, the Mentorship Hub, the warm gym introductions, the slow overlap.",
+                "Your friends from the old job ask how you did it. You tell them honestly: the qualification, the Mentorship Hub, the gym introduction, the slow overlap.",
                 "You haven't opened that payroll software in 14 months.",
                 "You're earning from work that doesn't hollow you out.",
               ].map((line) => (
@@ -460,7 +460,7 @@ export default function CareerChangeToPersonalTrainerPage() {
         {/* PRICING */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto">
-            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing — no upsells</p>
+            <p className="text-gold text-xs font-semibold tracking-widest uppercase text-center mb-4">Pricing · no upsells</p>
             <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-6">
               Spread the cost
               <br />
@@ -527,7 +527,7 @@ export default function CareerChangeToPersonalTrainerPage() {
                 </div>
                 <h3 className="text-white text-2xl font-bold mb-3">I&apos;ve decided. Let&apos;s start.</h3>
                 <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
-                  Enrol today and start studying tonight. Your tutor is introduced within 24 hours — payment plans designed to never sit on top of your salary.
+                  Enrol today and start studying tonight. Your tutor is introduced within 24 hours, and the payment plans are designed never to sit on top of your salary.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Immediate course access", "Tutor introduced within 24 hours", "Pay £599 + 5 × £200 monthly", "Cancel within 7 days, no questions"].map((line) => (
@@ -547,7 +547,7 @@ export default function CareerChangeToPersonalTrainerPage() {
                 </div>
                 <h3 className="text-white text-2xl font-bold mb-3">I want to talk it through first.</h3>
                 <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
-                  Book 15 minutes with the team. We&apos;ll map your transition based on your salary, time, and timeline — and tell you straight if it isn&apos;t a fit.
+                  Book 15 minutes with the team. We&apos;ll map your transition based on your salary, time and timeline, and tell you straight if it isn&apos;t a fit.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["15 minutes, completely free", "Honest pathway plan", "No script, no hard sell", "We'll tell you if it's not right for you"].map((line) => (

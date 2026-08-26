@@ -29,10 +29,10 @@ const config: GymConfig = {
     { value: "Pro", label: "Prime · Rogue · Hammer Strength" },
   ],
   gymHighlights: [
-    "17,000 sqft facility packed with elite equipment — Prime, Rogue, Hammer Strength, Cybex and more",
-    "Two locations — Bradford & Huddersfield",
+    "17,000 sqft facility packed with elite equipment: Prime, Rogue, Hammer Strength, Cybex and more",
+    "Two locations: Bradford and Huddersfield",
     "Recovery suite with ice bath and infrared sauna",
-    "A serious training environment — you'll learn in the gym where standards are set",
+    "A serious training environment, where standards are set",
     "On-site physio, barbers, supplement shop and deli bar",
   ],
   metaTitle: "Muscle Bound PT Academy | Become a Qualified Personal Trainer at Muscle Bound Gym",
