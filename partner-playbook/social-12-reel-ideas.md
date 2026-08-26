@@ -8,7 +8,7 @@ order: 120
 
 Phone, no script, under 30 seconds. Filmed badly beats not filmed.
 
-**Ask your trainer** — point a camera at a coach and ask one question
+**Ask your trainer.** Point a camera at a coach and ask one question
 ```
 What did you do before this?
 What's the worst advice you got starting out?
@@ -22,7 +22,7 @@ Would you go back to your old job?
 What would you tell yourself three years ago?
 ```
 
-**Myths** — one myth, one correction, done
+**Myths.** One myth, one correction, done
 ```
 You need to look a certain way
 It's all shouting and counting reps
@@ -36,7 +36,7 @@ It's all early mornings
 You can't do it around kids
 ```
 
-**Day in the life** — 6 to 8 clips of a real day, no narration
+**Day in the life.** 6 to 8 clips of a real day, no narration
 ```
 First client of the day
 What a session actually looks like
@@ -48,7 +48,7 @@ End of day
 What the job looks like at 6am / at 8pm
 ```
 
-**Career change** — the strongest category
+**Career change.** The strongest category
 ```
 What I did before
 Why I changed
@@ -60,7 +60,7 @@ How long it actually took
 What I got wrong
 ```
 
-**Explainer** — answer one question in 20 seconds
+**Explainer.** Answer one question in 20 seconds
 ```
 How long does it take?
 Can I do it around a job?

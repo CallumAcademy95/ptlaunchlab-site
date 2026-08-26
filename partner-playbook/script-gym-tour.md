@@ -10,16 +10,16 @@ Hugely overlooked. Someone joining a gym is already thinking about changing some
 
 Ask what you'd ask anyway: **"What are your goals?"**
 
-If any version of these comes back —
+If any version of these comes back:
 
 - "I love fitness."
 - "I've always wanted to learn more about it."
 - "I'd love to work in gyms one day."
 
-— reply:
+reply with:
 
 ```
-Interesting. We've actually got our own academy here — we help people qualify
+Interesting. We've actually got our own academy here. We help people qualify
 as Personal Trainers.
 
 If that's ever something you want to explore, just say.

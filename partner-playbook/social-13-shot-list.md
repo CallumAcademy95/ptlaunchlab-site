@@ -34,7 +34,7 @@ Weights being racked
 Coach demonstrating a movement
 Coach watching, arms folded, concentrating
 The moment after a good set
-A high five, a fist bump — the real reaction, not a posed one
+A high five, a fist bump: the real reaction, not a posed one
 ```
 
 **Studying**
@@ -56,7 +56,7 @@ Someone in gym uniform who clearly works there
 
 Set up in the quietest corner. Coach sits or stands, phone on a shelf at chest height, window light on their face.
 
-Ask the ten questions from *50 reel ideas*, one at a time. **Don't script the answers.** Ask, let them talk, move on. If they fumble the first one, keep it — that one is usually the most watchable.
+Ask the ten questions from *50 reel ideas*, one at a time. **Don't script the answers.** Ask, let them talk, move on. If they fumble the first one, keep it. That one is usually the most watchable.
 
 ## Three things people get wrong
 

@@ -11,7 +11,7 @@ order: 80
 ```
 Applications are open for our next academy intake.
 
-If you've ever thought "I'd love to work in fitness one day" —
+If you've ever thought "I'd love to work in fitness one day",
 
 don't let another year go by wondering what might have happened.
 

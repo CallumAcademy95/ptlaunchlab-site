@@ -12,12 +12,12 @@ Your job is to **create awareness, encourage conversations, and connect interest
 
 ## What the gyms that do well have in common
 
-Not size. Not footfall. Not marketing budget — none of them spend anything. They do five things:
+It isn't size, footfall or marketing budget. None of these gyms spend anything extra. They do five things:
 
 1. They mention the academy **consistently**, not only when an intake opens
 2. Every member of staff knows how to spot potential
 3. They celebrate learners publicly
-4. It's easy to enquire — visible QR codes, someone who knows the answer
+4. It's easy to enquire: visible QR codes, someone who knows the answer
 5. They look at their own activity once a month
 
 All five are habits, not spend.
@@ -26,6 +26,6 @@ All five are habits, not spend.
 
 Gym members have a finely tuned radar for being sold to by their own gym. They've had the PT upsell, the supplement offer, the referral scheme.
 
-The academy doesn't survive that treatment — and it doesn't need it, because it isn't a product they were resisting. It's an idea most of them have never had. Mentioning it once, genuinely, does more than pushing it ten times.
+The academy doesn't survive that treatment, and it doesn't need it, because it isn't a product they were resisting. It's an idea most of them have never had. Mentioning it once, genuinely, does more than pushing it ten times.
 
 If someone walks away feeling like they've been pitched, that's a worse outcome than not having spoken to them.

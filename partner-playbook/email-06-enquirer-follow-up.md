@@ -26,4 +26,4 @@ Reply to this and we'll point you in the right direction.
 The [Gym Name] Team
 ```
 
-Send it once. If there's no reply, leave it — they know where you are, and a third email turns a warm person cold.
+Send it once. If there's no reply, leave it. They know where you are, and a third email turns a warm person cold.

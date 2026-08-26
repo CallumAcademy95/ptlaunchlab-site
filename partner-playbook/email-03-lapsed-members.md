@@ -6,7 +6,7 @@ order: 30
 when_to_use: Any time. Counterintuitively one of the best-performing sends.
 ---
 
-Lapsed members are a better audience for this than active ones, and almost nobody uses them for it. They liked the place. They lost the habit. "Come back and train" has already failed on them — "come back and build a career" hasn't been tried.
+Lapsed members are a better audience for this than active ones, and almost nobody uses them for it. They liked the place. They lost the habit. "Come back and train" has already failed on them. "Come back and build a career" hasn't been tried.
 
 ```
 Subject: Thinking about a career change?

@@ -13,7 +13,7 @@ Can we ask you something?
 
 Have you ever thought about doing this professionally?
 
-If the answer is "maybe" — come and have a chat.
+If the answer is "maybe", come and have a chat.
 
 That one conversation could change your future.
 ```

@@ -15,17 +15,17 @@ Everyone in your gym is already thinking about change in January. Almost nobody 
 | Day | Do this |
 |---|---|
 | **Monday** | Post: *"Could [YEAR] be the year fitness becomes your career?"* |
-| **Wednesday** | Share a coach's story — what were they doing before? |
-| **Friday** | Instagram Story poll: *Ever thought about becoming a PT?* — Yes / Maybe / Never |
+| **Wednesday** | Share a coach's story. What were they doing before? |
+| **Friday** | Instagram Story poll: *Ever thought about becoming a PT?* Yes / Maybe / Never |
 | **Weekend** | Staff start conversations with anyone who answered or engaged |
 
-The Friday poll is the engine. Everyone who taps **Yes** or **Maybe** is a named person your team can approach on the gym floor — that's a list you couldn't buy, generated in a day.
+The Friday poll is the engine. Everyone who taps **Yes** or **Maybe** is a named person your team can approach on the gym floor. That's a list you couldn't buy, generated in a day.
 
 ## In the gym
 
 - Move the academy posters to the entrance for the month
 - Check every QR code actually scans
-- Mention the academy in every new member induction — January is when you do the most
+- Mention the academy in every new member induction. January is when you do the most
 
 ## What to judge it on
 

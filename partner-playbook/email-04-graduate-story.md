@@ -6,7 +6,7 @@ when_to_use: As soon as one member is enrolled. Upgrade it when they qualify.
 order: 40
 ---
 
-The highest-converting email in the library. It doesn't need a graduate — it needs somebody recognisable who **started**, and you have those the moment your first member enrols.
+The highest-converting email in the library. It needs somebody recognisable who **started**, not a graduate, and you have those the moment your first member enrols.
 
 **Send this now**
 
@@ -20,7 +20,7 @@ Hi [First Name],
 Works full-time. Comes in after work, same as most of us.
 
 A few months ago they decided to find out what it would take to do this
-professionally — and they're now working towards qualifying as a Personal
+professionally, and they're now working towards qualifying as a Personal
 Trainer, around the job they already have.
 
 They didn't change anything about their life to start. They just asked.
@@ -54,6 +54,6 @@ Could yours?
 The [Gym Name] Team
 ```
 
-Use a real photo of them in your gym, not a stock image. **Ask permission properly** and let them read it before it goes out — being named in a marketing email is a bigger ask than it feels like when you're the one sending it.
+Use a real photo of them in your gym, not a stock image. **Ask permission properly** and let them read it before it goes out. Being named in a marketing email is a bigger ask than it feels like when you're the one sending it.
 
 Never include what they earn, even if they offer. An income figure in a marketing email implies a typical result nobody can stand behind.

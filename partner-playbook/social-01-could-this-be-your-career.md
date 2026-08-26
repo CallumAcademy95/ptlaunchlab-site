@@ -18,12 +18,12 @@ never once imagined they could build a career out of it.
 
 That's why we've opened our own Personal Training academy, right here.
 
-If you've ever thought about becoming a Personal Trainer — or just wondered
-whether you'd be any good at it — come and talk to us.
+If you've ever thought about becoming a Personal Trainer, or just wondered
+whether you'd be any good at it, come and talk to us.
 
 No pressure. No hard sell. Just an opportunity you might not have considered.
 
 Send us a message with PT and we'll tell you more.
 ```
 
-The "send us a message with PT" ask does the heavy lifting. It's one word, it's private, and it doesn't commit them to anything — which is exactly why people who'd never comment will do it.
+The "send us a message with PT" ask does the heavy lifting. It's one word, it's private, and it doesn't commit them to anything, which is exactly why people who'd never comment will do it.

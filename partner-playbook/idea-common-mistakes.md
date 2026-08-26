@@ -7,7 +7,7 @@ order: 40
 ---
 
 **Waiting for members to ask.**
-They won't. Not because they're uninterested — because it hasn't occurred to them that it's for people like them. Start the conversation.
+They won't, because it hasn't occurred to them that it's for people like them. Start the conversation.
 
 **Talking about the qualification first.**
 Nobody wants a qualification. They want a different Monday morning. The qualification is how they get there, not the reason they'd go. Lead with the career, mention the course second.
@@ -20,4 +20,4 @@ One opportunity. One conversation. One next step. The moment there's a funnel, a
 
 ---
 
-The common thread: this fails quietly, not loudly. Nothing breaks. The posters stay up, the QR codes still work, and the conversations just stop happening. That's why the monthly check exists — it's the only thing that catches it.
+The common thread: this fails quietly, not loudly. Nothing breaks. The posters stay up, the QR codes still work, and the conversations just stop happening. That's why the monthly check exists. It's the only thing that catches it.

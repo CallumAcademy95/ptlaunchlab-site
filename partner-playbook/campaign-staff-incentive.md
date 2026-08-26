@@ -28,7 +28,7 @@ Enrolments are rare enough that a team could go two months with nothing, and ent
 - Most QR referrals
 - Coach spotter of the month
 
-These don't need to cost anything. An hour off, a coffee, lunch, or being named in the team meeting. **Recognition beats cash more often than people expect** — the £50 is what makes it real, the recognition is what makes it repeat.
+These don't need to cost anything. An hour off, a coffee, lunch, or being named in the team meeting. **Recognition beats cash more often than people expect**. The £50 is what makes it real, the recognition is what makes it repeat.
 
 ## Track it honestly
 

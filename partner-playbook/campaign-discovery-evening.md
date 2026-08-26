@@ -6,7 +6,7 @@ when_to_use: Once or twice a year, when you have a handful of interested members
 order: 40
 ---
 
-An hour in your own gym. Not a presentation — a conversation. The people who come are already interested; the job is to answer their questions honestly, not to convince anyone.
+An hour in your own gym, and a conversation rather than a presentation. The people who come are already interested; the job is to answer their questions honestly, not to convince anyone.
 
 ## The hour
 
@@ -17,7 +17,7 @@ An hour in your own gym. Not a presentation — a conversation. The people who c
 | **15 min** | The routes: employed PT, self-employed, online coaching, or a mix. |
 | **20 min** | Questions. No pressure, honest answers, including the awkward ones. |
 
-Tea, coffee, something to eat. Keep it relaxed — the room should feel like a chat, not a seminar.
+Tea, coffee, something to eat. Keep it relaxed. The room should feel like a chat, not a seminar.
 
 **Show all four routes.** Someone who doesn't want to be a full-time gym PT will rule the whole thing out if that's the only version they hear, and most people don't want that version.
 
@@ -31,4 +31,4 @@ Everyone who came gets, within 24 hours:
 
 Then leave it. One follow-up, not three.
 
-**Six people in a room beats sixty on a mailing list.** If only four turn up, run it anyway — those four came for a reason.
+**Six people in a room beats sixty on a mailing list.** If only four turn up, run it anyway. Those four came for a reason.

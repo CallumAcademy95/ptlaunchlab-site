@@ -24,4 +24,4 @@ you.
 The [Gym Name] Team
 ```
 
-Put the real date in. If it moves, tell them it moved — a deadline you quietly extend teaches people to ignore the next one.
+Put the real date in. If it moves, tell them it moved. A deadline you quietly extend teaches people to ignore the next one.
