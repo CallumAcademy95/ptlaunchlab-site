@@ -55,7 +55,7 @@ const objections = [
   },
   {
     q: "Am I really qualified enough? I haven't got abs / a degree / a sport science background.",
-    a: "None of that matters. UK gym hiring managers don't ask for abs or a degree — they ask for NCFE Level 3 by default on their job listings. That's exactly what you walk away with. Confidence comes from competence, not aesthetics. Your tutor reviews every assessment before you submit, so the qualification itself stops feeling intimidating fast.",
+    a: "None of that matters. UK gym hiring managers don't ask for abs or a degree — they ask for NCFE Level 3 by default on their job listings. That's exactly what you walk away with. Confidence comes from competence, not aesthetics. Your tutor reviews every unit you submit and either passes it or sends it back with feedback, so the qualification itself stops feeling intimidating fast.",
   },
   {
     q: "How do I know this isn't another £29 PDF scam?",
@@ -64,11 +64,11 @@ const objections = [
 ];
 
 const steps = [
-  { n: 1, title: "Enrol — your tutor lands within 24 hours", body: "Immediate access to the Merve app. No cohort start dates. Your tutor is a real person, not a help desk — most learners are messaging them by day two." },
+  { n: 1, title: "Enrol — your tutor lands within 24 hours", body: "Immediate access to the learning app. No cohort start dates. Your tutor is a real person, not a help desk — most learners are messaging them by day two." },
   { n: 2, title: "Smash Level 2 — Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite for Level 3 — already included in your fee, not sold separately." },
   { n: 3, title: "Move into Level 3 — Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals — film yourself coaching real movements at any gym, tutor reviews the footage." },
   { n: 4, title: "Qualify — NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
-  { n: 5, title: "Get warm-introduction gym interviews", body: "We've personally hired 500+ PTs across our partner gym network. Direct introductions, not cold CV drops. No other UK course offers this." },
+  { n: 5, title: "Get your warm-introduction gym interview", body: "We've personally hired 500+ PTs across our partner gym network. Direct introductions, not cold CV drops. No other UK course offers this." },
   { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The £500 PT Launch Lab Mentorship Hub is bundled free — your dashboard from 'qualified' to 'fully booked.'" },
 ];
 
@@ -86,8 +86,8 @@ const faqs = [
   { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes — Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
   { q: "Will gyms actually hire me with this qualification?", a: "Yes. NCFE is the awarding body UK gym managers ask for by default on job postings — PureGym, JD Gyms, Nuffield Health, David Lloyd, and every major independent operator. Our team has personally hired 500+ PTs across our partner gym network, so we know exactly what the hiring managers look for. We make warm introductions when you qualify." },
   { q: "Can I afford it?", a: "You can pay in full, or spread it with our deposit plan — £599 deposit then 5 × £200 monthly. Once qualified, a single PT session at £30 covers a month's payment." },
-  { q: "Can I really do this online from home?", a: "Yes — 100% online. Theory via the Merve app, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs get hired at every major UK gym every week — what matters is the certificate, not the room you got it in." },
-  { q: "When can I start?", a: "Immediately. Full access to the Merve app opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date — many learners are halfway through their first unit by the end of day one." },
+  { q: "Can I really do this online from home?", a: "Yes — 100% online. Theory online, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs get hired at every major UK gym every week — what matters is the certificate, not the room you got it in." },
+  { q: "When can I start?", a: "Immediately. Full access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date — many learners are halfway through their first unit by the end of day one." },
 ];
 
 const founders = [
@@ -102,7 +102,7 @@ const courseSchema = {
   "@context": "https://schema.org",
   "@type": "Course",
   name: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training",
-  description: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and guaranteed gym interviews on graduation.",
+  description: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and a guaranteed gym interview on graduation.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
   offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
@@ -476,7 +476,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               <span className="text-gold">£200 off for serious enquiries.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm-introduction interviews to our gym network. Most learners use the deposit plan — £599 then 5 × £200.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm-introduction interview to our gym network. Most learners use the deposit plan — £599 then 5 × £200.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>
@@ -536,7 +536,7 @@ export default function BecomeAPersonalTrainerUkPage() {
                 </div>
                 <h3 className="text-white text-2xl font-bold mb-3">I&apos;m in. Let&apos;s go.</h3>
                 <p className="text-soft/75 text-[15px] leading-relaxed mb-6">
-                  Enrol today and get immediate the Merve app access. Your tutor is introduced within 24 hours and you can start your first module tonight.
+                  Enrol today and get immediate access. Your tutor is introduced within 24 hours and you can start your first module tonight.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {["Immediate access on enrolment", "Tutor introduced within 24 hours", "Start module 1 today", "Multiple payment plans available"].map((line) => (

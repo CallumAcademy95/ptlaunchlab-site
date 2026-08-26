@@ -7,8 +7,8 @@ const faqs = [
     a: "Yes. The qualification is delivered through NCFE, regulated by Ofqual under reference 603/4388/6 (Ofqual is the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. Ofqual publishes the qualification on its own register, so you can check it yourself rather than take our word for it. That is the difference between a regulated qualification and a self-branded certificate.",
   },
   {
-    q: "What exactly are the \"guaranteed gym interviews\"? That sounds too good to be true.",
-    a: "It's a fair challenge. Here's exactly what it means: on completion of your qualification, we make direct introductions to gym employers in our network who are actively hiring PTs. These are warm introductions — not job board listings, not a generic CV drop. Because our founders have spent years on the hiring side of this industry, they have real relationships with gym operators. We use those relationships to get you in front of the right people. We can't guarantee you'll be offered every job — that's down to you in the interview. But we guarantee the interviews happen.",
+    q: "What exactly is the \"guaranteed gym interview\"? That sounds too good to be true.",
+    a: "It's a fair challenge, so here is exactly what it means. Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. It is a warm introduction rather than a job board listing or a generic CV drop. Our founders have spent years on the hiring side of this industry, so they know how to get you in front of the right person. What we cannot guarantee is the job itself. That part is down to you on the day. Getting you in the room is on us.",
   },
   {
     q: "I'm working full-time. Is there any realistic way to study around my job?",
@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "I've never been great at studying. What if I fail the assessments?",
-    a: "You have a personal tutor for exactly this reason. Before you submit any assessment, your tutor reviews your work, gives you feedback, and tells you whether it's ready. The point of that step is to catch problems before you submit rather than after. If you do need to resubmit anything, that is included at no extra cost. We want you to qualify, not to catch you out.",
+    a: "You have a personal tutor for exactly this reason. You submit each unit when you're ready and your tutor either passes it or sends it back with feedback on what to change. So a unit that isn't quite there yet comes back for another go rather than counting as a fail, and resubmitting is included at no extra cost. We want you to qualify, not to catch you out.",
   },
   {
     q: "How much can I realistically earn as a PT?",

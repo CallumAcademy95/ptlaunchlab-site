@@ -467,7 +467,7 @@ export default function ResultScreen({ name, resultKey, avatar, onStartOver }: P
           {[
             "We'll show you exactly how the course fits around your current job",
             "We'll be honest about what you can earn as a PT and how quickly",
-            "We'll explain the guaranteed gym interview process and what it means for you",
+            "We'll explain the guaranteed gym interview and what it means for you",
             "We'll walk through the payment options so the cost makes sense",
           ].map((point) => (
             <li key={point} className="flex items-start gap-2 text-soft/65 text-sm">

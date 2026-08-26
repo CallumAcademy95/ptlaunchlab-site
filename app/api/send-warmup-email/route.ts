@@ -53,7 +53,7 @@ Write Email 1 of 3 in a nurture sequence. This email:
 - Feels personal, not like a newsletter. Like Miles is talking directly to them
 - Acknowledges what they said in the quiz and their motivations and fears
 - Reinforces why the ${path.title} path is right for them specifically
-- Briefly explains what PT Launch Lab does and why it's different (mentorship plus qualification plus guaranteed gym interviews, built by PTs who've done £500K independently)
+- Briefly explains what PT Launch Lab does and why it's different (mentorship plus qualification plus a guaranteed gym interview, built by PTs who've done £500K independently)
 - End with a natural sentence directing them to the two buttons below the email: one to watch the free 90 Day PT Plan on YouTube, one to book a free strategy call. Do not write out any URLs. Just reference them naturally as "the buttons below" or "the links below".
 - Ends with a personal sign-off from Miles
 

@@ -48,7 +48,7 @@ const faqSchema = {
       name: "How much does the PT Launch Lab course cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The course costs £1,599 for full payment, or £599 deposit followed by 5 monthly payments of £200. The £1,599 is the total cost — it includes our £500 business mentorship community, your personal tutor, the full NCFE Level 3 qualification, and access to our gym-partnership interview pipeline. Nothing is bolted on as a paid upgrade.",
+        text: "The course costs £1,599 for full payment, or £599 deposit followed by 5 monthly payments of £200. The £1,599 is the total cost — it includes our £500 business mentorship community, your personal tutor, the full NCFE Level 3 qualification, and the guaranteed gym interview you get on qualifying. Nothing is bolted on as a paid upgrade.",
       },
     },
     {
@@ -72,7 +72,7 @@ const faqSchema = {
       name: "What is the guaranteed gym interview?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "On completion of your qualification, PT Launch Lab makes direct introductions to gym employers in our network who are actively hiring PTs. These are warm introductions — not job board listings. Our founders have hired 500+ PTs and use those relationships to get you in front of the right people.",
+        text: "On completion of your qualification, PT Launch Lab arranges at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. It is a warm introduction rather than a job board listing. Our founders have hired 500+ PTs and use those relationships to get you in front of the right person.",
       },
     },
     {

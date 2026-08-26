@@ -111,9 +111,15 @@ export default function PrivacyPage() {
               {ul([
                 "NCFE — qualification awarding body. Receives your name, DOB, NI number and address for qualification registration.",
                 "Stripe — payment processor. Handles card payments securely. PT Launch Lab does not store your card details. Stripe is PCI DSS compliant.",
+                "Supabase — database provider. Our online learning platform stores its records, including your name, email address and course progress, in a secure Supabase database.",
+                "Resend — transactional email provider. Sends service emails such as enrolment confirmations and course notifications. Receives your name and email address.",
+                "MailerLite — email marketing platform. If you submit a form on this site, such as the quiz, the career planner or a webinar registration, your name and email address are added to our mailing list. Every email includes an unsubscribe link.",
                 "Zapier — automation platform. Used to transfer enrolment data to our internal records (Google Sheets). Data is processed in transit only.",
                 "Google (Google Sheets / Google Workspace) — enrolment records are stored in a secure, access-controlled Google Sheet.",
-                "Merve — the learning platform through which course content is delivered. Your name and email are shared for course access.",
+                "Google Analytics — website and conversion analytics. Receives event data about how this site is used, including purchase events sent from our server.",
+                "Meta (Facebook and Instagram) — advertising measurement. When you submit a form on this site or complete a purchase, we send Meta a hashed (scrambled) version of details such as your email address, phone number, name, postcode and country, so we can measure how our adverts perform. Hashing means Meta does not receive these details in readable form.",
+                "Anthropic — provider of the AI assistant in our website chat. Messages you type into the chat are sent to Anthropic in order to generate a reply. Please do not enter sensitive personal information into the chat.",
+                "Calendly — appointment booking. If you book a call with us, Calendly receives your name, email address and the details of your booking.",
                 "Vercel — our website hosting provider. Processes web requests and API calls.",
                 "CookieYes — our cookie consent management platform. Stores your cookie preferences to ensure we only set non-essential cookies with your consent. CookieYes processes consent logs in accordance with GDPR.",
               ])}

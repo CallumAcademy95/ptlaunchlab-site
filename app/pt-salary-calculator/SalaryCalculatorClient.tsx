@@ -411,7 +411,7 @@ export default function SalaryCalculatorClient() {
                   </li>
                   <li>
                     <strong className="text-white">2. Get into a partner gym.</strong>{" "}
-                    Year 1 income is decided by access to clients more than skill. PT Launch Lab guarantees interviews with our partner gym network.
+                    Year 1 income is decided by access to clients more than skill. PT Launch Lab arranges at least one interview for you when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf.
                   </li>
                   <li>
                     <strong className="text-white">3. Build the book to £40k+ by year 2.</strong>{" "}

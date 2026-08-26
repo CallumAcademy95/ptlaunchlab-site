@@ -879,7 +879,39 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
 
 async function handleInstalmentFailed(invoice: StripeInvoice) {
   const subId = invoiceSubscriptionId(invoice);
-  if (!subId) return;
+
+  // An invoice with no subscription attached used to return here silently, so a
+  // one-off charge could fail and nobody was ever told. A £200 invoice raised on
+  // 3 February 2026 sat `open` for seven months that way. It is rare enough to
+  // deserve a short alert rather than the full instalment breakdown below, which
+  // needs subscription metadata this invoice does not have.
+  if (!subId) {
+    const amount = (invoice.amount_due ?? 0) / 100;
+    const who = invoice.customer_name || invoice.customer_email || "unknown customer";
+    console.warn(`[stripe-webhook] invoice FAILED with no subscription — ${invoice.id} (${who})`);
+    if (!process.env.RESEND_API_KEY) return;
+    try {
+      await resend.emails.send({
+        from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+        to: ADMIN_EMAIL,
+        subject: `⚠️ Payment failed (not an instalment plan): ${who} — £${amount}`,
+        html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
+          <p style="font-size:15px;">A payment of <strong>£${amount}</strong> failed for
+          <strong>${who}</strong>, on an invoice with no instalment plan attached.</p>
+          <p style="font-size:14px;color:#4A6280;">Because there is no subscription, Stripe may not
+          retry this on its own and none of the instalment tracking applies. It needs looking at by
+          hand.</p>
+          <p style="font-size:13px;">Invoice <code>${invoice.id}</code>${
+            invoice.hosted_invoice_url ? ` · <a href="${invoice.hosted_invoice_url}">view invoice</a>` : ""
+          }</p>
+          <p style="font-size:13px;color:#4A6280;">Course access is unaffected — this is a billing alert only.</p>
+        </div>`,
+      });
+    } catch (err) {
+      console.error("[stripe-webhook] orphan-invoice-failure email failed:", err);
+    }
+    return;
+  }
 
   const sub = await getSubscription(subId);
   if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return;

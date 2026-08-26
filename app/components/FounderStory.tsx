@@ -34,7 +34,7 @@ export default function FounderStory() {
             Callum, Miles, and Ryan didn&apos;t start out as course providers. They started as gym owners — building Ultimate Shred from scratch into a business turning over £500,000 a year. Along the way, they hired hundreds of personal trainers. And they saw the same problem, again and again: talented people who&apos;d done the qualification, who loved fitness, who genuinely wanted to help people — but had no idea how to actually run a PT business. They were qualified. They just weren&apos;t ready.
           </p>
           <p className="text-soft/75 text-[16px] leading-relaxed mb-8">
-            PT Launch Lab was built to close that gap. Every module, every piece of business training, every guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk — and who know exactly what separates the PTs who build thriving careers from the ones who quietly give up six months after qualifying.
+            PT Launch Lab was built to close that gap. Every module, every piece of business training, the guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk — and who know exactly what separates the PTs who build thriving careers from the ones who quietly give up six months after qualifying.
           </p>
 
           {/* Founder photo strip */}
@@ -84,7 +84,7 @@ export default function FounderStory() {
             <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Student Success Story</p>
             <h4 className="text-white font-bold text-lg mb-2">Gemma&apos;s Journey: Corporate to Coaching</h4>
             <p className="text-soft/70 text-sm leading-relaxed">
-              Gemma left a corporate career behind and retrained through PT Launch Lab. She had a personal tutor from day one, completed in 12 weeks around her job, and walked into guaranteed gym interviews on the other side. Now she runs her own PT business, earns more than she ever did in the office, and hasn&apos;t dreaded a Monday since.
+              Gemma left a corporate career behind and retrained through PT Launch Lab. She had a personal tutor from day one, completed in 12 weeks around her job, and walked into a guaranteed gym interview on the other side. Now she runs her own PT business, earns more than she ever did in the office, and hasn&apos;t dreaded a Monday since.
             </p>
           </div>
         </div>

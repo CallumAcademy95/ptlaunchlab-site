@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "PT Launch Lab",
     title: "PT Launch Lab — Become a Qualified Personal Trainer",
     description:
-      "NCFE Level 3 PT qualification, 100% online. Built by gym owners who've hired 500+ trainers. Ofqual regulated, CIMSPA recognised, guaranteed gym interviews.",
+      "NCFE Level 3 PT qualification, 100% online. Built by gym owners who've hired 500+ trainers. Ofqual regulated, CIMSPA recognised, a guaranteed gym interview.",
     url: "https://ptlaunchlab.co.uk",
     images: [
       {
@@ -101,7 +101,7 @@ export default function RootLayout({
                   },
                   image: "https://ptlaunchlab.co.uk/og-image.png",
                   description:
-                    "NCFE Level 3 Personal Trainer qualification, 100% online, built by gym owners. Ofqual regulated, CIMSPA recognised. Business mentorship and guaranteed gym interviews included.",
+                    "NCFE Level 3 Personal Trainer qualification, 100% online, built by gym owners. Ofqual regulated, CIMSPA recognised. Business mentorship and a guaranteed gym interview included.",
                   foundingDate: "2024",
                   founders: [
                     { "@type": "Person", name: "Callum Brown" },

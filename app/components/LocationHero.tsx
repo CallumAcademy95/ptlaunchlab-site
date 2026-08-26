@@ -78,7 +78,7 @@ export default function LocationHero({ location, headline }: { location: string;
               <span className="hidden sm:inline opacity-40">·</span>
               <span>£500 Mentorship Included</span>
               <span className="hidden sm:inline opacity-40">·</span>
-              <span>Guaranteed Gym Interviews</span>
+              <span>Guaranteed Gym Interview</span>
               <span className="hidden sm:inline opacity-40">·</span>
               <span>500+ PTs Hired</span>
               <span className="hidden sm:inline opacity-40">·</span>

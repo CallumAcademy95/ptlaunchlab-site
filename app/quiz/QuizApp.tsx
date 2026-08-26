@@ -320,7 +320,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
                   <svg viewBox="0 0 14 14" fill="none" className="w-3 h-3 text-gold">
                     <path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  Guaranteed gym interviews
+                  Guaranteed gym interview
                 </span>
                 <span className="flex items-center gap-1.5">
                   <svg viewBox="0 0 14 14" fill="none" className="w-3 h-3 text-gold">
