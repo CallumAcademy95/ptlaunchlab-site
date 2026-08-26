@@ -377,6 +377,9 @@ export default function EnrolmentFlow({
   const INSTALMENT_PENCE = 20_000;
   const INSTALMENT_COUNT = 5;
   const depositTotalPence = DEPOSIT_PENCE + INSTALMENT_COUNT * INSTALMENT_PENCE;
+  // Total shown in the instalment terms block. SEPT99_TOTAL is already in
+  // pounds; depositTotalPence is not.
+  const instalmentPlanTotal = isSept99 ? SEPT99_TOTAL : depositTotalPence / 100;
 
   // ─── Render ───────────────────────────────────────────────────────────
   return (
@@ -462,7 +465,7 @@ export default function EnrolmentFlow({
             {isSept99 && (
               <button onClick={() => pay("sept99")} disabled={submitting}
                 className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes midnight Sunday</p>
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes 11:59pm Sunday</p>
                 <p className="text-white font-bold text-2xl mb-1">Start today</p>
                 <p className="text-gold text-4xl font-bold mb-1">£{SEPT99_ENTRY}</p>
                 <p className="text-soft text-xs mb-3">
@@ -536,6 +539,50 @@ export default function EnrolmentFlow({
                   {submitting ? "Taking you to checkout…" : `Pay £${(DEPOSIT_PENCE / 100).toLocaleString()} Deposit →`}
                 </div>
               </button>
+            </div>
+
+            {/* The certificate condition and the instalment mandate are material
+                terms of what someone is buying, so they belong on the screen
+                where the purchase is agreed rather than only behind a link to
+                the T&Cs. Wording mirrors "Certification" in app/terms/page.tsx.
+                Rendered unconditionally: an instalment option is always on this
+                screen, either the September £99 entry or the £599 deposit. */}
+            <div className="bg-deep border border-gold/25 rounded-2xl p-6">
+              <p className="text-white font-bold text-sm mb-3">
+                If you spread the cost, here is what you are agreeing to
+              </p>
+              <ul className="text-soft text-[13px] leading-relaxed space-y-2.5">
+                {INSTALMENTS_ENABLED && (
+                  <li className="flex gap-2.5">
+                    <span className="text-gold shrink-0">·</span>
+                    <span>
+                      Your card is securely saved and £{(INSTALMENT_PENCE / 100).toLocaleString()} is
+                      taken automatically each month for {INSTALMENT_COUNT} months, starting 30 days
+                      from today. Total £{instalmentPlanTotal.toLocaleString()}.
+                    </span>
+                  </li>
+                )}
+                <li className="flex gap-2.5">
+                  <span className="text-gold shrink-0">·</span>
+                  <span>
+                    The {INSTALMENT_COUNT} payments are due in full. They run whether you finish the
+                    course in three months or ten, and finishing your assessments early does not bring
+                    them forward.
+                  </span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="text-gold shrink-0">·</span>
+                  <span>
+                    <span className="text-white">Your NCFE certificate is claimed once the course fee
+                    has been paid in full</span>, after the final payment clears rather than before.
+                    Your course access is not affected: every unit is open from day one.
+                  </span>
+                </li>
+              </ul>
+              <p className="text-faint text-[11px] mt-4">
+                Set out in full in our{" "}
+                <a href="/terms" className="text-gold hover:underline">terms and conditions</a>.
+              </p>
             </div>
 
             {/* Reassurance — what happens after payment */}

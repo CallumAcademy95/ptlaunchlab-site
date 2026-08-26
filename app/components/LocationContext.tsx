@@ -46,7 +46,7 @@ export default function LocationContext({ locationSlug, locationName, region }: 
           {[
             { q: "How long does it take to qualify?", a: "Most students complete the NCFE Level 2 & 3 in 4–8 weeks studying part-time. The course is self-paced and fully online, so you set the schedule." },
             { q: "Is the qualification recognised by gyms?", a: "NCFE Level 3 is regulated by Ofqual under reference 603/4388/6 and carries CIMSPA recognition. It sits on Ofqual's public register, so an employer or insurer can check it without taking your word for it." },
-            { q: "Do I get help finding work after qualifying?", a: "Yes. Guaranteed gym interviews are built into the course — direct introductions to our partner gym network, not a generic CV drop." },
+            { q: "Do I get help finding work after qualifying?", a: "Yes. A guaranteed gym interview is built into the course: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. A warm introduction, not a generic CV drop." },
           ].map((item) => (
             <div key={item.q} className="bg-[#0D3559] border border-[#3B82F6]/20 rounded-xl p-5">
               <h3 className="text-white font-semibold text-sm mb-2">{item.q}</h3>

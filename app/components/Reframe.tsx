@@ -2,7 +2,7 @@ const futures = [
   "A fully recognised Level 3 PT qualification — NCFE, Ofqual-regulated, CIMSPA-approved",
   "Lifetime access to the Mentorship Hub — the structured path from qualifying to your first paying client (£500 product, bundled free)",
   "A real understanding of the business of being a PT: pricing, client retention, marketing yourself",
-  "Guaranteed gym interviews lined up for when you graduate",
+  "A guaranteed gym interview lined up for when you graduate",
   "A personal tutor who's guided you through every unit",
   "Confidence walking into any gym in the UK and getting hired",
 ];

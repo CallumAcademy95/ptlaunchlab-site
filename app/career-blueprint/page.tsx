@@ -47,7 +47,7 @@ const comparison = [
 
 const roadmap = [
   { step: "01", title: "Join", body: "Enrol in minutes. Personal tutor introduced within 24 hours." },
-  { step: "02", title: "Study", body: "100% online via the Merve app, around your job. Most finish in 12–20 weeks." },
+  { step: "02", title: "Study", body: "100% online, around your job. Most finish in 12–20 weeks." },
   { step: "03", title: "Qualify", body: "NCFE Level 2 + Level 3, Ofqual regulated. Free resubmissions until you pass." },
   { step: "04", title: "Business mentoring", body: "The Mentorship Hub teaches pricing, clients and marketing — as a system." },
   { step: "05", title: "First client", body: "Warm introductions into our partner gym network. Start earning while you build." },
@@ -64,7 +64,7 @@ const included = [
   "Client & programme templates",
   "Personal tutor (24h)",
   "Free resubmissions — no cap",
-  "Student app (Merve)",
+  "Student learning app",
 ];
 
 const faqs = [

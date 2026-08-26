@@ -28,7 +28,7 @@ const locationInsights: Record<string, LocationContent> = {
   leeds: {
     marketContext: "Leeds is the commercial hub of Yorkshire and one of the fastest-growing cities in the UK. Its thriving business district, large student population across three major universities, and expanding suburban areas create strong and consistent demand for personal training at every level.",
     opportunity: "Leeds has seen consistent growth in both gym openings and membership numbers over the past five years. The city's mix of students, young professionals, and established families means PT clients range from first-time exercisers to experienced athletes — giving newly qualified trainers a wide target market.",
-    whyOnline: "As PT Launch Lab's home region, Leeds and West Yorkshire are at the centre of our gym partner network. Studying online from Leeds gives you the same qualification — and the same guaranteed interview access — as studying anywhere else in the UK, with the added advantage of our direct local connections.",
+    whyOnline: "As PT Launch Lab's home region, Leeds and West Yorkshire are at the centre of our gym partner network. Studying online from Leeds gives you the same qualification — and the same guaranteed gym interview — as studying anywhere else in the UK, with the added advantage of our direct local connections.",
     marketSize: "Leeds supports over 200 gyms and fitness facilities across the city and its suburbs. The city is home to multiple PureGym, The Gym Group and Nuffield Health sites, alongside a large independent sector.",
   },
   liverpool: {
@@ -100,7 +100,7 @@ const locationInsights: Record<string, LocationContent> = {
   hull: {
     marketContext: "Hull and the East Yorkshire coast have seen significant investment in fitness infrastructure over the past decade, with the city's UK City of Culture legacy driving renewed focus on community health and wellbeing. The city's compact geography means gyms serve dense, loyal memberships — giving PTs strong client retention potential.",
     opportunity: "Hull's PT market is less saturated than major cities, creating genuine opportunity for newly qualified trainers who are prepared to build their client base professionally. The business training built into the PT Launch Lab course is specifically designed for this kind of market entry.",
-    whyOnline: "Studying online from Hull means qualifying without travelling to training facilities in Leeds or Sheffield. You get the same NCFE Level 3 qualification, the same personal tutor, and the same guaranteed interviews — from your own city.",
+    whyOnline: "Studying online from Hull means qualifying without travelling to training facilities in Leeds or Sheffield. You get the same NCFE Level 3 qualification, the same personal tutor, and the same guaranteed gym interview — from your own city.",
     marketSize: "Hull and East Yorkshire support over 100 gyms and fitness facilities. National operators including PureGym and The Gym Group have Hull presence alongside a strong independent gym sector.",
   },
 };
@@ -110,7 +110,7 @@ const regionInsights: Record<string, LocationContent> = {
   "West Yorkshire": {
     marketContext: "West Yorkshire is PT Launch Lab's home region — the heart of our gym partner network and the market we know better than any other. The region's mix of major cities, commuter towns, and suburban areas creates a broad and accessible PT market with strong employment opportunities.",
     opportunity: "West Yorkshire's fitness market is growing alongside the region's wider economic development. Leeds, Bradford, Huddersfield, and Wakefield all have active gym sectors that regularly recruit qualified PTs — and PT Launch Lab's direct relationships with gym operators give our graduates a real advantage.",
-    whyOnline: "Studying online from West Yorkshire means qualifying in PT Launch Lab's own backyard. Our guaranteed gym interview network is strongest here, and our founders' relationships with local gym operators are direct and longstanding.",
+    whyOnline: "Studying online from West Yorkshire means qualifying in PT Launch Lab's own backyard. Our gym partner network is strongest here, and our founders' relationships with local gym operators are direct and longstanding.",
     marketSize: "West Yorkshire supports hundreds of gyms and fitness facilities across its five metropolitan districts. From national chains to independent operators, the demand for NCFE-qualified, CIMSPA-recognised personal trainers is consistent and well-established.",
   },
   "South Yorkshire": {
@@ -128,7 +128,7 @@ const regionInsights: Record<string, LocationContent> = {
   "East Yorkshire": {
     marketContext: "East Yorkshire's fitness market is centred on Hull but extends across a region with strong community gym culture and growing investment in health infrastructure. The area's loyal membership bases and tight-knit communities create strong client retention potential for newly qualified PTs.",
     opportunity: "East Yorkshire's PT market is growing as the region invests in health and fitness infrastructure. For newly qualified trainers, the lower competition compared to major cities creates real opportunity to establish a client base quickly — particularly with the business skills to market yourself effectively.",
-    whyOnline: "Studying online from East Yorkshire means qualifying without travelling to Leeds or Sheffield. You get the same nationally recognised qualification, the same personal tutor, and the same guaranteed interview access — from your own area.",
+    whyOnline: "Studying online from East Yorkshire means qualifying without travelling to Leeds or Sheffield. You get the same nationally recognised qualification, the same personal tutor, and the same guaranteed gym interview — from your own area.",
     marketSize: "East Yorkshire supports gyms and fitness facilities across Hull, Beverley, Bridlington, and surrounding towns, with a mix of national operators and independent gyms that regularly recruit NCFE-qualified personal trainers.",
   },
   "Greater Manchester": {
@@ -170,7 +170,7 @@ const regionInsights: Record<string, LocationContent> = {
   "South West England": {
     marketContext: "The South West — spanning Bristol, Bath, Exeter, Plymouth, and the wider region — has one of the UK's strongest fitness cultures. Bristol in particular leads nationally for health engagement, and the region's outdoor lifestyle, university towns, and growing professional demographic all create consistent PT demand.",
     opportunity: "The South West's fitness market rewards trainers who combine technical credentials with the ability to build their own client base. The region has a strong tradition of self-employed fitness professionals, and the business training built into the PT Launch Lab course is specifically designed to support this route.",
-    whyOnline: "Studying online from the South West means qualifying without travelling to large city training facilities. Whether you're in Bristol, Bath, Exeter, or a smaller town, you access the same qualification, the same tutor, and the same guaranteed interviews.",
+    whyOnline: "Studying online from the South West means qualifying without travelling to large city training facilities. Whether you're in Bristol, Bath, Exeter, or a smaller town, you access the same qualification, the same tutor, and the same guaranteed gym interview.",
     marketSize: "The South West supports hundreds of gyms and fitness facilities across its major cities and market towns. National operators and independent gyms both recognise NCFE Level 3 as the standard PT qualification across the region.",
   },
   "Scotland": {
@@ -196,7 +196,7 @@ const regionInsights: Record<string, LocationContent> = {
 // Generic fallback for any location not specifically covered
 const genericContent: LocationContent = {
   marketContext: "The UK fitness industry employs over 100,000 personal trainers and continues to grow year on year. Demand for qualified PTs remains strong across the country, in market towns as well as major cities.",
-  opportunity: "Regardless of where you're based, the fundamentals of a successful PT career are the same: a recognised qualification, a strong business foundation, and the ability to build and retain a client base. PT Launch Lab delivers all three — and the guaranteed gym interview network extends across the UK.",
+  opportunity: "Regardless of where you're based, the fundamentals of a successful PT career are the same: a recognised qualification, a strong business foundation, and the ability to build and retain a client base. PT Launch Lab delivers all three — and the guaranteed gym interview applies wherever in the UK you are.",
   whyOnline: "Studying online means your location doesn't limit your ability to qualify. Whether you're in a major city or a smaller town, you access the same NCFE Level 3 qualification, the same personal tutor, and the same business training that our graduates have used to build PT careers across the UK.",
   marketSize: "The UK gym market is worth over £5 billion and supports thousands of facilities nationwide. NCFE Level 3 is regulated by Ofqual under reference 603/4388/6, which is what makes it portable between employers rather than tied to the provider who taught it.",
 };

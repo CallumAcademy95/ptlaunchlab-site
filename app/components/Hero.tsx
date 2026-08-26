@@ -101,7 +101,7 @@ export default async function Hero() {
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ £500 Mentorship Included Free</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>✓ Guaranteed Gym Interviews</span>
+              <span>✓ Guaranteed Gym Interview</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-30">·</span>
