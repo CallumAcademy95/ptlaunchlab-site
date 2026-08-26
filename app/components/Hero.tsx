@@ -21,8 +21,8 @@ export default async function Hero() {
     : "NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Qualify in 8–16 Weeks";
 
   const positioningCopy = isYorkshire
-    ? "Built in Yorkshire by gym owners who've hired over 500 personal trainers across the UK — so you learn what actually gets you employed, not just qualified."
-    : "The UK's only PT course built by gym owners who've hired over 500 personal trainers — so you learn what actually gets you employed, not just qualified.";
+    ? "Built in Yorkshire by gym owners who've hired over 500 personal trainers, so the course covers getting hired as well as getting qualified."
+    : "Built by gym owners who've hired over 500 personal trainers, so the course covers getting hired as well as getting qualified.";
 
   return (
     <section
@@ -71,7 +71,7 @@ export default async function Hero() {
 
             {/* Sub */}
             <p className="text-[15px] text-soft/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              An 8–16 week online Level 3 qualification with business training, guaranteed gym interviews, and our <span className="text-white font-semibold">£500 business mentorship community — included free</span>. The bit other UK courses charge for separately, or skip entirely.
+              An 8–16 week online Level 3 qualification with business training and our <span className="text-white font-semibold">£500 business mentorship community, included in the fee</span> rather than sold on afterwards.
             </p>
 
             {/* CTA buttons */}
@@ -105,7 +105,7 @@ export default async function Hero() {
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>{isYorkshire ? "✓ Yorkshire Workshops Available" : "✓ 100% Online — Study from Anywhere in the UK"}</span>
+              <span>{isYorkshire ? "✓ Yorkshire Workshops Available" : "✓ 100% Online, Study from Anywhere in the UK"}</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ Study Around Your Current Job</span>
             </div>

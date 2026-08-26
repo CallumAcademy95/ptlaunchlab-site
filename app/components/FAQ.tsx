@@ -4,7 +4,7 @@ import { useState } from "react";
 const faqs = [
   {
     q: "Is the Level 3 qualification actually recognised? I've seen cheap courses that don't seem legitimate.",
-    a: "Yes — and this is the right question to ask. Our qualification is delivered through NCFE, regulated by Ofqual (the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. NCFE is the qualification name UK gym managers ask for by default on their job listings — PureGym, David Lloyd, Nuffield Health, JD Gyms, and independent operators alike. Some UK academies use Focus Awards or their own self-branded certifications. NCFE Level 3 is the one a gym manager recognises on a CV without you needing to explain it.",
+    a: "Yes. The qualification is delivered through NCFE, regulated by Ofqual under reference 603/4388/6 (Ofqual is the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. Ofqual publishes the qualification on its own register, so you can check it yourself rather than take our word for it. That is the difference between a regulated qualification and a self-branded certificate.",
   },
   {
     q: "What exactly are the \"guaranteed gym interviews\"? That sounds too good to be true.",
@@ -12,27 +12,27 @@ const faqs = [
   },
   {
     q: "I'm working full-time. Is there any realistic way to study around my job?",
-    a: "Yes — and it's the most common situation our students are in. The course is 100% online with no fixed class times. Most students study in evenings and weekends. If you put in 8–10 hours per week, you'll finish in around 12 weeks. If you want to push harder, you can complete in 8. If life gets busy, you have the full 16 weeks without penalty. Your tutor will help you build a realistic schedule in week one.",
+    a: "Yes, and it is the most common situation our students are in. The course is 100% online with no fixed class times. Most students study in evenings and weekends. If you put in 8–10 hours per week, you'll finish in around 12 weeks. If you want to push harder, you can complete in 8. If life gets busy, you have the full 16 weeks without penalty. Your tutor will help you build a realistic schedule in week one.",
   },
   {
     q: "I've never been great at studying. What if I fail the assessments?",
-    a: "You have a personal tutor for exactly this reason. Before you submit any assessment, your tutor reviews your work, gives you feedback, and tells you whether it's ready. Most students don't fail — because the support system catches problems before submission. If you do need to resubmit anything, that's included at no extra cost. We want you to qualify, not to catch you out.",
+    a: "You have a personal tutor for exactly this reason. Before you submit any assessment, your tutor reviews your work, gives you feedback, and tells you whether it's ready. The point of that step is to catch problems before you submit rather than after. If you do need to resubmit anything, that is included at no extra cost. We want you to qualify, not to catch you out.",
   },
   {
     q: "How much can I realistically earn as a PT?",
-    a: "Honestly, it varies — and we'll never give you a number that's misleading. A PT working in a gym on an employed basis typically earns £20,000–£28,000 to start, rising quickly with experience. Self-employed PTs who build their own client base regularly earn £35,000–£50,000+. The business training in our course is specifically designed to get you to that upper range faster — because knowing how to get and keep clients is the difference. Our founders built a £500K/year fitness business. They teach what actually works.",
+    a: "It varies, and we will not give you a number that flatters the course. A PT working in a gym on an employed basis typically earns £20,000–£28,000 to start, rising with experience. Self-employed PTs who build their own client base earn more, but that depends entirely on how many clients they keep. The business training in the course is aimed at that second problem, because getting qualified and getting clients are two different skills. Our founders have hired over 500 PTs and built a £500k/year fitness business, and that is the part they teach.",
   },
   {
     q: "Why should I choose PT Launch Lab over a cheaper course?",
-    a: "If price is the only factor, cheaper courses exist. Here's the honest comparison: most cheaper courses give you the content to pass the exam, and nothing else. No personal tutor. No business mentorship. No job pipeline. You qualify, then you're on your own. At £1,599 PT Launch Lab sits in the middle of the UK market on price — but the bundle is unmatched: the NCFE Level 3 qualification UK gyms ask for by default, a personal tutor assigned to you within 24 hours, our £500 business mentorship included at no extra cost, and warm-introduction interviews to gyms our team has hired from. Most UK academies charge £500–£3,000 separately for the mentorship piece, or skip it entirely. We bundle everything into the £1,599 — nothing is sold as a paid upgrade.",
+    a: "If price is the only factor, cheaper courses exist. What £1,599 buys here is the NCFE Level 3 qualification, a personal tutor assigned to you within 24 hours, and the £500 business mentorship. Everything is in the one fee and nothing is sold as a paid upgrade afterwards. Whether that is worth more than a cheaper course depends on how much support you want once the content is done.",
   },
   {
     q: "What does the business mentorship actually do for me?",
-    a: "It walks you from qualifying to your first paying client. You get the Mentorship Hub — your private dashboard built around that one job — plus our Skool community for daily peer contact. On the Hub you always know the next concrete thing to work on, and Callum's a message away when you're stuck. Most academies charge £500–£3,000 to bolt this on after qualification, or skip it entirely. We include it.",
+    a: "It walks you from qualifying to your first paying client. You get the Mentorship Hub, your private dashboard built around that one job, plus our Skool community for daily peer contact. On the Hub you always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee rather than sold on afterwards.",
   },
   {
     q: "I'm in my 30s or 40s — am I too old to start this?",
-    a: "No. Some of the most successful PTs are career-changers in their 30s and 40s. Life experience, empathy, and maturity are genuine assets in this profession — clients often prefer a trainer who understands what it's like to manage a job, a family, and a fitness goal at the same time. With the business training we include, career-changers with professional backgrounds often build their client base faster than 22-year-olds straight out of college.",
+    a: "No. Plenty of PTs are career-changers in their 30s and 40s. Life experience is an asset in this job: a lot of clients want a trainer who knows what it is like to fit training around work and a family, because that is the problem they are asking you to solve.",
   },
   {
     q: "When can I start?",
@@ -57,7 +57,7 @@ export default function FAQ() {
         <p className="text-soft/60 text-center text-base mb-12 max-w-xl mx-auto">
           If you have a question that isn&apos;t here,{" "}
           <a href="/book-call" className="text-gold hover:underline">book a free call</a>{" "}
-          — we&apos;ll give you a straight answer.
+          and we&apos;ll give you a straight answer.
         </p>
 
         <div className="space-y-2">

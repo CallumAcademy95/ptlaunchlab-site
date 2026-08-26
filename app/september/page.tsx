@@ -79,8 +79,8 @@ export default function SeptemberOfferPage() {
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft">
             {state === "closed" ? (
               <>
-                It ran from Friday to midnight on Sunday and it is no longer available.
-                The standard options are below — the qualification is the same one.
+                It ran from Friday to midnight on Sunday and is no longer available.
+                The standard options are below, and the qualification is the same one.
               </>
             ) : (
               <>
@@ -191,7 +191,7 @@ export default function SeptemberOfferPage() {
         {state !== "closed" && (
           <section className="mx-auto max-w-3xl px-6 py-14">
             <div className="border-l-2 border-gold/50 pl-6">
-              <h2 className="text-2xl font-bold sm:text-3xl">Know exactly what you are committing to</h2>
+              <h2 className="text-2xl font-bold sm:text-3xl">What you are committing to</h2>
               <div className="mt-5 space-y-4 text-soft">
                 <p>
                   After the £{SEPT99_ENTRY} you pay today, there are {SEPT99_INSTALMENTS} monthly
@@ -207,9 +207,9 @@ export default function SeptemberOfferPage() {
                   your certificate is claimed from NCFE once the balance is paid.
                 </p>
                 <p className="text-white">
-                  The £{SEPT99_ENTRY} makes it easier to start — but it is still worth being
-                  comfortable with £{SEPT99_MONTHLY} a month for the five months after that. If that
-                  works for you, you can begin without finding £{STANDARD_TOTAL.toLocaleString()} up front.
+                  The £{SEPT99_ENTRY} makes it easier to start. Be comfortable with
+                  £{SEPT99_MONTHLY} a month for the five months after that, and you can begin
+                  without finding £{STANDARD_TOTAL.toLocaleString()} up front.
                 </p>
               </div>
             </div>
