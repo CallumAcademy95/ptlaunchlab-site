@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 // Rendered per-request so the open/closed state is the real one. Without this the
-// page would be baked at build time and keep selling after midnight on Sunday.
+// page would be baked at build time and keep selling after the offer closes.
 export const dynamic = "force-dynamic";
 
 const included = [
@@ -51,7 +51,7 @@ export default function SeptemberOfferPage() {
         <section className="mx-auto max-w-3xl px-6 pt-16 pb-10 sm:pt-24">
           {state === "open" && (
             <p className="mb-5 inline-block border border-gold/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-gold">
-              Open now · closes midnight {formatCloses()}
+              Open now · closes 11:59pm {formatCloses()}
             </p>
           )}
           {state === "before" && (
@@ -79,7 +79,7 @@ export default function SeptemberOfferPage() {
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft">
             {state === "closed" ? (
               <>
-                It ran from Friday to midnight on Sunday and is no longer available.
+                It ran from Friday to 11:59pm on Sunday and is no longer available.
                 The standard options are below, and the qualification is the same one.
               </>
             ) : (
@@ -129,7 +129,7 @@ export default function SeptemberOfferPage() {
                   Start today for £{SEPT99_ENTRY}
                 </Link>
                 <p className="mt-4 text-sm text-faint">
-                  Closes midnight {formatCloses()}. After that the direct price returns to
+                  Closes 11:59pm {formatCloses()}. After that the direct price returns to
                   £{STANDARD_TOTAL.toLocaleString()}, with £{STANDARD_ENTRY} to start.
                 </p>
               </div>
@@ -220,7 +220,7 @@ export default function SeptemberOfferPage() {
         {state === "open" && (
           <section className="mx-auto max-w-3xl px-6 py-16 text-center">
             <h2 className="text-3xl font-bold sm:text-4xl">
-              Closes midnight {formatCloses()}
+              Closes 11:59pm {formatCloses()}
             </h2>
             <Link
               href="/enrol?offer=sept99"
