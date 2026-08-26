@@ -34,7 +34,7 @@ export default function FinalCTA() {
           You don&apos;t need to quit your job tomorrow. You don&apos;t need to have it all figured out. You just need to take the first step — with a provider that&apos;ll be with you from that step all the way to your first session as a qualified PT.
         </p>
         <p className="text-soft/55 text-base max-w-xl mx-auto mb-12 leading-relaxed">
-          Every month you wait is another month you&apos;re not earning in a career you love. If we can get you qualified in 8–16 weeks, around your current job, with guaranteed gym interviews at the end — is there a reason not to start?
+          Every month you wait is another month you&apos;re not earning in a career you love. If we can get you qualified in 8–16 weeks, around your current job, with a guaranteed gym interview at the end — is there a reason not to start?
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
@@ -57,7 +57,7 @@ export default function FinalCTA() {
 
         <div className="w-12 h-px bg-white/[0.1] mx-auto mb-6" />
         <p className="text-faint text-xs tracking-wide">
-          NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · £500 Mentorship Included · Personal Tutor · Guaranteed Gym Interviews · 8–16 Weeks
+          NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · £500 Mentorship Included · Personal Tutor · Guaranteed Gym Interview · 8–16 Weeks
         </p>
       </div>
     </section>

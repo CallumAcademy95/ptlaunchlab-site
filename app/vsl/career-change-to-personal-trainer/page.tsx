@@ -313,8 +313,8 @@ export default function CareerChangeToPersonalTrainerPage() {
               {[
                 { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
                 { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly, or pay in full. Roughly matches a single PT session per week once you qualify." },
-                { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews your work before submission so the assessments stop being scary." },
-                { tag: "Exit", title: "Employed-first, then self-employed", body: "Warm-introduction interviews into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
+                { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback, so the assessments stop being scary." },
+                { tag: "Exit", title: "Employed-first, then self-employed", body: "A warm-introduction interview into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
               ].map((row) => (
                 <div key={row.title} className="bg-card border border-white/[0.06] rounded-2xl p-6">
                   <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-2">{row.tag}</p>

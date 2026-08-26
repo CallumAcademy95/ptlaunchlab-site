@@ -35,9 +35,9 @@ type StackRow = { label: string; sub?: string; rrp: string };
 const VALUE_STACK: StackRow[] = [
   { label: "NCFE Level 2 Gym Instructor",        sub: "Ofqual regulated · the legal prerequisite", rrp: "£499" },
   { label: "NCFE Level 3 Personal Trainer",      sub: "Ofqual ref 603/4388/6 · gym-manager default", rrp: "£1,099" },
-  { label: "Personal tutor — introduced in 24h", sub: "Reviews every assessment before you submit",   rrp: "£499" },
+  { label: "Personal tutor — introduced in 24h", sub: "Reviews every unit you submit, passes it or sends it back", rrp: "£499" },
   { label: "PT Launch Lab Mentorship Hub",       sub: "Walks you from qualified to first paying client", rrp: "£500" },
-  { label: "Warm-introduction gym interviews",   sub: "Direct intros to our 500+ PT hiring network",  rrp: "Priceless" },
+  { label: "Warm-introduction gym interview",    sub: "A partner gym, or a local gym we approach for you", rrp: "Priceless" },
   { label: "Free resubmissions — no cap",        sub: "Resubmit until your tutor says it's a pass",   rrp: "£199" },
 ];
 

@@ -17,7 +17,7 @@ const painPoints = [
 
 const comparisonRows = [
   { other: "No mentoring — you're on your own",             us: "Personal tutor assigned from day one" },
-  { other: "No job help — just a certificate",              us: "Guaranteed gym interviews on graduation" },
+  { other: "No job help — just a certificate",              us: "A guaranteed gym interview on graduation" },
   { other: "No gym connections",                            us: "Active gym partnership network across the UK" },
   { other: "No business training",                          us: "Business, marketing & income systems built in" },
   { other: "Taught by lecturers, not practitioners",        us: "Taught by gym owners who've hired 500+ PTs" },
@@ -29,7 +29,7 @@ const howItWorksSteps = [
   { num: "02", icon: "📚", title: "Study around your job",      body: "Everything is in the learning app. Study mornings, evenings, weekends — whenever fits your life. No classrooms. No fixed schedule." },
   { num: "03", icon: "🎯", title: "Get mentored",               body: "Ryan and the team work with you throughout. Not a help-desk — real mentorship from people who've built the business themselves." },
   { num: "04", icon: "🏅", title: "Qualify — NCFE Level 3",     body: "Earn your Ofqual-regulated, CIMSPA-recognised Level 3 PT qualification. Every gym and insurer in the UK accepts it." },
-  { num: "05", icon: "🤝", title: "Get your gym interviews",    body: "We guarantee you interviews with our partner gyms. No other course in the UK does this. We're the ones who do the hiring." },
+  { num: "05", icon: "🤝", title: "Get your gym interview",     body: "We arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We're the ones who do the hiring, so we know what gets you through the door." },
   { num: "06", icon: "🚀", title: "Start your PT career",       body: "Walk into the gym floor qualified, confident, and with a real business plan. Not just a certificate — a career you can build on." },
 ];
 
@@ -38,7 +38,7 @@ const features = [
   { icon: "📚", title: "12 focused modules",                body: "Anatomy, nutrition, programming, client coaching — exactly what you need, nothing you don't. Built to qualify you fast and confidently.",             badge: null },
   { icon: "💼", title: "Business training built in",        body: "How to get clients, price yourself, market your services, and build recurring income. The stuff other courses skip entirely.",                          badge: null },
   { icon: "👤", title: "Your own personal tutor",           body: "They know your name, where you're at, and what you need next. Direct support whenever you need it — not a ticket system.",                            badge: "Included" },
-  { icon: "🏋️", title: "Guaranteed gym interviews",         body: "Once you qualify, we guarantee interviews with our partner gyms. We've hired 500+ PTs ourselves — we know what gets you through the door.",           badge: "Guaranteed" },
+  { icon: "🏋️", title: "Guaranteed gym interview",          body: "Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs ourselves, so we know what gets you through the door.",           badge: "Guaranteed" },
   { icon: "🎯", title: "Mentorship from Ryan & the team",   body: "Direct access to the people who built Ultimate Shred to £500K+ revenue. Real mentorship on getting clients, pricing, and staying profitable.",        badge: "Exclusive" },
 ];
 
@@ -254,7 +254,7 @@ export default function FunnelPage() {
               <div className="flex flex-wrap gap-3 md:gap-5 text-blue-200/70 text-xs animate-fade-in-up animate-delay-300">
                 <span>⭐ 5-Star Rated · 17 Reviews</span>
                 <span className="hidden sm:inline opacity-40">·</span>
-                <span>Guaranteed Gym Interviews</span>
+                <span>Guaranteed Gym Interview</span>
                 <span className="hidden sm:inline opacity-40">·</span>
                 <span>500+ PTs Hired</span>
                 <span className="hidden sm:inline opacity-40">·</span>
@@ -344,7 +344,7 @@ export default function FunnelPage() {
               {[
                 { icon: "🏋️", title: "We run real gyms", body: "Ultimate Shred is a gym we built from the ground up. We know what a gym floor looks like, what a PT shift feels like, and what gym owners actually need from their trainers." },
                 { icon: "👥", title: "We hire real PTs", body: "Over 500 personal trainers have been hired through our network. We've seen every CV, every interview, every first session. We've seen what works and what doesn't — and we've built the course around it." },
-                { icon: "🤝", title: "We have real gym partnerships", body: "When you graduate, we don't just give you a certificate and wish you luck. We connect you with our partner gym network and guarantee you interviews. No other course in the UK does this." },
+                { icon: "🤝", title: "We have real gym partnerships", body: "When you graduate, we don't just give you a certificate and wish you luck. We arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf." },
                 { icon: "💰", title: "We've built the income ourselves", body: "Callum, Miles, and Ryan built Ultimate Shred to £500K+ in revenue as independent personal trainers. The business training we give you isn't theory — it's the exact playbook we used." },
               ].map((item) => (
                 <div key={item.title} className="flex items-start gap-4">
@@ -380,7 +380,7 @@ export default function FunnelPage() {
                   &ldquo;We built the course we wish had existed when we started.&rdquo;
                 </p>
                 <p className="text-[#8CA3BF] text-sm leading-relaxed">
-                  Every module, every piece of business training, every guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk.
+                  Every module, every piece of business training, the guaranteed interview was designed by people who&apos;ve been on the hiring side of the desk.
                 </p>
               </div>
             </div>

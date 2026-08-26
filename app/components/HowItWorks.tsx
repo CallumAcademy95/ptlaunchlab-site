@@ -52,7 +52,7 @@ const steps = [
     Icon: RocketIcon,
     title: "Launch",
     subtitle: "Qualify, then get in front of a gym",
-    body: "When you complete your qualification we arrange your guaranteed gym interview: a direct introduction to a partner gym, rather than a certificate and good luck. Whether you get the job is between you and them, but getting in the room is on us.",
+    body: "When you complete your qualification we arrange your guaranteed gym interview: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Not a certificate and good luck. Whether you get the job is between you and them, but getting in the room is on us.",
     bullets: [
       "A guaranteed gym interview on completion, arranged by us",
       "CV and interview preparation included",
