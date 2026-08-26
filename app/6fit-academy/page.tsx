@@ -29,9 +29,9 @@ const config: GymConfig = {
   ],
   gymHighlights: [
     "Best Gym In The North",
-    "Best Gym In Bradford — 2 years running",
+    "Best Gym In Bradford, 2 years running",
     "Premium equipment: Gymleco, Cybex, Nautilus, Rogue",
-    "A real coaching environment — you learn where standards are set",
+    "A real coaching environment, where standards are set",
   ],
   metaTitle: "6fit PT Academy | Become a Qualified Personal Trainer at 6fit Gyms",
   metaDescription:

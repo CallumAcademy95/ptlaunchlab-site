@@ -25,20 +25,20 @@ const config: GymConfig = {
   discountAmount: 200,
   fullPrice: 1399,
   depositPrice: 599,
-  positioningSubline: "Built inside Xcelerate Gyms Edgware — a real coaching floor, not a classroom.",
+  positioningSubline: "Built inside Xcelerate Gyms Edgware: a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Xcelerate Gyms Edgware",
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
   stats: [
     { value: "HA8",      label: "Edgware, North London" },
-    { value: "2021",     label: "Open Since — Award-Winning Gym" },
+    { value: "2021",     label: "Open Since · Award-Winning Gym" },
     { value: "Functional", label: "Dedicated CrossFit Floor" },
     { value: "Studio",   label: "Classes & Yoga Space" },
   ],
   gymHighlights: [
     "An award-winning gym floor in Edgware, open since 2021",
     "Full free-weights, resistance and cardio floor plus a dedicated CrossFit area",
-    "Studio space for group classes and yoga — you see real coaching happen every day",
+    "Studio space for group classes and yoga, where real coaching happens every day",
     "No fixed-term contracts and a genuinely mixed membership, from first-timers to serious lifters",
   ],
   metaTitle: "Xcelerate PT Academy | Become a Qualified Personal Trainer in Edgware",

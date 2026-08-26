@@ -25,7 +25,7 @@ const config: GymConfig = {
   discountAmount: 200,
   fullPrice: 1399,
   depositPrice: 599,
-  positioningSubline: "Built inside Gym n Go Forest Hill — a real coaching floor, not a classroom.",
+  positioningSubline: "Built inside Gym n Go Forest Hill, a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Gym n Go Forest Hill",
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
@@ -37,9 +37,9 @@ const config: GymConfig = {
   ],
   gymHighlights: [
     "A premium strength and free-weights floor in the heart of Forest Hill",
-    "A full class timetable — yoga, Pilates and HIIT — running alongside the gym floor",
+    "A full class timetable of yoga, Pilates and HIIT running alongside the gym floor",
     "Flexible memberships and a free guest pass, so the floor stays busy with real members",
-    "A real coaching environment in SE23 — you learn where members actually train",
+    "A real coaching environment in SE23, where members actually train",
   ],
   metaTitle: "Gym n Go PT Academy | Become a Qualified Personal Trainer in Forest Hill",
   metaDescription:

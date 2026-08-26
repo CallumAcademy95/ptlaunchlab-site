@@ -33,7 +33,7 @@ const config: GymConfig = {
   // martial arts and fitness gym with a real coaching culture already in the
   // building. Equipment lists are what every other gym page says.
   positioningSubline:
-    "Built inside HITIO Gym Orpington — a family-run gym where coaching is already what the place does.",
+    "Built inside HITIO Gym Orpington, a family-run gym where coaching is already what the place does.",
   whyThisGymHeading: "Learn Inside HITIO Gym Orpington",
   gymIntro:
     "You qualify on a floor that already runs coached sessions every day, from fitness boxing and kickboxing to strength and conditioning.",
@@ -49,7 +49,7 @@ const config: GymConfig = {
   ],
 
   gymHighlights: [
-    "A family-run gym that coaches every day — fitness boxing, kickboxing and strength and conditioning",
+    "A family-run gym that coaches every day: fitness boxing, kickboxing, and strength and conditioning",
     "Full free-weight, cardio and functional training zones, plus a dedicated group training studio",
     "Open from 5am seven days a week, so client sessions fit around whatever else you do",
     "Three hours' free parking with EV charging, and strong bus links into Orpington",

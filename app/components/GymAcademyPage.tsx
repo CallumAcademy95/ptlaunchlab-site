@@ -100,7 +100,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <p className="text-center text-xl font-bold text-black mb-10">&ldquo;I could do this as a job.&rdquo;</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
-              {["You don't know where to start", "Too many courses online — not sure who to trust", "Don't want to waste money", "Don't know if you'll actually get work after"].map(i => (
+              {["You don't know where to start", "Too many courses online, and no idea who to trust", "Don't want to waste money", "Don't know if you'll actually get work after"].map(i => (
                 <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-100">
                   <span className="text-gray-300 shrink-0">—</span>
                   <span className="text-gray-500 text-sm">{i}</span>
@@ -145,8 +145,8 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[
                 { icon: "🎓", title: "Full PT Qualification", body: "Study 100% online around your current job.", items: ["Level 2 Gym Instructor", "Level 3 Personal Trainer", "Industry recognised & Ofqual regulated"] },
-                { icon: "🧠", title: "Mentorship Included", body: "This is where most courses fail — we don't leave you on your own.", items: ["Support throughout your qualification", "Real-world advice from industry pros", "How to actually succeed as a PT"] },
-                { icon: "🏋️", title: "Gym Pathway", body: `Not just qualified — a real route to working at ${c.gymName} as a self-employed PT. Interview opportunities available on completion. This is an independent contractor arrangement, not a salaried position.`, items: [`Interview opportunities at ${c.gymName}`, "Learn how gyms actually work", "Build confidence on the gym floor"] },
+                { icon: "🧠", title: "Mentorship Included", body: "You are not left to work it out on your own.", items: ["Support throughout your qualification", "Real-world advice from industry pros", "How to actually succeed as a PT"] },
+                { icon: "🏋️", title: "Gym Pathway", body: `A real route to working at ${c.gymName} as a self-employed PT once you qualify. Interview opportunities available on completion. This is an independent contractor arrangement, not a salaried position.`, items: [`Interview opportunities at ${c.gymName}`, "Learn how gyms actually work", "Build confidence on the gym floor"] },
                 { icon: "💰", title: "How You Make Money", body: "Income, not just certificates.", items: ["1-1 PT sessions", "Online coaching", "Hybrid coaching models"] },
               ].map(card => (
                 <div key={card.title} className="bg-gray-50 border border-gray-100 rounded-2xl p-7">
@@ -234,7 +234,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 <div>
                   <p className="font-black uppercase text-sm tracking-wide text-gray-400 mb-4">You don&apos;t need to:</p>
                   <ul className="space-y-3">
-                    {["Quit your job to start", "Have any experience", "Be perfect — just ready"].map(i => (
+                    {["Quit your job to start", "Have any experience", "Be perfect"].map(i => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
                         <span className="text-gray-300 shrink-0 font-bold">✗</span><span>{i}</span>
                       </li>
@@ -288,7 +288,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Spread the Cost</p>
                 <p className="text-black font-black text-2xl mb-1">Deposit Plan</p>
                 <p className="font-black text-4xl text-black mb-1">£{c.depositPrice.toLocaleString()}</p>
-                <p className="text-gray-400 text-sm mb-4">then £200 × {monthlyPayments} monthly payments — £{depositPlanTotal.toLocaleString()} total</p>
+                <p className="text-gray-400 text-sm mb-4">then £200 × {monthlyPayments} monthly payments, £{depositPlanTotal.toLocaleString()} total</p>
                 <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
                   Start with Deposit →
                 </a>
@@ -318,7 +318,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
       <footer className="bg-black border-t border-white/10 py-6 px-6 text-center">
         <p className="text-white/30 text-xs mb-2">
-          {c.gymName} is a gym partner of PT Launch Lab. All training, qualifications, and learning are delivered solely by PT Launch Lab — not by {c.gymName}. Any gym pathway or interview opportunity is subject to availability and is not a guarantee of employment. Self-employed PT arrangements involve independent contractor status, not PAYE employment.
+          {c.gymName} is a gym partner of PT Launch Lab. All training, qualifications, and learning are delivered solely by PT Launch Lab, not by {c.gymName}. Any gym pathway or interview opportunity is subject to availability and is not a guarantee of employment. Self-employed PT arrangements involve independent contractor status, not PAYE employment.
         </p>
         <p className="text-white/30 text-xs">
           Powered by PT Launch Lab · NCFE Accredited Centre No. 9002788 ·{" "}

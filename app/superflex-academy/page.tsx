@@ -20,7 +20,7 @@ const config: GymConfig = {
   discountAmount: 200,
   fullPrice: 1399,
   depositPrice: 599,
-  positioningSubline: "Built inside Superflex 2.0 Gym, Upton — a real coaching floor, not a classroom.",
+  positioningSubline: "Built inside Superflex 2.0 Gym in Upton: a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Superflex 2.0 Gym",
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
@@ -34,7 +34,7 @@ const config: GymConfig = {
     "A positive, no-ego environment where effort is respected and progress is celebrated",
     "Full free-weights and strength & conditioning floor",
     "Group classes, sports therapy and nutritional advice on site",
-    "A real coaching environment in Upton — you learn where members actually train",
+    "A real coaching environment in Upton, where members actually train",
   ],
   metaTitle: "Superflex PT Academy | Become a Qualified Personal Trainer in Upton",
   metaDescription:
