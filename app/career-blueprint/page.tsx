@@ -15,13 +15,13 @@ const PAGE_URL = "https://ptlaunchlab.co.uk/career-blueprint";
 export const metadata: Metadata = {
   title: "The PT Career Blueprint — Not Just a Qualification, a Career | PT Launch Lab",
   description:
-    "Become a qualified UK personal trainer and build a career that lasts. NCFE Level 2 + 3, Ofqual regulated, business mentorship, hiring partners and community — the parts most courses leave out.",
+    "Become a qualified UK personal trainer and build a career that lasts. NCFE Level 2 + 3, Ofqual regulated, business mentorship, hiring partners and community, the parts that decide the first yet.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
     title: "The PT Career Blueprint — Not Just a Qualification, a Career",
     description:
-      "Most providers stop at the certificate. We help you qualify, get clients, and build a career in fitness. NCFE Level 2 + 3, business mentorship, hiring partners, community.",
+      "This does not stop at the certificate. We help you qualify, get clients, and build a career in fitness. NCFE Level 2 + 3, business mentorship, hiring partners, community.",
     url: PAGE_URL,
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
@@ -154,7 +154,7 @@ export default function CareerBlueprintPage() {
               Roughly <span className="text-white font-semibold">80% of newly-qualified UK PTs leave the industry within 18 months.</span> Not because they failed the exams. Because nobody taught them the part that actually matters — how to get clients, price their time, and build a business.
             </p>
             <p className="text-soft/85 text-lg leading-relaxed">
-              Most providers hand you a certificate and wish you luck. You leave qualified, but with no plan, no clients, and no idea what to do on Monday morning. <span className="text-white font-semibold">A qualification is a door. It isn&apos;t a career.</span>
+              A certificate on its own leaves the hardest part undone. You leave qualified, but with no plan, no clients, and no idea what to do on Monday morning. <span className="text-white font-semibold">A qualification is a door. It isn&apos;t a career.</span>
             </p>
           </div>
         </section>
@@ -193,7 +193,7 @@ export default function CareerBlueprintPage() {
             <div className="rounded-2xl border border-white/[0.12] overflow-hidden bg-card">
               <div className="grid grid-cols-2">
                 <div className="p-4 md:p-5 text-center border-r border-white/[0.12] bg-white/[0.03]">
-                  <p className="text-soft text-[11px] md:text-xs font-bold tracking-widest uppercase">Most providers</p>
+                  <p className="text-soft text-[11px] md:text-xs font-bold tracking-widest uppercase">A certificate alone</p>
                 </div>
                 <div className="p-4 md:p-5 text-center bg-gold/[0.10]">
                   <p className="text-gold text-[11px] md:text-xs font-bold tracking-widest uppercase">PT Launch Lab</p>

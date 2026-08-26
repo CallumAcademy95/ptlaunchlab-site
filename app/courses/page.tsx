@@ -146,7 +146,7 @@ const objections = [
   {
     quote: "What if I qualify and still can't get clients?",
     answer:
-      "This is exactly what the Mentorship Hub is built for — it walks you from qualifying to your first paying client, milestone by milestone, with Callum a message away. You also stay in the Skool community for life. Most courses qualify you and walk away. We stay until you've launched.",
+      "This is exactly what the Mentorship Hub is built for — it walks you from qualifying to your first paying client, milestone by milestone, with Callum a message away. You also stay in the Skool community for life. The part after qualifying is where this course keeps going. We stay until you've launched.",
     link: null,
   },
   {
@@ -320,7 +320,7 @@ export default function CoursesPage() {
               6 core modules. Built to get<br />you qualified <span className="text-gold">and employed.</span>
             </h2>
             <p className="text-soft/60 text-center text-lg mb-16 max-w-xl mx-auto">
-              12 modules total. These are the ones that matter most — the knowledge and skills every gym, insurer, and client expects from a qualified PT.
+              12 modules total. These are the ones that matter most — the knowledge and skills the qualification is assessed against.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {curriculum.map((mod) => (
@@ -432,7 +432,7 @@ export default function CoursesPage() {
             <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Investment</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">One fee. Everything bundled.</h2>
             <p className="text-soft/60 text-center text-lg mb-12 max-w-2xl mx-auto">
-              Most UK PT academies sell the qualification, then upsell the mentorship. We bundle the lot — at a price that&apos;s lower than most academies charge for the qualification alone.
+              Most UK PT academies sell the qualification, then upsell the mentorship. We bundle the lot — at a price that&apos;s lower than many charge for the qualification alone.
             </p>
 
             {/* COMPETITOR COST ANCHOR */}

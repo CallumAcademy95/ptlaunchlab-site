@@ -10,7 +10,7 @@ const painPoints = [
   { icon: "😩", title: "Too many PT courses online — don't know who to trust",  body: "The internet is full of courses promising the world. You don't know which ones gyms actually respect. That's a valid fear." },
   { icon: "💸", title: "Don't want to waste money on the wrong one",            body: "You've got bills, responsibilities, a life to maintain. You can't afford to gamble everything on a certificate that leads nowhere." },
   { icon: "🏫", title: "Don't want to sit in a classroom for months",           body: "You've got a job. A life. You need something that fits around reality — not a course that demands you turn up somewhere for weeks on end." },
-  { icon: "🏋️", title: "Don't know if you'll even get a job after qualifying",  body: "Qualifying is one thing. Getting hired is another. Most courses don't help with that part. You've probably seen it happen to others." },
+  { icon: "🏋️", title: "Don't know if you'll even get a job after qualifying",  body: "Qualifying is one thing. Getting hired is another. That part is included here. You've probably seen it happen to others." },
   { icon: "⏳", title: "Can't quit your job yet",                               body: "You need a route in that doesn't mean walking out before you're ready. You just need the first step — not a life overhaul." },
   { icon: "🤷", title: "Not sure if PT is even right for you",                  body: "Maybe you love fitness but wonder if you've got what it takes to make it a career. That uncertainty is normal — and we can help you work it out." },
 ];
@@ -28,7 +28,7 @@ const howItWorksSteps = [
   { num: "01", icon: "📱", title: "Enrol online today",         body: "Immediate access. No waiting around. Your course, your tutor, and your learning platform are ready the moment you sign up." },
   { num: "02", icon: "📚", title: "Study around your job",      body: "Everything is in the learning app. Study mornings, evenings, weekends — whenever fits your life. No classrooms. No fixed schedule." },
   { num: "03", icon: "🎯", title: "Get mentored",               body: "Ryan and the team work with you throughout. Not a help-desk — real mentorship from people who've built the business themselves." },
-  { num: "04", icon: "🏅", title: "Qualify — NCFE Level 3",     body: "Earn your Ofqual-regulated, CIMSPA-recognised Level 3 PT qualification. Every gym and insurer in the UK accepts it." },
+  { num: "04", icon: "🏅", title: "Qualify — NCFE Level 3",     body: "Earn your Ofqual-regulated, CIMSPA-recognised Level 3 PT qualification, on the public Ofqual register under reference 603/4388/6." },
   { num: "05", icon: "🤝", title: "Get your gym interview",     body: "We arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We're the ones who do the hiring, so we know what gets you through the door." },
   { num: "06", icon: "🚀", title: "Start your PT career",       body: "Walk into the gym floor qualified, confident, and with a real business plan. Not just a certificate — a career you can build on." },
 ];
@@ -36,7 +36,7 @@ const howItWorksSteps = [
 const features = [
   { icon: "📱", title: "Learn on your phone",               body: "Everything in the learning app. Study at your own pace, track your progress — no classrooms or fixed hours.",                                           badge: null },
   { icon: "📚", title: "12 focused modules",                body: "Anatomy, nutrition, programming, client coaching — exactly what you need, nothing you don't. Built to qualify you fast and confidently.",             badge: null },
-  { icon: "💼", title: "Business training built in",        body: "How to get clients, price yourself, market your services, and build recurring income. The stuff other courses skip entirely.",                          badge: null },
+  { icon: "💼", title: "Business training built in",        body: "How to get clients, price yourself, market your services, and build recurring income. The part that decides whether you actually earn from it.",                          badge: null },
   { icon: "👤", title: "Your own personal tutor",           body: "They know your name, where you're at, and what you need next. Direct support whenever you need it — not a ticket system.",                            badge: "Included" },
   { icon: "🏋️", title: "Guaranteed gym interview",          body: "Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs ourselves, so we know what gets you through the door.",           badge: "Guaranteed" },
   { icon: "🎯", title: "Mentorship from Ryan & the team",   body: "Direct access to the people who built Ultimate Shred to £500K+ revenue. Real mentorship on getting clients, pricing, and staying profitable.",        badge: "Exclusive" },
@@ -70,7 +70,7 @@ const reviews = [
 const faqs = [
   { q: "Can I do this around my job?",          a: "Yes — most students study in the evenings or at weekends. The course is fully online and self-paced, so you fit it around your life. No classrooms, no fixed hours." },
   { q: "Do I need any experience?",             a: "No. We teach everything step by step, from the foundations up. All you need is a genuine passion for fitness and the drive to make it your career." },
-  { q: "Is the qualification recognised?",      a: "Yes. You earn an industry-recognised Level 2 & Level 3 PT qualification — NCFE accredited, Ofqual regulated, and accepted by every gym and insurance provider in the UK." },
+  { q: "Is the qualification recognised?",      a: "Yes. You earn an industry-recognised Level 2 & Level 3 PT qualification — NCFE accredited, Ofqual regulated, and on the public Ofqual regider in the UK." },
   { q: "Will I get help getting work?",         a: "Yes — mentoring and gym interview opportunities are included. We've personally hired over 500 PTs across our gym network, so we know exactly what gets you through the door." },
   { q: "Do I need to pay in full?",             a: "No. You can pay in full, or spread it with our deposit plan — £599 deposit then 5 × £200 monthly. We work hard to make sure the cost isn't the barrier." },
   { q: "How long does it take?",                a: "Most students complete in 8–16 weeks, studying around their job. You set the pace — qualify faster if you want, or take your time if life gets busy." },
@@ -406,7 +406,7 @@ export default function FunnelPage() {
             <span className="text-[#F5C518]">and exactly how we fix it.</span>
           </h2>
           <p className="text-[#8CA3BF] text-center text-base mb-10 max-w-2xl mx-auto">
-            Callum, Miles, and Ryan explain what most courses get wrong, what gyms actually look for, and why PT Launch Lab is built differently. Watch this before you decide.
+            Callum, Miles, and Ryan explain what gyms actually look for, and how this course is built around it. Watch this before you decide.
           </p>
           <div className="relative rounded-2xl overflow-hidden border border-[#3B82F6]/25 shadow-2xl shadow-[#3B82F6]/10 aspect-video mb-8">
             <iframe
@@ -449,7 +449,7 @@ export default function FunnelPage() {
             <span className="text-[#F5C518]">And why PT Launch Lab is different.</span>
           </h2>
           <p className="text-[#8CA3BF] text-center text-base mb-4 max-w-2xl mx-auto">
-            Most courses just give you a certificate. Then leave you on your own.
+            A certificate on its own is where most of the risk sits. Then leave you on your own.
           </p>
           <p className="text-white/60 text-center text-sm mb-12 max-w-xl mx-auto">
             No help getting work. No mentoring. No real gym connections. No business guidance. That&apos;s why most people never make it as a PT. We built PT Launch Lab to fix that.
@@ -694,7 +694,7 @@ export default function FunnelPage() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase mb-4">Fully accredited</p>
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Industry recognised. Accepted everywhere.</h2>
-          <p className="text-[#8CA3BF] text-base mb-10 max-w-xl mx-auto">Regulated by Ofqual and accepted by every gym and insurance provider in the UK.</p>
+          <p className="text-[#8CA3BF] text-base mb-10 max-w-xl mx-auto">Regulated by Ofqual under reference 603/4388/6, and listed on the public register.</p>
           <div className="flex flex-wrap justify-center gap-4">
             {["NCFE", "Ofqual Regulated", "CIMSPA", "REPs"].map((logo) => (
               <div key={logo} className="px-6 py-4 rounded-xl border border-[#3B82F6]/20 bg-white/5 text-white font-semibold text-sm min-w-[130px] text-center hover:border-[#F5C518]/40 transition-colors">
