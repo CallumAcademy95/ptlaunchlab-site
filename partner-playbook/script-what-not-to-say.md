@@ -6,7 +6,7 @@ when_to_use: Brief every member of staff on this before they speak to anyone
 order: 70
 ---
 
-The most important page in this playbook. Never promise something you don't control — it exposes your gym, it exposes us, and it lets down the person who believed it.
+The most important page in this playbook. Never promise something you don't control. It exposes your gym, it exposes us, and it lets down the person who believed it.
 
 | Don't say | Say instead |
 |---|---|

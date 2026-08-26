@@ -25,4 +25,4 @@ be taught.
 Ever thought about doing it professionally?
 ```
 
-This is aimed at the member who'd never put themselves forward. You're not asking them to want a career — you're telling them they already have the hardest part of one.
+This is aimed at the member who'd never put themselves forward. You're telling them they already have the hardest part of a career, not asking them to want one.

@@ -60,6 +60,6 @@ Two spaces left on this intake.
 If you've been thinking about it, this is the bit where you ask.
 ```
 
-**How to use them:** pick a hook, add one line of context, add one line of ask. Three lines total. The instinct to explain everything in the caption is what kills reach — the explaining happens in the DM.
+**How to use them:** pick a hook, add one line of context, add one line of ask. Three lines total. The instinct to explain everything in the caption is what kills reach. The explaining happens in the DM.
 
 **Rotate them.** Using the same hook twice in a month teaches people to scroll past your posts, which costs you more than one weak post ever would.

@@ -18,9 +18,9 @@ Each coach answers five questions:
 
 ## Turn each set of answers into
 
-- An Instagram Reel — them talking, phone camera, no script
-- A Facebook post — the written version, for the older audience who won't watch a Reel
-- A Story — one answer, big text
+- An Instagram Reel: them talking, phone camera, no script
+- A Facebook post: the written version, for the older audience who won't watch a Reel
+- A Story: one answer, big text
 - A slide for the gym TV screen
 
 **Film it badly on purpose.** A polished advert gets read as an advert. A coach talking to a phone in the changing room gets read as a person. Real outperforms produced every single time here, and it costs nothing.

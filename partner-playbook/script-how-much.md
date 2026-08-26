@@ -9,7 +9,7 @@ order: 40
 Never avoid it. Never go awkward. Awkwardness about price tells someone there's something wrong with the price.
 
 ```
-It depends which payment option you go for — there are flexible plans, so most
+It depends which payment option you go for. There are flexible plans, so most
 people spread it.
 
 Rather than me guessing, the academy team will walk you through the options

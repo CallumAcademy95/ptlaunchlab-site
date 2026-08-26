@@ -6,12 +6,12 @@ when_to_use: The most common objection you will hear
 order: 50
 ---
 
-Never argue with it. Never try to "overcome" it. They're right — they are busy.
+Never argue with it. Never try to "overcome" it. They're right, and they are busy.
 
 ```
 Completely understand. Most people who enrol are already working full-time.
 
-That's actually why it's built the way it is — designed to fit around a job
+That's actually why it's built the way it is, designed to fit around a job
 rather than replace one.
 ```
 

@@ -15,9 +15,9 @@ here in the gym.
 If you've ever thought about working in fitness, it's built so you can study
 around your current job.
 
-If you're curious, scan the QR code — or grab me and I'll talk you through it.
+If you're curious, scan the QR code, or grab me and I'll talk you through it.
 ```
 
 Then pause. Don't add anything. The pause is doing the work.
 
-If they ask what it costs, don't dodge it — see the "How much does it cost?" script. *"We'll talk about that later"* kills more conversations than the price ever does.
+If they ask what it costs, don't dodge it. See the "How much does it cost?" script. *"We'll talk about that later"* kills more conversations than the price ever does.

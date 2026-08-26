@@ -11,7 +11,7 @@ A lot of people who end up qualifying started because a friend pushed them into 
 ## The week
 
 - Guest passes for members to bring someone
-- Academy posters where the guests will actually stand — reception, not the back corridor
+- Academy posters where the guests will actually stand: reception, not the back corridor
 - Coaches having the usual conversations, with guests included
 - A countdown on social through the week
 

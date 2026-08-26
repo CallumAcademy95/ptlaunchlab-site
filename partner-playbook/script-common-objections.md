@@ -29,8 +29,8 @@ That's exactly what the academy is for. They take you through it step by step.
 **"I'll think about it."**
 
 ```
-No problem at all. If anything comes to mind, grab one of us — we're always
+No problem at all. If anything comes to mind, grab one of us. We're always
 happy to talk it through.
 ```
 
-Then genuinely leave it. Never chase, never pressure, never raise it again unprompted. Someone who feels pursued won't come back to you when they're ready — and most of them do come back when they're ready.
+Then genuinely leave it. Never chase, never pressure, never raise it again unprompted. Someone who feels pursued won't come back to you when they're ready, and most of them do come back when they're ready.

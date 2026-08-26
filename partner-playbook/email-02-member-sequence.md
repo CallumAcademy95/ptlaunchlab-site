@@ -6,9 +6,9 @@ when_to_use: Over six weeks, one a week, after the launch announcement
 order: 20
 ---
 
-Six emails, one a week. They build — a question, then recognition, then dissatisfaction, then permission, then the picture, then the nudge. Sent as a set they do far more than any one of them alone.
+Six emails, one a week. They build: a question, then recognition, then dissatisfaction, then permission, then the picture, then the nudge. Sent as a set they do far more than any one of them alone.
 
-**1 — The question**
+**1. The question**
 ```
 Subject: Can I ask you something?
 
@@ -27,7 +27,7 @@ I ask because we now run our own Personal Training academy, here in the gym.
 The funny thing is, most people who end up brilliant at this never planned on
 it. They were members who loved training.
 
-If it's ever crossed your mind — even for a second — we'd love a chat.
+If it's ever crossed your mind, even for a second, we'd love a chat.
 
 No pressure. No sales pitch. Just a conversation.
 
@@ -38,7 +38,7 @@ P.S. Next time you're in, ask us about the academy. You might be surprised
 what's possible.
 ```
 
-**2 — You probably don't realise it**
+**2. You probably don't realise it**
 ```
 Subject: We've noticed something about you...
 
@@ -60,7 +60,7 @@ you in the right direction.
 Reply to this, or grab one of the team next time you're in.
 ```
 
-**3 — What if Monday didn't feel like Monday**
+**3. What if Monday didn't feel like Monday**
 ```
 Subject: Do you enjoy what you do?
 
@@ -78,13 +78,13 @@ happiest when they're training, learning, helping.
 They don't fall in love with a qualification. They just decide they want a
 different future.
 
-If you've ever thought "I'd love to work in fitness" — maybe it's worth finding
+If you've ever thought "I'd love to work in fitness", it might be worth finding
 out what that would actually look like.
 
 No commitment. Just honest advice.
 ```
 
-**4 — Every coach started somewhere**
+**4. Every coach started somewhere**
 ```
 Subject: Every Personal Trainer has one thing in common
 
@@ -104,7 +104,7 @@ show you what that looks like.
 The first step isn't enrolling. It's a conversation. That's it.
 ```
 
-**5 — Imagine this**
+**5. Imagine this**
 ```
 Subject: Imagine this is your job
 
@@ -119,14 +119,13 @@ celebrate PBs. You watch people change.
 
 You go home knowing you actually made a difference to someone.
 
-That's why people choose this career. Not because it's easy — because it
-matters.
+That's why people choose this career. It isn't easy, but it matters.
 
 If you've ever wondered whether you could do something like this, let's have a
 chat. You might be closer than you think.
 ```
 
-**6 — Don't leave it as a what if**
+**6. Don't leave it as a what if**
 ```
 Subject: One last thing...
 

@@ -6,7 +6,7 @@ when_to_use: A member is always the one helping everyone else
 order: 20
 ---
 
-The member who spots for strangers, fixes someone's deadlift, gets asked what to eat — that's your highest-potential learner in the building. Walk over.
+The member who spots for strangers, fixes someone's deadlift and gets asked what to eat is your highest-potential learner in the building. Walk over.
 
 ```
 Can I ask you something?
@@ -18,7 +18,7 @@ Has anyone ever suggested you become a Personal Trainer?
 
 Most people smile. Some laugh. You'll get one of two answers:
 
-- **"No, never."** — "Genuinely? You'd be good at it." Leave it there.
-- **"I've actually thought about it."** — This is the one. Ask: **"What stopped you?"**
+- **"No, never."** Say "Genuinely? You'd be good at it.", then leave it there.
+- **"I've actually thought about it."** This is the one. Ask: **"What stopped you?"**
 
-Then say nothing and let them answer. Whatever comes back — time, money, confidence, not knowing where to start — is the exact thing that needs addressing, and you found it in one question.
+Then say nothing and let them answer. Whatever comes back, whether that's time, money, confidence or not knowing where to start, is the exact thing that needs addressing, and you found it in one question.

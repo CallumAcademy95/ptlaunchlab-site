@@ -6,7 +6,7 @@ when_to_use: The real question underneath all the others
 order: 60
 ---
 
-This is the one that decides it. Nobody is buying a qualification — they're buying the belief that it leads somewhere.
+This is the one that decides it. Members are buying the belief that it leads somewhere, not the qualification itself.
 
 Which is exactly why you must not oversell it.
 

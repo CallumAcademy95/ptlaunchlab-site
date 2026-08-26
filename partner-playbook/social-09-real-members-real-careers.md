@@ -6,7 +6,7 @@ when_to_use: As soon as one member has enrolled. You don't need a graduate.
 order: 90
 ---
 
-The mistake is waiting for a success story. You don't need someone who's finished — you need someone who **started**, because starting is the leap your other members can't picture themselves making.
+The mistake is waiting for a success story. You need someone who **started** rather than someone who's finished, because starting is the leap your other members can't picture themselves making.
 
 **Image:** your enrolled member training, or helping someone. Ask first.
 
@@ -17,7 +17,7 @@ They start as members.
 
 [NAME] joined here [WHEN]. Trains after work, like everyone else.
 
-They're now training to become a qualified PT — around a full-time job.
+They're now training to become a qualified PT, around a full-time job.
 
 Same gym. Same start. They just decided to find out.
 

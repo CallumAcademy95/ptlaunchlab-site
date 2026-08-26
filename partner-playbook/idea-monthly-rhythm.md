@@ -13,7 +13,7 @@ You don't need to market the academy every day. You need a few focused things, r
 | Week | Focus | Do |
 |---|---|---|
 | 1 | Awareness | One post, a couple of stories |
-| 2 | Conversations | Staff challenge — three each |
+| 2 | Conversations | Staff challenge: three each |
 | 3 | Proof | A member or coach story |
 | 4 | Ask | Intake reminder + email |
 
@@ -38,4 +38,4 @@ Six yeses means you're doing the job. You don't need anything else.
 - Any new stories?
 - Who are we speaking to next month?
 
-Question two is the valuable one. The questions your team can't answer are the questions your members have — pass them to the academy team and the answer comes back for everyone.
+Question two is the valuable one. The questions your team can't answer are the questions your members have. Pass them to the academy team and the answer comes back for everyone.

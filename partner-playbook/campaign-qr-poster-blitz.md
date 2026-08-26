@@ -28,4 +28,4 @@ The question qualifies the scan. Fewer people scan, more of them mean it.
 
 ## Check them monthly
 
-QR codes get covered by other posters, printed too small, faded by the window, or stuck somewhere with no phone signal. **Scan every one yourself once a month.** A dead QR code looks identical to a working one, and you'd never know until someone mentioned it — which they won't.
+QR codes get covered by other posters, printed too small, faded by the window, or stuck somewhere with no phone signal. **Scan every one yourself once a month.** A dead QR code looks identical to a working one, and you'd never know until someone mentioned it, which they won't.
