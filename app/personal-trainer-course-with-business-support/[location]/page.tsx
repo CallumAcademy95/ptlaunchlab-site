@@ -46,7 +46,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
     <>
       <Nav />
       <main>
-        <LocationHero location={loc.name} headline="PT Course with Business Support in {location}.|Qualify and build a career — not just pass an exam." />
+        <LocationHero location={loc.name} headline="PT Course with Business Support in {location}.|Qualify, then build a career on top of it." />
         <LocationContext locationSlug={loc.slug} locationName={loc.name} region={loc.region} />
         <PainPoints />
         <Reframe />
