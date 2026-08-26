@@ -254,7 +254,7 @@ export default function AboutPage() {
                 Real stories. Real<br /><span className="text-gold">Yorkshire honesty.</span>
               </h2>
               <p className="text-soft/70 text-lg leading-relaxed mb-6">
-                The PT Launch Lab Podcast covers what nobody else talks about — how PTs actually build careers, make money, and navigate the reality of working in fitness.
+                The PT Launch Lab Podcast covers what rarely gets covered: how PTs actually build careers, make money, and navigate the reality of working in fitness.
               </p>
               <ul className="space-y-3 mb-8">
                 {["Real transformation stories from working PTs", "Step-by-step business building from scratch", "How to go from qualification to full-time income", "Honest takes on the fitness industry"].map((item) => (

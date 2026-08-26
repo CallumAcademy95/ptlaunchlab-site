@@ -89,7 +89,7 @@ const faqs = [
   },
   {
     q: "Can you become a personal trainer online from home?",
-    a: "Yes. Since COVID, fully online has become the default route in the UK, not the exception. Theory units have always worked online. Practical units are now video-assessed — you film yourself coaching real movements, your tutor reviews the footage. NCFE, Focus Awards, and Active IQ all accept video assessment. Every major UK commercial gym hires online-qualified PTs every week. The qualification on the paper is what counts; whether you got it in a classroom or on Zoom doesn't.",
+    a: "Yes. Since COVID, fully online has become the default route in the UK, not the exception. Theory units have always worked online. Practical units are now video-assessed — you film yourself coaching real movements, your tutor reviews the footage. NCFE, Focus Awards, and Active IQ all accept video assessment. Online-qualified PTs are hired by commercial gyms across the UK. The qualification on the paper is what counts; whether you got it in a classroom or on Zoom doesn't.",
   },
   {
     q: "Employed vs self-employed PT — which is better to start with?",

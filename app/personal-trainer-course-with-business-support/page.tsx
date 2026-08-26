@@ -45,7 +45,7 @@ export default function Page() {
                   Most PT courses teach you the exam. PT Launch Lab teaches you the exam and how to actually build a business from it.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  Our £500 business mentorship community is bundled into the £1,599 course fee — not an optional add-on, not an upsell. Client acquisition, pricing, marketing, and a self-employed PT business — built into the course alongside your NCFE Level 3 qualification. Most UK academies sell mentorship separately for £500–£3,000, or skip it entirely.
+                  Our £500 business mentorship community is bundled into the £1,599 course fee — not an optional add-on, not an upsell. Client acquisition, pricing, marketing, and a self-employed PT business — built into the course alongside your NCFE Level 3 qualification. It is included in the fee rather than sold on afterwards.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>
