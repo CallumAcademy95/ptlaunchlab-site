@@ -19,7 +19,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "title": "How Much Should A Personal Trainer Charge?",
     "date": "2026-08-27",
     "category": "business",
-    "wordCount": 8256
+    "wordCount": 8235
   },
   {
     "id": "pekkJVhEY8w",
