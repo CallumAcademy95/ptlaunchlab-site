@@ -13,6 +13,15 @@ export interface EpisodeIndex {
 
 export const episodesIndex: EpisodeIndex[] = [
   {
+    "id": "BWEaeD3ygp4",
+    "slug": "how-much-should-a-personal-trainer-charge",
+    "ep": 35,
+    "title": "How Much Should A Personal Trainer Charge?",
+    "date": "2026-08-27",
+    "category": "business",
+    "wordCount": 8256
+  },
+  {
     "id": "pekkJVhEY8w",
     "slug": "ai-glp-1s-and-the-death-of-the-20-personal-trainer",
     "ep": 34,
