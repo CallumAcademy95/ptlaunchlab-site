@@ -35,6 +35,15 @@ export const metadata = {
 
 const episodes: Episode[] = [
   {
+    id: "BWEaeD3ygp4",
+    slug: "how-much-should-a-personal-trainer-charge",
+    ep: 35,
+    title: "How Much Should A Personal Trainer Charge?",
+    desc: "Ryan went from £10 an hour at seventeen to £40 a session, raising his price at milestones rather than dates. He explains what happened when a client asked him to match a £20 gym, and why he said no. Plus coaching as a diagnostic, why comparing yourself to who you used to be is the thief of all progression, and what GLP-1s and steroids will not do for you.",
+    date: "2026-08",
+    category: "business",
+  },
+  {
     id: "pekkJVhEY8w",
     slug: "ai-glp-1s-and-the-death-of-the-20-personal-trainer",
     ep: 34,
