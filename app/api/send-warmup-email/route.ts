@@ -37,6 +37,7 @@ async function generateEmail(
   name: string,
   result: string,
   answers: string[],
+  recipientEmail: string,
 ): Promise<{ subject: string; html: string }> {
   const path = PATH_CONTEXT[result] ?? PATH_CONTEXT.onFloor;
   const firstName = name.split(' ')[0];
@@ -151,7 +152,7 @@ Body: plain paragraphs separated by blank lines. No HTML. No dashes of any kind.
 
       <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e5e5e5; font-size: 13px; color: #888;">
         <p style="margin: 0;">PT Launch Lab · <a href="https://ptlaunchlab.co.uk" style="color: #888;">ptlaunchlab.co.uk</a></p>
-        <p style="margin: 4px 0 0 0;"><a href="https://ptlaunchlab.co.uk/unsubscribe" style="color: #888;">Unsubscribe</a></p>
+        <p style="margin: 4px 0 0 0;"><a href="https://ptlaunchlab.co.uk/unsubscribe?email=${encodeURIComponent(recipientEmail)}" style="color: #888;">Unsubscribe</a></p>
       </div>
     </div>
   `;
@@ -172,9 +173,9 @@ export async function POST(req: NextRequest) {
 
     // Generate all 3 emails in parallel
     const [email1, email2, email3] = await Promise.all([
-      generateEmail(1, name, result, answers),
-      generateEmail(2, name, result, answers),
-      generateEmail(3, name, result, answers),
+      generateEmail(1, name, result, answers, email),
+      generateEmail(2, name, result, answers, email),
+      generateEmail(3, name, result, answers, email),
     ]);
 
     // Send all 3 via Resend — Email 1 immediate, 2 and 3 scheduled
