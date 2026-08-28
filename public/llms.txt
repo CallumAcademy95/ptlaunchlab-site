@@ -6,16 +6,35 @@
 
 - [Home](https://ptlaunchlab.co.uk/): Overview of the PT Launch Lab course, unique method, social proof, and pricing
 - [Courses](https://ptlaunchlab.co.uk/courses): Full course details — curriculum, PT Launch Method™, pricing, FAQs
+- [Level 3 Personal Trainer Course](https://ptlaunchlab.co.uk/level-3-personal-trainer-course): What the Level 3 qualification covers, entry requirements, and how the course runs
 - [Enrol](https://ptlaunchlab.co.uk/enrol): Start your application
 - [Book a Call](https://ptlaunchlab.co.uk/book-call): Free 15-minute consultation with the founders
 - [About](https://ptlaunchlab.co.uk/about): Our story, founders' backgrounds, values, and podcast
 - [Quiz](https://ptlaunchlab.co.uk/quiz): Skills assessment to see if PT is right for you
 
+## Podcast
+
+- [Podcast index](https://ptlaunchlab.co.uk/podcast): All episodes
+
+33 episodes are published at `https://ptlaunchlab.co.uk/podcast/<slug>`. Every episode
+page carries the **full written transcript**, chapter markers, and an FAQ section — long-form
+first-hand interviews with working UK personal trainers, gym owners and career changers about
+qualifying, getting hired, pricing, and building a client base. Representative episodes:
+
+- [From 46 Stone to Qualified Personal Trainer — Jack Atkinson](https://ptlaunchlab.co.uk/podcast/from-46-stone-to-qualified-personal-trainer-jack-atkinson)
+- [3 Things I Wish I Knew Before Becoming a Personal Trainer — Luke McCarthy](https://ptlaunchlab.co.uk/podcast/3-things-i-wish-i-knew-before-becoming-a-personal-trainer-luke-mccarthy)
+- [British Powerlifting Champion to Bodybuilding Burnout — Sam Hincks](https://ptlaunchlab.co.uk/podcast/british-powerlifting-champion-to-bodybuilding-burnout-sam-hincks)
+- [Building a Martial Arts Gym from Scratch — Ty Harrison](https://ptlaunchlab.co.uk/podcast/building-a-martial-arts-gym-from-scratch-ty-harrison)
+- [From Addiction to Full-Time Boxing Coach: Pembo's Story](https://ptlaunchlab.co.uk/podcast/from-addiction-to-full-time-boxing-coach-pembos-story)
+
+The complete episode list is in the sitemap: https://ptlaunchlab.co.uk/sitemap.xml
+
 ## Key Facts
 
 - Qualification: NCFE Level 2 & 3 Personal Trainer Certificate (Ofqual regulated, CIMSPA recognised)
 - Duration: 4–8 weeks (self-paced, fully online)
-- Price: £1,399 full payment or £599 deposit + 5 × £200 monthly payments
+- Price: £1,599 — pay in full, or a £599 deposit + 5 × £200 monthly payments (£1,599 total, 0% interest)
+- The £500 business mentorship community is included in the fee at no extra cost
 - Founders have hired 500+ personal trainers across their gym businesses
 - 5.0★ Google rating
 - Guaranteed gym interviews with partner gyms on qualification
