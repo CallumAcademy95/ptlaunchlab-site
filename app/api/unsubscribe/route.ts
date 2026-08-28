@@ -26,9 +26,12 @@ export async function POST(req: NextRequest) {
     email = new URLSearchParams(raw).get('email') || '';
   }
 
-  // RFC 8058 one-click carries nothing but the marker in the body, so the
-  // address has to come from the URL. The header we send encodes it there.
-  if (!email) email = req.nextUrl.searchParams.get('email') || '';
+  // RFC 8058 one-click carries nothing in the body but the marker, so the
+  // address has to come from the URL. Prefer it outright for one-click rather
+  // than merely falling back, so a non-conformant body cannot override it.
+  const queryEmail = req.nextUrl.searchParams.get('email') || '';
+  if (oneClick) email = queryEmail;
+  else if (!email) email = queryEmail;
 
   email = email.trim().toLowerCase();
 
