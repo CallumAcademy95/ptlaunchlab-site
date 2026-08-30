@@ -2,7 +2,14 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
-export default function Nav() {
+/**
+ * @param ctaHref  Destination for the gold "Start Today" button. Defaults to
+ *   /enrol. /september overrides it: that page renders this nav, and with the
+ *   default the most prominent button on a £99 landing page sent buyers to the
+ *   £1,599 enrolment instead — and in the pre-open state it was the only
+ *   clickable CTA on the page.
+ */
+export default function Nav({ ctaHref = "/enrol" }: { ctaHref?: string } = {}) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -79,7 +86,7 @@ export default function Nav() {
             Discover Your Pathway
           </a>
           <a
-            href="/enrol"
+            href={ctaHref}
             className="px-5 py-2.5 rounded-full bg-gold text-deep text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/20"
           >
             Start Today →
@@ -125,7 +132,7 @@ export default function Nav() {
               Discover Your Pathway
             </a>
             <a
-              href="/enrol"
+              href={ctaHref}
               className="text-center px-5 py-3 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all"
             >
               Start Today →

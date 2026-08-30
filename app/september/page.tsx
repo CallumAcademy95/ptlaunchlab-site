@@ -45,7 +45,7 @@ export default function SeptemberOfferPage() {
 
   return (
     <>
-      <Nav />
+      <Nav ctaHref="/enrol?offer=sept99" />
       <main className="bg-deep text-white">
         {/* ─── Hero ─────────────────────────────────────────────── */}
         <section className="mx-auto max-w-3xl px-6 pt-16 pb-10 sm:pt-24">
