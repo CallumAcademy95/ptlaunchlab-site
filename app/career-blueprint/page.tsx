@@ -48,7 +48,7 @@ const comparison = [
 
 const roadmap = [
   { step: "01", title: "Join", body: "Enrol in minutes. Personal tutor introduced within 24 hours." },
-  { step: "02", title: "Study", body: "100% online, around your job. Most finish in 12–20 weeks." },
+  { step: "02", title: "Study", body: "100% online, around your job. Most finish in 8–16 weeks." },
   { step: "03", title: "Qualify", body: "NCFE Level 2 + Level 3, Ofqual regulated. Free resubmissions until you pass." },
   { step: "04", title: "Business mentoring", body: "The Mentorship Hub teaches pricing, clients and marketing — as a system." },
   { step: "05", title: "First client", body: "Warm introductions into our partner gym network. Start earning while you build." },
@@ -69,8 +69,8 @@ const included = [
 ];
 
 const faqs = [
-  { q: "Can I do this while working full-time?", a: "Yes — it's how most of our learners do it. It's fully online and self-paced with no fixed class times. Average study load is 8–10 hours a week; most people finish Level 2 + Level 3 in 12–20 weeks while still earning. You qualify first, then transition." },
-  { q: "How long does it take?", a: "Typically 12–20 weeks at 8–10 hours a week, but it's self-paced — faster or slower is fine. There's no deadline pressure and resubmissions are free until your tutor passes you." },
+  { q: "Can I do this while working full-time?", a: "Yes — it's how most of our learners do it. It's fully online and self-paced with no fixed class times. Average study load is 8–10 hours a week; most people finish Level 2 + Level 3 in 8–16 weeks while still earning. You qualify first, then transition." },
+  { q: "How long does it take?", a: "Typically 8–16 weeks at 8–10 hours a week, but it's self-paced — faster or slower is fine. There's no deadline pressure and resubmissions are free until your tutor passes you." },
   { q: "I have no gym or fitness-industry experience. Is that a problem?", a: "No. The course starts from the ground up, and plenty of our most successful graduates came from completely different careers. Life experience and work ethic count for a lot in this industry." },
   { q: "Am I too old to start?", a: "No. Career-changers in their 30s, 40s and 50s often do better — clients trust maturity, and you bring real-world people skills the 19-year-olds don't have yet." },
   { q: "Will you actually help me get clients?", a: "Yes — that's the whole point. The Mentorship Hub walks you through pricing, marketing and client conversations as a system, and we make warm introductions into our partner gym network when you qualify." },

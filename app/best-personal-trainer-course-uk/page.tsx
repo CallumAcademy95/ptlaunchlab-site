@@ -43,7 +43,7 @@ export default function Page() {
                   PT Launch Lab was built because most PT courses produce qualified trainers who still don&apos;t know how to get clients.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  We fix that. NCFE Level 3 — the qualification UK gym managers ask for by name — plus our £500 business mentorship community, a personal tutor, and a guaranteed gym interview, all bundled into the £1,599 fee. It is in the fee rather than sold on afterwards. Qualify in 12–16 weeks and come out ready to earn.
+                  We fix that. NCFE Level 3 — the qualification UK gym managers ask for by name — plus our £500 business mentorship community, a personal tutor, and a guaranteed gym interview, all bundled into the £1,599 fee. It is in the fee rather than sold on afterwards. Qualify in 8–16 weeks and come out ready to earn.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>
@@ -51,7 +51,7 @@ export default function Page() {
                 </div>
                 <div className="flex flex-wrap gap-3 text-blue-200/70 text-xs">
                   <span>⭐ 5-Star Rated</span><span className="opacity-40">·</span>
-                  <span>Qualify in 12–16 Weeks</span><span className="opacity-40">·</span>
+                  <span>Qualify in 8–16 Weeks</span><span className="opacity-40">·</span>
                   <span>500+ PTs Hired</span><span className="opacity-40">·</span>
                   <span>NCFE & Ofqual Regulated</span>
                 </div>

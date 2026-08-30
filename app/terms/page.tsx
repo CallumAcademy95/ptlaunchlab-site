@@ -50,7 +50,7 @@ export default function TermsPage() {
                 "Guaranteed gym interview support upon qualification",
                 "NCFE qualification registration (Ofqual regulated, CIMSPA and REPs recognised)",
               ])}
-              {p("Course access begins as soon as your payment is confirmed. The standard completion timeframe is 12–16 weeks, though you are able to study at your own pace.")}
+              {p("Course access begins as soon as your payment is confirmed. The standard completion timeframe is 8–16 weeks, though you are able to study at your own pace.")}
             </>
           ),
         },

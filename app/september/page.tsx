@@ -109,9 +109,10 @@ export default function SeptemberOfferPage() {
               </>
             ) : (
               <>
-                NCFE Level 2 and Level 3, Ofqual regulated. Study online around the job
-                you have now, with a tutor who knows your name. No classroom, no fixed
-                hours, no credit check.
+                NCFE Level 2 and Level 3, Ofqual regulated. Most people qualify in 8 to
+                16 weeks around the job they already have, with a tutor who knows their
+                name. Self-paced, so slower is fine. No classroom, no fixed hours, no
+                credit check.
               </>
             )}
           </p>

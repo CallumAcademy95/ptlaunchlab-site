@@ -17,7 +17,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm-introduction gym interviews — all bundled, no paid upgrades. Qualify in 4–8 weeks.",
+    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm-introduction gym interviews — all bundled, no paid upgrades. Qualify in 8–16 weeks.",
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -124,7 +124,7 @@ const curriculum = [
 ];
 
 const method = [
-  { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 4–8 weeks." },
+  { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 8–16 weeks." },
   { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free with the £1,599 fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
   { num: "03", title: "Gym Interview", body: "A guaranteed interview when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs, so we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
@@ -153,7 +153,7 @@ const objections = [
   {
     quote: "I'm worried I won't finish an online course.",
     answer:
-      "You get a personal tutor introduced within 24 hours of enrolling. They check in, keep you accountable, and most learners finish in 4–8 weeks. The course is built to be done around a full-time job, not on top of it.",
+      "You get a personal tutor introduced within 24 hours of enrolling. They check in, keep you accountable, and most learners finish in 8–16 weeks. The course is built to be done around a full-time job, not on top of it.",
     link: null,
   },
   {
@@ -211,7 +211,7 @@ const compare = [
 const faqs = [
   { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. NCFE is the qualification name UK gym managers ask for by default — PureGym, David Lloyd, Nuffield, JD Gyms, independents. Some UK academies use Focus Awards or self-branded certifications; NCFE is the one that doesn't need explaining on a CV." },
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
-  { q: "How long does it take?", a: "Most students complete in 4–8 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
+  { q: "How long does it take?", a: "Most students complete in 8–16 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
   { q: "What is the guaranteed gym interview?", a: "Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. It is written into our terms rather than being a vague promise. We've hired 500+ PTs ourselves, so we know what gyms look for and we prepare you for it." },
   { q: "Can I spread the cost?", a: "Yes. Our deposit plan lets you start with a £599 deposit, then 5 monthly payments of £200 (total £1,599). Book a free call if you'd like to talk it through." },
 ];

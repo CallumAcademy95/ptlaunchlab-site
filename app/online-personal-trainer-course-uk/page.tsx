@@ -156,7 +156,7 @@ export default function OnlinePtCourseUkPage() {
               <span className="text-gold">the honest 2026 guide.</span>
             </h1>
             <p className="text-xl text-soft/80 leading-relaxed mb-6">
-              An online personal trainer course in the UK is an Ofqual-regulated Level 3 qualification — usually awarded by NCFE or Focus Awards — that you can complete 100% online in 4 to 16 weeks. It bundles the Level 2 Gym Instructor and Level 3 Personal Trainer units, lets you legally take paying clients, and gets you onto the CIMSPA register.
+              An online personal trainer course in the UK is an Ofqual-regulated Level 3 qualification — usually awarded by NCFE or Focus Awards — that you can complete 100% online in 8 to 16 weeks. It bundles the Level 2 Gym Instructor and Level 3 Personal Trainer units, lets you legally take paying clients, and gets you onto the CIMSPA register.
             </p>
             <p className="text-xl text-soft/80 leading-relaxed mb-6">
               Prices range from around £600 at the cheap-but-legit end up to £2,800 for premium blended courses.{" "}
@@ -320,7 +320,7 @@ export default function OnlinePtCourseUkPage() {
               How long does it take?
             </h2>
             <p className="text-soft/80 text-lg leading-relaxed mb-5">
-              Honestly: <strong className="text-gold">4 to 16 weeks part-time</strong>, depending on your hours. Most of our learners finish in 8 to 12 weeks comfortably.
+              Honestly: <strong className="text-gold">8 to 16 weeks part-time</strong>, depending on your hours. Most of our learners finish in 8 to 16 weeks comfortably.
             </p>
             <div className="space-y-5 text-soft/80 text-base leading-relaxed">
               <p>

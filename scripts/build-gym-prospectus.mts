@@ -126,7 +126,8 @@ ${page(`
       enrol and qualify under your brand.</p></div>
     <div class="box"><h3>2. We deliver all of it</h3>
       <p>Tutoring, assessment, certification and learner support. NCFE Level 2 and
-      Level 3, Ofqual regulated, CIMSPA recognised. You teach nothing.</p></div>
+      Level 3, Ofqual regulated, CIMSPA recognised. Most learners qualify in 8 to 16
+      weeks around a job. You teach nothing.</p></div>
     <div class="box"><h3>3. You are paid</h3>
       <p>£500 for every member who enrols through your academy.</p></div>
     <div class="box"><h3>4. They stay on your floor</h3>
