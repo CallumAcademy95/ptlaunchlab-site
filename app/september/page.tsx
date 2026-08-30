@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "../components/Nav";
-import Footer from "../components/Footer";
+import Image from "next/image";
 import Accreditation from "../components/Accreditation";
 import Reviews from "../components/Reviews";
 import {
@@ -45,7 +44,22 @@ export default function SeptemberOfferPage() {
 
   return (
     <>
-      <Nav ctaHref="/enrol?offer=sept99" />
+      {/* Wordmark only, deliberately not a link. This is a copy page: the
+          reader arrived from one email about one offer, and every nav item is
+          a way out of it. The site nav also carried a gold "Start Today" button
+          hardcoded to /enrol, which sent £99 traffic to the £1,599 price. */}
+      <header className="bg-deep px-6 pt-8">
+        <div className="mx-auto max-w-3xl">
+          <Image
+            src="/logo.svg"
+            alt="PT Launch Lab"
+            width={160}
+            height={56}
+            className="h-10 w-auto object-contain"
+            priority
+          />
+        </div>
+      </header>
       <main className="bg-deep text-white">
         {/* ─── Hero ─────────────────────────────────────────────── */}
         <section className="mx-auto max-w-3xl px-6 pt-16 pb-10 sm:pt-24">
@@ -134,9 +148,17 @@ export default function SeptemberOfferPage() {
                 </p>
               </div>
             ) : (
-              <p className="mt-7 text-sm text-faint">
-                The link goes live at 7am on {formatOpens()}.
-              </p>
+              <div className="mt-7">
+                <span
+                  aria-disabled="true"
+                  className="inline-block cursor-not-allowed border-2 border-gold/40 px-10 py-4 text-lg font-bold uppercase tracking-wide text-gold/60"
+                >
+                  Opens 7am {formatOpens()}
+                </span>
+                <p className="mt-4 text-sm text-faint">
+                  Nothing to do yet. Come back Friday and this button goes live.
+                </p>
+              </div>
             )}
           </section>
         )}
@@ -231,7 +253,22 @@ export default function SeptemberOfferPage() {
           </section>
         )}
       </main>
-      <Footer />
+      {/* Legal only. The shared Footer carries the same six nav links as the
+          header, which on a single-offer copy page are six more ways out.
+          Terms and privacy stay because they have to. */}
+      <footer className="bg-deep px-6 pb-14 pt-4">
+        <div className="mx-auto max-w-3xl border-t border-white/10 pt-8 text-xs leading-relaxed text-faint">
+          <p>© 2026 PT Launch Lab. All rights reserved.</p>
+          <p className="mt-1">
+            PT Launch Lab is the business mentorship provider. NCFE qualifications are
+            delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.
+          </p>
+          <p className="mt-4 flex gap-5">
+            <a href="/terms" className="underline-offset-2 hover:text-white hover:underline">Terms &amp; Conditions</a>
+            <a href="/privacy" className="underline-offset-2 hover:text-white hover:underline">Privacy Policy</a>
+          </p>
+        </div>
+      </footer>
     </>
   );
 }
