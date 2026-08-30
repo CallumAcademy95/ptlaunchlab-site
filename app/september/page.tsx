@@ -171,9 +171,14 @@ export default function SeptemberOfferPage() {
 
                 <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-soft">
                   {[
-                    "Full refund within 14 days",
-                    "No credit check, no finance company",
-                    "Every unit open on day one",
+                    // Spelled out rather than badged. "Satisfaction guaranteed"
+                    // is the kind of vague reassurance a reader skips; a
+                    // guarantee only lowers the risk if it says exactly what
+                    // happens. Placed at the button because that is the half
+                    // second where doubt spikes.
+                    `Change your mind in 14 days and we refund the full £${SEPT99_ENTRY}`,
+                    "No credit check, no finance company, no lender",
+                    "Every unit open on day one, not drip-fed",
                   ].map((b) => (
                     <li key={b} className="flex items-center gap-2">
                       <span aria-hidden className="text-gold">✓</span>
