@@ -190,7 +190,7 @@ export default function RecognisedPage() {
                 <p className="font-semibold text-white">Advantages of the video-assessed route:</p>
                 <ul className="space-y-3 pl-0">
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">You can re-record.</strong> In a classroom, your assessor sees one attempt. With video, you submit your best work. This is closer to how PTs actually work in real life.</li>
-                  <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">You can study around a job.</strong> PT Launch Lab learners typically qualify in 12–16 weeks while still working full-time.</li>
+                  <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">You can study around a job.</strong> PT Launch Lab learners typically qualify in 8–16 weeks while still working full-time.</li>
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">Assessor feedback is permanent.</strong> You get written feedback on every video, which becomes a learning record you keep forever.</li>
                 </ul>
                 <p>What you don&apos;t get from a video-assessed course is immediate physical gym-floor practice with peers. Good online courses solve this with optional in-person workshops, partner gym shadow days, and an active mentorship community. PT Launch Lab includes the <strong className="text-white">£500 Skool mentorship community</strong> in its £1,599 all-in price specifically for this — daily peer practice, weekly live coaching from founders Callum, Ryan and Miles, and warm-intro interviews with partner gyms.</p>

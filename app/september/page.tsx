@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Nav from "../components/Nav";
-import Footer from "../components/Footer";
+import Image from "next/image";
+
+// Real graduates, photographed at Ultimate Shred with their certificates. These
+// already run on the Google Business Profile. Names shown with permission
+// (Callum, 2026-08-30) — an anonymous certificate reads as stock.
+const GRADUATES = [
+  // crop = 4:5 portrait framing, set per image to keep both the person and the
+  // certificate in shot. Each was composed differently against the same wall.
+  { src: "/gbp/learner-01.jpg", name: "Rebecca Davies", crop: "76% 42%" },
+  { src: "/gbp/learner-03.jpg", name: "Regan Winn",     crop: "54% 46%" },
+  { src: "/gbp/learner-08.jpg", name: "Samuel Brown",   crop: "52% 52%" },
+] as const;
 import Accreditation from "../components/Accreditation";
 import Reviews from "../components/Reviews";
 import {
@@ -45,7 +55,22 @@ export default function SeptemberOfferPage() {
 
   return (
     <>
-      <Nav />
+      {/* Wordmark only, deliberately not a link. This is a copy page: the
+          reader arrived from one email about one offer, and every nav item is
+          a way out of it. The site nav also carried a gold "Start Today" button
+          hardcoded to /enrol, which sent £99 traffic to the £1,599 price. */}
+      <header className="bg-deep px-6 pt-8">
+        <div className="mx-auto max-w-3xl">
+          <Image
+            src="/logo.svg"
+            alt="PT Launch Lab"
+            width={160}
+            height={56}
+            className="h-10 w-auto object-contain"
+            priority
+          />
+        </div>
+      </header>
       <main className="bg-deep text-white">
         {/* ─── Hero ─────────────────────────────────────────────── */}
         <section className="mx-auto max-w-3xl px-6 pt-16 pb-10 sm:pt-24">
@@ -70,8 +95,8 @@ export default function SeptemberOfferPage() {
               <>The £{SEPT99_ENTRY} weekend has ended</>
             ) : (
               <>
-                Start your PT qualification for{" "}
-                <span className="text-gold">£{SEPT99_ENTRY}</span>
+                Become a qualified<br className="hidden sm:block" /> personal trainer.{" "}
+                <span className="block text-gold">£{SEPT99_ENTRY} to start.</span>
               </>
             )}
           </h1>
@@ -84,12 +109,28 @@ export default function SeptemberOfferPage() {
               </>
             ) : (
               <>
-                The NCFE Level 3 Diploma in Gym Instructing and Personal Training.
-                £{SEPT99_ENTRY} to start, then {SEPT99_INSTALMENTS} monthly payments of £{SEPT99_MONTHLY}.
-                £{SEPT99_TOTAL.toLocaleString()} in total, against our normal direct price of £{STANDARD_TOTAL.toLocaleString()}.
+                NCFE Level 2 and Level 3, Ofqual regulated. Most people qualify in 8 to
+                16 weeks around the job they already have, with a tutor who knows their
+                name. Self-paced, so slower is fine. No classroom, no fixed hours, no
+                credit check.
               </>
             )}
           </p>
+
+          {/* Proof above the fold. The rating already existed on this page but sat
+              below three full sections, inside a carousel. 60% of visitors never
+              scroll past the fold, and a carousel hides what it does not show. */}
+          {/* An avatar stack was tried here and dropped: these are wide gym photos,
+              not portraits, so no square crop lands on a face at 44px. The proof
+              band below the CTA carries the visual proof instead. */}
+          {state !== "closed" && (
+            <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-soft">
+              <span aria-hidden className="text-gold">★★★★★</span>
+              <span><span className="font-semibold text-white">5.0</span> from 19 verified reviews</span>
+              <span className="text-faint">·</span>
+              <span>Ofqual regulated · CIMSPA recognised</span>
+            </p>
+          )}
         </section>
 
         {/* ─── The numbers ──────────────────────────────────────── */}
@@ -128,16 +169,79 @@ export default function SeptemberOfferPage() {
                 >
                   Start today for £{SEPT99_ENTRY}
                 </Link>
-                <p className="mt-4 text-sm text-faint">
+
+                <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-soft">
+                  {[
+                    // Spelled out rather than badged. "Satisfaction guaranteed"
+                    // is the kind of vague reassurance a reader skips; a
+                    // guarantee only lowers the risk if it says exactly what
+                    // happens. Placed at the button because that is the half
+                    // second where doubt spikes.
+                    `Change your mind in 14 days and we refund the full £${SEPT99_ENTRY}`,
+                    "No credit check, no finance company, no lender",
+                    "Every unit open on day one, not drip-fed",
+                  ].map((b) => (
+                    <li key={b} className="flex items-center gap-2">
+                      <span aria-hidden className="text-gold">✓</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-sm text-faint">
                   Closes 11:59pm {formatCloses()}. After that the direct price returns to
                   £{STANDARD_TOTAL.toLocaleString()}, with £{STANDARD_ENTRY} to start.
                 </p>
               </div>
             ) : (
-              <p className="mt-7 text-sm text-faint">
-                The link goes live at 7am on {formatOpens()}.
-              </p>
+              <div className="mt-7">
+                <span
+                  aria-disabled="true"
+                  className="inline-block cursor-not-allowed border-2 border-gold/40 px-10 py-4 text-lg font-bold uppercase tracking-wide text-gold/60"
+                >
+                  Opens 7am {formatOpens()}
+                </span>
+                <p className="mt-4 text-sm text-faint">
+                  Nothing to do yet. Come back Friday and this button goes live.
+                </p>
+              </div>
             )}
+          </section>
+        )}
+
+        {/* ─── Proof: the certificate itself ────────────────────── */}
+        {/* The hero image has to prove the headline, and "become a qualified
+            personal trainer" is proved by a person holding the qualification.
+            Three, not one, because stacked proof outsells a single asset — and
+            deliberately not a carousel, which hides most of what it holds.
+            The Ofqual and CIMSPA marks are legible in shot, so these carry the
+            accreditation claim without a line of copy. */}
+        {state !== "closed" && (
+          <section className="mx-auto max-w-3xl px-6 py-14">
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              This is the certificate you finish with.
+            </h2>
+            <p className="mt-3 max-w-xl text-soft">
+              Not a course completion badge. The NCFE Level 3 Diploma in Gym Instructing
+              and Personal Training, Ofqual regulated and CIMSPA recognised.
+            </p>
+            <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+              {GRADUATES.map((g) => (
+                <li key={g.src}>
+                  <div className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-card">
+                    <Image
+                      src={g.src}
+                      alt={`${g.name} holding their NCFE Level 3 Diploma`}
+                      fill
+                      sizes="(min-width: 640px) 33vw, 100vw"
+                      className="object-cover"
+                      style={{ objectPosition: g.crop }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">{g.name}</p>
+                  <p className="text-xs text-faint">NCFE Level 3 Diploma</p>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
@@ -231,7 +335,22 @@ export default function SeptemberOfferPage() {
           </section>
         )}
       </main>
-      <Footer />
+      {/* Legal only. The shared Footer carries the same six nav links as the
+          header, which on a single-offer copy page are six more ways out.
+          Terms and privacy stay because they have to. */}
+      <footer className="bg-deep px-6 pb-14 pt-4">
+        <div className="mx-auto max-w-3xl border-t border-white/10 pt-8 text-xs leading-relaxed text-faint">
+          <p>© 2026 PT Launch Lab. All rights reserved.</p>
+          <p className="mt-1">
+            PT Launch Lab is the business mentorship provider. NCFE qualifications are
+            delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.
+          </p>
+          <p className="mt-4 flex gap-5">
+            <a href="/terms" className="underline-offset-2 hover:text-white hover:underline">Terms &amp; Conditions</a>
+            <a href="/privacy" className="underline-offset-2 hover:text-white hover:underline">Privacy Policy</a>
+          </p>
+        </div>
+      </footer>
     </>
   );
 }

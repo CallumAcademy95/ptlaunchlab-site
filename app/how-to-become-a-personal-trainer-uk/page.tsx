@@ -46,9 +46,9 @@ const steps = [
   {
     n: 3,
     id: "step-3",
-    title: "Get qualified (4–8 weeks online, longer in-person)",
+    title: "Get qualified (8–16 weeks online, longer in-person)",
     summary:
-      "How modern PT qualifications actually work in 2026 — fully online theory, video-assessed practicals, a tutor in your inbox. Most learners qualify in 4 to 8 weeks around a full-time job.",
+      "How modern PT qualifications actually work in 2026 — fully online theory, video-assessed practicals, a tutor in your inbox. Most learners qualify in 8 to 16 weeks around a full-time job.",
   },
   {
     n: 4,
@@ -69,7 +69,7 @@ const steps = [
 const faqs = [
   {
     q: "How do I become a personal trainer in the UK with no experience?",
-    a: "The official route is the same whether you've been in fitness for 10 years or you're starting from a desk job: complete a Level 2 Gym Instructor qualification followed by Level 3 Personal Trainer, both Ofqual-regulated. Most decent UK courses bundle the two and you can complete the lot in 4 to 8 weeks online, around a full-time job. You don't need a sports degree, a 6-pack, or to be under 30. The bit that matters more than your starting point is what you do in the first 90 days after qualifying — that's when most people quit.",
+    a: "The official route is the same whether you've been in fitness for 10 years or you're starting from a desk job: complete a Level 2 Gym Instructor qualification followed by Level 3 Personal Trainer, both Ofqual-regulated. Most decent UK courses bundle the two and you can complete the lot in 8 to 16 weeks online, around a full-time job. You don't need a sports degree, a 6-pack, or to be under 30. The bit that matters more than your starting point is what you do in the first 90 days after qualifying — that's when most people quit.",
   },
   {
     q: "What qualifications do you need to be a personal trainer in the UK?",
@@ -77,7 +77,7 @@ const faqs = [
   },
   {
     q: "How long does it take to become a personal trainer in the UK?",
-    a: "The qualification itself takes 4 to 16 weeks depending on your hours and the provider. Fast-track online learners finish in 4 to 6 weeks studying evenings and weekends. Add another 4 to 12 weeks after qualifying to land your first proper role and fill an initial client book. Realistic end-to-end timeline from 'I'm thinking about it' to 'I'm earning': 3 to 6 months. Anyone telling you 'qualify Monday, full diary by Friday' is selling marketing, not a career.",
+    a: "The qualification itself takes 8 to 16 weeks depending on your hours and the provider. Fast-track online learners finish in 8 to 16 weeks studying evenings and weekends. Add another 4 to 12 weeks after qualifying to land your first proper role and fill an initial client book. Realistic end-to-end timeline from 'I'm thinking about it' to 'I'm earning': 3 to 6 months. Anyone telling you 'qualify Monday, full diary by Friday' is selling marketing, not a career.",
   },
   {
     q: "How much does it cost to become a personal trainer in the UK?",
@@ -311,7 +311,7 @@ export default function HowToBecomePtUkPage() {
           <div className="max-w-3xl mx-auto">
             <p className="text-gold text-sm font-semibold tracking-widest uppercase mb-3">Step 3</p>
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">
-              Get qualified — 4 to 8 weeks online.
+              Get qualified — 8 to 16 weeks online.
             </h2>
             <p className="text-soft/80 text-lg leading-relaxed mb-5">
               Since 2020, fully online has become the default route in the UK, not the exception. Theory units have always worked online. The change is in how practical units are now assessed:
@@ -322,10 +322,10 @@ export default function HowToBecomePtUkPage() {
               <li className="flex gap-3"><span className="text-gold shrink-0">→</span><span><span className="text-white font-semibold">Tutor support:</span> the good providers assign a tutor inside 24 hours of enrolment and you can message them throughout. The cheap providers assign tutors thinly and replies take days.</span></li>
             </ul>
             <p className="text-soft/80 text-base leading-relaxed mb-5">
-              Most UK learners doing this around a full-time job finish in 4 to 8 weeks studying evenings plus weekends. Fast-trackers with more hours available qualify in 4 to 6 weeks. People who let it slide do it in 6 to 12 months — same content, just spread out.
+              Most UK learners doing this around a full-time job finish in 8 to 16 weeks studying evenings plus weekends. Fast-trackers with more hours available qualify in 8 to 16 weeks. People who let it slide do it in 6 to 12 months — same content, just spread out.
             </p>
             <p className="text-soft/80 text-base leading-relaxed mb-5">
-              <span className="text-white font-semibold">Don&apos;t believe the &quot;qualified in 2 weeks&quot; marketing.</span> That timeline assumes you study 40 hours a week with no job. The real number for a working adult is 4 to 8 weeks.
+              <span className="text-white font-semibold">Don&apos;t believe the &quot;qualified in 2 weeks&quot; marketing.</span> That timeline assumes you study 40 hours a week with no job. The real number for a working adult is 8 to 16 weeks.
             </p>
             <p className="text-soft/80 text-base leading-relaxed">
               If you prefer in-person delivery — workshops, hands-on assessments, classroom days — providers like Train Fitness run them in major UK cities. Adds 2 to 4 weeks and £200-£500 to the cost. Worth it if you genuinely don&apos;t trust online video for practical work; not worth it for most people, since the commercial gyms hiring you don&apos;t care which route you took. See <Link href="/podcast/what-puregym-looks-for-when-hiring-personal-trainers-mac-livock" className="text-gold hover:underline">Mac Livock&apos;s episode on hiring at PureGym</Link> for what gym managers actually look for.
@@ -460,7 +460,7 @@ export default function HowToBecomePtUkPage() {
             <div className="space-y-4">
               {[
                 { phase: "Decision + research", dur: "1–4 weeks", body: "Reading guides like this one, talking to a real coach, watching podcast episodes, taking the quiz, deciding which route is right for you." },
-                { phase: "Enrol + qualify", dur: "4–8 weeks", body: "Online Level 2 + 3 around a job. Tutor assigned within 24 hours of enrolling. Fast-trackers finish in 4-6, average is 6-8." },
+                { phase: "Enrol + qualify", dur: "8–16 weeks", body: "Online Level 2 + 3 around a job. Tutor assigned within 24 hours of enrolling. Fast-trackers finish in 4-6, average is 6-8." },
                 { phase: "Insurance + CIMSPA + first role", dur: "2–4 weeks", body: "Apply for jobs while finishing the course. Most commercial gyms hire 2-4 weeks after the qualification certificate lands." },
                 { phase: "First 10 paying clients", dur: "4–12 weeks", body: "Talk to 5 strangers per shift, run free intro sessions, raise rates as you fill. 10 clients at £30-£40/session is full-time income territory." },
               ].map((row, i) => (

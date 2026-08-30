@@ -40,7 +40,7 @@ const faqSchema = {
       name: "How long does it take to become a qualified personal trainer?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Most students complete the NCFE Level 2 & 3 Personal Trainer qualification in 4–8 weeks studying part-time. The course is 100% online and self-paced, so you study around your current job.",
+        text: "Most students complete the NCFE Level 2 & 3 Personal Trainer qualification in 8–16 weeks studying part-time. The course is 100% online and self-paced, so you study around your current job.",
       },
     },
     {
@@ -64,7 +64,7 @@ const faqSchema = {
       name: "Can I study for a personal trainer qualification while working full-time?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Yes — this is the most common situation our students are in. The course is 100% online with no fixed class times. Most students study in evenings and weekends and qualify in 8–12 weeks.",
+        text: "Yes — this is the most common situation our students are in. The course is 100% online with no fixed class times. Most students study in evenings and weekends and qualify in 8–16 weeks.",
       },
     },
     {

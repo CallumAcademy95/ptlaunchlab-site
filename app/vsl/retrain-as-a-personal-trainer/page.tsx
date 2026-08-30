@@ -51,7 +51,7 @@ const objections = [
   },
   {
     q: "Can I actually do this around the kids?",
-    a: "Yes, and it's how the majority of returner students do it. The course is fully online and fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 12–20 weeks.",
+    a: "Yes, and it's how the majority of returner students do it. The course is fully online and fully self-paced. No fixed class times, no in-person workshops, no commute. You log in while they're at school, while the baby naps, after bedtime, on a Saturday morning while your partner has them. Practical units are video-assessed at any local gym (a quiet weekday slot is ideal). Most returners finish in 8–16 weeks.",
   },
   {
     q: "I haven't studied in years. What if I can't cope?",
@@ -83,7 +83,7 @@ const comparisonRows = [
 
 const faqs = [
   { q: "Is 40 too old to retrain as a personal trainer in the UK?", a: "No. The UK PT market has a genuine shortage of qualified coaches who understand busy parents, midlife bodies, and women's specific goals. Clients in their 30s, 40s, and 50s consistently prefer a PT who relates to them. We've put learners through in their late 50s who are now coaching full diaries. The blocker is confidence rather than age, and that's exactly what the course and mentorship are built to rebuild." },
-  { q: "Can I really retrain around school hours and family life?", a: "Yes. The course is fully online and fully self-paced. No fixed class times, no commute, no childcare requirements for study. Practical units are video-assessed at any gym. Most returners finish the full Level 2 + Level 3 in 12–20 weeks fitting study around school runs, bedtimes, and weekends." },
+  { q: "Can I really retrain around school hours and family life?", a: "Yes. The course is fully online and fully self-paced. No fixed class times, no commute, no childcare requirements for study. Practical units are video-assessed at any gym. Most returners finish the full Level 2 + Level 3 in 8–16 weeks fitting study around school runs, bedtimes, and weekends." },
   { q: "I haven't studied in years. Will I cope with the assessments?", a: "Yes. Your personal tutor is assigned within 24 hours of enrolment and stays with you throughout. You submit each unit when you're ready and your tutor either passes it or sends it back with feedback on what to change, so a unit that isn't quite there yet comes back for another go rather than counting as a fail. Resubmissions are free if you ever need them." },
   { q: "Can I do this without ever going to a college or classroom?", a: "Yes, 100%. Theory is delivered online. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
   { q: "I want to coach women specifically. Is that realistic?", a: "It's one of the strongest niches in the UK market. Women-only training, postnatal recovery, midlife strength, perimenopausal fitness, and beginner confidence are all undersupplied and growing. Many female returner-PTs we work with build their entire client base on referrals from one school-gate network. The Mentorship Hub has a dedicated track on niching down, and our community has plenty of women coaching women you can learn from directly." },
@@ -312,7 +312,7 @@ export default function RetrainAsAPersonalTrainerPage() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
-                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online. While they're at school, after bedtime, weekend mornings: your hours, your pace. Most returners finish in 12–20 weeks." },
+                { tag: "Time", title: "Whenever they're not awake or there", body: "100% online. While they're at school, after bedtime, weekend mornings: your hours, your pace. Most returners finish in 8–16 weeks." },
                 { tag: "Money", title: "Spread across the school term", body: "£599 deposit + 5 × £200 monthly, or pay in full. Designed to never sit on top of the food shop." },
                 { tag: "Support", title: "A real tutor, not a help desk", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback. Resubmissions are free." },
                 { tag: "Confidence", title: "We rebuild it on purpose", body: "The Mentorship Hub teaches the version of confidence you need when you've been out of the workforce." },
@@ -427,7 +427,7 @@ export default function RetrainAsAPersonalTrainerPage() {
               <span className="text-gold">No drama. Your pace.</span>
             </h2>
             <p className="text-soft/75 text-center text-lg mb-14 max-w-2xl mx-auto">
-              Most returners finish in 12–20 weeks fitting study around school runs, bedtimes, and weekends. Faster if you&apos;ve got the energy, slower if life gets in the way. Your call entirely.
+              Most returners finish in 8–16 weeks fitting study around school runs, bedtimes, and weekends. Faster if you&apos;ve got the energy, slower if life gets in the way. Your call entirely.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {steps.map((step, i) => (

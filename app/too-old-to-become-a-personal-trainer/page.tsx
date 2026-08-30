@@ -65,7 +65,7 @@ const faqSchema = {
     {
       "@type": "Question",
       name: "How long does it take to become a PT at 40+?",
-      acceptedAnswer: { "@type": "Answer", text: "12–16 weeks to qualify (NCFE Level 2 + Level 3, fully online with video-assessed practical units), studying 6–10 hours per week around a full-time job. First paying clients in months 4–6. £35k+ self-employed by month 12–18 if you build a business properly." },
+      acceptedAnswer: { "@type": "Answer", text: "8–16 weeks to qualify (NCFE Level 2 + Level 3, fully online with video-assessed practical units), studying 6–10 hours per week around a full-time job. First paying clients in months 4–6. £35k+ self-employed by month 12–18 if you build a business properly." },
     },
   ],
 };
@@ -177,7 +177,7 @@ export default function TooOldPage() {
               <p className="text-soft/80 text-lg leading-relaxed mb-6">For someone qualifying with PT Launch Lab in their 40s while still working a day job:</p>
               <div className="space-y-4">
                 {[
-                  { stage: "Months 0–4", title: "Qualifying (Level 2 + Level 3)", body: "Fully online with video-assessed practical units. Most learners qualify in 12–16 weeks while still in their full-time role. Personal tutor response within 24 hours. The £500 Skool mentorship community starts immediately." },
+                  { stage: "Months 0–4", title: "Qualifying (Level 2 + Level 3)", body: "Fully online with video-assessed practical units. Most learners qualify in 8–16 weeks while still in their full-time role. Personal tutor response within 24 hours. The £500 Skool mentorship community starts immediately." },
                   { stage: "Months 4–6", title: "First paying clients", body: "Warm-intro interview with a partner gym across Yorkshire and the UK mean you walk into your first conversation with a foot already in the door. Most learners pick up 3–6 paying clients in this window." },
                   { stage: "Months 6–12", title: "Replace day-job income", body: "Self-employed PTs in this stage typically hit £1,500–£3,000/month. Most career-changers leave their corporate role somewhere in months 9–12." },
                   { stage: "Months 12–18", title: "£35k+ self-employed", body: "With a settled book of 15–25 weekly sessions plus referrals from your existing professional network, this is where most 40+ career changers land.", highlight: true },
