@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+
+// Real graduates, photographed at Ultimate Shred with their certificates. These
+// already run on the Google Business Profile. Names shown with permission
+// (Callum, 2026-08-30) — an anonymous certificate reads as stock.
+const GRADUATES = [
+  // crop = 4:5 portrait framing, set per image to keep both the person and the
+  // certificate in shot. Each was composed differently against the same wall.
+  { src: "/gbp/learner-01.jpg", name: "Rebecca Davies", crop: "76% 42%" },
+  { src: "/gbp/learner-03.jpg", name: "Regan Winn",     crop: "54% 46%" },
+  { src: "/gbp/learner-08.jpg", name: "Samuel Brown",   crop: "52% 52%" },
+] as const;
 import Accreditation from "../components/Accreditation";
 import Reviews from "../components/Reviews";
 import {
@@ -108,12 +119,15 @@ export default function SeptemberOfferPage() {
           {/* Proof above the fold. The rating already existed on this page but sat
               below three full sections, inside a carousel. 60% of visitors never
               scroll past the fold, and a carousel hides what it does not show. */}
+          {/* An avatar stack was tried here and dropped: these are wide gym photos,
+              not portraits, so no square crop lands on a face at 44px. The proof
+              band below the CTA carries the visual proof instead. */}
           {state !== "closed" && (
             <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-soft">
               <span aria-hidden className="text-gold">★★★★★</span>
               <span><span className="font-semibold text-white">5.0</span> from 19 verified reviews</span>
               <span className="text-faint">·</span>
-              <span>Delivered through Ultimate Shred Academy, NCFE centre 9002788</span>
+              <span>Ofqual regulated · CIMSPA recognised</span>
             </p>
           )}
         </section>
@@ -185,6 +199,43 @@ export default function SeptemberOfferPage() {
                 </p>
               </div>
             )}
+          </section>
+        )}
+
+        {/* ─── Proof: the certificate itself ────────────────────── */}
+        {/* The hero image has to prove the headline, and "become a qualified
+            personal trainer" is proved by a person holding the qualification.
+            Three, not one, because stacked proof outsells a single asset — and
+            deliberately not a carousel, which hides most of what it holds.
+            The Ofqual and CIMSPA marks are legible in shot, so these carry the
+            accreditation claim without a line of copy. */}
+        {state !== "closed" && (
+          <section className="mx-auto max-w-3xl px-6 py-14">
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              This is the certificate you finish with.
+            </h2>
+            <p className="mt-3 max-w-xl text-soft">
+              Not a course completion badge. The NCFE Level 3 Diploma in Gym Instructing
+              and Personal Training, Ofqual regulated and CIMSPA recognised.
+            </p>
+            <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+              {GRADUATES.map((g) => (
+                <li key={g.src}>
+                  <div className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-card">
+                    <Image
+                      src={g.src}
+                      alt={`${g.name} holding their NCFE Level 3 Diploma`}
+                      fill
+                      sizes="(min-width: 640px) 33vw, 100vw"
+                      className="object-cover"
+                      style={{ objectPosition: g.crop }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-white">{g.name}</p>
+                  <p className="text-xs text-faint">NCFE Level 3 Diploma</p>
+                </li>
+              ))}
+            </ul>
           </section>
         )}
 
