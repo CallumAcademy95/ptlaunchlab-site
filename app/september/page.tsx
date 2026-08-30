@@ -84,8 +84,8 @@ export default function SeptemberOfferPage() {
               <>The £{SEPT99_ENTRY} weekend has ended</>
             ) : (
               <>
-                Start your PT qualification for{" "}
-                <span className="text-gold">£{SEPT99_ENTRY}</span>
+                Become a qualified<br className="hidden sm:block" /> personal trainer.{" "}
+                <span className="block text-gold">£{SEPT99_ENTRY} to start.</span>
               </>
             )}
           </h1>
@@ -98,12 +98,24 @@ export default function SeptemberOfferPage() {
               </>
             ) : (
               <>
-                The NCFE Level 3 Diploma in Gym Instructing and Personal Training.
-                £{SEPT99_ENTRY} to start, then {SEPT99_INSTALMENTS} monthly payments of £{SEPT99_MONTHLY}.
-                £{SEPT99_TOTAL.toLocaleString()} in total, against our normal direct price of £{STANDARD_TOTAL.toLocaleString()}.
+                NCFE Level 2 and Level 3, Ofqual regulated. Study online around the job
+                you have now, with a tutor who knows your name. No classroom, no fixed
+                hours, no credit check.
               </>
             )}
           </p>
+
+          {/* Proof above the fold. The rating already existed on this page but sat
+              below three full sections, inside a carousel. 60% of visitors never
+              scroll past the fold, and a carousel hides what it does not show. */}
+          {state !== "closed" && (
+            <p className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-soft">
+              <span aria-hidden className="text-gold">★★★★★</span>
+              <span><span className="font-semibold text-white">5.0</span> from 19 verified reviews</span>
+              <span className="text-faint">·</span>
+              <span>Delivered through Ultimate Shred Academy, NCFE centre 9002788</span>
+            </p>
+          )}
         </section>
 
         {/* ─── The numbers ──────────────────────────────────────── */}
@@ -142,7 +154,20 @@ export default function SeptemberOfferPage() {
                 >
                   Start today for £{SEPT99_ENTRY}
                 </Link>
-                <p className="mt-4 text-sm text-faint">
+
+                <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-soft">
+                  {[
+                    "Full refund within 14 days",
+                    "No credit check, no finance company",
+                    "Every unit open on day one",
+                  ].map((b) => (
+                    <li key={b} className="flex items-center gap-2">
+                      <span aria-hidden className="text-gold">✓</span>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-5 text-sm text-faint">
                   Closes 11:59pm {formatCloses()}. After that the direct price returns to
                   £{STANDARD_TOTAL.toLocaleString()}, with £{STANDARD_ENTRY} to start.
                 </p>
