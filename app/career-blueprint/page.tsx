@@ -9,6 +9,7 @@ import Reviews from "../components/Reviews";
 import ProofStrip from "../components/ProofStrip";
 import FunnelPricingBlock from "../components/FunnelPricingBlock";
 import PromoBar from "../components/PromoBar";
+import { faqPageSchema } from "@/app/lib/faqSchema";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/career-blueprint";
 
@@ -82,6 +83,7 @@ const faqs = [
 export default function CareerBlueprintPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema(faqs)) }} />
       <PromoBar />
       <Nav />
       <main className="pt-[72px]">

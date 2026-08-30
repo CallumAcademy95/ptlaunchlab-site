@@ -2,6 +2,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ProspectusButton from "../components/ProspectusButton";
 import Breadcrumbs from "../components/Breadcrumbs";
+import { faqPageSchema } from "@/app/lib/faqSchema";
 
 export const metadata = {
   title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
@@ -226,6 +227,7 @@ function CheckIcon() {
 export default function CoursesPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema(faqs)) }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}

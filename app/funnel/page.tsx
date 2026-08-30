@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import HeroSlideshow from "../components/HeroSlideshow";
 import { useFormSecurity } from "@/app/lib/security/client";
+import { faqPageSchema } from "@/app/lib/faqSchema";
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -138,6 +139,7 @@ export default function FunnelPage() {
 
   return (
     <div className="bg-[#072B4A] font-[Poppins,sans-serif]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema(faqs)) }} />
 
       {/* ── PROSPECTUS MODAL ─────────────────────────────────── */}
       {prospectusOpen && (
