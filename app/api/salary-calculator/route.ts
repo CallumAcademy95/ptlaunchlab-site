@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/salary-calculator
@@ -57,6 +58,11 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({ name, email, phone, source: 'salary_calculator' }),
       }).catch((err) => console.error('[salary-calculator] email server error:', err));
     }
+
+    // Hand the lead to the setter so it lands in Leads Central alongside every
+    // other enquiry. notifySetter swallows its own errors and no-ops when
+    // unconfigured, so this can never break the submission.
+    if (email) await notifySetter({ name, email, source: 'salary-calculator' });
 
     const response = NextResponse.json({ success: true });
     try {

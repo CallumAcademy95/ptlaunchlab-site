@@ -4,6 +4,7 @@ import { validateLiveRegister } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 import { mlAddSubscriber } from '@/app/lib/mailerlite';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 // "Live Sessions" group in MailerLite. Override via env if it ever changes.
 const LIVE_GROUP_ID = process.env.LIVE_MAILERLITE_GROUP_ID || '191617669489756012';
@@ -105,6 +106,11 @@ export async function POST(request: NextRequest) {
         console.warn('[live-register] no MailerLite token or webhook configured — skipping.');
       }
     }
+
+    // Hand the registration to the setter so it lands in Leads Central alongside
+    // every other enquiry. notifySetter swallows its own errors and no-ops when
+    // unconfigured, so this can never break the registration.
+    await notifySetter({ name, email, source: 'live-register' });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
 

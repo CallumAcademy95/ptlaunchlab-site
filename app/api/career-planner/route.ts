@@ -5,6 +5,7 @@ import { validateCareerPlanner } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 import { buildEscapePlanEmail, type EscapePlanResult } from "@/app/lib/careerPlannerEmail";
+import { notifySetter } from "@/app/lib/setter-intake";
 import { Resend } from "resend";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,6 +164,12 @@ export async function POST(request: NextRequest) {
         contentCategory: typeof res.businessModel === "string" ? res.businessModel : undefined,
       },
     });
+
+    // Hand the lead to the setter so it lands in Leads Central with every other
+    // enquiry, rather than only in Zapier/MailerLite. Fire-and-forget by design:
+    // notifySetter swallows its own errors and no-ops when unconfigured, so this
+    // can never break the submission.
+    await notifySetter({ name, email, source: "career-planner" });
 
     const response = NextResponse.json({ success: true, lead: true });
     try {

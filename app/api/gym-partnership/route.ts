@@ -3,6 +3,7 @@ import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateGymPartnership } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
+import { notifySetter } from '@/app/lib/setter-intake';
 
 const rateLimiter = createRateLimiter(3, 60_000);
 const ENDPOINT = '/api/gym-partnership';
@@ -82,6 +83,16 @@ export async function POST(request: NextRequest) {
         { status: 502 },
       );
     }
+
+    // Hand the enquiry to the setter so partner leads sit in Leads Central with
+    // everything else. Tagged distinctly because this is a B2B gym enquiry, not a
+    // learner lead — the partner platform is a separate pipeline downstream.
+    await notifySetter({
+      name,
+      email,
+      message: `Gym partnership enquiry — ${gymName}${location ? `, ${location}` : ''}${gymSize ? ` (${gymSize})` : ''}`,
+      source: 'gym-partnership',
+    });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
 
