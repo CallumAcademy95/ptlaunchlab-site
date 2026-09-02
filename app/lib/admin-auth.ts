@@ -1,17 +1,73 @@
 // HMAC-signed admin auth cookie. Edge-runtime compatible (uses Web Crypto API).
 //
-// Cookie format: `<expiryMs>.<base64url(hmac-sha256(secret, expiryMs))>`
-// On verify: split, recompute HMAC, constant-time compare, check expiry.
+// Cookie formats — BOTH are accepted on verify:
+//   v2 (current): `<expiryMs>.<subject>.<base64url(hmac(secret, "expiry.subject"))>`
+//   v1 (legacy):  `<expiryMs>.<base64url(hmac(secret, expiryMs))>`
 //
-// This is intentionally minimal — single shared password for a small admin
-// team. Upgrade to Supabase Auth or magic links when adding multi-user roles.
+// v1 is still honoured so that shipping v2 does not sign every existing admin
+// out. It carries no identity, so it logs as `user:legacy`. Once everyone has
+// signed in again, v1 support can be deleted — that is the only step needed.
+//
+// IDENTITY
+// Originally a single shared password with no notion of *who* logged in. The
+// admin overview now shows named leads, phone numbers and payment amounts, so
+// per-person credentials matter: you can tell who accessed it, and revoke one
+// person without rotating a secret everybody shares.
+//
+// Configure ADMIN_USERS as JSON:  [{"id":"callum","password":"…"}, …]
+// If ADMIN_USERS is absent, ADMIN_PASSWORD still works exactly as before and
+// authenticates as subject "admin". Nothing breaks by not setting it.
 
 const COOKIE_NAME = "ptll_admin_auth";
-const COOKIE_MAX_AGE_SEC = 30 * 24 * 60 * 60; // 30 days
+
+// 30 days was generous for a password-only gate on a page that now shows
+// customer PII. Override with ADMIN_SESSION_DAYS if a different trade is wanted.
+const DEFAULT_SESSION_DAYS = 7;
+function sessionDays(): number {
+  const raw = Number(process.env.ADMIN_SESSION_DAYS);
+  return Number.isFinite(raw) && raw > 0 && raw <= 90 ? raw : DEFAULT_SESSION_DAYS;
+}
+const COOKIE_MAX_AGE_SEC = sessionDays() * 24 * 60 * 60;
 const COOKIE_TTL_MS = COOKIE_MAX_AGE_SEC * 1000;
 
 export const ADMIN_AUTH_COOKIE = COOKIE_NAME;
 export const ADMIN_AUTH_MAX_AGE = COOKIE_MAX_AGE_SEC;
+
+export interface AdminUser {
+  id: string;
+  password: string;
+}
+
+/**
+ * Named admin users from ADMIN_USERS, or a single implicit "admin" user from
+ * ADMIN_PASSWORD. Returns [] when neither is configured — callers must treat
+ * that as "deny", never as "allow".
+ */
+export function getAdminUsers(): AdminUser[] {
+  const raw = process.env.ADMIN_USERS;
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const users = parsed.filter(
+          (u): u is AdminUser =>
+            !!u && typeof u.id === "string" && u.id.length > 0 &&
+            typeof u.password === "string" && u.password.length > 0,
+        );
+        if (users.length) return users;
+      }
+      // Malformed ADMIN_USERS must not silently fall through to the shared
+      // password — that would look like it worked while identity was lost.
+      console.error("[admin-auth] ADMIN_USERS is set but unusable (expected [{id,password}]). Refusing to fall back.");
+      return [];
+    } catch {
+      console.error("[admin-auth] ADMIN_USERS is not valid JSON. Refusing to fall back to ADMIN_PASSWORD.");
+      return [];
+    }
+  }
+  const shared = process.env.ADMIN_PASSWORD;
+  return shared ? [{ id: "admin", password: shared }] : [];
+}
 
 function getSecret(): string {
   const s = process.env.ADMIN_AUTH_SECRET;
@@ -67,27 +123,57 @@ async function hmacVerify(data: string, sigBase64Url: string, secret: string): P
   }
 }
 
-/** Build a fresh signed cookie value valid for COOKIE_TTL_MS. */
-export async function issueAuthCookieValue(): Promise<string> {
+// Subjects go in the cookie and the audit log, so keep them boring and safe:
+// no dots (the cookie delimiter) and nothing that could confuse a log grep.
+const SAFE_SUBJECT = /^[a-zA-Z0-9_-]{1,40}$/;
+
+/**
+ * Build a fresh signed cookie for `subject`, valid for the session window.
+ * Subject defaults to "admin" so existing callers keep working unchanged.
+ */
+export async function issueAuthCookieValue(subject = "admin"): Promise<string> {
+  const sub = SAFE_SUBJECT.test(subject) ? subject : "admin";
   const expiry = Date.now() + COOKIE_TTL_MS;
-  const sig = await hmacSignBase64Url(String(expiry), getSecret());
-  return `${expiry}.${sig}`;
+  const payload = `${expiry}.${sub}`;
+  const sig = await hmacSignBase64Url(payload, getSecret());
+  return `${payload}.${sig}`;
+}
+
+/**
+ * Verify a cookie and return the subject it authenticates, or null.
+ *
+ * Accepts the current 3-part format and the legacy 2-part one. The legacy
+ * branch is what stops this change signing everyone out; remove it once all
+ * admins have signed in again.
+ */
+export async function readAuthCookieSubject(
+  value: string | undefined | null,
+): Promise<string | null> {
+  if (!value) return null;
+  const parts = value.split(".");
+  if (parts.length !== 2 && parts.length !== 3) return null;
+
+  const expiry = Number(parts[0]);
+  if (!Number.isFinite(expiry) || expiry < Date.now()) return null;
+
+  try {
+    if (parts.length === 3) {
+      const [expiryStr, sub, sig] = parts;
+      if (!SAFE_SUBJECT.test(sub)) return null;
+      const ok = await hmacVerify(`${expiryStr}.${sub}`, sig, getSecret());
+      return ok ? sub : null;
+    }
+    // Legacy: signature covers the expiry alone, and carries no identity.
+    const ok = await hmacVerify(parts[0], parts[1], getSecret());
+    return ok ? "legacy" : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Verify a cookie value. Returns true iff signature valid and not expired. */
 export async function verifyAuthCookieValue(value: string | undefined | null): Promise<boolean> {
-  if (!value) return false;
-  const dot = value.indexOf(".");
-  if (dot < 0) return false;
-  const expiryStr = value.slice(0, dot);
-  const sig = value.slice(dot + 1);
-  const expiry = Number(expiryStr);
-  if (!Number.isFinite(expiry) || expiry < Date.now()) return false;
-  try {
-    return await hmacVerify(expiryStr, sig, getSecret());
-  } catch {
-    return false;
-  }
+  return (await readAuthCookieSubject(value)) !== null;
 }
 
 /**

@@ -3,8 +3,10 @@ import {
   ADMIN_AUTH_COOKIE,
   ADMIN_AUTH_MAX_AGE,
   constantTimeEqual,
+  getAdminUsers,
   issueAuthCookieValue,
 } from "@/app/lib/admin-auth";
+import { logSec } from "@/app/lib/security/log";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/admin-auth
@@ -13,13 +15,22 @@ import {
 // On failure: 401 + { success: false, error: string }
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-// Tiny in-memory rate limiter (per server instance) so brute force across a
-// single instance is throttled. Not bulletproof across serverless instances —
-// add a Supabase rate-limit table later if traffic grows.
+const ENDPOINT = "/api/admin-auth";
+
+// In-memory rate limiter, per serverless instance.
+//
+// HONEST LIMITATION: this does not throttle an attacker spread across many
+// instances. It is deliberately NOT backed by the database — putting the DB in
+// the login path means a Supabase blip locks you out of your own admin, which
+// is a worse failure than the one it prevents. The mitigations that actually
+// matter here are a strong password and the audit log below; treat this as
+// friction, not a control. If real brute-force pressure ever shows up in the
+// logs, move it to Vercel KV (shared, and outside the auth-critical path).
+//
+// Tightened from 8/5min to 5/15min: no legitimate admin needs eight guesses.
 const attempts = new Map<string, { count: number; firstAt: number }>();
-const WINDOW_MS = 5 * 60 * 1000; // 5 min
-const MAX_ATTEMPTS = 8;
+const WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 5;
 
 function getClientKey(req: NextRequest): string {
   return (
@@ -42,22 +53,24 @@ function checkRateLimit(key: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-  if (!ADMIN_PASSWORD) {
+  const users = getAdminUsers();
+  if (users.length === 0) {
     return NextResponse.json(
-      { success: false, error: "Admin auth not configured (ADMIN_PASSWORD missing)." },
+      { success: false, error: "Admin auth not configured (set ADMIN_USERS or ADMIN_PASSWORD)." },
       { status: 500 }
     );
   }
 
   const key = getClientKey(request);
   if (!checkRateLimit(key)) {
+    logSec({ level: "security", endpoint: ENDPOINT, outcome: "blocked-silent", signals: ["admin-login", "rate-limit"], ip: key });
     return NextResponse.json(
-      { success: false, error: "Too many attempts. Try again in 5 minutes." },
+      { success: false, error: "Too many attempts. Try again in 15 minutes." },
       { status: 429 }
     );
   }
 
-  let body: { password?: string };
+  let body: { password?: string; user?: string };
   try {
     body = await request.json();
   } catch {
@@ -69,7 +82,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Password required." }, { status: 400 });
   }
 
-  if (!constantTimeEqual(submitted, ADMIN_PASSWORD)) {
+  // Compare against EVERY configured user rather than short-circuiting on the
+  // first match, so response time does not reveal which account exists. The
+  // password alone identifies the user — no username field is required, which
+  // keeps the existing login form working unchanged.
+  let matched: string | null = null;
+  for (const u of users) {
+    if (constantTimeEqual(submitted, u.password)) matched = matched ?? u.id;
+  }
+
+  if (!matched) {
+    logSec({
+      level: "security",
+      endpoint: ENDPOINT,
+      outcome: "blocked-user",
+      signals: ["admin-login", "bad-password"],
+      ip: key,
+      ua: request.headers.get("user-agent"),
+    });
     return NextResponse.json(
       { success: false, error: "Incorrect password." },
       { status: 401 }
@@ -79,9 +109,20 @@ export async function POST(request: NextRequest) {
   // Reset rate-limit on successful auth
   attempts.delete(key);
 
+  // Audit trail. logSec writes one JSON line to stdout, surfaced in Vercel Logs —
+  // filter `level:security` + `admin-login` to see who signed in, when, from where.
+  logSec({
+    level: "security",
+    endpoint: ENDPOINT,
+    outcome: "accepted",
+    signals: ["admin-login", `user:${matched}`],
+    ip: key,
+    ua: request.headers.get("user-agent"),
+  });
+
   let cookieValue: string;
   try {
-    cookieValue = await issueAuthCookieValue();
+    cookieValue = await issueAuthCookieValue(matched);
   } catch (err) {
     return NextResponse.json(
       { success: false, error: err instanceof Error ? err.message : "Auth setup error." },
