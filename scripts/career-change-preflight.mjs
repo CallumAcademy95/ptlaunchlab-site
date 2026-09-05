@@ -74,7 +74,14 @@ async function main() {
     // that never fires is the quietest way to waste a budget.
     const stats = await graph(`/${PIXEL}/stats`, 'start_time,aggregation,data');
     const recent = JSON.stringify(stats).includes('Lead');
-    recent ? ok('pixel has recent Lead activity') : wr('no recent Lead activity seen on the pixel');
+    if (recent) {
+      ok('pixel has recent Lead activity');
+    } else {
+      // Not a fault, but it means the custom conversion has no history to learn
+      // from, so the ad sets start cold. Expected while no traffic is running.
+      wr('no recent Lead events on the pixel',
+        'conversion starts with no history — expect a slower learning phase');
+    }
   } catch (e) { wr('conversion check incomplete', e.message); }
 
   // 3. structure and money
@@ -105,10 +112,16 @@ async function main() {
         : no('buyers NOT excluded — the course would be advertised to people who own it');
       const ads = await graph(`/${s.id}/ads`, 'id,name,status,effective_status');
       adCount += ads.data.length;
-      const live = ads.data.filter((a) => a.effective_status !== 'PAUSED');
+      // Check the ad's OWN status, not effective_status. After a creative swap
+      // Meta reports IN_PROCESS or PENDING_REVIEW while it reviews the new
+      // video -- those are review states on a paused ad, not delivery. Reading
+      // effective_status here reported ten paused ads as live.
+      const live = ads.data.filter((a) => a.status !== 'PAUSED');
       live.length === 0
         ? ok(`${ads.data.length} ads, all paused`)
-        : wr(`${live.length} of ${ads.data.length} ads NOT paused`, live.map((a) => a.name).join(', '));
+        : no(`${live.length} of ${ads.data.length} ads NOT paused`, live.map((a) => a.name).join(', '));
+      const reviewing = ads.data.filter((a) => /IN_PROCESS|PENDING_REVIEW/.test(a.effective_status));
+      if (reviewing.length) console.log(`    (${reviewing.length} in Meta review — normal after a creative change)`);
     }
   } catch (e) { no('campaign check failed', e.message); }
 
