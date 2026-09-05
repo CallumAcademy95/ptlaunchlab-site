@@ -6,6 +6,7 @@ import { logSec } from "@/app/lib/security/log";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 import { buildEscapePlanEmail, type EscapePlanResult } from "@/app/lib/careerPlannerEmail";
 import { notifySetter } from "@/app/lib/setter-intake";
+import { mlAddSubscriber } from "@/app/lib/mailerlite";
 import { Resend } from "resend";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -112,28 +113,35 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Nurture sequence (email server), non-blocking. Pass the plan snapshot so the
-    // server can route to the dedicated `career_planner` track and personalise on
-    // their result (readiness / quit date / income) instead of the generic quiz track.
-    const emailServerUrl = process.env.EMAIL_SERVER_URL;
-    if (emailServerUrl) {
-      const plan = {
-        readinessScore: res.readinessScore ?? null,
-        readinessBand: res.readinessBand ?? null,
-        quitMonths: res.quitMonths ?? null,
-        year1Income: res.year1Income ?? null,
-        steadyIncome: res.steadyIncome ?? null,
-        recommendedRoute: res.recommendedRoute ?? null,
-        businessModel: res.businessModel ?? null,
-        financeOption: res.financeOption ?? null,
-        region: inp.region ?? null,
-        currentJob: inp.job ?? null,
-      };
-      fetch(`${emailServerUrl}/leads/new`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, source: "career-planner", plan }),
-      }).catch((err) => console.error("[career-planner] email server error:", err));
+    // Nurture. Straight into the MailerLite group that triggers the 7-day
+    // Career Planner sequence, carrying the plan so the emails can personalise
+    // on it without recomputing anything.
+    //
+    // This replaces the Render drip (`${EMAIL_SERVER_URL}/leads/new`), which
+    // owned the career_planner track and never reliably ran: the free instance
+    // sleeps after ~15 minutes so its in-process cron rarely fired, and every
+    // lead sat frozen at step 0 with nobody advancing or handing off. MailerLite
+    // runs this on a group trigger with no cron of ours in the path.
+    //
+    // Non-fatal on purpose: a MailerLite hiccup must never break the result the
+    // user is already looking at, and the Zapier push above is a second route in.
+    try {
+      await mlAddSubscriber({
+        email,
+        name,
+        phone,
+        groupId: "193045414277022964", // PTLL Career Planner
+        fields: {
+          plan_readiness_score: res.readinessScore as number | undefined,
+          plan_readiness_band: res.readinessBand as string | undefined,
+          plan_quit_months: res.quitMonths as number | undefined,
+          plan_recommended_route: res.recommendedRoute as string | undefined,
+          plan_region: inp.region as string | undefined,
+          plan_current_job: inp.job as string | undefined,
+        },
+      });
+    } catch (err) {
+      console.error("[career-planner] level:lead-lost — MailerLite add failed:", email, err);
     }
 
     logSec({ level: "security", endpoint: ENDPOINT, outcome: "accepted", signals: [], ip, email_domain: email.split("@")[1] });
