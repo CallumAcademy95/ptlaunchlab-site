@@ -198,7 +198,13 @@ export async function sendCapiEvent(input: SendCapiEventInput): Promise<unknown 
       console.warn(`[meta-capi] non-2xx ${res.status} for ${input.eventName}:`, text.slice(0, 300));
       return null;
     }
-    return await res.json().catch(() => null);
+    const json = (await res.json().catch(() => null)) as { events_received?: number; fbtrace_id?: string } | null;
+    // Success is logged too. Until 2026-09-06 only failures were, and every
+    // send was being cut off before it left the function -- silently, because
+    // a request that never completes raises nothing. One line per event keeps
+    // "did Meta get it?" answerable from the Vercel log without Events Manager.
+    console.log(`[meta-capi] ${input.eventName} sent: events_received=${json?.events_received ?? "?"} event_id=${eventId} fbtrace=${json?.fbtrace_id ?? "?"}`);
+    return json;
   } catch (err) {
     console.error(`[meta-capi] dispatch failed for ${input.eventName}:`, err);
     return null;
