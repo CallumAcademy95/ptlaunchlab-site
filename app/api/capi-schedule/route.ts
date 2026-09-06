@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const fullName = (body.name || "").trim();
   const [firstName, ...rest] = fullName.split(/\s+/);
 
-  void sendCapiEvent({
+  after(() => sendCapiEvent({
     eventName: "Schedule",
     eventId,
     eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk/book-call",
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       contentCategory: typeof body.avatar === "string" ? body.avatar : undefined,
       contentName: typeof body.source === "string" ? body.source : "book_call",
     },
-  });
+  }));
 
   return NextResponse.json({ success: true });
 }

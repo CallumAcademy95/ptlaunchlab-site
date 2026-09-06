@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from "next/server";
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateLiveRegister } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
     const eventId = rawEventId || deterministicEventId('live_register', email, 'live-webinar');
     const [firstName, ...rest] = (name || '').split(/\s+/);
     const lastName = rest.join(' ');
-    void sendCapiEvent({
+    after(() => sendCapiEvent({
       eventName: 'Lead',
       eventId,
       eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/live',
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
         contentName: 'live_webinar_registration',
         contentCategory: 'live-sessions',
       },
-    });
+    }));
 
     return NextResponse.json({ success: true, lead: true, streamUrl });
   } catch (err) {

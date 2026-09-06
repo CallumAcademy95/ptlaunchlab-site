@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from "next/server";
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { validateGymPartnership } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
         : null;
     const eventId = rawEventId || deterministicEventId('gym_partnership_lead', email);
     const [firstName, ...rest] = (name || '').split(/\s+/);
-    void sendCapiEvent({
+    after(() => sendCapiEvent({
       eventName: 'Lead',
       eventId,
       eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/gym-partnership',
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
         contentName: 'gym_partnership',
         contentCategory: 'b2b_partner',
       },
-    });
+    }));
 
     return NextResponse.json({ success: true, lead: true });
   } catch (err) {

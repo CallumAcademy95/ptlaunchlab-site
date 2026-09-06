@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from "next/server";
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateProspectus } from '@/app/lib/security/validate';
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     const eventId = rawEventId || deterministicEventId('prospectus_lead', email);
     const [firstName, ...rest] = (name || '').split(/\s+/);
     const lastName = rest.join(' ');
-    void sendCapiEvent({
+    after(() => sendCapiEvent({
       eventName: 'Lead',
       eventId,
       eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/',
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
         contentName: 'prospectus_download',
         contentCategory: rawAvatar,
       },
-    });
+    }));
 
     const response = NextResponse.json({ success: true });
     try {

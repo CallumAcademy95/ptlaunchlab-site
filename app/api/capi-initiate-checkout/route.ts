@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   const value = typeof body.value === "number" && Number.isFinite(body.value) ? body.value : undefined;
   const currency = typeof body.currency === "string" && body.currency.length === 3 ? body.currency : "GBP";
 
-  void sendCapiEvent({
+  after(() => sendCapiEvent({
     eventName: "InitiateCheckout",
     eventId,
     eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk/enrol",
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       contentName: typeof body.plan === "string" ? body.plan : undefined,
       contentCategory: typeof body.source === "string" ? body.source : undefined,
     },
-  });
+  }));
 
   return NextResponse.json({ success: true });
 }
