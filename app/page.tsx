@@ -94,12 +94,33 @@ const faqSchema = {
   ],
 };
 
+const videoSchema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  name: "What PT Launch Lab actually is",
+  description:
+    "NCFE Level 2 and 3 personal trainer qualification, Ofqual regulated, fully online around your current job, with a tutor introduced within 24 hours and business training built into the course. Learn. Qualify. Launch.",
+  thumbnailUrl: ["https://ptlaunchlab.co.uk/video/homepage-vsl-poster.jpg"],
+  uploadDate: "2026-09-06",
+  duration: "PT47S",
+  contentUrl: "https://ptlaunchlab.co.uk/video/homepage-vsl-1080.mp4",
+  publisher: {
+    "@type": "Organization",
+    name: "PT Launch Lab",
+    url: "https://ptlaunchlab.co.uk",
+  },
+};
+
 export default function Home() {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema) }}
       />
       <Nav />
       <main>
