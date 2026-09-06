@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
+import HomepageVsl from "./components/HomepageVsl";
 import PainPoints from "./components/PainPoints";
 import Reframe from "./components/Reframe";
 import FounderStory from "./components/FounderStory";
@@ -125,6 +126,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <HomepageVsl />
         <PainPoints />
         <Reframe />
         <FounderStory />

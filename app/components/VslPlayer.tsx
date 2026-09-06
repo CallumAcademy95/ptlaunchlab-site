@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 
-// Homepage VSL. Click-to-play with sound rather than muted autoplay: the cut
+// Homepage VSL player. Click-to-play with sound rather than muted autoplay: the cut
 // has no burned-in captions (they covered the graphics on 16:9), so a silent
 // loop would say nothing. The poster is the first hook frame and the play
 // button is the only affordance until the visitor chooses to watch.
@@ -24,7 +24,7 @@ declare global {
   }
 }
 
-export default function HeroVideo() {
+export default function VslPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<"idle" | "playing" | "ended">("idle");
 
@@ -46,8 +46,7 @@ export default function HeroVideo() {
   };
 
   return (
-    <div className="flex justify-center items-center animate-fade-in-up animate-delay-200 mt-2 lg:mt-0">
-      <div className="relative w-full">
+    <div className="relative w-full">
         {/* Outer glow ring */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-gold/25 to-blue/15 blur-2xl scale-105" />
 
@@ -94,18 +93,6 @@ export default function HeroVideo() {
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent z-20 pointer-events-none" />
         </div>
 
-        {/* Floating stat badge */}
-        <div className="hidden lg:block absolute -bottom-5 -left-6 z-50 bg-gold rounded-2xl px-5 py-3 shadow-xl shadow-gold/30">
-          <p className="text-deep font-bold text-lg leading-none font-display">500+</p>
-          <p className="text-deep/70 text-xs font-semibold">PTs Hired</p>
-        </div>
-
-        {/* Floating accreditation badge */}
-        <div className="hidden lg:block absolute -top-4 -right-4 z-50 bg-card border border-white/[0.12] rounded-xl px-4 py-2.5 shadow-xl shadow-black/30">
-          <p className="text-white font-bold text-xs">NCFE · Ofqual</p>
-          <p className="text-soft/60 text-[10px]">Regulated &amp; Recognised</p>
-        </div>
-      </div>
     </div>
   );
 }
