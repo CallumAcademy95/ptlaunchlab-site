@@ -1,4 +1,4 @@
-import HeroVideo from "./HeroVideo";
+import HeroSlideshow from "./HeroSlideshow";
 import { getVisitorGeo } from "@/app/lib/geoDetect";
 
 // Geo-aware variant of the homepage hero. Yorkshire visitors get a hero
@@ -125,8 +125,8 @@ export default async function Hero() {
             ))}
           </div>
 
-          {/* Right — the 47-second VSL, click to play */}
-          <HeroVideo />
+          {/* Right — slideshow */}
+          <HeroSlideshow />
 
         </div>
       </div>
