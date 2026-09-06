@@ -33,10 +33,15 @@ const CONFIG = {
     // is career-planner opt-ins. Do not copy this shape for a general "clean
     // Lead" conversion: as an exclusion it must enumerate the junk, or every
     // lead source added later silently drops out of it.
+    // Rule keys are `event` and `url` (or a bare custom-data key), NOT
+    // `event.event_name` / `event.content_name`. Meta accepts the dotted keys
+    // and silently never matches: the first build's conversion sat at zero
+    // for a day of live spend. Rules are immutable once created, so get this
+    // right first time or you are creating a replacement and repointing.
     rule: {
       and: [
-        { 'event.event_name': { eq: 'Lead' } },
-        { 'event.content_name': { eq: 'career_planner' } },
+        { event: { eq: 'Lead' } },
+        { url: { i_contains: '/career-planner' } },
       ],
     },
   },

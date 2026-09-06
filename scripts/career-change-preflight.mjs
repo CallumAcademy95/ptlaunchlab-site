@@ -18,7 +18,7 @@ const ACCT = 'act_37869536';
 const BASE = 'https://graph.facebook.com/v21.0';
 const PIXEL = '1133525198707842';
 const CAMPAIGN = '52568821923718';
-const CONVERSION = '1820186202748369';
+const CONVERSION = '1385682013072444'; // URL-rule conversion; 1820186202748369 never fired (bad rule keys)
 const LANDING = 'https://ptlaunchlab.co.uk/career-planner';
 const BUYERS = '52549805883518';
 
