@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import {
   readPromoFromRequest,
   STRIPE_LINKS,
@@ -96,7 +96,7 @@ export async function GET(req: NextRequest) {
     (utm.get("ic_eid") ?? "").slice(0, 64) ||
     deterministicEventId("funnel_promo_ic", promo?.source ?? "anon", plan, String(Date.now()));
 
-  void sendCapiEvent({
+  after(() => sendCapiEvent({
     eventName: "InitiateCheckout",
     eventId: icEventId,
     eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk/",
@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
       contentName,
       contentCategory: promo?.source ?? undefined,
     },
-  });
+  }));
 
   return NextResponse.redirect(url.toString(), { status: 302 });
 }

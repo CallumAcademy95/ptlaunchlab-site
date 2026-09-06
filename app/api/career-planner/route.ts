@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { attachPromoCookie } from "@/app/lib/funnelPromo";
 import { validateCareerPlanner } from "@/app/lib/security/validate";
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
         : null;
     const eventId = rawEventId || deterministicEventId("career_planner_lead", email);
     const [firstName, ...rest] = (name || "").split(/\s+/);
-    void sendCapiEvent({
+    after(() => sendCapiEvent({
       eventName: "Lead",
       eventId,
       eventSourceUrl: request.headers.get("referer") || "https://ptlaunchlab.co.uk/career-planner",
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
         contentName: "career_planner",
         contentCategory: typeof res.businessModel === "string" ? res.businessModel : undefined,
       },
-    });
+    }));
 
     const response = NextResponse.json({ success: true, lead: true });
     try {

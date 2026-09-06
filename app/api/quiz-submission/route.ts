@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from "next/server";
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
 import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateQuiz } from '@/app/lib/security/validate';
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     const eventId = rawEventId || deterministicEventId('quiz_lead', email, quizResult);
     const [firstName, ...rest] = (name || '').split(/\s+/);
     const lastName = rest.join(' ');
-    void sendCapiEvent({
+    after(() => sendCapiEvent({
       eventName: 'Lead',
       eventId,
       eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/quiz',
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
         contentName: quizResult, // result key (onFloor / online / hybrid / alreadyQualified)
         contentCategory: avatar ?? undefined,
       },
-    });
+    }));
 
     const response = NextResponse.json({ success: true, lead: true });
     try {
