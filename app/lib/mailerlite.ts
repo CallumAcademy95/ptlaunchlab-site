@@ -16,6 +16,10 @@ export async function mlAddSubscriber(params: {
   name?: string;
   phone?: string;
   groupId: string;
+  /** Extra custom fields, by MailerLite field key. Unknown keys are ignored by
+   *  MailerLite rather than erroring, so the field must exist before it will
+   *  hold a value — create it once, then this can set it. */
+  fields?: Record<string, string | number | null | undefined>;
 }): Promise<void> {
   const token = process.env.MAILERLITE_TOKEN;
   if (!token) throw new Error('MAILERLITE_TOKEN not set');
@@ -23,6 +27,9 @@ export async function mlAddSubscriber(params: {
   const fields: Record<string, string> = {};
   if (params.name) fields.name = params.name;
   if (params.phone) fields.phone = params.phone;
+  for (const [k, v] of Object.entries(params.fields ?? {})) {
+    if (v !== null && v !== undefined && v !== '') fields[k] = String(v);
+  }
 
   const res = await fetch(`${BASE}/subscribers`, {
     method: 'POST',
