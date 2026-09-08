@@ -13,6 +13,15 @@ export interface EpisodeIndex {
 
 export const episodesIndex: EpisodeIndex[] = [
   {
+    "id": "oznEK8qJLEw",
+    "slug": "what-every-new-personal-trainer-gets-wrong-about-money",
+    "ep": 36,
+    "title": "What Every New Personal Trainer Gets Wrong About Money",
+    "date": "2026-09-08",
+    "category": "business",
+    "wordCount": 11471
+  },
+  {
     "id": "BWEaeD3ygp4",
     "slug": "how-much-should-a-personal-trainer-charge",
     "ep": 35,

@@ -35,6 +35,15 @@ export const metadata = {
 
 const episodes: Episode[] = [
   {
+    id: "oznEK8qJLEw",
+    slug: "what-every-new-personal-trainer-gets-wrong-about-money",
+    ep: 36,
+    title: "What Every New Personal Trainer Gets Wrong About Money",
+    desc: "Jay Johnston is 22, a qualified accountant and a coach, and now The Fitness Accountant. He walks through what he sees when personal trainers hand him their books: the first three financial things to do on day one, why cash in hand bites the moment you want a mortgage, sole trader versus limited company, whether VAT is a badge of honour or a tax on your prices, what you can genuinely put through the business, and the line between tax efficiency and tax avoidance that HMRC eventually finds.",
+    date: "2026-09",
+    category: "business",
+  },
+  {
     id: "BWEaeD3ygp4",
     slug: "how-much-should-a-personal-trainer-charge",
     ep: 35,
