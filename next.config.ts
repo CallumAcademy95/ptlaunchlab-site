@@ -58,6 +58,40 @@ const CSP = [
   "upgrade-insecure-requests",
 ].join("; ");
 
+// ─── Embed card CSP ──────────────────────────────────────────────────────────
+// /embed/* is the ONLY framable path on the site. It serves a self-contained
+// promo banner for gym partners to paste into their own websites.
+//
+// Deliberately far stricter than the main CSP: no analytics, no pixel, no
+// consent banner, no third-party scripts of any kind. The card ships zero
+// JavaScript, so nothing needs to be allowed beyond its own markup and the
+// partner's logo.
+//
+// `frame-ancestors https:` lets ANY https site frame it. That is the point —
+// partners embed it without us allowlisting a domain and deploying each time.
+// It is safe on this route specifically because there is no form, no cookie,
+// no auth and no PII on it: nothing to clickjack.
+const EMBED_CSP = [
+  "default-src 'self'",
+  "script-src 'none'",
+  "style-src 'unsafe-inline'",
+  // Partner logos are hosted on their own CDNs (Wix, gym sites)
+  "img-src 'self' https: data:",
+  "font-src 'self'",
+  "connect-src 'none'",
+  "object-src 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  // Production: any https site, no allowlist. Development also permits
+  // localhost so the cross-origin framing test exercises a real iframe
+  // rather than only asserting on the header string — an http origin is
+  // otherwise rejected by `https:` and the test would prove nothing.
+  process.env.NODE_ENV === "production"
+    ? "frame-ancestors https:"
+    : "frame-ancestors https: http://localhost:* http://127.0.0.1:*",
+  "upgrade-insecure-requests",
+].join("; ");
+
 const nextConfig: NextConfig = {
   async redirects() {
     return [
@@ -88,7 +122,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(.*)",
+        // Everything EXCEPT /embed/* — that path has its own block below.
+        // A negative lookahead rather than a second overriding entry: header
+        // merge precedence is not worth depending on for a security header,
+        // so exactly one rule matches any given path.
+        source: "/((?!embed/).*)",
         headers: [
           {
             key: "Strict-Transport-Security",
@@ -118,6 +156,36 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value: CSP,
+          },
+        ],
+      },
+      {
+        // ─── Embed cards ─────────────────────────────────────────────────
+        // X-Frame-Options is OMITTED, not relaxed. It has no multi-origin
+        // form — ALLOW-FROM is dead in every current browser — and leaving
+        // DENY here would override frame-ancestors in some engines and keep
+        // the embed broken. frame-ancestors is what governs.
+        source: "/embed/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: EMBED_CSP,
           },
         ],
       },
