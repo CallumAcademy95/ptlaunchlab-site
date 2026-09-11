@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ObjectionCapture from "../components/ObjectionCapture";
+import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { trackEvent } from "@/app/lib/gtag";
 import { useFormSecurity } from "@/app/lib/security/client";
 import {
@@ -439,9 +440,12 @@ function Gate({
         <input type="email" required placeholder="Email address"
           value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })}
           className="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25" />
-        <input type="tel" placeholder="Phone (optional)"
+        <input type="tel" placeholder="Mobile — optional, if you'd like us to call"
           value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })}
           className="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25" />
+        <p className="text-white/35 text-xs leading-relaxed -mt-1">
+          Leave a mobile and one of us will call within a working day to talk your plan through. No number, no call — your plan still lands by email either way.
+        </p>
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button type="submit" disabled={submitting}
           className="w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-60">
@@ -491,18 +495,30 @@ function Results({ r, name }: { r: CareerPlannerResult; name: string }) {
         <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight mb-3">
           Turn this plan into reality.
         </h3>
-        <p className="text-soft text-sm mb-6 max-w-md mx-auto">
+        <p className="text-soft text-sm mb-2 max-w-md mx-auto">
           The {r.recommendedRoute} is how you get there — Ofqual-regulated, with the mentorship that
-          actually teaches you to get clients. You&apos;ve unlocked <span className="text-gold font-bold">£200 off for 48 hours</span>.
+          actually teaches you to get clients.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <a href="/enrol" className="px-8 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">
-            See the course & enrol →
-          </a>
+        <div className="flex justify-center">
           <a href="/book-call" className="px-8 py-3.5 rounded-full border border-gold text-gold font-bold text-sm hover:bg-gold/10 transition-all">
             Talk it through on a call
           </a>
         </div>
+      </div>
+
+      {/* Pricing + the 48h promo.
+          Until 2026-09-10 this section hard-coded "You've unlocked £200 off for
+          48 hours" above a link to /enrol. /enrol cannot apply that discount: it
+          chooses between three payment links and never reads the promo cookie,
+          and /api/checkout only resolves PARTNER codes (gated on gymSlug), which
+          a direct funnel lead does not have. So the planner promised £200 off and
+          then sent the buyer to a £1,599 checkout.
+          FunnelPricingBlock is what the other ten surfaces already use. It reads
+          the real cookie state and routes to /api/funnel-promo/checkout, which
+          serves the discounted link. It also fails honestly: no live promo means
+          it renders full price rather than a discount nothing can deliver. */}
+      <div className="mt-6">
+        <FunnelPricingBlock />
       </div>
 
       <div className="mt-6">

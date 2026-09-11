@@ -13,6 +13,11 @@ const ALLOWED: ReadonlyArray<FunnelSource> = [
   "youtube",
   "salary-calculator",
   "book-call",
+  // Added 2026-09-10. It was the one FunnelSource missing here, even though
+  // app/api/career-planner/route.ts calls attachPromoCookie(res, "career-planner")
+  // and the type has always permitted it — so a planner lead arriving at this
+  // route could not start the promo the planner had just promised them.
+  "career-planner",
 ] as const;
 
 export async function POST(req: NextRequest) {

@@ -489,10 +489,10 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
 
                 <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-white leading-none tracking-tight mb-4">
                   Where do we send<br />
-                  <span className="text-gold">your free guide?</span>
+                  <span className="text-gold">your results?</span>
                 </h2>
                 <p className="text-soft/60 leading-relaxed">
-                  We&apos;ll email your personalised guide as a PDF backup so you&apos;ve got it forever, not just in WhatsApp.
+                  We&apos;ll email your result and what it actually means for you, so you still have it after you close this page.
                 </p>
               </div>
 
