@@ -14,6 +14,15 @@ const gymPartners = [
   { name: "Muscle Bound Gym",      src: "/logos/muscle bound gym.png",    dark: true  },
   { name: "Ebor Gym",              src: "/logos/EBOR GYM.png",            dark: false },
   { name: "HITIO Gym Orpington",   src: "/logos/hitio-gym.png",           dark: true  },
+  // Added 2026-09-13. These are partners with a commercial record in
+  // pp_partners — fee_per_learner_pence, a promo code, the lot — and they were
+  // missing from this wall while three gyms with NO such record were on it.
+  // Their logos already existed under /gym-logos/ for their own landing pages.
+  { name: "Gym n Go",              src: "/gym-logos/gym-n-go.png",        dark: false },
+  { name: "Xcelerate Gyms",        src: "/gym-logos/xcelerate.png",       dark: false },
+  // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
+  // and still missing here, because no logo file exists anywhere in the repo.
+  // Drop one at public/logos/superflex.png and add the row.
 ];
 
 const accreditations = [
