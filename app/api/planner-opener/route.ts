@@ -99,7 +99,13 @@ async function markSent(token: string, email: string, stamp: string): Promise<bo
  * Never throws. Instrumentation that can break the thing it measures is worse
  * than no instrumentation.
  */
-async function logInvocation(req: NextRequest, now: Date, trigger: string, willSend: boolean) {
+async function logInvocation(
+  req: NextRequest,
+  now: Date,
+  trigger: string,
+  willSend: boolean,
+  extra: Record<string, unknown> = {}
+) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return;
@@ -117,6 +123,7 @@ async function logInvocation(req: NextRequest, now: Date, trigger: string, willS
           userAgent: (req.headers.get("user-agent") ?? "").slice(0, 120),
           trigger,
           willSend,
+          ...extra,
         },
       }),
     });
@@ -128,7 +135,27 @@ async function logInvocation(req: NextRequest, now: Date, trigger: string, willS
 
 async function run(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
-  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
+  const authOk = !!secret && req.headers.get("authorization") === `Bearer ${secret}`;
+
+  // Log a scheduler call BEFORE the auth check, not after.
+  //
+  // With the log after it, a rejected cron writes nothing — so "Vercel never
+  // called us" and "Vercel called and we turned it away" are the same picture,
+  // which is exactly the ambiguity that hid a dead cron for two days on the
+  // sister repo, and exactly what a missing CRON_SECRET does. `secretPresent`
+  // and `authOk` make the difference visible.
+  //
+  // Only requests claiming to be the scheduler are logged, so an anonymous
+  // caller cannot fill the table by hammering the route.
+  const looksLikeCron = /vercel-cron/i.test(req.headers.get("user-agent") ?? "");
+  if (looksLikeCron) {
+    await logInvocation(req, new Date(), "vercel-cron", authOk, {
+      secretPresent: !!secret,
+      authOk,
+    });
+  }
+
+  if (!authOk) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -160,7 +187,8 @@ async function run(req: NextRequest) {
   // MailerLite unreachable) are exactly the cases this needs to explain, and a
   // dangling promise is dropped when the handler returns. Wrapped so the log can
   // never take the send down with it.
-  await logInvocation(req, now, trigger, send);
+  // Manual runs only — a cron call was already logged above, before the auth check.
+  if (!looksLikeCron) await logInvocation(req, now, trigger, send);
 
   const hour = ukHour(now);
   if (send && (hour < SENDING_HOURS.from || hour >= SENDING_HOURS.to)) {
