@@ -504,8 +504,8 @@ export const MONTHS = [
     discountPence: 60_000,
     codeSuffix: "BF600",
     eyebrow: "{{gymName}} ACADEMY",
-    headline: ["BLACK FRIDAY", "£600 OFF"],
-    accentLine: "£999 PAID IN FULL.",
+    headline: ["BLACK FRIDAY", "£999 PAID IN FULL"],
+    accentLine: "NORMALLY £1,399.",
     sub: "Level 2 and Level 3 Personal Training, £999 paid in full at {{gymName}}. Black Friday only.",
     footer: "Code {{monthCode}}",
   },
@@ -549,6 +549,8 @@ export function tokensForMonth(brand, origin, slug, monthKey) {
 export const monthText = conceptText;
 export const allMonthStrings = allConceptStrings;
 ```
+
+> **Ruling, recorded at the whole-branch review (2026-09-14): never frame a discount to a member as "£X off."** A member's own reference point is the price already on their gym's page (£1,399), not the internal £1,599 base a code's `amount_off` is actually computed against — so "£600 off" implies a starting price (£1,999) that exists nowhere a member can check, and for Black Friday specifically it is the exact number the owner banned outright. State only the two numbers a member can verify themselves: **£999, normally £1,399.** This applies to the graphic headline, the member email and the SMS alike, and to every future money month this calendar adds — not just November. The `£600 off` language earlier in this snippet, and in the November markdown draft further down this plan, predates that ruling and has been corrected in place; treat any similar phrasing in a future month as the same defect, not a stylistic choice.
 
 - [ ] **Step 5: Run the tests**
 
@@ -699,7 +701,7 @@ node --use-system-ca scripts/gym-promo-creatives.mjs ebor
 
 Expected: 4 PNGs in `ad-assets/gym-promos/ebor/` — `oct-1080x1080.png`, `oct-1080x1920.png`, `nov-1080x1080.png`, `nov-1080x1920.png`.
 
-**Open the two November files and read them.** Confirm the code reads `EBORBF600` and not `{{monthCode}}`, and that no headline line wraps mid-thought — the existing renderer carries a comment about a 108px sizing fix for exactly that failure, and "BLACK FRIDAY" / "£600 OFF" are shorter than the string that caused it, but confirm rather than assume.
+**Open the two November files and read them.** Confirm the code reads `EBORBF600` and not `{{monthCode}}`, and that no headline line wraps mid-thought — the existing renderer carries a comment about a 108px sizing fix for exactly that failure, and "BLACK FRIDAY" / "£999 PAID IN FULL" are shorter than the string that caused it, but confirm rather than assume.
 
 - [ ] **Step 3: Render all nine**
 
@@ -813,7 +815,7 @@ This is the one week all year the price moves properly, and the one month member
 
 **£999 paid in full. Code `{{monthCode}}`.**
 
-That is £600 off. It applies to the pay-in-full price only — it cannot be used on the instalment plan, and it replaces the standing discount rather than stacking on top of it. Say so plainly; a member who finds that out at checkout is a member who does not finish checkout.
+£600 off the £1,599 list price — but every member's own reference point is the £1,399 already on your page, since the code replaces your standing £200 discount rather than stacking on it. So don't say "£600 off" to a member: say the number they can check themselves — £999, down from £1,399. It applies to the pay-in-full price only — it cannot be used on the instalment plan. A member who discovers any of this at checkout is a member who does not finish checkout.
 
 ## The week
 
@@ -830,7 +832,7 @@ Reply speed is the whole campaign. A Black Friday enquiry that waits until Tuesd
 
 Subject: **£999 this week**
 
-> Our PT course is £999 this week — £600 off the full price.
+> Our PT course is £999 this week if you pay in full — normally £1,399.
 >
 > It covers the NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, with a tutor from day one and the £500 business mentorship community included.
 >
@@ -840,7 +842,7 @@ Subject: **£999 this week**
 
 ## WhatsApp / SMS
 
-> PT course is £999 this week, £600 off. Code {{monthCode}} at {{academyUrl}}. Full payment only, back to normal Monday.
+> PT course is £999 this week (normally £1,399), paid in full. Code {{monthCode}} at {{academyUrl}}. Back to normal Monday.
 
 ## What to judge it on
 
@@ -1085,7 +1087,7 @@ list of 40 files."
 
 ## After this plan
 
-The remaining ten months repeat Tasks 4, 5, 6 and 8 with more entries in `MONTHS` — the renderer, uploader and code-minter all take them without modification. Do January next, not February: it is the largest month of the year and the one the whole calendar is shaped around.
+The remaining ten months repeat Tasks 4, 5, 6 and 8 with more entries in `MONTHS`. The renderer and code-minter take a new month without modification. **The uploader does not** — corrected from an earlier draft of this note, which claimed all three did: `scripts/upload-gym-promo-packs.mts` needs a hand-added `MONTH_PACK` entry (the playbook slug its graphics attach to) and `MONTH_PLAYBOOK_TITLE` entry (the playbook entry's own `title`) for every month, or it prints `"<month>: no playbook pack mapping — skipped"` nine times per gym and summarises `"would upload 0"` — a silent no-op that reads exactly like a clean, empty run rather than a forgotten step. Add both maps' entries in the same task that adds the month's `MONTHS` entry, not after. Do January next, not February: it is the largest month of the year and the one the whole calendar is shaped around.
 
 Two items from the spec are deliberately **not** in this plan:
 

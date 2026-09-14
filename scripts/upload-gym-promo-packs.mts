@@ -91,6 +91,10 @@ const { MONTHS } = await import("./lib/promo-calendar.mjs");
 const OUT_ROOT = path.join(process.cwd(), "ad-assets", "gym-promos");
 
 // Month key -> the playbook campaign slug the month's graphics attach to.
+// NOT derived from MONTHS -- unlike the renderer and the minter, this script
+// needs a hand-added entry here (and in MONTH_PLAYBOOK_TITLE below) every
+// time a month is added, or it skips that month for all nine gyms with only
+// a warning and reports "would upload 0", which reads like a clean run.
 const MONTH_PACK: Record<string, string> = {
   oct: "campaign-october-two-qualifications",
   nov: "campaign-november-black-friday",
