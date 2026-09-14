@@ -9,6 +9,8 @@ export interface PlaybookTokens {
   town: string;
   promoCode: string | null;
   academyUrl: string;
+  /** The month's own code, e.g. EBORBF600. Null outside a money month. */
+  monthCode?: string | null;
 }
 
 interface GymBrand {
