@@ -80,6 +80,7 @@ test("money months carry a code, reveal months do not", () => {
 
 test("November is £600 off, landing at £999", () => {
   const nov = MONTHS.find((m) => m.key === "nov");
+  assert.ok(nov, "November is missing from MONTHS");
   assert.equal(nov.offerType, "money");
   assert.equal(nov.discountPence, 60_000);
   assert.equal(159_900 - nov.discountPence, 99_900);

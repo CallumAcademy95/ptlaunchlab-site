@@ -54,6 +54,7 @@ export const MONTHS = [
  * a prefix the validator does not hold for that gym is refused on the site --
  * which is exactly what happened to HITIO500 and HITIO300.
  */
+/** @type {Record<string, string>} */
 export const MONTH_CODE_PREFIX = {
   "6fit": "6FIT",
   ebor: "EBOR",
