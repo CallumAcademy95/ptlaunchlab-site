@@ -1095,3 +1095,95 @@ Two items from the spec are deliberately **not** in this plan:
 **One spec item is deliberately dropped, not missed.** Spec §9.3 called for a claim-gate carve-out in `ad-guards.mjs` so gym-own-truth career lines could pass in captions and email. That was written when the plan was to let each gym state its own hiring record. Callum later ruled the softer route — use the contracted interview guarantee instead — so no carve-out is needed and the gate stays exactly as it is. Reinstate §9.3 only if that ruling changes.
 
 - **Pulling the false interview material** from Superflex's handout and the gym-n-go/xcelerate poster. Those are files in `pp_resources`, not code, so no task here touches them. `2e35561` fixed the partner academy pages; the assets still carry the partner-named claim.
+
+---
+
+### Task 9: Record the Xcelerate payout for Stephanie Parry
+
+Added 2026-09-14 at Callum's request. Not part of the calendar — a bookkeeping
+correction that shares the same production database, so it rides the same
+dry-run-then-approve rule as Tasks 7 and 8.
+
+**What happened:** Xcelerate was owed £500 commission for Stephanie Parry. Callum
+paid it by bank transfer on **10 September 2026**. Nothing records that, so the
+partner portal still shows the money as owed — a partner chasing an amount they
+have already had.
+
+**Files:** none. `scripts/mark-commission-paid.mts` already exists and does exactly
+this job; no code change is needed.
+
+**State verified against production 2026-09-14:**
+
+| Field | Value |
+|---|---|
+| `pp_sales.id` | `5bb2d5b0-32d4-4e8f-9fc0-68e077f91f51` |
+| Partner | `xcelerate` (`bd734110-f089-45e4-9fca-46d6aff93d94`), `fee_per_learner_pence` 50000 |
+| Learner | Stephanie Parry |
+| Enrolled | 2026-08-17 |
+| Plan / paid | PIF, £1,099 |
+| `status` | `confirmed` |
+| `commission_status` | **`accruing`** |
+| `commission_release_at` | **2026-09-16** — two days AFTER the transfer |
+
+**Why the release date does not block this.** The tool's query filters on
+`enrolled_at`, `status=confirmed` and `commission_status` not in (paid, voided).
+It does **not** filter on `commission_release_at`, so a commission paid before it
+formally released is still picked up. That is deliberate: partners are routinely
+paid early, and every one of the first four payouts went out ahead of release.
+
+**`--paid-at` is mandatory here.** Without it the script groups by
+`commission_release_at` and would date this payout 16 September — a date on which
+no transfer happened. Dating payouts from the release date once produced seven
+wrong records that had to be deleted and redone.
+
+- [ ] **Step 1: Dry run** — ALREADY DONE by the controller, 2026-09-14:
+
+```bash
+npx tsx scripts/mark-commission-paid.mts --partner=xcelerate \
+  --paid-at=2026-09-10 --before=2026-08-18 --reference="Bank transfer 10/09/2026"
+```
+
+Output was:
+
+```
+DRY RUN — marking commission paid on 1 enrolment(s) before 2026-08-18
+
+  Xcelerate Gyms         Paid 10 September 2026       1 × £500 = £500
+      enrolled 2026-08-17  Stephanie Parry
+
+Nothing written. Re-run with --apply to commit.
+```
+
+`--before=2026-08-18` is an exclusive cutoff on enrolment date. It is deliberately
+tight: it catches Stephanie's 17 August enrolment and nothing later, so a future
+Xcelerate sale cannot be swept into this payment run.
+
+- [ ] **Step 2: Apply — CALLUM RUNS THIS, not a subagent.** Same ruling as Tasks 7
+  and 8: this writes to the production partner database.
+
+```bash
+npx tsx scripts/mark-commission-paid.mts --partner=xcelerate \
+  --paid-at=2026-09-10 --before=2026-08-18 --reference="Bank transfer 10/09/2026" --apply
+```
+
+It creates one `pp_payouts` row (`period_label` "Paid 10 September 2026",
+`total_pence` 50000, `status` paid, `paid_at` 2026-09-10) and PATCHes the sale to
+`commission_status: "paid"` with that `payout_id`.
+
+- [ ] **Step 3: Verify** — re-run Step 1's dry run. It must now print
+  "Nothing to mark", proving the sale is no longer unpaid. The script is idempotent
+  on `commission_status`, so a double-apply cannot create a second payout.
+
+## ⚠️ Separate finding, NOT fixed by this task
+
+`pp_sales.promo_code` for this sale reads **`XCELERATEPT`** — the standing £200
+code. But `amount_paid_pence` is £1,099, which is £500 off, and live Stripe shows
+`XCELERATE500` with **1 redemption** while `XCELERATEPT` has **0**. So the row
+records the gym's *configured* standing code rather than the code actually
+redeemed.
+
+This matters beyond bookkeeping: the promo calendar's whole attribution story for
+money months is "the code tells you which enrolments came from that campaign". If
+`recordPartnerSale` stamps the configured code rather than the redeemed one, a
+November BF600 enrolment would be recorded as `XCELERATEPT` and the campaign would
+look like it sold nothing. Worth confirming before Black Friday.
