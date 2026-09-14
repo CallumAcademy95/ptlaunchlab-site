@@ -132,3 +132,25 @@ test("every gym with an active standing code advertises the discounted price", (
     );
   }
 });
+
+test("the route-to-gym-slug map matches the real source in each enrol/page.tsx", () => {
+  for (const routeSlug of Object.keys(GYMS)) {
+    const gymSlug = GYM_SLUG_BY_ROUTE[routeSlug];
+    if (gymSlug === "demo") continue;
+
+    const enrolPagePath = new URL(`../app/${routeSlug}/enrol/page.tsx`, import.meta.url);
+    assert.ok(existsSync(enrolPagePath), `${routeSlug}/enrol/page.tsx does not exist`);
+
+    const content = readFileSync(enrolPagePath, "utf8");
+    const match = content.match(/gymSlug:\s*["']([^"']+)["']/);
+    assert.ok(match?.[1], `${routeSlug}/enrol/page.tsx has no gymSlug literal`);
+
+    const realGymSlug = match[1];
+
+    assert.equal(
+      realGymSlug,
+      gymSlug,
+      `${routeSlug}/enrol/page.tsx has gymSlug: "${realGymSlug}" but the map says "${gymSlug}" — the map must match the real source`,
+    );
+  }
+});
