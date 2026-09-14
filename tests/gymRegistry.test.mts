@@ -154,3 +154,25 @@ test("the route-to-gym-slug map matches the real source in each enrol/page.tsx",
     );
   }
 });
+
+// scripts/gym-brands.json is a SEPARATE registry from app/lib/gyms/ — used by
+// the ad renderer and the partner playbook, keyed on gymSlug rather than the
+// route slug. It drifted from PARTNER_STANDING_CODE for Ebor specifically:
+// this file said `promoCode: null` (the pre-e2a91b5 "grandfathered, no
+// discount" state) while PARTNER_STANDING_CODE and app/lib/gyms/ebor-fitness.ts
+// both already said EBORPTDISCOUNT — so any playbook copy gated on
+// {{#promoCode}} silently hid Ebor's own live discount from Ebor.
+test("gym-brands.json's promoCode agrees with PARTNER_STANDING_CODE for every gym", () => {
+  const brands: Record<string, { promoCode: string | null }> = JSON.parse(
+    readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
+  );
+
+  for (const [gymSlug, code] of Object.entries(PARTNER_STANDING_CODE)) {
+    assert.equal(
+      brands[gymSlug]?.promoCode,
+      code,
+      `${gymSlug}: gym-brands.json says promoCode ${JSON.stringify(brands[gymSlug]?.promoCode)} but ` +
+        `PARTNER_STANDING_CODE says ${JSON.stringify(code)}`,
+    );
+  }
+});
