@@ -54,6 +54,7 @@ ptlaunchlab.co.uk/
 # Generated TV screen slides — rebuild with scripts/gym-tv-slides.mjs
 /ad-assets/gym-tv/
 /ad-assets/gym-ads/
+/ad-assets/gym-promos/
 
 # Partner gym photography — source images for the TV slides, supplied per gym
 /partner-photos/*/
