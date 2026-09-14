@@ -35,6 +35,6 @@ export const muscleBoundAcademy: GymConfig = {
   ],
   metaTitle: "Muscle Bound PT Academy | Become a Qualified Personal Trainer at Muscle Bound Gym",
   metaDescription:
-    "Train, qualify, and earn at Bradford's biggest gym. Get £200 off your Level 2 & 3 PT qualification exclusively through Muscle Bound Gym. Mentorship included. Interview opportunities at Muscle Bound.",
+    "Train, qualify, and earn at Bradford's biggest gym. Get £200 off your Level 2 & 3 PT qualification exclusively through Muscle Bound Gym. Mentorship included. Interview guarantee on qualifying.",
   canonicalPath: "/muscle-bound-academy",
 };
