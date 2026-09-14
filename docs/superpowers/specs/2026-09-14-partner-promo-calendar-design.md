@@ -1,7 +1,12 @@
 # Partner promo calendar — 12 months, reusable
 
 **Date:** 2026-09-14
-**Status:** ⛔ **ON HOLD — do not build.** Callum's ruling, 2026-09-14, later the same
+**Status:** ✅ **Unblocked 2026-09-14 (third pass).** The instalment entry-price route
+is parked — see §12 — and the eight non-money months are rebuilt on §13, what the
+course already includes and never says. No new cost, nothing to deliver that does not
+already exist.
+
+**Superseded status:** ⛔ **was ON HOLD —** Callum's ruling, 2026-09-14, later the same
 day: nothing ships that cannot actually be delivered. An audit of the eight
 non-money months found only one of their four offers exists today (the 15-minute
 Calendly information call). "Extra mentorship block" and "taster session with a
@@ -96,19 +101,11 @@ Incentive", never "LIMITED SLOTS").
    session carrying both. The second code box is structurally impossible, which is
    correct and must not be "fixed".
 
-### Peel-off components, and who delivers
+### The eight non-money months — superseded
 
-| Component | Delivered by | Months |
-|---|---|---|
-| 1:1 career consultation (30 min) | PTLL | Feb, May |
-| Taster session with a working coach | Gym | Mar |
-| Extra mentorship block on enrolment | PTLL | Jul, Aug |
-| Live Q&A | PTLL | Jun |
-
-**Default is PTLL-delivered.** Five of nine partners have never signed into the portal
-(`must_change_password` still true: 6fit, gym-n-go, ironwolf, mof, muscle-bound), so
-any month that depends on partner action is a month that will not run at those five.
-Gym-delivered components are an optional upgrade, never the mechanism.
+This table originally invented four bonuses. Three of them did not exist. **Replaced
+by §13.** Kept here only so the mistake is legible: an offer table is not an offer
+until someone can name who delivers it and when.
 
 ---
 
@@ -129,15 +126,15 @@ constrained one (see §7).
 | Month | Campaign | Belief | Offer |
 |---|---|---|---|
 | **Jan** | New Year, New Career *(exists)* | B1 | **£500 off → £1,099** |
-| Feb | You're Already Here | B3 | Free 1:1 career consultation |
-| Mar | Meet Your Future Trainer *(exists)* | B4 | Free taster session with a working coach |
+| Feb | You're Already Here | B3 | Reveal: 8–16 weeks, online, around your shifts |
+| Mar | Meet Your Future Trainer *(exists)* | B4 | Reveal: the contracted interview guarantee |
 | **Apr** | Six Months From Now | B1 | **£500 off → £1,099** |
-| May | Coach Spotting *(exists)* | B1 | Staff nominate → free consultation |
-| Jun | Ask Us Anything | B2 | **No offer, deliberately** |
-| Jul | Discovery Evening *(exists)* | B3 | Attend → extra mentorship block on enrolment |
-| Aug | Train Together | B1 | Pair enrolment → extra mentorship each |
+| May | Coach Spotting *(exists)* | B1 | Reveal: a personal tutor from day one |
+| Jun | Ask Us Anything | B2 | Reveal: Ofqual-regulated, CIMSPA-recognised |
+| Jul | Discovery Evening *(exists)* | B3 | Reveal: what a week of study actually looks like |
+| Aug | Train Together | B1 | Reveal: the £500 mentorship community, free |
 | **Sep** | Autumn Intake | B4 | **£500 off → £1,099** |
-| Oct | Success Story Month *(exists)* | B2 | Proof — automations begin |
+| Oct | Success Story Month *(exists)* | B2 | Reveal: two NCFE qualifications, one course |
 | **Nov** | Black Friday | all | **£600 off → £999** |
 | Dec | Decide Before January | B3 | January place held on deposit |
 
@@ -364,3 +361,66 @@ terms but scales with success.
 3. Decide whether the instalment plan is offered at partner gyms at all, or only on
    direct routes where no commission is owed — that sidesteps the collision entirely
    but weakens the partner offer.
+
+---
+
+## 13. The eight non-money months: name what is already included
+
+**Callum's ruling, 2026-09-14 (third pass):** find incentive that does not cost
+margin. The answer was not a new giveaway. It was that the course already includes
+four things the partner packs never mention, and two of them are rare.
+
+### The four pillars — all verified, all already in the price
+
+| Pillar | Evidence | Belief |
+|---|---|---|
+| **Two NCFE qualifications, one course** — Level 2 Certificate in Gym Instructing *and* Level 3 Certificate in Personal Training | QN 603/4388/6 bundles both (`reference_ptll_accreditation`) | B2 |
+| **£500 business mentorship community**, included free | `ConversionSection.tsx`, brand system | B1 |
+| **A personal tutor** from day one | `ConversionSection.tsx` | B1 / B3 |
+| **A contracted interview guarantee** | `app/terms/page.tsx:130` — "at least one interview, either with a gym in our partner network, or with a gym local to you that we approach on your behalf" | B4 |
+
+Plus the regulatory floor: **Ofqual-regulated, CIMSPA-recognised, NCFE** — which the
+research says collapses an entire need-to-believe for free, and which PTLL underuses.
+
+**The interview guarantee is the rare one.** It is written into PTLL's own terms, it is
+PTLL's obligation rather than any partner gym's, and the national competitors do not
+offer it. It appears nowhere in the partner packs.
+
+### How the months work now
+
+Each non-money month reveals **one** pillar rather than inventing a bonus:
+
+| Month | Reveals |
+|---|---|
+| Feb | 8–16 weeks, online, around your shifts |
+| Mar | The contracted interview guarantee |
+| May | A personal tutor from day one |
+| Jun | Ofqual-regulated, CIMSPA-recognised |
+| Jul | What a week of study actually looks like |
+| Aug | The £500 mentorship community, free |
+| Oct | Two NCFE qualifications, one course |
+| Dec | January place held on deposit *(unchanged — the deposit path is real)* |
+
+**The price does not move. The proposition does.** £1,399 for "a PT course" is
+expensive. £1,399 for two Ofqual-regulated qualifications, a personal tutor, a £500
+mentorship community and a contracted interview guarantee is a different offer at the
+same number. This costs nothing because every line is already true.
+
+### The rule this section exists to enforce
+
+An offer is not an offer until someone can name **who delivers it and when**. The
+original eight months failed that test three times out of four. Anything added to this
+calendar in future is checked against it before it is written down.
+
+### ⚠️ Before any of this ships
+
+- **Do not put a number on what competitors charge** for Level 2 and Level 3
+  separately without checking live pricing first. "Most providers sell these
+  separately" is defensible; a figure is not, until verified.
+- **The interview guarantee is conditional** — the terms require passing all
+  assessments, engaging with the mentorship elements, and updating the learner
+  profile/CV. Any pack that mentions it carries the conditions. It covers interview
+  access only, never employment.
+- **Never attach the interview to a named partner gym.** That is the claim `982cacc`
+  removed in August and `2e35561` finished removing from the partner academy pages.
+  v3.0 Clause 2.2 obliges no partner gym to give one.
