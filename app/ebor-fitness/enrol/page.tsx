@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const PARTNER: PartnerConfig = {
   gymSlug: "ebor",
   gymReferral: "Ebor Fitness",
+  fullPrice: 1399,
   stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
   stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 };

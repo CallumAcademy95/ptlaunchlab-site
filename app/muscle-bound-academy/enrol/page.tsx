@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const MUSCLE_BOUND_PARTNER = {
   gymSlug: "muscle-bound",
   gymReferral: "Muscle Bound Gym",
+  fullPrice: 1399,
 };
 
 export default function MuscleBoundEnrolPage() {

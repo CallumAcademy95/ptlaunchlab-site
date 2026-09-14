@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 const HITIO_PARTNER = {
   gymSlug: "hitio-orpington",
   gymReferral: "HITIO Gym Orpington",
+  fullPrice: 1399,
 };
 
 export default function HitioOrpingtonEnrolPage() {

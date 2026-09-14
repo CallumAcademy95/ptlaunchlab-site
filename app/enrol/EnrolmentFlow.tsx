@@ -365,9 +365,26 @@ export default function EnrolmentFlow({
 
   const firstName = fullName.trim().split(" ")[0];
 
-  // Pay-in-full is £1,599 less whatever Stripe says the applied code is worth.
+  // Pay-in-full is £1,599 less whatever Stripe says the applied code is
+  // worth. This is what Stripe actually charges — untouched by the display
+  // fix below, because every code's amount_off is defined against this same
+  // £1,599 base regardless of what any one partner advertises.
   const PIF_PENCE = 159_900;
   const fullPricePence = PIF_PENCE - (appliedPromo?.amountOffPence ?? 0);
+
+  // DISPLAY ONLY. What this page crosses out as the "was" price — the
+  // partner's own advertised full price (config.fullPrice, e.g. £1,399),
+  // never the internal £1,599 base Stripe discounts against. Showing the
+  // £1,599 base here was the bug: a 6fit member's own page has never
+  // mentioned £1,599, so crossing it out and captioning "Save £200" advertised
+  // a saving against a number nobody had seen, and for a Black Friday code it
+  // reproduced the exact "£600 off" framing the owner banned outright. A
+  // discount is only shown at all when it beats what the partner already
+  // advertises — the routine standing-code case (£1,399 -> £1,399) shows a
+  // plain price, not a price struck through against itself.
+  const listPricePence = (partner?.fullPrice ?? PIF_PENCE / 100) * 100;
+  const showDiscountUI = Boolean(appliedPromo) && fullPricePence < listPricePence;
+  const displayPricePence = appliedPromo ? fullPricePence : listPricePence;
 
   // The deposit is NEVER discounted: £599 now, then 5 × £200. The old code
   // computed instalments as (fullPrice - depositPrice) / 200, which produced 4
@@ -439,8 +456,13 @@ export default function EnrolmentFlow({
               <div className="bg-deep border border-white/10 rounded-xl p-4">
                 <p className="text-soft text-sm mb-2 font-semibold">Got a launch code from the gym?</p>
                 {appliedPromo && (
+                  // States the code and the resulting price only — never the raw
+                  // Stripe amount_off. That figure is relative to the internal
+                  // £1,599 base a partner's own page never mentions, and for a
+                  // month code it reproduces the exact "£X off" framing the
+                  // owner has ruled must never reach a member.
                   <p className="text-gold font-bold text-sm mb-2">
-                    ✓ £{(appliedPromo.amountOffPence / 100).toLocaleString()} off applied
+                    ✓ {appliedPromo.code} applied — pay in full now £{(fullPricePence / 100).toLocaleString()}
                   </p>
                 )}
                 <div className="flex gap-2">
@@ -489,18 +511,15 @@ export default function EnrolmentFlow({
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
-                {appliedPromo ? (
+                {showDiscountUI ? (
                   <div className="mb-3">
-                    <p className="text-faint text-2xl font-bold line-through leading-none">£{(PIF_PENCE / 100).toLocaleString()}</p>
-                    <p className="text-gold text-4xl font-bold leading-none">£{(fullPricePence / 100).toLocaleString()}</p>
+                    <p className="text-faint text-2xl font-bold line-through leading-none">£{(listPricePence / 100).toLocaleString()}</p>
+                    <p className="text-gold text-4xl font-bold leading-none">£{(displayPricePence / 100).toLocaleString()}</p>
                   </div>
                 ) : (
-                  <p className="text-gold text-4xl font-bold mb-3">£{(PIF_PENCE / 100).toLocaleString()}</p>
+                  <p className="text-gold text-4xl font-bold mb-3">£{(displayPricePence / 100).toLocaleString()}</p>
                 )}
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  {appliedPromo && (
-                    <li className="flex items-center gap-2"><span className="text-gold">✓</span> Save £{(appliedPromo.amountOffPence / 100).toLocaleString()}</li>
-                  )}
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Immediate course access</li>
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> One single payment</li>
                 </ul>

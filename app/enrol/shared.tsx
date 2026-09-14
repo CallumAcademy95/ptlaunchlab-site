@@ -26,6 +26,17 @@ export interface PartnerConfig {
   // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Hardcoding
   // them here is what let the page advertise £1,399 while Stripe charged
   // £1,599, and what kept HITIO's launch codes off the site entirely.
+  /**
+   * DISPLAY ONLY. The pay-in-full price this partner already advertises
+   * elsewhere on their own page (app/lib/gyms/<slug>.ts's `fullPrice`, £1,399
+   * for every gym with an active standing code). EnrolmentFlow uses it only
+   * to decide what "was" price it may cross out when a code is applied — it
+   * never affects what Stripe actually charges, which is driven entirely by
+   * the applied promo code's own Stripe amount_off against the underlying
+   * £1,599 base price. Omit it and the general £1,599 rate is used, which is
+   * only correct for a partner who has never advertised a lower one.
+   */
+  fullPrice?: number;
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────

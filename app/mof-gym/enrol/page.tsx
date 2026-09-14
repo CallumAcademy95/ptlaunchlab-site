@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 const MOF_PARTNER = {
   gymSlug: "mof",
   gymReferral: "Ministry of Fitness",
+  fullPrice: 1399,
 };
 
 export default function MofGymEnrolPage() {

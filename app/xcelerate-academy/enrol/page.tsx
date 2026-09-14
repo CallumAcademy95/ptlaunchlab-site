@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const XCELERATE_PARTNER = {
   gymSlug: "xcelerate",
   gymReferral: "Xcelerate Gyms Edgware",
+  fullPrice: 1399,
 };
 
 export default function XcelerateEnrolPage() {

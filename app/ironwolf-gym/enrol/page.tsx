@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const PARTNER: PartnerConfig = {
   gymSlug: "ironwolf",
   gymReferral: "Iron Wolf Gym",
+  fullPrice: 1399,
 };
 
 export default function IronWolfEnrolPage() {

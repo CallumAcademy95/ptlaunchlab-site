@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const SIXFIT_PARTNER = {
   gymSlug: "6fit",
   gymReferral: "6fit Gyms",
+  fullPrice: 1399,
 };
 
 export default function SixFitEnrolPage() {

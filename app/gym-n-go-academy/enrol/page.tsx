@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const GYM_N_GO_PARTNER = {
   gymSlug: "gym-n-go",
   gymReferral: "Gym n Go Forest Hill",
+  fullPrice: 1399,
 };
 
 export default function GymNGoEnrolPage() {

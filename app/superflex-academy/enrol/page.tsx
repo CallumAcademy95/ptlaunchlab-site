@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const SUPERFLEX_PARTNER = {
   gymSlug: "superflex",
   gymReferral: "Superflex 2.0 Gym",
+  fullPrice: 1399,
 };
 
 export default function SuperflexEnrolPage() {

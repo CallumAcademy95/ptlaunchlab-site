@@ -19,6 +19,13 @@ const PARTNER: PartnerConfig = {
   // and add the same value as `slug` on the pp_partners row.
   gymSlug: "GYM-SLUG-HERE",
   gymReferral: "GYM NAME HERE",
+  // Match app/lib/gyms/<slug>.ts's fullPrice — 1399 for every gym with an
+  // active standing code (see tests/gymRegistry.test.mts). DISPLAY ONLY: this
+  // is what the enrolment page may cross out, never what Stripe charges.
+  // Forgetting it falls back to the general £1,599 rate, which crosses out a
+  // price this gym's own page has never advertised — the defect this field
+  // exists to close.
+  fullPrice: 1399,
   // No promo config here on purpose. Prices and discounts come from Stripe at
   // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Add this
   // gym's standing code and prefix(es) there, not here.
