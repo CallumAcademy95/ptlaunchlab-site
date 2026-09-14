@@ -1,7 +1,14 @@
 # Partner promo calendar — 12 months, reusable
 
 **Date:** 2026-09-14
-**Status:** design approved, not built
+**Status:** ⛔ **ON HOLD — do not build.** Callum's ruling, 2026-09-14, later the same
+day: nothing ships that cannot actually be delivered. An audit of the eight
+non-money months found only one of their four offers exists today (the 15-minute
+Calendly information call). "Extra mentorship block" and "taster session with a
+working coach" were placeholder text, not offers.
+
+**Blocked on:** the entry-price change to the instalment plan (§12). The year gets
+redesigned around what is real once that lands.
 **Scope:** Task 1 of 3. The calendar and its creative/copy system. The October
 partner automation is deliberately out of scope — separate spec.
 
@@ -281,3 +288,79 @@ The calendar is wrong without these.
 - **Consent for recognisable people** in gym photos is still unconfirmed across all
   partners.
 - Agreement v3.0 has never been legally reviewed.
+
+---
+
+## 12. Why this is on hold — the instalment plan (2026-09-14, later)
+
+### The plan already exists. Only one number is in question.
+
+The deposit route is **already** £599 entry then 5 × £200 = £1,599
+(`partner-sales.ts:214`, `paidPence = 59_900 + n * 20_000`). So "add a £200/month
+plan" is not a new payment system — it is **changing the entry amount and the
+instalment count**. That makes this far smaller than it first looked.
+
+| Shape | Entry | Then | Total |
+|---|---|---|---|
+| Today | £599 | 5 × £200 | £1,599 |
+| £400 entry | £400 | 6 × £200 | £1,600 |
+| £200 entry | £200 | 7 × £200 | £1,600 |
+
+At the £1,399 gyms the same structure lands on £1,400 — a pound over the pay-in-full
+price, so it is honestly *"the same price, spread"* with no instalment premium.
+
+### Why it beats discounting
+
+Discounts are blocked on the subscription path by design
+(`stripeCheckout.ts`, keyed off `config.allowPromotionCodes`), so an instalment sale
+can never be discounted. Per partner sale:
+
+| Route | Collected | Less £500 commission | PTLL keeps |
+|---|---|---|---|
+| Instalment plan | £1,600 | −£500 | **£1,100** |
+| Full price PIF | £1,399 | −£500 | £899 |
+| Discounted PIF (£500 off) | £1,099 | −£500 | **£599** |
+
+**The instalment plan is the highest-margin partner sale available and the discounted
+one is the worst** — and every partner sale in the programme's history went through a
+£500 or £300 code. £599 gross on an NCFE L2+L3 with assessment, IQA and mentorship is
+thin enough to be worth checking against actual delivery cost.
+
+### The commission collision
+
+`partner-sales.ts:220` releases commission 30 days after **instalment 2**, and the
+amount is `fee_per_learner_pence` (£500).
+
+| Entry | Collected by instalment 2 | Owed at release | Position |
+|---|---|---|---|
+| £599 (today) | £799 | £500 | +£299 |
+| £400 | £600 | £500 | +£100 |
+| £200 | £400 | £500 | **−£100** |
+
+A £200 entry is cash-negative per learner until roughly day 90. Moving release to
+instalment 3 would fix it but **contradicts agreement v3.0 Clause 5.4**, which states
+30 days after the second instalment — a contract change across signed partners, not a
+config tweak.
+
+**Callum's lean, 2026-09-14: £400 entry**, on the grounds that instalment-3 release
+"may not be suitable". Not final.
+
+⚠️ **The counter-argument, unresolved:** £599 → £400 is a £199 change, and a £200
+change is precisely the size of intervention that has never once moved anyone here —
+the £200 standing discount has zero redemptions across nine gyms. £400 may be too
+small to be worth building. Against that, the total float at £200 entry is about £100
+× current partner volume (~9 sales/year) ≈ £900/year, which is small in absolute
+terms but scales with success.
+
+### Required regardless of which entry is chosen
+
+1. **`paidPence` must derive from the actual plan, not hardcode `59_900`.** Any new
+   entry amount makes the partner portal overstate what has been collected — it would
+   show £999 collected on a £200-entry learner who has paid £400. A portal that
+   misreports collections to the people owed commission is the same defect class as
+   the Ebor price mismatch (§9).
+2. Confirm plan-type classification handles the new shape. `be251b2` moved this to
+   sale shape rather than amount; verify it still holds with a non-£599 entry.
+3. Decide whether the instalment plan is offered at partner gyms at all, or only on
+   direct routes where no commission is owed — that sidesteps the collision entirely
+   but weakens the partner offer.
