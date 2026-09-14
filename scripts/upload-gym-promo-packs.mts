@@ -96,6 +96,17 @@ const MONTH_PACK: Record<string, string> = {
   nov: "campaign-november-black-friday",
 };
 
+// Month key -> the playbook entry's own `title` frontmatter (not
+// month.label, which is a different, internal-facing string — see
+// partner-playbook/campaign-*.md). The Playbook tab
+// (app/partners/(portal)/playbook/page.tsx) lists entries by this title, so
+// quoting it in the resource description is what actually lets an owner find
+// the matching campaign; quoting the `pack` slug or `month.label` would not.
+const MONTH_PLAYBOOK_TITLE: Record<string, string> = {
+  oct: "Two qualifications, one course",
+  nov: "Black Friday",
+};
+
 const GYM_SLUGS = Object.keys(BRANDS).filter((s) => s !== "demo");
 
 const partnersRes = await fetch(`${URL_BASE}/rest/v1/pp_partners?select=id,slug`, { headers: H });
@@ -124,12 +135,21 @@ for (const slug of GYM_SLUGS) {
     continue;
   }
 
-  for (const month of MONTHS) {
+  for (const [monthIndex, month] of MONTHS.entries()) {
     const pack = MONTH_PACK[month.key];
     if (!pack) {
       console.warn(`${month.key}: no playbook pack mapping — skipped`);
       continue;
     }
+    const playbookTitle = MONTH_PLAYBOOK_TITLE[month.key];
+    if (!playbookTitle) {
+      console.warn(`${month.key}: no playbook title mapping — skipped`);
+      continue;
+    }
+    // Own band, after the evergreen Meta ad-pack rows (20/21), so the two
+    // kinds don't interleave in the Resources tab and a month's square/story
+    // pair stays adjacent.
+    const sortBase = 30 + monthIndex * 2;
 
     for (const { w, h } of SIZES) {
       const file = `${month.key}-${w}x${h}.png`;
@@ -163,8 +183,14 @@ for (const slug of GYM_SLUGS) {
         continue;
       }
 
+      const description = `${w}×${h}. Campaign copy is in your Playbook under "${playbookTitle}".`;
+
       const verb = prior ? (APPLY ? "REPLACE" : "would replace") : APPLY ? "UPLOAD" : "would upload";
-      console.log(`${verb.padEnd(13)} ${slug.padEnd(16)} ${title.padEnd(40)} -> ${objectPath}  [pack: ${pack}]`);
+      console.log(
+        `${verb.padEnd(13)} ${slug.padEnd(16)} ${title.padEnd(40)} -> ${objectPath}  [pack: ${pack}, sort_order: ${
+          shape === "story" ? sortBase + 1 : sortBase
+        }]\n              description: ${description}`
+      );
 
       // Counted here, not after the network calls below, so a dry run's
       // summary line reports what it printed rather than a stale zero.
@@ -190,7 +216,7 @@ for (const slug of GYM_SLUGS) {
               mime: "image/png",
               file_size: body.length,
               pack,
-              description: `${w}×${h}. Find the campaign copy in your Playbook under "${pack}".`,
+              description,
             }),
           })
         : await fetch(`${URL_BASE}/rest/v1/pp_resources`, {
@@ -200,13 +226,13 @@ for (const slug of GYM_SLUGS) {
               partner_id: partnerId,
               category: "digital",
               title,
-              description: `${w}×${h}. Find the campaign copy in your Playbook under "${pack}".`,
+              description,
               storage_path: objectPath,
               mime: "image/png",
               file_size: body.length,
               version: "1.0",
               pack,
-              sort_order: h === 1920 ? 21 : 20,
+              sort_order: shape === "story" ? sortBase + 1 : sortBase,
             }),
           });
       if (!row.ok) {
