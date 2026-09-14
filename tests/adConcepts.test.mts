@@ -13,7 +13,19 @@ import { CONCEPTS, SIZES, conceptText, allConceptStrings } from "../scripts/lib/
 import { findBannedClaims, findBrandLeaks } from "../scripts/lib/ad-guards.mjs";
 import { tokensForGym } from "../app/lib/partner-playbook-tokens.ts";
 
-const BRANDS = JSON.parse(readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"));
+// Mirrors the (unexported) GymBrand shape tokensForGym expects — TypeScript
+// 5.9 stopped inferring `any` through JSON.parse -> Object.entries, so the
+// parsed brands need a declared shape rather than being left as `unknown`.
+interface GymBrand {
+  gymName: string;
+  adTown: string;
+  promoCode: string | null;
+  canonicalPath: string;
+}
+
+const BRANDS: Record<string, GymBrand> = JSON.parse(
+  readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
+);
 const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 
 test("there are two concepts at two sizes", () => {

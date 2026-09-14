@@ -46,7 +46,7 @@ export function applyPlaybookTokens(body: string, tokens: PlaybookTokens): strin
   );
 
   return withConditionals.replace(/\{\{(\w+)\}\}/g, (match, key: string) => {
-    const value = (tokens as Record<string, string | null>)[key];
+    const value = (tokens as unknown as Record<string, string | null>)[key];
     return typeof value === "string" ? value : match;
   });
 }

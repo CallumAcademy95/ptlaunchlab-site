@@ -14,7 +14,22 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const BRANDS = JSON.parse(readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"));
+// TypeScript 5.9 stopped inferring `any` through JSON.parse -> Object.entries,
+// so the parsed brands need a declared shape rather than being left as
+// `unknown`. Only the fields this file actually asserts on are declared;
+// gym-brands.json entries carry more (colours, prices, etc.) which is fine —
+// this is a structural supertype, not the full record shape.
+interface GymBrand {
+  location?: string;
+  adTown: string;
+  siteUrl?: string;
+  logoUrl?: string;
+  logoHasAlpha?: boolean;
+}
+
+const BRANDS: Record<string, GymBrand> = JSON.parse(
+  readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
+);
 const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 
 test("there are 9 real partner gyms", () => {
