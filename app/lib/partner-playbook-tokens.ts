@@ -11,6 +11,14 @@ export interface PlaybookTokens {
   academyUrl: string;
   /** The month's own code, e.g. EBORBF600. Null outside a money month. */
   monthCode?: string | null;
+  /**
+   * Per-money-month codes as the PARTNER PORTAL addresses them, e.g. `bfCode`
+   * for Black Friday -- see codeTokenName()/tokensForPortal() in
+   * scripts/lib/promo-calendar.mjs. An index signature rather than named
+   * fields because the set of money months (and their token names) grows
+   * every time one is added to MONTHS.
+   */
+  [token: string]: string | null | undefined;
 }
 
 interface GymBrand {

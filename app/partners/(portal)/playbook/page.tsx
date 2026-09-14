@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { getPlaybook, PLAYBOOK_TYPES, type PlaybookEntry } from "@/app/lib/partner-playbook";
 import { getPackResources, formatFileSize, type PartnerResource } from "@/app/lib/partner-resources";
-import { tokensForGym } from "@/app/lib/partner-playbook-tokens";
+import { tokensForPortal } from "@/scripts/lib/promo-calendar.mjs";
 import brands from "@/scripts/gym-brands.json";
 import CopyButton from "../CopyButton";
 
@@ -146,10 +146,16 @@ export default async function PlaybookPage({
   // A brand entry with no `adTown` (the demo tenant) is treated the same as no
   // brand entry at all — otherwise `town` comes back `undefined` and
   // `{{town}}` renders literally on screen instead of being substituted.
+  //
+  // tokensForPortal (not tokensForGym) so every money month's own code —
+  // {{bfCode}} for November, and whatever a future money month adds — comes
+  // back resolved for the signed-in partner's slug, not left as a literal
+  // {{token}} in the owner-facing headline and the copy-to-clipboard email
+  // and SMS panels underneath it.
   const brand = (brands as Record<string, GymBrandEntry>)[partner.slug];
   const tokens =
     brand && brand.adTown
-      ? tokensForGym({ ...brand, adTown: brand.adTown }, "https://ptlaunchlab.co.uk")
+      ? tokensForPortal({ ...brand, adTown: brand.adTown }, "https://ptlaunchlab.co.uk", partner.slug)
       : null;
 
   const [entries, packs] = await Promise.all([
