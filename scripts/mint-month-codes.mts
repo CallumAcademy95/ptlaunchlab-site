@@ -14,6 +14,16 @@
  * what lets nine gyms share an amount while each carrying its own redeemable
  * string -- which is how an enrolment gets attributed to a gym at all.
  *
+ * Every promotion code this script creates carries an `expires_at` and a
+ * `max_redemptions` of 3. "The price goes back on Monday" is a promise the
+ * copy makes, not something Stripe enforces on its own -- SUMMER500PTLL is
+ * the standing counter-example: still ACTIVE, still uncapped, "archive it
+ * later" having never happened. The expiry comes from the month's own
+ * `expiresAt` (scripts/lib/promo-calendar.mjs), never a literal in this
+ * file, so January cannot inherit November's date; a money month with no
+ * `expiresAt` is refused before any network call. The redemption cap matches
+ * the HITIO launch precedent (3 per gym).
+ *
  * Uses raw fetch against the Stripe REST API, matching scripts/onboard-hitio.mts
  * -- `stripe` is not a dependency of this repo and is not being added for a
  * one-off minting script.
@@ -70,9 +80,35 @@ if (month.offerType !== "money") {
   );
   process.exit(1);
 }
+// Owner's ruling after SUMMER500PTLL: every money-month code gets BOTH an
+// expiry and a per-gym redemption cap, full stop. "Archive it later" is what
+// left SUMMER500PTLL live, uncapped, and undercutting every reveal month --
+// so a money month with no expiresAt in its MONTHS entry is refused outright
+// rather than minted with Stripe's defaults (no expiry, no cap). Derived from
+// the month's own data rather than a literal here, so January cannot inherit
+// November's date by copy-paste.
+if (!month.expiresAt) {
+  console.error(
+    `"${month.key}" (${month.label}) has no expiresAt in its MONTHS entry (scripts/lib/promo-calendar.mjs) -- ` +
+      `refusing to mint nine uncapped, unexpiring codes. Add expiresAt (an ISO 8601 UTC string) to this month.`,
+  );
+  process.exit(1);
+}
 // Re-bound so its type drops `undefined` for good -- TS does not carry the
 // narrowing above into the nested main() below, even for a const.
 const MONTH = month;
+
+// Unix seconds -- what Stripe's API wants -- derived from the month's own
+// ISO string rather than hardcoded, so this travels with MONTH automatically.
+const EXPIRES_AT_UNIX = Math.floor(new Date(MONTH.expiresAt).getTime() / 1000);
+if (!Number.isFinite(EXPIRES_AT_UNIX)) {
+  console.error(`"${MONTH.key}": expiresAt "${MONTH.expiresAt}" does not parse as a date.`);
+  process.exit(1);
+}
+// Matches the HITIO launch precedent: 3 redemptions per gym, not per code
+// pool -- each gym's promotion code is its own object, so this caps each
+// gym's own code independently, not the coupon as a whole.
+const MAX_REDEMPTIONS_PER_GYM = 3;
 
 const stripe = async (path: string, body?: Record<string, string>) => {
   const r = await fetch(`https://api.stripe.com/v1/${path}`, {
@@ -96,7 +132,10 @@ const stripe = async (path: string, body?: Record<string, string>) => {
 // early refusals above, before any network call, are fine as bare
 // process.exit(1) -- there is nothing yet to drain.)
 async function main() {
-console.log(`${APPLY ? "APPLYING" : "DRY RUN"} -- ${MONTH.label} (${MONTH.key}), £${MONTH.discountPence! / 100} off\n`);
+console.log(
+  `${APPLY ? "APPLYING" : "DRY RUN"} -- ${MONTH.label} (${MONTH.key}), £${MONTH.discountPence! / 100} off, ` +
+    `expires ${MONTH.expiresAt} (${EXPIRES_AT_UNIX}), max ${MAX_REDEMPTIONS_PER_GYM} redemptions per gym\n`,
+);
 
 const CURRENCY = "gbp";
 const couponName = `${MONTH.label} £${MONTH.discountPence! / 100} off`;
@@ -190,12 +229,22 @@ for (const slug of Object.keys(MONTH_CODE_PREFIX)) {
   }
 
   if (!APPLY) {
-    console.log(`  ${slug.padEnd(16)} ${code.padEnd(20)} WOULD CREATE (£${MONTH.discountPence! / 100} off)`);
+    console.log(
+      `  ${slug.padEnd(16)} ${code.padEnd(20)} WOULD CREATE (£${MONTH.discountPence! / 100} off, ` +
+        `expires ${MONTH.expiresAt}, max ${MAX_REDEMPTIONS_PER_GYM} redemptions)`,
+    );
     continue;
   }
 
-  const pc = await stripe("promotion_codes", { coupon: couponId!, code });
-  console.log(`  ${slug.padEnd(16)} ${code.padEnd(20)} created ${pc.id}`);
+  const pc = await stripe("promotion_codes", {
+    coupon: couponId!,
+    code,
+    expires_at: String(EXPIRES_AT_UNIX),
+    max_redemptions: String(MAX_REDEMPTIONS_PER_GYM),
+  });
+  console.log(
+    `  ${slug.padEnd(16)} ${code.padEnd(20)} created ${pc.id} (expires ${MONTH.expiresAt}, max ${MAX_REDEMPTIONS_PER_GYM})`,
+  );
 }
 
 if (!APPLY) console.log("\nDRY RUN -- nothing was created. Re-run with --apply.");

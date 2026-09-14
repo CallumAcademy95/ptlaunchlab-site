@@ -37,6 +37,13 @@ export const MONTHS = [
     offerType: "money",
     discountPence: 60_000,
     codeSuffix: "BF600",
+    // Every money month's codes must expire and be capped -- SUMMER500PTLL is
+    // the precedent for what "archive it later" means in practice, i.e.
+    // nothing, indefinitely. mint-month-codes.mts reads this and refuses to
+    // mint a money month that has none, rather than defaulting to "forever".
+    // ISO 8601 UTC so a human reads it directly; the minter converts to the
+    // Unix seconds Stripe's API wants.
+    expiresAt: "2026-12-01T00:00:00Z",
     eyebrow: "{{gymName}} ACADEMY",
     headline: ["BLACK FRIDAY", "£999 PAID IN FULL"],
     accentLine: "NORMALLY £1,399.",
