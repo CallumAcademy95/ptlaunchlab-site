@@ -11,6 +11,10 @@
     {
       "path": "/api/planner-opener",
       "schedule": "0 9,11,13,15 * * *"
+    },
+    {
+      "path": "/api/planner-opener",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

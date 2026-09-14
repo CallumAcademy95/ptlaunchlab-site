@@ -92,6 +92,40 @@ async function markSent(token: string, email: string, stamp: string): Promise<bo
   return j?.data?.fields?.plan_opener_sent === stamp;
 }
 
+/**
+ * One row per invocation, in the same `setter_events` table the gym cron writes
+ * to — the site and the setter app share a Supabase project.
+ *
+ * Never throws. Instrumentation that can break the thing it measures is worse
+ * than no instrumentation.
+ */
+async function logInvocation(req: NextRequest, now: Date, trigger: string, willSend: boolean) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+  try {
+    const res = await fetch(`${url}/rest/v1/setter_events`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        provider: "cron",
+        external_event_id: `planner-opener:${now.toISOString()}`,
+        signature_ok: true,
+        payload: {
+          route: "planner-opener",
+          verb: req.method,
+          userAgent: (req.headers.get("user-agent") ?? "").slice(0, 120),
+          trigger,
+          willSend,
+        },
+      }),
+    });
+    if (!res.ok) console.error("[planner-opener] invocation log failed", res.status);
+  } catch (err) {
+    console.error("[planner-opener] invocation log threw", err);
+  }
+}
+
 async function run(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
@@ -112,6 +146,22 @@ async function run(req: NextRequest) {
   const trigger = fromVercelCron ? "vercel-cron" : send ? "manual-send" : "manual-dry-run";
 
   const now = new Date();
+
+  // Record that this route was REACHED, before any decision about sending.
+  //
+  // Without this, "the scheduler never fired" and "it fired and nobody was
+  // eligible" are the same observation: nothing happens and nothing is written.
+  // That ambiguity cost two days on the sister repo, where a cron had been
+  // returning 405 to every run in silence. It matters more here, because this
+  // project had NO CRON_SECRET at all until 14 Sept — meaning gbp-cron had been
+  // 401ing since the day it was written, and nobody could tell.
+  //
+  // Awaited, never fire-and-forget: the early returns below (outside hours,
+  // MailerLite unreachable) are exactly the cases this needs to explain, and a
+  // dangling promise is dropped when the handler returns. Wrapped so the log can
+  // never take the send down with it.
+  await logInvocation(req, now, trigger, send);
+
   const hour = ukHour(now);
   if (send && (hour < SENDING_HOURS.from || hour >= SENDING_HOURS.to)) {
     return NextResponse.json({ ok: true, trigger, sent: 0, skipped: `outside sending hours (UK ${hour}:00)` });
