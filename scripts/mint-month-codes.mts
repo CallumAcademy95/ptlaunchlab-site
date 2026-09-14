@@ -18,6 +18,24 @@
  * -- `stripe` is not a dependency of this repo and is not being added for a
  * one-off minting script.
  *
+ * Coupon creation is idempotent too, not just the promotion codes: before
+ * creating, the script pages through every coupon in the account (GET
+ * /v1/coupons has no name filter, so this cannot be a single-page lookup --
+ * the account already holds a dozen-plus coupons) looking for one that
+ * already matches this month's name, amount_off and currency and is still
+ * `valid`. Exactly one match is reused; zero means create; more than one is
+ * refused rather than guessed at, because guessing which coupon nine
+ * partners' codes should point to is exactly the kind of silent mistake this
+ * script exists to prevent. `--coupon=<id>` lets the operator pin a specific
+ * coupon (skipping the search), but it is still validated against the
+ * month's amount/currency before use -- pinning the wrong id would be a live
+ * pricing error across nine partners, not a cosmetic one. Without this, a
+ * second `--apply` run (realistic: the operator recovering from a partial
+ * batch, or just unsure whether the first run went through) would mint a
+ * second £600 coupon every time, silently splitting gyms across coupon A and
+ * coupon B -- no financial harm since both discount the same amount, but it
+ * breaks the "one coupon per month" design and clean recovery.
+ *
  * Codes are derived via monthCodeFor()/MONTH_CODE_PREFIX from
  * scripts/lib/promo-calendar.mjs rather than re-derived here. Two gyms
  * (ironwolf, muscle-bound) deliberately mint under their launch-code prefix
@@ -38,6 +56,7 @@ for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8
 const SK = process.env.STRIPE_SECRET_KEY!;
 const APPLY = process.argv.includes("--apply");
 const monthKey = process.argv.find((a) => a.startsWith("--month="))?.split("=")[1];
+const couponArg = process.argv.find((a) => a.startsWith("--coupon="))?.split("=")[1];
 
 const month = MONTHS.find((m) => m.key === monthKey);
 if (!month) {
@@ -51,6 +70,9 @@ if (month.offerType !== "money") {
   );
   process.exit(1);
 }
+// Re-bound so its type drops `undefined` for good -- TS does not carry the
+// narrowing above into the nested main() below, even for a const.
+const MONTH = month;
 
 const stripe = async (path: string, body?: Record<string, string>) => {
   const r = await fetch(`https://api.stripe.com/v1/${path}`, {
@@ -66,27 +88,97 @@ const stripe = async (path: string, body?: Record<string, string>) => {
   return j;
 };
 
-console.log(`${APPLY ? "APPLYING" : "DRY RUN"} -- ${month.label} (${month.key}), £${month.discountPence! / 100} off\n`);
+// Everything past this point talks to the network. On Windows, calling
+// process.exit() while a fetch()'s keep-alive socket is still open crashes
+// the process with a libuv assertion instead of exiting cleanly -- so every
+// exit path below this line sets process.exitCode and returns out of main()
+// instead, letting Node drain the event loop and exit on its own. (The two
+// early refusals above, before any network call, are fine as bare
+// process.exit(1) -- there is nothing yet to drain.)
+async function main() {
+console.log(`${APPLY ? "APPLYING" : "DRY RUN"} -- ${MONTH.label} (${MONTH.key}), £${MONTH.discountPence! / 100} off\n`);
 
-const couponName = `${month.label} £${month.discountPence! / 100} off`;
+const CURRENCY = "gbp";
+const couponName = `${MONTH.label} £${MONTH.discountPence! / 100} off`;
 
-let couponId: string | null = null;
-if (APPLY) {
-  const coupon = await stripe("coupons", {
-    amount_off: String(month.discountPence),
-    currency: "gbp",
-    duration: "once",
-    name: couponName,
-  });
+// A coupon that matches this month's intent: same name, same amount, same
+// currency, and still redeemable. `valid` is Stripe's own flag for "not
+// deleted and (if it ever had a redeem_by/max_redemptions) not expired" --
+// an invalid coupon must never be silently reused.
+const matchesMonth = (c: { name: string | null; amount_off: number | null; currency: string | null; valid: boolean }) =>
+  c.valid && c.name === couponName && c.amount_off === MONTH.discountPence && c.currency === CURRENCY;
+
+let couponId: string;
+
+if (couponArg) {
+  // Operator pinned a specific coupon -- skip the search entirely, but still
+  // validate it before nine promotion codes get pointed at it. A mismatch
+  // here would be a live pricing error across nine partners, so it refuses
+  // loudly rather than proceeding.
+  let coupon;
+  try {
+    coupon = await stripe(`coupons/${encodeURIComponent(couponArg)}`);
+  } catch (e) {
+    console.error(`--coupon=${couponArg}: ${(e as Error).message}`);
+    process.exitCode = 1;
+    return;
+  }
+  if (!coupon.valid || coupon.amount_off !== MONTH.discountPence || coupon.currency !== CURRENCY) {
+    console.error(
+      `--coupon=${couponArg} does not match ${MONTH.key}: ` +
+        `valid=${coupon.valid} amount_off=${coupon.amount_off} currency=${coupon.currency} ` +
+        `(expected valid=true amount_off=${MONTH.discountPence} currency=${CURRENCY}). Refusing to mint ` +
+        `nine codes against the wrong discount.`,
+    );
+    process.exitCode = 1;
+    return;
+  }
   couponId = coupon.id;
-  console.log(`coupon ${coupon.id} -- ${couponName}`);
+  console.log(`coupon ${coupon.id} -- using --coupon (name="${coupon.name}", £${coupon.amount_off / 100} off, valid)`);
 } else {
-  console.log(`coupon  WOULD CREATE -- "${couponName}" (amount_off=${month.discountPence}, currency=gbp, duration=once)`);
+  // No pin given: page through every coupon in the account looking for one
+  // that already matches. GET /v1/coupons has no name filter, so this cannot
+  // be a single list() call -- has_more must be honoured.
+  const matches: { id: string; name: string | null }[] = [];
+  let startingAfter: string | undefined;
+  for (;;) {
+    const page = await stripe(`coupons?limit=100${startingAfter ? `&starting_after=${startingAfter}` : ""}`);
+    for (const c of page.data as { id: string; name: string | null; amount_off: number | null; currency: string | null; valid: boolean }[]) {
+      if (matchesMonth(c)) matches.push({ id: c.id, name: c.name });
+    }
+    if (!page.has_more) break;
+    startingAfter = page.data[page.data.length - 1].id;
+  }
+
+  if (matches.length > 1) {
+    console.error(`${matches.length} existing coupons match "${couponName}" (£${MONTH.discountPence! / 100} off, ${CURRENCY}, valid):`);
+    for (const m of matches) console.error(`  ${m.id}  ${m.name}`);
+    console.error("Refusing to guess. Re-run with --coupon=<id> to pick one.");
+    process.exitCode = 1;
+    return;
+  }
+
+  if (matches.length === 1) {
+    couponId = matches[0].id;
+    console.log(`coupon ${couponId} -- REUSING existing match ("${matches[0].name}")`);
+  } else if (APPLY) {
+    const coupon = await stripe("coupons", {
+      amount_off: String(MONTH.discountPence),
+      currency: CURRENCY,
+      duration: "once",
+      name: couponName,
+    });
+    couponId = coupon.id;
+    console.log(`coupon ${coupon.id} -- created "${couponName}"`);
+  } else {
+    couponId = "";
+    console.log(`coupon  WOULD CREATE -- "${couponName}" (amount_off=${MONTH.discountPence}, currency=${CURRENCY}, duration=once)`);
+  }
 }
 
 console.log("\nPromotion codes:");
 for (const slug of Object.keys(MONTH_CODE_PREFIX)) {
-  const code = monthCodeFor(slug, month.key)!;
+  const code = monthCodeFor(slug, MONTH.key)!;
 
   // Read-only existence check -- safe in both dry run and apply. Filtered to
   // ACTIVE codes only: Stripe allows an archived code and a fresh code to
@@ -98,7 +190,7 @@ for (const slug of Object.keys(MONTH_CODE_PREFIX)) {
   }
 
   if (!APPLY) {
-    console.log(`  ${slug.padEnd(16)} ${code.padEnd(20)} WOULD CREATE (£${month.discountPence! / 100} off)`);
+    console.log(`  ${slug.padEnd(16)} ${code.padEnd(20)} WOULD CREATE (£${MONTH.discountPence! / 100} off)`);
     continue;
   }
 
@@ -107,3 +199,6 @@ for (const slug of Object.keys(MONTH_CODE_PREFIX)) {
 }
 
 if (!APPLY) console.log("\nDRY RUN -- nothing was created. Re-run with --apply.");
+}
+
+await main();
