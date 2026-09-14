@@ -23,21 +23,25 @@ The poll is the engine, same as January. Everyone who taps **No** has just learn
 
 ## The member email
 
-Subject: **A question about the PT course**
+```
+Subject: A question about the PT course
 
-> Quick one.
->
-> Most personal training courses get you the Level 3. Ours covers the Level 2 Certificate in Gym Instructing as well — both, in the same course, for the same price.
->
-> There's a tutor from day one, and a £500 business mentorship community included, which is the part people are usually most surprised by.
->
-> If you've ever thought about it, reply to this and tell me where you're at. I'll tell you honestly whether it's worth your time.
+Quick one.
+
+Most personal training courses get you the Level 3. Ours covers the Level 2 Certificate in Gym Instructing as well — both, in the same course, for the same price.
+
+There's a tutor from day one, and a £500 business mentorship community included, which is the part people are usually most surprised by.
+
+If you've ever thought about it, reply to this and tell me where you're at. I'll tell you honestly whether it's worth your time.
+```
 
 Reply, not click. People who reply are in a conversation; people who click are on a page.
 
 ## WhatsApp / SMS
 
-> Did you know our PT course covers Level 2 AND Level 3? Most only do the 3. Reply if you want the detail.
+```
+Did you know our PT course covers Level 2 AND Level 3? Most only do the 3. Reply if you want the detail.
+```
 
 ## When someone replies
 

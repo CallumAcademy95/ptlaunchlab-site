@@ -38,9 +38,9 @@ export const MONTHS = [
     discountPence: 60_000,
     codeSuffix: "BF600",
     eyebrow: "{{gymName}} ACADEMY",
-    headline: ["BLACK FRIDAY", "£600 OFF"],
-    accentLine: "£999 PAID IN FULL.",
-    sub: "Level 2 and Level 3 Personal Training, £999 paid in full at {{gymName}}. Black Friday only.",
+    headline: ["BLACK FRIDAY", "£999 PAID IN FULL"],
+    accentLine: "NORMALLY £1,399.",
+    sub: "Level 2 and Level 3 Personal Training at {{gymName}}. Pay-in-full price, Black Friday only.",
     footer: "Code {{monthCode}}",
   },
 ];

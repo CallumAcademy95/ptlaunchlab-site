@@ -10,7 +10,7 @@ This is the one week all year the price moves properly, and the one month member
 
 **£999 paid in full. Code `{{monthCode}}`.**
 
-That is £600 off. It applies to the pay-in-full price only — it cannot be used on the instalment plan, and it replaces the standing discount rather than stacking on top of it. Say so plainly; a member who finds that out at checkout is a member who does not finish checkout.
+£600 off the £1,599 list price — but every member's own reference point is the £1,399 already on your page, since the code replaces your standing £200 discount rather than stacking on it. So don't say "£600 off" to a member: say the number they can check themselves — £999, down from £1,399. It applies to the pay-in-full price only — it cannot be used on the instalment plan. A member who discovers any of this at checkout is a member who does not finish checkout.
 
 ## The week
 
@@ -25,19 +25,23 @@ Reply speed is the whole campaign. A Black Friday enquiry that waits until Tuesd
 
 ## The member email
 
-Subject: **£999 this week**
+```
+Subject: £999 this week
 
-> Our PT course is £999 this week — £600 off the full price.
->
-> It covers the NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, with a tutor from day one and the £500 business mentorship community included.
->
-> Use code **{{monthCode}}** at {{academyUrl}}. It applies to the full payment option only, and the price goes back on Monday.
->
-> If you want to talk it through before you decide, just reply.
+Our PT course is £999 this week if you pay in full — normally £1,399.
+
+It covers the NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, with a tutor from day one and the £500 business mentorship community included.
+
+Use code {{monthCode}} at {{academyUrl}}. It applies to the full payment option only, and the price goes back on Monday.
+
+If you want to talk it through before you decide, just reply.
+```
 
 ## WhatsApp / SMS
 
-> PT course is £999 this week, £600 off. Code {{monthCode}} at {{academyUrl}}. Full payment only, back to normal Monday.
+```
+PT course is £999 this week (normally £1,399), paid in full. Code {{monthCode}} at {{academyUrl}}. Back to normal Monday.
+```
 
 ## What to judge it on
 
