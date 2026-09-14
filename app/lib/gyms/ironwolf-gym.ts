@@ -56,6 +56,6 @@ export const ironwolfGym: GymConfig = {
   // ── SEO
   metaTitle: "Iron Wolf PT Academy | Become a Qualified Personal Trainer at Iron Wolf Gym, Goole",
   metaDescription:
-    "Train, qualify, and earn at Iron Wolf Gym in Goole. Get £200 off your Level 2 & 3 PT qualification exclusively through Iron Wolf Gym. Mentorship included. Interview opportunities at Iron Wolf.",
+    "Train, qualify, and earn at Iron Wolf Gym in Goole. Get £200 off your Level 2 & 3 PT qualification exclusively through Iron Wolf Gym. Mentorship included. Interview guarantee on qualifying.",
   canonicalPath: "/ironwolf-gym",
 };

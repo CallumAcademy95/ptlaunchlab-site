@@ -33,6 +33,6 @@ export const sixFitAcademy: GymConfig = {
   ],
   metaTitle: "6fit PT Academy | Become a Qualified Personal Trainer at 6fit Gyms",
   metaDescription:
-    "Train, qualify, and earn at Bradford's best gym. Get £200 off your Level 2 & 3 PT qualification exclusively through 6fit Gyms. Mentorship included. Interview opportunities at 6fit.",
+    "Train, qualify, and earn at Bradford's best gym. Get £200 off your Level 2 & 3 PT qualification exclusively through 6fit Gyms. Mentorship included. Interview guarantee on qualifying.",
   canonicalPath: "/6fit-academy",
 };

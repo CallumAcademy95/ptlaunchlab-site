@@ -146,7 +146,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               {[
                 { icon: "🎓", title: "Full PT Qualification", body: "Study 100% online around your current job.", items: ["Level 2 Gym Instructor", "Level 3 Personal Trainer", "Industry recognised & Ofqual regulated"] },
                 { icon: "🧠", title: "Mentorship Included", body: "You are not left to work it out on your own.", items: ["Support throughout your qualification", "Real-world advice from industry pros", "How to actually succeed as a PT"] },
-                { icon: "🏋️", title: "Gym Pathway", body: `A real route to working at ${c.gymName} as a self-employed PT once you qualify. Interview opportunities available on completion. This is an independent contractor arrangement, not a salaried position.`, items: [`Interview opportunities at ${c.gymName}`, "Learn how gyms actually work", "Build confidence on the gym floor"] },
+                { icon: "🏋️", title: "Gym Pathway", body: `Qualify inside ${c.gymName}, on the floor where trainers actually work. On completion at least one interview is arranged for you — with a gym in the partner network, or with a gym local to you approached on your behalf. Any arrangement with a gym is an independent contractor one, not a salaried position.`, items: ["At least one interview arranged on qualifying", "Learn how gyms actually work", "Build confidence on the gym floor"] },
                 { icon: "💰", title: "How You Make Money", body: "Income, not just certificates.", items: ["1-1 PT sessions", "Online coaching", "Hybrid coaching models"] },
               ].map(card => (
                 <div key={card.title} className="bg-gray-50 border border-gray-100 rounded-2xl p-7">
