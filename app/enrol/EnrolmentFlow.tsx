@@ -384,7 +384,16 @@ export default function EnrolmentFlow({
   // plain price, not a price struck through against itself.
   const listPricePence = (partner?.fullPrice ?? PIF_PENCE / 100) * 100;
   const showDiscountUI = Boolean(appliedPromo) && fullPricePence < listPricePence;
-  const displayPricePence = appliedPromo ? fullPricePence : listPricePence;
+  // Until appliedPromo resolves (it starts null — set only by the client-side
+  // round-trip to /api/promo/validate fired from a mount effect, never during
+  // SSR or first paint), the CTA below is already showing PIF_PENCE — nothing
+  // has discounted fullPricePence yet. This must match it, not listPricePence,
+  // or the page reads "£1,399" above a "Pay £1,599 →" button on every load
+  // until the round-trip returns, and PERMANENTLY if the standing code ever
+  // fails to validate — the exact "page advertises one price, Stripe charges
+  // another" defect this file's own PartnerConfig.fullPrice comment warns
+  // about, reintroduced by the fix meant to remove it.
+  const displayPricePence = appliedPromo ? fullPricePence : PIF_PENCE;
 
   // The deposit is NEVER discounted: £599 now, then 5 × £200. The old code
   // computed instalments as (fullPrice - depositPrice) / 200, which produced 4
