@@ -34,11 +34,27 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { extractSnippets } from "../app/lib/partner-playbook-snippets.ts";
+import { applyPlaybookTokens } from "../app/lib/partner-playbook-tokens.ts";
+import { tokensForPortal } from "../scripts/lib/promo-calendar.mjs";
 import { findBrandLeaks } from "../scripts/lib/ad-guards.mjs";
 
 const PLAYBOOK_DIR = new URL("../partner-playbook/", import.meta.url);
 
 const FILES = readdirSync(PLAYBOOK_DIR).filter((f) => f.endsWith(".md"));
+
+// Mirrors the (unexported) GymBrand shape tokensForGym/tokensForPortal expect
+// — same reason as the identical interface in tests/adCopy.test.mts.
+interface GymBrand {
+  gymName: string;
+  adTown: string;
+  promoCode: string | null;
+  canonicalPath: string;
+}
+
+const BRANDS: Record<string, GymBrand> = JSON.parse(
+  readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
+);
+const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 
 // Same frontmatter split as app/lib/partner-playbook.ts's parseFrontmatter —
 // the portal never runs extractSnippets over the frontmatter block, so
@@ -91,6 +107,80 @@ test("no fenced copy block in any partner-playbook entry names PT Launch Lab", (
   }
 
   // Same rationale as the file-count check above: a scan that quietly found
-  // 0 blocks would pass this test having verified nothing at all.
-  assert.equal(totalBlocks, 78, `expected 78 fenced blocks across partner-playbook, found ${totalBlocks}`);
+  // 0 blocks would pass this test having verified nothing at all. Not pinned
+  // to an exact number here (contrast the 52-file / 8-block checks elsewhere)
+  // — new fenced blocks land in these files routinely as the calendar grows,
+  // and the whole-body test below is what actually closes the gap a
+  // fenced-only scan leaves.
+  assert.ok(totalBlocks > 0, "found 0 fenced blocks across partner-playbook — the scan verified nothing");
+});
+
+// WIDENING THE SCAN
+//
+// findBrandLeaks above only ever sees fenced blocks. campaign-october-two-
+// qualifications.md:11 ("**The line:** *Level 2 and Level 3...*") and its
+// story-poll table cell are member-facing copy — a partner reads them
+// straight off the page and repeats them on the gym floor or in a caption —
+// but they sit outside a fenced block, so the check above never runs on
+// them. findBrandLeaks has no false-positive problem (see the file header),
+// so there is no reason to hold it back from the rest of the body the way
+// findBannedClaims is deliberately held back in tests/adCopy.test.mts.
+test("no partner-playbook entry names PT Launch Lab anywhere in its body, fenced or not", () => {
+  for (const file of FILES) {
+    const raw = readFileSync(new URL(file, PLAYBOOK_DIR), "utf8");
+    const body = stripFrontmatter(raw);
+
+    // Same completeness guard as above, per file this time: a file that
+    // parsed to an empty body (a frontmatter-split bug, a truncated read)
+    // must not silently pass by having nothing to scan.
+    assert.ok(body.trim().length > 0, `${file}: body is empty after stripping frontmatter — nothing was scanned`);
+
+    const leaks = findBrandLeaks(body);
+    assert.deepEqual(
+      leaks,
+      [],
+      `${file}: brand leak ${JSON.stringify(leaks)} in member-facing copy outside a fenced block`
+    );
+  }
+});
+
+// THE GUARD THAT WAS MISSING — see FIX 2 in the whole-branch review.
+//
+// gym-promo-creatives.mjs has exactly this check for the rendered graphics
+// (`if (line.includes("{{")) throw ...`); the playbook had nothing
+// equivalent, which is how campaign-november-black-friday.md shipped with a
+// literal {{monthCode}} in the portal — a token tokensForGym (what the portal
+// actually calls) never supplied.
+//
+// This substitutes tokens with tokensForPortal — the SAME function
+// app/partners/(portal)/playbook/page.tsx calls — for every real gym, over
+// every playbook entry, and asserts no machine token survives. Anything
+// hand-built here (a literal `{ ...tokensForGym(...), monthCode: ... }`, say)
+// would test a token object nothing in production constructs, which is
+// exactly the gap that let the original defect through review undetected.
+//
+// Scoped to /\{\{\w+\}\}/ — the exact shape applyPlaybookTokens' own regex
+// looks for — rather than a bare "{{" anywhere. email-02-member-sequence.md
+// deliberately uses {{First Name}} and {{Gym Name}} (Title Case, a space)
+// as hand-fill placeholders for a 1:1 email a gym owner sends themselves —
+// the member's first name cannot be known at portal-render time, and the
+// space means applyPlaybookTokens' own \w+ regex never matches it either.
+// That is a different, legitimate convention, not an unresolved token.
+test("every partner-playbook entry, rendered the way the portal renders it, has no unresolved {{token}}", () => {
+  assert.ok(REAL.length === 9, `expected 9 real gyms in gym-brands.json, found ${REAL.length}`);
+
+  for (const file of FILES) {
+    const raw = readFileSync(new URL(file, PLAYBOOK_DIR), "utf8");
+    const body = stripFrontmatter(raw);
+
+    for (const [slug, brand] of REAL) {
+      const tokens = tokensForPortal(brand, "https://ptlaunchlab.co.uk", slug);
+      const personalised = applyPlaybookTokens(body, tokens);
+      assert.doesNotMatch(
+        personalised,
+        /\{\{\w+\}\}/,
+        `${file}, gym ${slug}: unresolved token placeholder survived substitution as the portal would render it:\n---\n${personalised}\n---`
+      );
+    }
+  }
 });

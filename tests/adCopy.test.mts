@@ -52,6 +52,11 @@ const BRANDS: Record<string, GymBrand> = JSON.parse(
 );
 const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 
+// Hardcoded to this one file on purpose — findBannedClaims stays file-scoped
+// because widening it flags 20 legitimate passages elsewhere ("designed to
+// fit around a job", the "no guarantee" script). See the header of
+// tests/brandLeaks.test.mts for the full reasoning and for findBrandLeaks,
+// which has no such false-positive problem and DOES run over every entry.
 const RAW = readFileSync(
   new URL("../partner-playbook/campaign-meta-ads.md", import.meta.url),
   "utf8"

@@ -17,7 +17,7 @@ Every post, email and conversation in this playbook is written in **your** voice
 **Not this**
 
 > "We've partnered with a training provider."
-> "Applications are open for the PT Launch Lab intake."
+> "Applications are open for the training provider's intake."
 > "They run the course, we just refer you."
 
 ## Why it matters
