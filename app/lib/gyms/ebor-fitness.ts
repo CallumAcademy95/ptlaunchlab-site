@@ -22,8 +22,9 @@ export const eborFitness: GymConfig = {
   location: "York",
 
   // ── Discount
-  showDiscount: false,
-  fullPrice: 1599,
+  promoCode: "EBORPTDISCOUNT",
+  discountAmount: 200,
+  fullPrice: 1399,
   depositPrice: 599,
 
   positioningSubline: "Built inside one of York's most established gyms, by people who actually hire PTs.",

@@ -23,6 +23,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { GYMS, GYM_SLUGS, getGym } from "../app/lib/gyms/index.ts";
+import { PARTNER_STANDING_CODE } from "../app/lib/partnerPromo.ts";
 
 const APP_DIR = new URL("../app/", import.meta.url);
 
@@ -95,5 +96,39 @@ test("slugs are url-safe — they are pasted into a partner's html", () => {
   for (const slug of GYM_SLUGS) {
     assert.match(slug, /^[a-z0-9-]+$/, `${slug} is not url-safe`);
     assert.equal(encodeURIComponent(slug), slug, `${slug} would be escaped in the embed URL`);
+  }
+});
+
+// Route slug -> gym slug. Only two differ, both documented in
+// app/lib/gyms/index.ts. Commission joins on the gym slug, never the route.
+const GYM_SLUG_BY_ROUTE: Record<string, string> = {
+  "6fit-academy": "6fit",
+  "ebor-fitness": "ebor",
+  "gym-n-go-academy": "gym-n-go",
+  "hitio-orpington-academy": "hitio-orpington",
+  "ironwolf-gym": "ironwolf",
+  "mof-gym": "mof",
+  "muscle-bound-academy": "muscle-bound",
+  "superflex-academy": "superflex",
+  "xcelerate-academy": "xcelerate",
+  "demo-academy": "demo",
+};
+
+test("the route-to-gym-slug map covers every registered gym", () => {
+  for (const routeSlug of Object.keys(GYMS)) {
+    assert.ok(GYM_SLUG_BY_ROUTE[routeSlug], `${routeSlug} is missing from GYM_SLUG_BY_ROUTE`);
+  }
+});
+
+test("every gym with an active standing code advertises the discounted price", () => {
+  for (const [routeSlug, config] of Object.entries(GYMS)) {
+    const gymSlug = GYM_SLUG_BY_ROUTE[routeSlug];
+    if (gymSlug === "demo") continue;
+    if (!PARTNER_STANDING_CODE[gymSlug]) continue;
+    assert.equal(
+      config.fullPrice,
+      1399,
+      `${gymSlug} has standing code ${PARTNER_STANDING_CODE[gymSlug]} but advertises £${config.fullPrice}`,
+    );
   }
 });
