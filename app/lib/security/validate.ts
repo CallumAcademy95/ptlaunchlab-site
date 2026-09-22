@@ -184,7 +184,14 @@ export function validateContact(raw: unknown): ValidationResult<ContactClean> {
   if (!parsed.success) {
     return { ok: false, silent: false, status: 400, error: "Missing required fields.", signals: ["schema-fail"] };
   }
-  const secCheck = sec(raw);
+  // Honeypot only — same permissive stance as gym partnership and enrolments,
+  // and for the same reason. The time-trap and nonce checks silently binned
+  // real enquiries (a returning visitor whose browser autofills name/email and
+  // sends a one-line message trips the 1.5s trap; a submit fired before the
+  // nonce effect has run trips "no-js") while showing the sender a success
+  // screen. That failure mode is invisible to us and reads to them as "your
+  // form is broken" — which is exactly how it was reported.
+  const secCheck = validateContactSec(raw);
   if (!secCheck.ok) {
     return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
   }
@@ -203,7 +210,11 @@ export function validateContact(raw: unknown): ValidationResult<ContactClean> {
   }
 
   if (hasEmail) {
-    const ec = validateEmail(parsed.data.email);
+    // allowRole: a general enquiry legitimately comes from a team inbox —
+    // info@ or admin@ at a gym, a studio or an employer is a real person
+    // asking a real question, not the cold lead the role-address filter was
+    // written to screen out.
+    const ec = validateEmail(parsed.data.email, { allowRole: true });
     if (!ec.ok) {
       return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
     }
@@ -552,6 +563,23 @@ export function validateGymPartnership(raw: unknown): ValidationResult<GymPartne
     },
     signals: [],
   };
+}
+
+/**
+ * Contact-form sec check. Honeypot only, mirroring validateGymPartnershipSec
+ * and validateEnrolmentSec — see the note at the call site in validateContact.
+ * A filled honeypot is a real bot signal and still drops; "too fast" and
+ * "no JS" are not, at the false-positive rate they were costing us.
+ */
+export function validateContactSec(raw: unknown): SecCheck {
+  if (!raw || typeof raw !== "object") return { ok: true };
+  const s = (raw as Record<string, unknown>)[SEC_KEY];
+  if (!s || typeof s !== "object") return { ok: true };
+  const hp = (s as { hp?: unknown }).hp;
+  if (typeof hp === "string" && hp.length > 0) {
+    return { ok: false, reason: "honeypot" };
+  }
+  return { ok: true };
 }
 
 /**

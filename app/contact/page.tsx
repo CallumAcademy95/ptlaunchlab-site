@@ -8,20 +8,41 @@ import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const sec = useFormSecurity();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  // This used to `await fetch(...)` and then setSubmitted(true) unconditionally,
+  // so a 400/422/429/502 all rendered "Message sent." — the sender walked away
+  // believing they'd reached us. Every other lead form on the site checks the
+  // response; this one now does too. On failure the form KEEPS the typed
+  // message so they can fix one field and resend rather than retype it.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
-    });
-    setSubmitted(true);
+    if (sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) {
+        setError(data?.error ?? "Something went wrong sending your message.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setError("We couldn't reach the server. Check your connection and try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -102,6 +123,15 @@ export default function ContactPage() {
                   <h2 className="text-white font-bold text-2xl mb-6">Send us a message</h2>
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <sec.Honeypot />
+                    {error && (
+                      <div role="alert" className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3">
+                        <p className="text-red-200 text-sm">{error}</p>
+                        <p className="text-[#8CA3BF] text-xs mt-2">
+                          Or reach us directly on{" "}
+                          <a href={`tel:${PHONE_TEL}`} className="text-[#F5C518] hover:underline">{PHONE_NATIONAL}</a>.
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <label className="text-[#8CA3BF] text-sm mb-2 block">Name</label>
                       <input
@@ -151,9 +181,10 @@ export default function ContactPage() {
                     <p className="text-[#4A6280] text-xs">Either email or phone number is required.</p>
                     <button
                       type="submit"
-                      className="w-full px-6 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
+                      disabled={sending}
+                      className="w-full px-6 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Send Message →
+                      {sending ? "Sending…" : "Send Message →"}
                     </button>
                   </form>
                 </>
