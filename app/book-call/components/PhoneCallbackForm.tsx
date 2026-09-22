@@ -5,7 +5,6 @@ import { trackEvent } from "@/app/lib/gtag";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { WHATSAPP_DISPLAY } from "@/app/lib/contactDetails";
 
-const ZAPIER_HOOK = process.env.NEXT_PUBLIC_ZAPIER_PHONE_CALLBACK_HOOK || "";
 
 type Touch = {
   utm_source?: string;
@@ -86,23 +85,28 @@ export default function PhoneCallbackForm() {
     };
 
     try {
-      if (!ZAPIER_HOOK) {
-        throw new Error("Form endpoint not configured. Please WhatsApp us instead.");
+      // Posts to OUR origin, not hooks.zapier.com. The direct-to-Zapier call
+      // this replaces was blocked before it left the device by ad blockers,
+      // privacy browsers, DNS filters and some carrier networks — every one of
+      // which has hooks.zapier.com on a list — and surfaced to the visitor as a
+      // raw "Failed to fetch" on the form we most need to work. The route
+      // forwards to the same Zapier hook server-side and emails the request to
+      // the team inbox, so a blocked or dead hook can no longer lose a lead.
+      // Everything in the payload that isn't a field the route takes directly
+      // rides along as attribution: utm/click-ids, landing path, referrer.
+      const CORE = new Set(["call_type", "name", "mobile", "email", "topics"]);
+      const attribution: Record<string, string> = {};
+      for (const [k, v] of Object.entries(payload)) {
+        if (!CORE.has(k)) attribution[k] = String(v ?? "");
       }
-      // Form-encoded body (not JSON) — keeps the request CORS-simple so
-      // the browser skips preflight, which Zapier's catch hook does not
-      // fully support. Zapier parses application/x-www-form-urlencoded
-      // identically to JSON for catch hooks.
-      const body = new URLSearchParams();
-      Object.entries(payload).forEach(([k, v]) => {
-        body.append(k, String(v ?? ""));
-      });
-      const res = await fetch(ZAPIER_HOOK, {
+      const res = await fetch("/api/book-call", {
         method: "POST",
-        body,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, mobile, email, topics, attribution }),
       });
-      if (!res.ok) {
-        throw new Error("Submission failed");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) {
+        throw new Error(data?.error ?? "Submission failed");
       }
 
       window.dataLayer = window.dataLayer || [];
@@ -159,8 +163,12 @@ export default function PhoneCallbackForm() {
 
       setSubmitted(true);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong.";
-      setError(message + ` Please try again, or WhatsApp us at ${WHATSAPP_DISPLAY}.`);
+      // A raw fetch TypeError reads "Failed to fetch", which tells the visitor
+      // nothing and looks broken. Only show a message we wrote ourselves.
+      const raw = err instanceof Error ? err.message : "";
+      const known = raw && !/fetch|network|load failed/i.test(raw);
+      const message = known ? raw : "Something went wrong sending your request.";
+      setError(`${message.replace(/\.?$/, ".")} Please try again, or WhatsApp us at ${WHATSAPP_DISPLAY}.`);
     } finally {
       setSubmitting(false);
     }

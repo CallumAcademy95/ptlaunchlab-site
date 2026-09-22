@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const PROTECTED_PATHS = new Set([
+  "/api/book-call",
   "/api/contact",
   "/api/quiz-submission",
   "/api/prospectus",
@@ -23,6 +24,9 @@ const PROTECTED_PATHS = new Set([
 // so the allowance went with it rather than being left as a standing 32 KB door
 // to a path that no longer exists.
 const MAX_BODY: Record<string, number> = {
+  // Carries the utm/click-id attribution bag as well as the fields, so it runs
+  // larger than the other form payloads.
+  "/api/book-call":       16 * 1024,
   "/api/contact":         8 * 1024,
   "/api/quiz-submission": 12 * 1024,
   "/api/prospectus":      4 * 1024,

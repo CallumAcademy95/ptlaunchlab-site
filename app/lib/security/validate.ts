@@ -147,6 +147,21 @@ const gymPartnershipSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
+// ── Book a call (phone callback) ─────────────────────────────────────────
+// The highest-intent form on the site and the one the paid campaigns point at,
+// so validation is deliberately thin: name, mobile and email must be present
+// and plausible, everything else rides along. Attribution is a free-form bag of
+// utm/click-id strings — it is forwarded, never validated, because a weird
+// value in a tracking field must never cost a callback.
+const bookCallSchema = z.object({
+  name:   z.string().max(200),
+  mobile: z.string().max(40),
+  email:  z.string().max(254),
+  topics: z.string().max(2000).optional().or(z.literal("")),
+  attribution: z.record(z.string(), z.string().max(500)).optional(),
+  [SEC_KEY]: secSchema,
+});
+
 // ── Result types ─────────────────────────────────────────────────────────
 export type ValidationOk<T> = {
   ok: true;
@@ -615,4 +630,62 @@ export function validateEnrolmentSec(raw: unknown): SecCheck {
     return { ok: false, reason: "honeypot" };
   }
   return { ok: true };
+}
+
+
+export type BookCallClean = {
+  name: string;
+  mobile: string;
+  email: string;
+  topics: string;
+  attribution: Record<string, string>;
+};
+
+/**
+ * Callback requests. Permissive for the same reason gym partnerships and
+ * enrolments are: this is a person asking to be phoned back about a £1,599
+ * course, so the cost of a false positive dwarfs the cost of letting a bot
+ * through to a human who can ignore it.
+ *
+ * - Honeypot only on the sec check (no time-trap, no nonce).
+ * - Role addresses allowed: academy@, info@ and enquiries@ at a gym are exactly
+ *   who we want on this form.
+ * - validateAnyPhone, not validateUKPhone: the form's own field already asks
+ *   for a mobile, and rejecting a valid international number on the callback
+ *   form is a lost sale, not a caught bot.
+ */
+export function validateBookCall(raw: unknown): ValidationResult<BookCallClean> {
+  const parsed = bookCallSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Please enter your name, email and mobile number.", signals: ["schema-fail"] };
+  }
+  const secCheck = validateContactSec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+
+  const nameCheck = validateName(parsed.data.name);
+  if (!nameCheck.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter your full name.", signals: [`name:${nameCheck.reason}`] };
+  }
+  const ec = validateEmail(parsed.data.email, { allowRole: true });
+  if (!ec.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  }
+  const pc = validateAnyPhone(parsed.data.mobile);
+  if (!pc.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a valid mobile number.", signals: [`phone:${pc.reason}`] };
+  }
+
+  return {
+    ok: true,
+    data: {
+      name:        nameCheck.normalised!,
+      mobile:      pc.normalised!,
+      email:       ec.normalised!,
+      topics:      (parsed.data.topics ?? "").trim(),
+      attribution: parsed.data.attribution ?? {},
+    },
+    signals: [],
+  };
 }
