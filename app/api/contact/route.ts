@@ -129,6 +129,15 @@ export async function POST(request: NextRequest) {
 
   // ── 1. Email the enquiry to the team inbox. This is the delivery that
   //       matters — replying to it reaches the sender directly.
+  //
+  //       This is a NOTIFICATION, not a lead hand-off. info@ is also the
+  //       mailbox the setter polls (see planner-opener/route.ts), so without
+  //       the markers below the poll would read this as an inbound lead and
+  //       open a second conversation on top of the notifySetter hand-off in
+  //       step 3 — one enquiry, two opener emails to the same prospect.
+  //       `Auto-Submitted: auto-generated` is the RFC 3834 marker for exactly
+  //       this; the own-domain From is the second signal. Step 3 is the only
+  //       route into the setter.
   let delivered = false;
   if (process.env.RESEND_API_KEY) {
     try {
@@ -141,6 +150,11 @@ export async function POST(request: NextRequest) {
         subject: `New enquiry: ${name}`,
         html,
         text,
+        headers: {
+          'Auto-Submitted': 'auto-generated',
+          'X-Auto-Response-Suppress': 'All',
+          'X-PTLL-Notification': 'contact-enquiry',
+        },
       });
       delivered = true;
     } catch (err) {
@@ -172,9 +186,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── 3. Hand the enquiry to the setter, which opens a real conversation by
-  //       email. Already fire-and-forget and no-ops when unconfigured.
-  await notifySetter({ name, email, message, source: 'contact' });
+  // ── 3. Hand the enquiry to the setter, which opens the real conversation
+  //       with the enquirer. The single route into the setter — see the note
+  //       in step 1. Never fatal: a follow-up that didn't start is not a
+  //       reason to tell someone their message failed when it is sitting in
+  //       the inbox, but it IS logged, and carried into logSec so a setter
+  //       that has quietly stopped working shows up in the same place the
+  //       rest of the form's health does.
+  const setterOk = await notifySetter({ name, email, message, source: 'contact' });
 
   if (!delivered) {
     // Nothing got through. Say so, rather than showing a tick for an enquiry
@@ -186,6 +205,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email ? email.split('@')[1] : null });
+  logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: setterOk ? [] : ['setter-missed'], ip, email_domain: email ? email.split('@')[1] : null });
   return NextResponse.json({ success: true });
 }
