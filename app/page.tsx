@@ -102,7 +102,13 @@ const videoSchema = {
   description:
     "NCFE Level 2 and 3 personal trainer qualification, Ofqual regulated, fully online around your current job, with a tutor introduced within 24 hours and business training built into the course. Learn. Qualify. Launch.",
   thumbnailUrl: ["https://ptlaunchlab.co.uk/video/homepage-vsl-poster.jpg"],
-  uploadDate: "2026-09-06",
+  // Schema.org VideoObject.uploadDate requires ISO 8601 WITH a timezone offset.
+  // A bare "2026-09-06" tripped both Search Console warnings on this page:
+  // "missing a time zone" and "invalid datetime value". The two podcast
+  // emitters were checked and are already correct — app/podcast/page.tsx
+  // builds 2026-09-01T12:00:00Z from a year-month, and podcast/[slug] builds
+  // 2026-08-04T12:00:00Z from a full date. Don't "fix" those.
+  uploadDate: "2026-09-06T12:00:00Z",
   duration: "PT47S",
   contentUrl: "https://ptlaunchlab.co.uk/video/homepage-vsl-1080.mp4",
   publisher: {
