@@ -84,7 +84,7 @@ test("partner-playbook scan covers the whole directory", () => {
   // check below vacuously pass over zero files. Pin the corpus size the task
   // measured so a scan that finds nothing — or suddenly finds much more or
   // less — fails loudly instead of rubber-stamping an empty run.
-  assert.equal(FILES.length, 52, `expected 52 partner-playbook entries, found ${FILES.length}`);
+  assert.equal(FILES.length, 53, `expected 53 partner-playbook entries, found ${FILES.length}`);
 });
 
 test("no fenced copy block in any partner-playbook entry names PT Launch Lab", () => {
