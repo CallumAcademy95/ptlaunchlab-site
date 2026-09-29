@@ -164,7 +164,14 @@ for (const slug of GYM_SLUGS) {
       }
 
       const shape = h === 1920 ? "story" : "square";
-      const title = `Promo — ${month.label} (${shape})`;
+      // playbookTitle, NOT month.label. `label` is the internal slot name for
+      // the month (see the MONTH_PLAYBOOK_TITLE comment above) and it is not
+      // what the campaign is called. October's slot is "Success Story Month"
+      // while its campaign — and its artwork — is "Two qualifications, one
+      // course", so nine partners had eighteen resources mislabelled in their
+      // drives. November hid the bug because its slot name and campaign title
+      // happen to be the same string.
+      const title = `Promo — ${playbookTitle} (${shape})`;
       const prior = already.get(`${partnerId}::${title}`);
 
       if (prior && !REPLACE) {
