@@ -595,6 +595,11 @@ async function sendWelcomeEmail(args: {
   try {
     await new Resend(process.env.RESEND_API_KEY).emails.send({
       from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
+      // This email tells a partner to "reply to this email", so replies must land
+      // somewhere a human reads. partnerships@ sends fine (verified 2026-09-29) but
+      // is not a monitored mailbox, and a partner locked out of the portal replying
+      // into a void is the worst version of this. info@ is monitored.
+      replyTo: "info@ptlaunchlab.co.uk",
       to: args.to,
       subject: args.isReset
         ? "Your PT Launch Lab portal password has been reset"
