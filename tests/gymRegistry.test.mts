@@ -133,6 +133,40 @@ test("every gym with an active standing code advertises the discounted price", (
   }
 });
 
+// gym-brands.json is a SECOND source of per-gym pricing, and the one the in-gym
+// screens read. scripts/gym-tv-slides.mjs and scripts/gym-gamma-decks.mjs both
+// render `brand.fullPrice` straight onto a slide, so a gym whose page says £1,399
+// and whose brands entry says £1,599 quotes two different prices in two places a
+// member can see. That is exactly what happened to Ebor: the page config was
+// corrected and this file was not, so its TV slides kept advertising £1,599 while
+// its website advertised £1,399.
+//
+// The check above guards app/lib/gyms/*. This one guards the other source, so the
+// two cannot drift apart again without a test failing.
+test("gym-brands.json advertises the same discounted price as the gym registry", () => {
+  const brands = JSON.parse(
+    readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
+  ) as Record<string, { fullPrice?: number; discountAmount?: number | null; promoCode?: string | null }>;
+
+  // A silently-renamed or moved file would make every assertion below vacuous.
+  assert.ok(Object.keys(brands).length >= 9, `expected at least 9 gyms in gym-brands.json, found ${Object.keys(brands).length}`);
+
+  for (const [gymSlug, brand] of Object.entries(brands)) {
+    if (gymSlug === "demo") continue;
+    if (!PARTNER_STANDING_CODE[gymSlug]) continue;
+    assert.equal(
+      brand.fullPrice,
+      1399,
+      `gym-brands.json: ${gymSlug} has standing code ${PARTNER_STANDING_CODE[gymSlug]} but its TV slides would advertise £${brand.fullPrice}`,
+    );
+    assert.equal(
+      brand.discountAmount,
+      200,
+      `gym-brands.json: ${gymSlug} advertises £1,399 but carries discountAmount ${brand.discountAmount}`,
+    );
+  }
+});
+
 test("the route-to-gym-slug map matches the real source in each enrol/page.tsx", () => {
   for (const routeSlug of Object.keys(GYMS)) {
     const gymSlug = GYM_SLUG_BY_ROUTE[routeSlug];
