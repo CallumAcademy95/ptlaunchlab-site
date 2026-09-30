@@ -169,7 +169,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
           onClick={startRecording}
           disabled={disabled}
           aria-label="Record voice message"
-          className="flex-shrink-0 p-2.5 rounded-full text-soft hover:text-gold hover:bg-card transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-shrink-0 p-2.5 rounded-full text-slate-500 hover:text-blue-700 hover:bg-slate-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
             <rect x="9" y="2" width="6" height="13" rx="3" stroke="currentColor" strokeWidth="1.7" />
@@ -182,7 +182,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
           </svg>
         </button>
         {error && (
-          <p className="text-red-400 text-[10px] max-w-[180px] text-right leading-snug">{error}</p>
+          <p className="text-rose-600 text-[10px] max-w-[180px] text-right leading-snug">{error}</p>
         )}
       </div>
     );
@@ -191,8 +191,8 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
   // Requesting mic permission
   if (state === "requesting") {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-card text-soft text-xs">
-        <span className="inline-block w-3 h-3 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+      <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-white text-slate-500 text-xs">
+        <span className="inline-block w-3 h-3 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
         Waiting for mic…
       </div>
     );
@@ -201,19 +201,19 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
   // Recording — pulsing red dot, timer, stop button
   if (state === "recording") {
     return (
-      <div className="flex items-center gap-3 px-3 py-2 rounded-full bg-card border border-red-500/40">
+      <div className="flex items-center gap-3 px-3 py-2 rounded-full bg-white border border-rose-200">
         <span className="relative flex h-3 w-3 flex-shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
           <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
         </span>
-        <span className="text-white font-mono tabular-nums text-sm">
+        <span className="text-slate-900 font-mono tabular-nums text-sm">
           {formatDuration(duration)}
         </span>
         <button
           type="button"
           onClick={resetAll}
           aria-label="Cancel recording"
-          className="text-soft hover:text-white transition-colors p-1"
+          className="text-slate-500 hover:text-slate-900 transition-colors p-1"
         >
           <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -223,7 +223,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
           type="button"
           onClick={stopRecording}
           aria-label="Stop recording"
-          className="px-3 py-1.5 rounded-full bg-gold text-deep font-bold text-xs hover:brightness-110 transition-all"
+          className="px-3 py-1.5 rounded-full bg-blue-700 text-slate-900 font-bold text-xs hover:brightness-110 transition-all"
         >
           Stop
         </button>
@@ -234,7 +234,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
   // Preview — play, duration, discard, send
   if (state === "preview" || state === "sending") {
     return (
-      <div className="flex items-center gap-2 px-2 py-2 rounded-full bg-card border border-gold/30">
+      <div className="flex items-center gap-2 px-2 py-2 rounded-full bg-white border border-blue-200">
         {previewUrl && (
           // eslint-disable-next-line jsx-a11y/media-has-caption
           <audio
@@ -250,7 +250,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
           onClick={resetAll}
           disabled={state === "sending"}
           aria-label="Discard recording"
-          className="text-soft hover:text-white transition-colors p-1 disabled:opacity-50"
+          className="text-slate-500 hover:text-slate-900 transition-colors p-1 disabled:opacity-50"
         >
           <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
             <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
@@ -261,7 +261,7 @@ export default function VoiceRecorder({ onSend, disabled }: Props) {
           onClick={handleSend}
           disabled={state === "sending"}
           aria-label="Send voice message"
-          className="px-3 py-1.5 rounded-full bg-gold text-deep font-bold text-xs hover:brightness-110 disabled:opacity-60 transition-all"
+          className="px-3 py-1.5 rounded-full bg-blue-700 text-slate-900 font-bold text-xs hover:brightness-110 disabled:opacity-60 transition-all"
         >
           {state === "sending" ? "…" : "Send"}
         </button>

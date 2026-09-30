@@ -191,7 +191,7 @@ export default async function AdminPartnersPage({
   const recentChangeCutoff = Date.parse(nowIso) - 7 * 86400000;
 
   return (
-    <AdminPage width="max-w-7xl">
+    <AdminPage>
       <div className="space-y-8">
         <PageHeader
           title="Gym partners"
