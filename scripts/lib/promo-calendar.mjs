@@ -27,7 +27,7 @@ export const MONTHS = [
     eyebrow: "{{gymName}} ACADEMY",
     headline: ["TWO QUALIFICATIONS.", "ONE COURSE."],
     accentLine: "LEVEL 2 AND LEVEL 3.",
-    sub: "The NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, studied at {{gymName}}.",
+    sub: "The NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, through {{gymName}}.",
     footer: "Next intake open",
   },
   {

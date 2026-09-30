@@ -112,3 +112,23 @@ export function assertDimensions(meta, expected) {
     );
   }
 }
+
+/**
+ * Claims that study happens physically at the gym.
+ *
+ * The academy is locally represented by the gym; the learning is online and
+ * self-paced with tutor support. Some of it genuinely happens in a gym — the
+ * observed session in Unit 6, the case-study client in Unit 9 — but "studied
+ * at <gym>" tells a learner they will be taught there, and they will not.
+ *
+ * This wording reached NINE live graphics and two evergreen concepts before
+ * anyone noticed, which is why it is a gate and not a code review note.
+ * "Through <gym>" is accurate and reads the same.
+ */
+export function findVenueClaims(text) {
+  const hits = new Set();
+  for (const m of text.matchAll(/\b(?:stud(?:y|ied|ying)|taught|delivered|classes|lessons)\s+(?:at|in)\b/gi)) {
+    hits.add(m[0].toLowerCase());
+  }
+  return [...hits];
+}
