@@ -13,26 +13,13 @@ you never lose the visitor from your own site.
 
 ## Your snippet
 
-Copy this exactly. Replace nothing except what your account manager has told
-you — the address below is already yours.
+Copy this exactly. The address below is already yours — nothing to change.
 
 ```html
-<iframe src="https://ptlaunchlab.co.uk/embed/YOUR-GYM-SLUG"
+<iframe src="{{embedUrl}}"
         width="100%" height="220" frameborder="0" scrolling="no"
         title="PT Academy"></iframe>
 ```
-
-| Gym | Use this address |
-|---|---|
-| 6fit Gyms | `https://ptlaunchlab.co.uk/embed/6fit-academy` |
-| Ebor Fitness | `https://ptlaunchlab.co.uk/embed/ebor-fitness` |
-| Gym N Go | `https://ptlaunchlab.co.uk/embed/gym-n-go-academy` |
-| HITIO Gym Orpington | `https://ptlaunchlab.co.uk/embed/hitio-orpington-academy` |
-| Iron Wolf Gym | `https://ptlaunchlab.co.uk/embed/ironwolf-gym` |
-| Ministry of Fitness | `https://ptlaunchlab.co.uk/embed/mof-gym` |
-| Musclebound Gym | `https://ptlaunchlab.co.uk/embed/muscle-bound-academy` |
-| Superflex | `https://ptlaunchlab.co.uk/embed/superflex-academy` |
-| Xcelerate | `https://ptlaunchlab.co.uk/embed/xcelerate-academy` |
 
 **Keep `height="220"`.** The banner is built to fit that height on every screen
 size from a narrow phone to a wide desktop. Making it shorter will cut the

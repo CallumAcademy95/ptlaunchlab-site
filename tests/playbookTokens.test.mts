@@ -32,6 +32,9 @@ test("tokens are built from the gym's own brand entry", () => {
     town: "Orpington",
     promoCode: "HITIOPT",
     academyUrl: "https://ptlaunchlab.co.uk/hitio-orpington-academy",
+    // Added so website-embed.md can print THIS gym's address instead of a
+    // table of all nine — see tests/partnerListLeaks.test.mts.
+    embedUrl: "https://ptlaunchlab.co.uk/embed/hitio-orpington-academy",
   });
 });
 

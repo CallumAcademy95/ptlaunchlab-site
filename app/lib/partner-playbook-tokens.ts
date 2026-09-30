@@ -9,6 +9,14 @@ export interface PlaybookTokens {
   town: string;
   promoCode: string | null;
   academyUrl: string;
+  /**
+   * The gym's own embed address, for the website-embed entry.
+   *
+   * Exists because that entry used to print a TABLE of all nine partners'
+   * embed URLs to every partner, which told each gym who the others were.
+   * Two of them share a town.
+   */
+  embedUrl?: string;
   /** The month's own code, e.g. EBORBF600. Null outside a money month. */
   monthCode?: string | null;
   /**
@@ -34,6 +42,7 @@ export function tokensForGym(brand: GymBrand, origin: string): PlaybookTokens {
     town: brand.adTown,
     promoCode: brand.promoCode,
     academyUrl: `${origin.replace(/\/$/, "")}${brand.canonicalPath}`,
+    embedUrl: `${origin.replace(/\/$/, "")}/embed${brand.canonicalPath}`,
   };
 }
 
