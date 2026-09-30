@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { formatPence } from "@/app/lib/partner-data";
+import { buildPartnerTimeline, partnerHealth } from "@/app/lib/partner-timeline";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
 import BankReveal from "./BankReveal";
@@ -17,6 +18,13 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+const HEALTH_STYLE: Record<string, string> = {
+  producing: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+  engaged: "bg-sky-500/15 text-sky-300 border-sky-500/40",
+  quiet: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+  "never started": "bg-red-500/15 text-red-300 border-red-500/40",
+};
+
 interface PartnerRow {
   id: string;
   slug: string;
@@ -25,11 +33,22 @@ interface PartnerRow {
   landing_page_path: string | null;
   commission_terms: string;
   is_demo?: boolean;
+  agreement_signed_at: string | null;
+  agreement_version: string | null;
+  created_at: string | null;
   bank_account_name: string | null;
   bank_sort_code: string | null;
   bank_account_number: string | null;
   bank_details_updated_at: string | null;
-  pp_partner_users: { id: string; email: string; role: string; must_change_password: boolean; last_login_at: string | null }[];
+  pp_partner_users: {
+    id: string;
+    email: string;
+    full_name: string | null;
+    role: string;
+    must_change_password: boolean;
+    last_login_at: string | null;
+    created_at: string | null;
+  }[];
 }
 
 export default async function AdminPartnersPage({
@@ -42,8 +61,9 @@ export default async function AdminPartnersPage({
     .from("pp_partners")
     .select(
       "id, slug, gym_name, status, landing_page_path, commission_terms, is_demo, " +
+      "agreement_signed_at, agreement_version, created_at, " +
       "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
-      "pp_partner_users(id, email, role, must_change_password, last_login_at)"
+      "pp_partner_users(id, email, full_name, role, must_change_password, last_login_at, created_at)"
     )
     .order("gym_name");
 
@@ -123,6 +143,41 @@ export default async function AdminPartnersPage({
   const owedTotal = [...payable.entries()]
     .filter(([id]) => !demoIds.has(id))
     .reduce((t, [, e]) => t + e.total, 0);
+  // The same derivation the detail page runs, so the list and the page can
+  // never disagree about whether a gym is doing anything. It also stops a
+  // payout WE sent from reading as the gym being active, which is what had
+  // MoF and Musclebound showing as producing.
+  const salesFor = new Map<string, typeof sales>();
+  for (const s of sales) {
+    const bucket = salesFor.get(s.partner_id) ?? [];
+    bucket.push(s);
+    salesFor.set(s.partner_id, bucket);
+  }
+  const payoutsFor = new Map<string, typeof payouts>();
+  for (const p of payouts) {
+    const bucket = payoutsFor.get(p.partner_id) ?? [];
+    bucket.push(p);
+    payoutsFor.set(p.partner_id, bucket);
+  }
+  const healthFor = new Map<string, ReturnType<typeof partnerHealth>>();
+  for (const p of partners) {
+    const events = buildPartnerTimeline({
+      partner: p,
+      users: p.pp_partner_users,
+      sales: salesFor.get(p.id) ?? [],
+      payouts: payoutsFor.get(p.id) ?? [],
+    });
+    healthFor.set(
+      p.id,
+      partnerHealth({
+        events,
+        hasEverLoggedIn: p.pp_partner_users.some((u) => u.last_login_at),
+        learners: learnersFor.get(p.id) ?? 0,
+        logins: p.pp_partner_users.length,
+      }),
+    );
+  }
+
   // Read the clock once, outside the render, so the rows stay pure.
   const recentChangeCutoff = Date.parse(nowIso) - 7 * 86400000;
 
@@ -193,6 +248,7 @@ export default async function AdminPartnersPage({
               <tr>
                 <th className="px-4 py-3 font-bold">Gym</th>
                 <th className="px-4 py-3 font-bold">Slug</th>
+                <th className="px-4 py-3 font-bold">Standing</th>
                 <th className="px-4 py-3 font-bold">Terms</th>
                 <th className="px-4 py-3 font-bold">Learners</th>
                 <th className="px-4 py-3 font-bold">Earned</th>
@@ -206,7 +262,12 @@ export default async function AdminPartnersPage({
               {partners.map((p) => (
                 <tr key={p.id}>
                   <td className="px-4 py-3">
-                    <span className="text-white font-semibold">{p.gym_name}</span>
+                    <a
+                      href={`/admin/partners/${p.slug}`}
+                      className="text-white font-semibold hover:text-gold"
+                    >
+                      {p.gym_name}
+                    </a>
                     {p.is_demo && (
                       <span className="ml-2 px-2 py-0.5 rounded-full bg-white/5 text-soft border border-white/15 text-[10px] font-semibold">
                         demo
@@ -220,6 +281,18 @@ export default async function AdminPartnersPage({
                     )}
                   </td>
                   <td className="px-4 py-3 text-soft font-mono text-xs">{p.slug}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2 py-0.5 rounded-full border text-[10px] font-bold whitespace-nowrap ${
+                        HEALTH_STYLE[healthFor.get(p.id)?.health ?? "quiet"]
+                      }`}
+                    >
+                      {healthFor.get(p.id)?.health}
+                    </span>
+                    <div className="text-soft text-[11px] mt-1 max-w-[16rem]">
+                      {healthFor.get(p.id)?.why}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-soft text-xs">
                     {p.commission_terms === "on_enrolment"
                       ? "30d after enrolment (grandfathered)"
