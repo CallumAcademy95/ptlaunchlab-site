@@ -6,7 +6,7 @@ import { addPlaybookEntry, type PlaybookEntryState } from "./actions";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-lg bg-deep border border-white/15 text-white placeholder:text-soft/60 focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -14,7 +14,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="px-6 py-2.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+      className="px-6 py-2.5 rounded-lg bg-blue-700 text-white font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
     >
       {pending ? "Saving…" : "Add to playbook"}
     </button>
@@ -25,10 +25,10 @@ export default function AddPlaybookForm() {
   const [state, formAction] = useActionState<PlaybookEntryState, FormData>(addPlaybookEntry, {});
 
   return (
-    <form action={formAction} className="rounded-xl bg-card border border-white/10 p-6 space-y-4">
+    <form action={formAction} className="rounded-xl bg-white border border-slate-200 p-6 space-y-4">
       <div>
-        <h2 className="text-white font-bold text-lg">Add a playbook entry</h2>
-        <p className="text-soft text-xs mt-1">
+        <h2 className="text-slate-900 font-bold text-lg">Add a playbook entry</h2>
+        <p className="text-slate-500 text-xs mt-1">
           For one-offs. The curated entries live as markdown in the repo and win on a title clash, so
           nothing reviewed gets overwritten from here.
         </p>
@@ -36,11 +36,11 @@ export default function AddPlaybookForm() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-2">
-          <label htmlFor="pb-title" className="block text-soft text-xs font-semibold mb-1.5">Title</label>
+          <label htmlFor="pb-title" className="block text-slate-500 text-xs font-semibold mb-1.5">Title</label>
           <input id="pb-title" name="title" type="text" required placeholder="January intake — story post" className={inputClass} />
         </div>
         <div>
-          <label htmlFor="pb-type" className="block text-soft text-xs font-semibold mb-1.5">Section</label>
+          <label htmlFor="pb-type" className="block text-slate-500 text-xs font-semibold mb-1.5">Section</label>
           <select id="pb-type" name="type" required defaultValue="" className={inputClass}>
             <option value="" disabled>Choose…</option>
             {PLAYBOOK_TYPES.map((t) => (
@@ -52,17 +52,17 @@ export default function AddPlaybookForm() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <label htmlFor="pb-channel" className="block text-soft text-xs font-semibold mb-1.5">Channel</label>
+          <label htmlFor="pb-channel" className="block text-slate-500 text-xs font-semibold mb-1.5">Channel</label>
           <input id="pb-channel" name="channel" type="text" placeholder="Instagram" className={inputClass} />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="pb-when" className="block text-soft text-xs font-semibold mb-1.5">Use it when</label>
+          <label htmlFor="pb-when" className="block text-slate-500 text-xs font-semibold mb-1.5">Use it when</label>
           <input id="pb-when" name="whenToUse" type="text" placeholder="A member asks what the course involves" className={inputClass} />
         </div>
       </div>
 
       <div>
-        <label htmlFor="pb-body" className="block text-soft text-xs font-semibold mb-1.5">
+        <label htmlFor="pb-body" className="block text-slate-500 text-xs font-semibold mb-1.5">
           Content (markdown)
         </label>
         <textarea
@@ -76,15 +76,15 @@ export default function AddPlaybookForm() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div>
-          <label htmlFor="pb-file" className="block text-soft text-xs font-semibold mb-1.5">Attach a file</label>
+          <label htmlFor="pb-file" className="block text-slate-500 text-xs font-semibold mb-1.5">Attach a file</label>
           <input id="pb-file" name="file" type="file" className={`${inputClass} py-2`} />
         </div>
         <div>
-          <label htmlFor="pb-url" className="block text-soft text-xs font-semibold mb-1.5">Or a link</label>
+          <label htmlFor="pb-url" className="block text-slate-500 text-xs font-semibold mb-1.5">Or a link</label>
           <input id="pb-url" name="externalUrl" type="url" placeholder="https://…" className={inputClass} />
         </div>
         <div>
-          <label htmlFor="pb-order" className="block text-soft text-xs font-semibold mb-1.5">Order</label>
+          <label htmlFor="pb-order" className="block text-slate-500 text-xs font-semibold mb-1.5">Order</label>
           <input id="pb-order" name="sortOrder" type="number" defaultValue={100} className={inputClass} />
         </div>
       </div>

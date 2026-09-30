@@ -145,11 +145,17 @@ export function buildPartnerTimeline(input: {
     // An unpaid payout row is a plan, not an event. Only what left the bank
     // belongs on a history.
     if (p.status !== "paid" || !p.paid_at) continue;
+    // period_label on these rows is often "Paid 29 May 2026" — not a period,
+    // just the title again. Printed under "Paid £1,500" it reads as a stutter.
+    const label =
+      p.period_label && p.period_label.trim().toLowerCase().startsWith("paid")
+        ? null
+        : p.period_label;
     out.push({
       at: p.paid_at,
       kind: "payout",
       title: `Paid ${money(p.total_pence)}`,
-      detail: [p.period_label, p.invoice_number].filter(Boolean).join(" · ") || null,
+      detail: [label, p.invoice_number].filter(Boolean).join(" · ") || null,
       amountPence: p.total_pence,
       byUs: true,
     });

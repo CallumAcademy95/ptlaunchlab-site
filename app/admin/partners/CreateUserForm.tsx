@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { createPartnerUser, type CreatePartnerUserState } from "./actions";
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-lg bg-deep border border-white/15 text-white placeholder:text-soft focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full px-4 py-2.5 rounded-lg bg-[#f6f8fb] border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -13,7 +13,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="px-6 py-2.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+      className="px-6 py-2.5 rounded-lg bg-blue-700 text-white font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
     >
       {pending ? "Creating…" : "Create login and email them"}
     </button>
@@ -31,12 +31,12 @@ export default function CreateUserForm({
   );
 
   return (
-    <form action={formAction} className="rounded-xl bg-card border border-white/10 p-6 space-y-4">
-      <h2 className="text-white font-bold text-lg">Create a partner login</h2>
+    <form action={formAction} className="rounded-xl bg-white border border-slate-200 p-6 space-y-4">
+      <h2 className="text-slate-900 font-bold text-lg">Create a partner login</h2>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="partnerId" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="partnerId" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Partner
           </label>
           <select id="partnerId" name="partnerId" required className={inputClass}>
@@ -50,7 +50,7 @@ export default function CreateUserForm({
         </div>
 
         <div>
-          <label htmlFor="role" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="role" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Role
           </label>
           <select id="role" name="role" defaultValue="owner" className={inputClass}>
@@ -60,14 +60,14 @@ export default function CreateUserForm({
         </div>
 
         <div>
-          <label htmlFor="fullName" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="fullName" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Full name
           </label>
           <input id="fullName" name="fullName" type="text" className={inputClass} />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="email" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Email address
           </label>
           <input id="email" name="email" type="email" required className={inputClass} />

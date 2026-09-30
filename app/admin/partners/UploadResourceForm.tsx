@@ -6,7 +6,7 @@ import { uploadResource, type UploadResourceState } from "./actions";
 import { RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-lg bg-deep border border-white/15 text-white placeholder:text-soft/60 focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -14,7 +14,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="px-6 py-2.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+      className="px-6 py-2.5 rounded-lg bg-blue-700 text-white font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
     >
       {pending ? "Uploading…" : "Add resource"}
     </button>
@@ -32,10 +32,10 @@ export default function UploadResourceForm({
   const [mode, setMode] = useState<"file" | "link">("file");
 
   return (
-    <form action={formAction} className="rounded-xl bg-card border border-white/10 p-6 space-y-4">
+    <form action={formAction} className="rounded-xl bg-white border border-slate-200 p-6 space-y-4">
       <div>
-        <h2 className="text-white font-bold text-lg">Add a resource</h2>
-        <p className="text-soft text-xs mt-1">
+        <h2 className="text-slate-900 font-bold text-lg">Add a resource</h2>
+        <p className="text-slate-500 text-xs mt-1">
           Leave the gym blank to share it with every partner. Files go to a private bucket — partners
           only ever get a 60-second signed link.
         </p>
@@ -43,7 +43,7 @@ export default function UploadResourceForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="res-partner" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="res-partner" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Gym
           </label>
           <select id="res-partner" name="partnerId" defaultValue="" className={inputClass}>
@@ -55,7 +55,7 @@ export default function UploadResourceForm({
         </div>
 
         <div>
-          <label htmlFor="res-category" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="res-category" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Category
           </label>
           <select id="res-category" name="category" required defaultValue="" className={inputClass}>
@@ -68,14 +68,14 @@ export default function UploadResourceForm({
       </div>
 
       <div>
-        <label htmlFor="res-title" className="block text-soft text-xs font-semibold mb-1.5">
+        <label htmlFor="res-title" className="block text-slate-500 text-xs font-semibold mb-1.5">
           Title
         </label>
         <input id="res-title" name="title" type="text" required placeholder="A3 QR poster" className={inputClass} />
       </div>
 
       <div>
-        <label htmlFor="res-description" className="block text-soft text-xs font-semibold mb-1.5">
+        <label htmlFor="res-description" className="block text-slate-500 text-xs font-semibold mb-1.5">
           Description
         </label>
         <input
@@ -88,7 +88,7 @@ export default function UploadResourceForm({
       </div>
 
       <div>
-        <label htmlFor="res-pack" className="block text-soft text-xs font-semibold mb-1.5">
+        <label htmlFor="res-pack" className="block text-slate-500 text-xs font-semibold mb-1.5">
           Campaign pack (optional)
         </label>
         <input
@@ -98,7 +98,7 @@ export default function UploadResourceForm({
           placeholder="campaign-january-new-career"
           className={inputClass}
         />
-        <p className="text-soft text-[10px] mt-1">
+        <p className="text-slate-500 text-[10px] mt-1">
           The playbook entry&rsquo;s filename without .md. Attaches this file inside that campaign.
         </p>
       </div>
@@ -110,7 +110,7 @@ export default function UploadResourceForm({
             type="button"
             onClick={() => setMode(m)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-              mode === m ? "border-gold text-gold bg-gold/10" : "border-white/15 text-soft hover:text-white"
+              mode === m ? "border-blue-600 text-blue-700 bg-blue-50" : "border-slate-200 text-slate-500 hover:text-slate-900"
             }`}
           >
             {m === "file" ? "Upload a file" : "Link somewhere else"}
@@ -120,14 +120,14 @@ export default function UploadResourceForm({
 
       {mode === "file" ? (
         <div>
-          <label htmlFor="res-file" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="res-file" className="block text-slate-500 text-xs font-semibold mb-1.5">
             File (max 50MB)
           </label>
           <input id="res-file" name="file" type="file" className={`${inputClass} py-2`} />
         </div>
       ) : (
         <div>
-          <label htmlFor="res-url" className="block text-soft text-xs font-semibold mb-1.5">
+          <label htmlFor="res-url" className="block text-slate-500 text-xs font-semibold mb-1.5">
             Link (Drive, Canva, YouTube…)
           </label>
           <input id="res-url" name="externalUrl" type="url" placeholder="https://…" className={inputClass} />

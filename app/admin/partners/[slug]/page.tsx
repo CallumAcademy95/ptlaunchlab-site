@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  Banknote,
+  Building2,
+  ExternalLink,
+  LogIn,
+  Mail,
+  PoundSterling,
+  Ticket,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { formatPence } from "@/app/lib/partner-data";
 import {
@@ -9,6 +19,19 @@ import {
   partnerHealth,
   type TimelineEvent,
 } from "@/app/lib/partner-timeline";
+import {
+  AdminPage,
+  Badge,
+  Card,
+  DefRow,
+  EmptyState,
+  Notice,
+  PageHeader,
+  SectionTitle,
+  StatTile,
+  cn,
+} from "../../ui/praxel";
+import { STANDING_TONE } from "../standing";
 import ResetPasswordButton from "../ResetPasswordButton";
 
 // One gym, everything about them.
@@ -20,6 +43,9 @@ import ResetPasswordButton from "../ResetPasswordButton";
 //
 // The timeline is derived from tables that already exist and were never read
 // together, so this opens with a real history rather than an empty box.
+//
+// Laid out the way Praxel lays out a learner: a profile column that stays
+// still, and a right-hand column that tells you what has happened.
 
 export const metadata: Metadata = {
   title: "Partner — PT Launch Lab admin",
@@ -29,22 +55,27 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const dateUK = (iso: string | null | undefined) =>
-  iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  iso
+    ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    : "—";
 
-const HEALTH_STYLE: Record<string, string> = {
-  producing: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-  engaged: "bg-sky-500/15 text-sky-300 border-sky-500/40",
-  quiet: "bg-amber-500/15 text-amber-300 border-amber-500/40",
-  "never started": "bg-red-500/15 text-red-300 border-red-500/40",
-};
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("") || "?";
 
-const KIND_STYLE: Record<string, { dot: string; label: string }> = {
-  signed: { dot: "bg-emerald-400", label: "Agreement" },
-  login_created: { dot: "bg-sky-400", label: "Portal" },
-  first_login: { dot: "bg-sky-300", label: "Sign-in" },
-  sale: { dot: "bg-gold", label: "Enrolment" },
-  payout: { dot: "bg-emerald-300", label: "Payment" },
-  note: { dot: "bg-white/50", label: "Note" },
+// Who caused the event decides its colour: the things we did are slate and
+// recede, the things the gym did carry a tone and come forward.
+const EVENT: Record<string, { dot: string; label: string; tone: string }> = {
+  signed: { dot: "bg-emerald-400", label: "Agreement", tone: "bg-emerald-50 text-emerald-700" },
+  login_created: { dot: "bg-slate-300", label: "Portal", tone: "bg-slate-100 text-slate-600" },
+  first_login: { dot: "bg-sky-400", label: "Sign-in", tone: "bg-sky-50 text-sky-700" },
+  sale: { dot: "bg-blue-500", label: "Enrolment", tone: "bg-blue-50 text-blue-700" },
+  payout: { dot: "bg-slate-300", label: "Payment", tone: "bg-slate-100 text-slate-600" },
+  note: { dot: "bg-violet-400", label: "Note", tone: "bg-violet-50 text-violet-700" },
 };
 
 export default async function PartnerDetailPage({
@@ -59,8 +90,8 @@ export default async function PartnerDetailPage({
     .from("pp_partners")
     .select(
       "id, slug, gym_name, status, is_demo, landing_page_path, promo_code, commission_terms, " +
-      "payout_terms_days, fee_per_learner_pence, agreement_signed_at, agreement_version, " +
-      "contact_name, contact_email, created_at, bank_sort_code, bank_account_number"
+        "payout_terms_days, fee_per_learner_pence, agreement_signed_at, agreement_version, " +
+        "contact_name, contact_email, created_at, bank_sort_code, bank_account_number",
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -69,13 +100,19 @@ export default async function PartnerDetailPage({
   const p = partner as Record<string, any>;
 
   const [{ data: users }, { data: sales }, { data: payouts }] = await Promise.all([
-    admin.from("pp_partner_users")
+    admin
+      .from("pp_partner_users")
       .select("id, email, full_name, role, must_change_password, last_login_at, created_at")
       .eq("partner_id", p.id),
-    admin.from("pp_sales")
-      .select("learner_name, learner_email, plan_type, amount_paid_pence, commission_pence, commission_status, status, enrolled_at, created_at")
+    admin
+      .from("pp_sales")
+      .select(
+        "learner_name, learner_email, plan_type, amount_paid_pence, commission_pence, " +
+          "commission_status, status, enrolled_at, created_at",
+      )
       .eq("partner_id", p.id),
-    admin.from("pp_payouts")
+    admin
+      .from("pp_payouts")
       .select("period_label, total_pence, status, invoice_number, paid_at, created_at")
       .eq("partner_id", p.id),
   ]);
@@ -84,138 +121,280 @@ export default async function PartnerDetailPage({
   const s = (sales ?? []) as any[];
   const po = (payouts ?? []) as any[];
 
-  const events = buildPartnerTimeline({ partner: p as any, users: u as any, sales: s as any, payouts: po as any });
+  const events = buildPartnerTimeline({
+    partner: p as any,
+    users: u as any,
+    sales: s as any,
+    payouts: po as any,
+  });
   // Their activity, not ours. Creating their login is not them turning up.
   const idle = daysSinceTheirActivity(events);
   const learners = s.filter((x) => x.status !== "voided").length;
   const hasEverLoggedIn = u.some((x) => x.last_login_at);
   const { health, why } = partnerHealth({ events, hasEverLoggedIn, learners, logins: u.length });
 
-  const earned = s.filter((x) => x.status !== "voided").reduce((t, x) => t + (x.commission_pence ?? 0), 0);
+  const earned = s
+    .filter((x) => x.status !== "voided")
+    .reduce((t, x) => t + (x.commission_pence ?? 0), 0);
   const paid = po.filter((x) => x.status === "paid").reduce((t, x) => t + x.total_pence, 0);
-  const owed = earned - paid;
-
-  const Stat = ({ k, v, note }: { k: string; v: string; note?: string }) => (
-    <div className="rounded-xl bg-card border border-white/10 px-4 py-3">
-      <div className="text-soft text-[10px] uppercase tracking-widest font-bold">{k}</div>
-      <div className="text-white font-bold text-xl mt-1">{v}</div>
-      {note && <div className="text-soft text-[11px] mt-0.5">{note}</div>}
-    </div>
-  );
+  const owed = Math.max(0, earned - paid);
 
   return (
-    <div className="min-h-screen bg-deep">
-      <div className="mx-auto max-w-4xl px-6 py-10 space-y-7">
-        <div>
-          <Link href="/admin/partners" className="text-soft text-xs hover:text-gold">← All partners</Link>
-          <div className="flex items-center gap-3 mt-2 flex-wrap">
-            <h1 className="text-white font-bold text-2xl">{p.gym_name}</h1>
-            <span className={`px-2.5 py-0.5 rounded-full border text-[11px] font-bold ${HEALTH_STYLE[health]}`}>
-              {health}
-            </span>
-            {p.is_demo && (
-              <span className="px-2 py-0.5 rounded-full bg-white/5 text-soft border border-white/15 text-[10px] font-semibold">demo</span>
-            )}
-            {p.status !== "active" && <span className="text-amber-300 text-xs">({p.status})</span>}
-          </div>
-          <p className="text-soft text-sm mt-1">{why}</p>
-        </div>
+    <AdminPage>
+      <PageHeader
+        backHref="/admin/partners"
+        backLabel="All partners"
+        title={p.gym_name}
+        subtitle={why}
+        badge={
+          <>
+            <Badge tone={STANDING_TONE[health]}>{health}</Badge>
+            {p.is_demo && <Badge tone="violet">demo</Badge>}
+            {p.status !== "active" && <Badge tone="amber">{p.status}</Badge>}
+          </>
+        }
+        action={
+          p.landing_page_path ? (
+            <a
+              href={p.landing_page_path}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              <ExternalLink className="h-3.5 w-3.5" /> Academy page
+            </a>
+          ) : null
+        }
+      />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat k="Learners" v={String(learners)} note="attributed" />
-          <Stat k="Earned" v={formatPence(earned)} note="commission" />
-          <Stat k="Paid" v={formatPence(paid)} note="left the bank" />
-          <Stat k="Owed" v={formatPence(Math.max(0, owed))} note={owed > 0 ? "outstanding" : "all settled"} />
-        </div>
-
-        {/* THE ANSWER TO "WHAT DO I DO ABOUT THIS ONE" */}
-        <div className="rounded-xl bg-card border border-white/10 p-5">
-          <h2 className="text-white font-bold mb-3">Where they stand</h2>
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-            {[
-              ["Last thing they did", idle === null ? "Nothing, ever" : `${idle} days ago`],
-              ["Agreement", p.agreement_signed_at ? `Signed ${dateUK(p.agreement_signed_at)}${p.agreement_version ? ` (v${p.agreement_version})` : ""}` : "Not signed"],
-              ["Contact", p.contact_name || p.contact_email || "—"],
-              ["Academy page", p.landing_page_path ?? "—"],
-              ["Promo code", p.promo_code ?? "none"],
-              ["Fee per learner", p.fee_per_learner_pence ? formatPence(p.fee_per_learner_pence) : "—"],
-              ["Commission terms", p.commission_terms === "on_enrolment" ? "30d after enrolment (grandfathered)" : "Held to instalment 2"],
-              ["Bank details", p.bank_sort_code && p.bank_account_number ? "On file" : "Not provided"],
-            ].map(([k, v]) => (
-              <div key={k as string} className="flex justify-between gap-4 border-b border-white/5 py-1.5">
-                <dt className="text-soft">{k}</dt>
-                <dd className="text-white text-right">{v}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-
-        {/* LOGINS */}
-        <div className="rounded-xl bg-card border border-white/10 p-5">
-          <h2 className="text-white font-bold mb-3">Logins</h2>
-          {u.length === 0 ? (
-            <p className="text-amber-300 text-sm">No portal login exists. They cannot see anything we send them.</p>
-          ) : (
-            <div className="space-y-3">
-              {u.map((x) => (
-                <div key={x.id} className="flex items-center justify-between gap-4 flex-wrap">
-                  <div>
-                    <div className="text-white text-sm">{x.full_name ? `${x.full_name} · ` : ""}{x.email}</div>
-                    <div className={`text-xs ${x.last_login_at ? "text-soft" : "text-amber-300"}`}>
-                      {x.role}
-                      {" · "}
-                      {x.last_login_at ? `last in ${dateUK(x.last_login_at)}` : "never signed in"}
-                      {x.must_change_password && " · password not changed"}
-                    </div>
-                  </div>
-                  <ResetPasswordButton userId={x.id} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* TIMELINE */}
-        <div className="rounded-xl bg-card border border-white/10 p-5">
-          <h2 className="text-white font-bold mb-1">History</h2>
-          <p className="text-soft text-xs mb-4">
-            Everything we already know, in order. Nobody had to type any of it.
-          </p>
-          {events.length === 0 ? (
-            <p className="text-soft text-sm">Nothing recorded for this partner at all.</p>
-          ) : (
-            <ol className="space-y-0">
-              {events.map((e: TimelineEvent, i: number) => {
-                const k = KIND_STYLE[e.kind] ?? KIND_STYLE.note;
-                return (
-                  <li key={`${e.at}-${i}`} className="flex gap-4 pb-4 last:pb-0">
-                    <div className="flex flex-col items-center pt-1.5">
-                      <span className={`w-2 h-2 rounded-full ${k.dot} shrink-0`} />
-                      {i < events.length - 1 && <span className="w-px flex-1 bg-white/10 mt-1" />}
-                    </div>
-                    <div className="min-w-0 flex-1 -mt-0.5">
-                      <div className="flex items-baseline justify-between gap-3 flex-wrap">
-                        <span className="text-white text-sm">{e.title}</span>
-                        <span className="text-soft text-xs whitespace-nowrap">{dateUK(e.at)}</span>
-                      </div>
-                      <div className="text-soft text-xs mt-0.5">
-                        <span className="opacity-70">{k.label}</span>
-                        {e.detail && <> · {e.detail}</>}
-                        {e.kind === "sale" && e.amountPence ? <> · {formatPence(e.amountPence)} commission</> : null}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </div>
-
-        <p className="text-soft text-xs">
-          Notes and a next action are not here yet — this page is the history we already had.
-          Adding them is the next step.
-        </p>
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <StatTile
+          icon={<Users className="h-5 w-5" />}
+          value={learners}
+          label="Learners attributed"
+          tone={learners > 0 ? "blue" : "slate"}
+        />
+        <StatTile
+          icon={<PoundSterling className="h-5 w-5" />}
+          value={formatPence(earned)}
+          label="Commission earned"
+          tone="slate"
+        />
+        <StatTile
+          icon={<Banknote className="h-5 w-5" />}
+          value={formatPence(paid)}
+          label="Paid out"
+          sublabel="left the bank"
+          tone="green"
+        />
+        <StatTile
+          icon={<Wallet className="h-5 w-5" />}
+          value={formatPence(owed)}
+          label="Owed now"
+          sublabel={owed > 0 ? "outstanding" : "all settled"}
+          tone={owed > 0 ? "amber" : "slate"}
+        />
       </div>
-    </div>
+
+      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[20rem_1fr]">
+        {/* Profile column */}
+        <div>
+          <Card>
+            <div className="flex items-center gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-700 text-lg font-bold text-white">
+                {initials(p.gym_name)}
+              </span>
+              <div className="min-w-0">
+                <h2 className="truncate text-base font-semibold text-slate-900">{p.gym_name}</h2>
+                <p className="font-mono text-xs text-slate-500">{p.slug}</p>
+              </div>
+            </div>
+
+            {(p.contact_name || p.contact_email || p.promo_code) && (
+              <dl className="mt-5 space-y-2.5 text-sm">
+                {p.contact_name && (
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Building2 className="h-4 w-4 shrink-0 text-slate-400" />
+                    <span className="truncate">{p.contact_name}</span>
+                  </div>
+                )}
+                {p.contact_email && (
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Mail className="h-4 w-4 shrink-0 text-slate-400" />
+                    <a href={`mailto:${p.contact_email}`} className="truncate hover:text-slate-900">
+                      {p.contact_email}
+                    </a>
+                  </div>
+                )}
+                {p.promo_code && (
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Ticket className="h-4 w-4 shrink-0 text-slate-400" />
+                    <span className="truncate font-mono text-xs">{p.promo_code}</span>
+                  </div>
+                )}
+              </dl>
+            )}
+
+            <dl className="mt-4 border-t border-slate-100 pt-2">
+              <DefRow
+                k="Last thing they did"
+                v={
+                  idle === null ? (
+                    <span className="text-rose-600">Nothing, ever</span>
+                  ) : (
+                    `${idle} days ago`
+                  )
+                }
+              />
+              <DefRow
+                k="Agreement"
+                v={
+                  p.agreement_signed_at
+                    ? `${dateUK(p.agreement_signed_at)}${p.agreement_version ? ` · v${p.agreement_version}` : ""}`
+                    : "Not signed"
+                }
+              />
+              <DefRow
+                k="Fee per learner"
+                v={p.fee_per_learner_pence ? formatPence(p.fee_per_learner_pence) : "—"}
+              />
+              <DefRow
+                k="Terms"
+                v={
+                  p.commission_terms === "on_enrolment"
+                    ? "30d after enrolment"
+                    : "Held to instalment 2"
+                }
+              />
+              <DefRow
+                k="Bank details"
+                v={
+                  p.bank_sort_code && p.bank_account_number ? (
+                    "On file"
+                  ) : (
+                    <span className="text-amber-700">Not provided</span>
+                  )
+                }
+              />
+            </dl>
+          </Card>
+        </div>
+
+        {/* Record column */}
+        <div className="space-y-5">
+          {u.length === 0 && (
+            <Notice tone="rose" title="No portal login exists">
+              Nothing we send this gym can be opened. They cannot see their creatives, their
+              playbook, or their sales.
+            </Notice>
+          )}
+
+          <Card>
+            <SectionTitle hint="Who can get into the partner portal, and whether they ever have.">
+              Logins
+            </SectionTitle>
+            {u.length === 0 ? (
+              <div className="mt-4">
+                <EmptyState
+                  icon={<LogIn className="h-5 w-5" />}
+                  title="No login has been created"
+                  hint="Create one from the partner list."
+                />
+              </div>
+            ) : (
+              <ul className="mt-4 space-y-3">
+                {u.map((x) => (
+                  <li
+                    key={x.id}
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-800">
+                        {x.full_name ? `${x.full_name} · ` : ""}
+                        {x.email}
+                      </p>
+                      <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                        <span className="capitalize">{x.role}</span>
+                        <span aria-hidden>·</span>
+                        {x.last_login_at ? (
+                          <span>last in {dateUK(x.last_login_at)}</span>
+                        ) : (
+                          <Badge tone="amber">never signed in</Badge>
+                        )}
+                        {x.must_change_password && (
+                          <Badge tone="neutral">password not changed</Badge>
+                        )}
+                      </span>
+                    </div>
+                    <ResetPasswordButton userId={x.id} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          <Card>
+            <SectionTitle hint="Everything we already know, in order. Nobody had to type any of it.">
+              History
+            </SectionTitle>
+            {events.length === 0 ? (
+              <div className="mt-4">
+                <EmptyState title="Nothing recorded for this partner at all." />
+              </div>
+            ) : (
+              <ol className="mt-5">
+                {events.map((e: TimelineEvent, i: number) => {
+                  const k = EVENT[e.kind] ?? EVENT.note;
+                  return (
+                    <li key={`${e.at}-${i}`} className="relative flex gap-4 pb-5 last:pb-0">
+                      {i < events.length - 1 && (
+                        <span
+                          className="absolute left-[7px] top-4 h-full w-px bg-slate-200"
+                          aria-hidden
+                        />
+                      )}
+                      <span
+                        className={cn(
+                          "mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-white ring-1 ring-slate-200",
+                          k.dot,
+                        )}
+                        aria-hidden
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={cn(
+                              "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                              k.tone,
+                            )}
+                          >
+                            {k.label}
+                          </span>
+                          <span className="text-xs text-slate-500">{dateUK(e.at)}</span>
+                          {e.byUs && <span className="text-xs text-slate-400">· us</span>}
+                        </div>
+                        <p className="mt-1 text-sm font-medium text-slate-800">{e.title}</p>
+                        {(e.detail || (e.kind === "sale" && e.amountPence)) && (
+                          <p className="mt-0.5 text-sm text-slate-500">
+                            {e.detail}
+                            {e.kind === "sale" && e.amountPence
+                              ? `${e.detail ? " · " : ""}${formatPence(e.amountPence)} commission`
+                              : ""}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </Card>
+
+          <p className="px-1 text-xs text-slate-500">
+            Notes and a next action are not here yet — this page is the history we already had.
+          </p>
+        </div>
+      </div>
+    </AdminPage>
   );
 }

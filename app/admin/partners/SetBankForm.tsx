@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 import { setPartnerBankDetails, type SetBankState } from "./actions";
 
 const inputClass =
-  "w-full px-4 py-2.5 rounded-lg bg-deep border border-white/15 text-white placeholder:text-soft/60 focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40";
+  "w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -13,7 +13,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="px-6 py-2.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+      className="px-6 py-2.5 rounded-lg bg-blue-700 text-white font-bold text-sm hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
     >
       {pending ? "Saving…" : "Save bank details"}
     </button>
@@ -29,21 +29,21 @@ export default function SetBankForm({
   const missing = partners.filter((p) => !p.hasBank);
 
   return (
-    <form action={formAction} className="rounded-xl bg-card border border-white/10 p-6 space-y-4">
+    <form action={formAction} className="rounded-xl bg-white border border-slate-200 p-6 space-y-4">
       <div>
-        <h2 className="text-white font-bold text-lg">Record bank details</h2>
-        <p className="text-soft text-xs mt-1">
+        <h2 className="text-slate-900 font-bold text-lg">Record bank details</h2>
+        <p className="text-slate-500 text-xs mt-1">
           For details you were given by email. Until they&rsquo;re here the partner gets nagged on
           their home page for something you already have.
           {missing.length > 0 && (
-            <> Still missing: <span className="text-amber-300">{missing.map((p) => p.gym_name).join(", ")}</span>.</>
+            <> Still missing: <span className="text-amber-700">{missing.map((p) => p.gym_name).join(", ")}</span>.</>
           )}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="bank-partner" className="block text-soft text-xs font-semibold mb-1.5">Gym</label>
+          <label htmlFor="bank-partner" className="block text-slate-500 text-xs font-semibold mb-1.5">Gym</label>
           <select id="bank-partner" name="partnerId" required defaultValue="" className={inputClass}>
             <option value="" disabled>Choose…</option>
             {partners.map((p) => (
@@ -54,15 +54,15 @@ export default function SetBankForm({
           </select>
         </div>
         <div>
-          <label htmlFor="bank-name" className="block text-soft text-xs font-semibold mb-1.5">Name on the account</label>
+          <label htmlFor="bank-name" className="block text-slate-500 text-xs font-semibold mb-1.5">Name on the account</label>
           <input id="bank-name" name="accountName" type="text" required className={inputClass} />
         </div>
         <div>
-          <label htmlFor="bank-sort" className="block text-soft text-xs font-semibold mb-1.5">Sort code</label>
+          <label htmlFor="bank-sort" className="block text-slate-500 text-xs font-semibold mb-1.5">Sort code</label>
           <input id="bank-sort" name="sortCode" type="text" inputMode="numeric" placeholder="12-34-56" required className={inputClass} />
         </div>
         <div>
-          <label htmlFor="bank-acc" className="block text-soft text-xs font-semibold mb-1.5">Account number</label>
+          <label htmlFor="bank-acc" className="block text-slate-500 text-xs font-semibold mb-1.5">Account number</label>
           <input id="bank-acc" name="accountNumber" type="text" inputMode="numeric" placeholder="12345678" required className={inputClass} />
         </div>
       </div>

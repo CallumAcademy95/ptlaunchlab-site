@@ -213,3 +213,25 @@ test("a payout we sent does not keep a dead partner looking alive", () => {
   const { health } = partnerHealth({ events: t, hasEverLoggedIn: true, learners: 1, logins: 1, now: NOW });
   assert.equal(health, "quiet", "a payment we made read as the gym being active");
 });
+
+test("a payout does not say the same thing twice", () => {
+  // The period_label on these rows is not a period, it is "Paid 29 May 2026".
+  // Rendered under a title that already reads "Paid £1,500", the timeline said
+  // "Paid £1,500 / Paid 29 May 2026" on every payment Ebor ever had.
+  const t = buildPartnerTimeline({
+    partner: { ...partner, agreement_signed_at: null },
+    users: [], sales: [],
+    payouts: [{ period_label: "Paid 29 May 2026", total_pence: 150000, status: "paid", invoice_number: null, paid_at: ago(20), created_at: ago(21) }],
+  });
+  assert.equal(t[0].title, "Paid £1,500");
+  assert.equal(t[0].detail, null, `the date was repeated as detail: ${t[0].detail}`);
+});
+
+test("a payout keeps a period label that says something new", () => {
+  const t = buildPartnerTimeline({
+    partner: { ...partner, agreement_signed_at: null },
+    users: [], sales: [],
+    payouts: [{ period_label: "September", total_pence: 50000, status: "paid", invoice_number: "INV-4", paid_at: ago(5), created_at: ago(6) }],
+  });
+  assert.equal(t[0].detail, "September · INV-4");
+});
