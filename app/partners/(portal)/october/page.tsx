@@ -101,11 +101,11 @@ export default async function OctoberCampaignPage() {
             </p>
             <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 px-4 py-3 mb-4">
               <p className="text-amber-200 text-sm leading-relaxed">
-                <strong>One thing to check before you run it.</strong> Your artwork uses a
-                photograph of {partner.gym_name}. If anyone is recognisable in it, please make
-                sure you hold their permission to use it in advertising. It is your gym, your
-                members and your ad account — we can&apos;t confirm that from here. Tell us and
-                we will swap the image the same day.
+                <strong>One thing to check before you run it.</strong> Some of these adverts
+                are built on a photograph of the gym. If yours shows one, and anyone in it is
+                recognisable, please make sure you hold their permission to use it in
+                advertising. It is your gym, your members and your ad account — we can&apos;t
+                confirm that from here. Tell us and we will swap the image the same day.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
