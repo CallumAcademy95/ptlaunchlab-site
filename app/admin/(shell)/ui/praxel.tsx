@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Inter } from "next/font/google";
 import { ChevronLeft } from "lucide-react";
 
 // The admin screens borrow Praxel's shape, because that is the shape that
@@ -15,33 +14,19 @@ import { ChevronLeft } from "lucide-react";
 // The rest of /admin is still on the dark marketing palette. Anything moved
 // over should use these, not fresh class strings.
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 export const cn = (...parts: (string | false | null | undefined)[]) =>
   parts.filter(Boolean).join(" ");
 
-/** The page shell: light slate, Inter, and the one place the width is set. */
-export function AdminPage({
-  children,
-  width = "max-w-6xl",
-}: {
-  children: React.ReactNode;
-  width?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        inter.variable,
-        "min-h-screen bg-[#f6f8fb] text-slate-900 [font-family:var(--font-inter),ui-sans-serif,system-ui,sans-serif]",
-      )}
-    >
-      <div className={cn("mx-auto px-4 py-8 sm:px-6 sm:py-10", width)}>{children}</div>
-    </div>
-  );
+/**
+ * A page's vertical rhythm.
+ *
+ * The background, the font and the content width belong to the shell
+ * (app/admin/(shell)/layout.tsx) now — a page that sets its own would break
+ * alignment with every other page, which is the thing the shell exists to
+ * prevent. All this does is space the sections.
+ */
+export function AdminPage({ children }: { children: React.ReactNode }) {
+  return <div className="space-y-6">{children}</div>;
 }
 
 export function PageHeader({

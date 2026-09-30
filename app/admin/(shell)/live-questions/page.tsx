@@ -25,10 +25,10 @@ type QuestionRow = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  new: "bg-white/10 text-soft border-white/15",
-  starred: "bg-gold/15 text-gold border-gold/40",
+  new: "bg-slate-100 text-slate-500 border-slate-200",
+  starred: "bg-blue-100 text-blue-700 border-blue-300",
   answered: "bg-green-500/15 text-green-300 border-green-500/40",
-  hidden: "bg-white/5 text-soft/50 border-white/10",
+  hidden: "bg-slate-50 text-slate-400 border-slate-200",
 };
 
 function fmt(iso: string): string {
@@ -57,7 +57,7 @@ function StatusButton({
       <input type="hidden" name="status" value={status} />
       <button
         type="submit"
-        className="px-3 py-1.5 rounded-full border border-white/15 text-xs font-semibold text-soft hover:border-gold/50 hover:text-gold transition-colors"
+        className="px-3 py-1.5 rounded-full border border-slate-200 text-xs font-semibold text-slate-500 hover:border-blue-300 hover:text-blue-700 transition-colors"
       >
         {label}
       </button>
@@ -71,8 +71,8 @@ function QuestionCard({ q }: { q: QuestionRow }) {
     <div
       className={`rounded-2xl border p-5 ${
         q.status === "starred"
-          ? "border-gold/40 bg-gold/[0.04]"
-          : "border-white/[0.08] bg-card"
+          ? "border-blue-300 bg-blue-50"
+          : "border-white/[0.08] bg-white"
       } ${q.status === "hidden" || q.status === "answered" ? "opacity-60" : ""}`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -81,15 +81,15 @@ function QuestionCard({ q }: { q: QuestionRow }) {
         >
           {q.status}
         </span>
-        <span className="text-soft/50 text-xs whitespace-nowrap">{fmt(q.created_at)}</span>
+        <span className="text-slate-400 text-xs whitespace-nowrap">{fmt(q.created_at)}</span>
       </div>
 
-      <p className="text-white text-lg leading-relaxed mb-3 whitespace-pre-wrap">{q.question}</p>
+      <p className="text-slate-900 text-lg leading-relaxed mb-3 whitespace-pre-wrap">{q.question}</p>
 
-      <p className="text-soft/70 text-sm mb-4">
-        {q.name ? <span className="text-soft">{q.name}</span> : <span className="italic">No name</span>}
+      <p className="text-slate-500 text-sm mb-4">
+        {q.name ? <span className="text-slate-500">{q.name}</span> : <span className="italic">No name</span>}
         {" · "}
-        <a href={`mailto:${q.email}`} className="hover:text-gold">
+        <a href={`mailto:${q.email}`} className="hover:text-blue-700">
           {q.email}
         </a>
       </p>
@@ -140,22 +140,22 @@ export default async function LiveQuestionsPage() {
     <main className="max-w-3xl mx-auto px-5 py-10">
       <div className="flex items-start justify-between gap-4 mb-2">
         <div>
-          <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-1">
+          <p className="text-blue-700 text-[11px] font-bold tracking-widest uppercase mb-1">
             PT Launch Lab LIVE
           </p>
           <h1 className="font-display font-extrabold text-3xl md:text-4xl">Audience questions</h1>
         </div>
         <form action="/api/admin-logout" method="post">
-          <button type="submit" className="text-soft/60 text-xs hover:text-gold">
+          <button type="submit" className="text-slate-500 text-xs hover:text-blue-700">
             Sign out
           </button>
         </form>
       </div>
 
-      <p className="text-soft/70 text-sm mb-1">
-        Current event: <span className="text-soft">#{EVENT.number} — {EVENT.title}</span>
+      <p className="text-slate-500 text-sm mb-1">
+        Current event: <span className="text-slate-500">#{EVENT.number} — {EVENT.title}</span>
       </p>
-      <p className="text-soft/50 text-xs mb-8">
+      <p className="text-slate-400 text-xs mb-8">
         {rows.length} total · {starred} starred · {answered} answered · {hidden} hidden
       </p>
 
@@ -170,11 +170,11 @@ export default async function LiveQuestionsPage() {
           </p>
         </div>
       ) : visible.length === 0 ? (
-        <div className="rounded-2xl border border-white/[0.08] bg-card p-10 text-center">
-          <p className="text-white font-bold text-lg mb-2">No questions yet</p>
-          <p className="text-soft/60 text-sm">
+        <div className="rounded-2xl border border-white/[0.08] bg-white p-10 text-center">
+          <p className="text-slate-900 font-bold text-lg mb-2">No questions yet</p>
+          <p className="text-slate-500 text-sm">
             They&apos;ll appear here the moment someone submits one at{" "}
-            <span className="text-soft">ptlaunchlab.co.uk/ask</span>.
+            <span className="text-slate-500">ptlaunchlab.co.uk/ask</span>.
           </p>
         </div>
       ) : (

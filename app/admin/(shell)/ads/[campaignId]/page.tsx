@@ -31,7 +31,7 @@ interface AdSet {
 }
 
 const scoreColour = (s: string) =>
-  s === 'good' ? '#22c55e' : s === 'ok' ? '#F5C518' : s === 'poor' ? '#ef4444' : '#6b7280';
+  s === 'good' ? '#15803d' : s === 'ok' ? '#1d4ed8' : s === 'poor' ? '#dc2626' : '#475569';
 
 export default function CampaignDetailPage({ params }: { params: Promise<{ campaignId: string }> }) {
   const { campaignId } = use(params);
@@ -76,28 +76,28 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ campa
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
-        <a href="/admin/ads" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'none', fontSize: '14px' }}>← Dashboard</a>
+        <a href="/admin/ads" style={{ color: '#64748b', textDecoration: 'none', fontSize: '14px' }}>← Dashboard</a>
         <h1 style={{ fontSize: '24px', fontWeight: 700, margin: 0 }}>Campaign Detail</h1>
       </div>
 
       {error && (
-        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', borderRadius: '8px', padding: '12px 16px', marginBottom: '24px', color: '#ef4444' }}>
+        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid #dc2626', borderRadius: '8px', padding: '12px 16px', marginBottom: '24px', color: '#dc2626' }}>
           {error}
         </div>
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', padding: '60px' }}>Loading...</div>
+        <div style={{ textAlign: 'center', color: '#64748b', padding: '60px' }}>Loading...</div>
       ) : adsets.length === 0 ? (
-        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', padding: '60px' }}>No ad sets found.</div>
+        <div style={{ textAlign: 'center', color: '#64748b', padding: '60px' }}>No ad sets found.</div>
       ) : (
         adsets.map((adset) => (
-          <div key={adset.id} style={{ background: '#0D3559', borderRadius: '12px', padding: '24px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div key={adset.id} style={{ background: '#ffffff', borderRadius: '12px', padding: '24px', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
             {/* Ad Set header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div>
                 <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>{adset.name}</div>
-                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                <div style={{ fontSize: '13px', color: '#64748b' }}>
                   Budget: £{(parseInt(adset.daily_budget ?? '0', 10) / 100).toFixed(2)}/day
                 </div>
               </div>
@@ -112,7 +112,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ campa
                   fontWeight: 600,
                   fontSize: '13px',
                   background: adset.status === 'ACTIVE' ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)',
-                  color: adset.status === 'ACTIVE' ? '#ef4444' : '#22c55e',
+                  color: adset.status === 'ACTIVE' ? '#dc2626' : '#15803d',
                   opacity: toggling === adset.id ? 0.6 : 1,
                 }}
               >
@@ -122,11 +122,11 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ campa
 
             {/* Ads */}
             {adset.ads.length === 0 ? (
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '14px' }}>No ads in this ad set.</div>
+              <div style={{ color: '#94a3b8', fontSize: '14px' }}>No ads in this ad set.</div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
-                  <tr style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'left' }}>
+                  <tr style={{ color: '#64748b', textAlign: 'left' }}>
                     {['Ad Name', 'Status', 'Impressions', 'Clicks', 'CTR', 'CPC', 'Spend', 'Leads', 'CPL', 'Score', 'Action'].map((h) => (
                       <th key={h} style={{ padding: '8px 10px', fontWeight: 500 }}>{h}</th>
                     ))}
@@ -134,10 +134,10 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ campa
                 </thead>
                 <tbody>
                   {adset.ads.map((ad) => (
-                    <tr key={ad.id} style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                    <tr key={ad.id} style={{ borderTop: '1px solid #f1f5f9' }}>
                       <td style={{ padding: '10px' }}>{ad.name}</td>
                       <td style={{ padding: '10px' }}>
-                        <span style={{ color: ad.status === 'ACTIVE' ? '#22c55e' : '#9ca3af', fontSize: '12px' }}>{ad.status}</span>
+                        <span style={{ color: ad.status === 'ACTIVE' ? '#15803d' : '#64748b', fontSize: '12px' }}>{ad.status}</span>
                       </td>
                       <td style={{ padding: '10px' }}>{ad.insights?.impressions?.toLocaleString() ?? '—'}</td>
                       <td style={{ padding: '10px' }}>{ad.insights?.clicks ?? '—'}</td>
@@ -163,7 +163,7 @@ export default function CampaignDetailPage({ params }: { params: Promise<{ campa
                             fontSize: '12px',
                             fontWeight: 600,
                             background: ad.status === 'ACTIVE' ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)',
-                            color: ad.status === 'ACTIVE' ? '#ef4444' : '#22c55e',
+                            color: ad.status === 'ACTIVE' ? '#dc2626' : '#15803d',
                             opacity: toggling === ad.id ? 0.6 : 1,
                           }}
                         >

@@ -42,11 +42,11 @@ const dateUK = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 const statusTone: Record<string, string> = {
-  new: "text-amber-300",
-  contacted: "text-sky-300",
-  enrolled: "text-emerald-300",
-  declined: "text-soft",
-  duplicate: "text-soft",
+  new: "text-amber-700",
+  contacted: "text-sky-700",
+  enrolled: "text-emerald-700",
+  declined: "text-slate-500",
+  duplicate: "text-slate-500",
 };
 
 export default async function AdminReferralsPage({
@@ -73,7 +73,7 @@ export default async function AdminReferralsPage({
   const enrolled = all.filter((r) => r.status === "enrolled").length;
 
   const countFor = (s: string) => all.filter((r) => r.status === s).length;
-  const select = "rounded-md bg-deep border border-white/15 text-white px-2 py-1.5 text-xs";
+  const select = "rounded-md bg-[#f6f8fb] border border-slate-200 text-slate-900 px-2 py-1.5 text-xs";
 
   const tab = (href: string, label: string, active: boolean, n: number) => (
     <Link
@@ -81,7 +81,7 @@ export default async function AdminReferralsPage({
       href={href}
       className={
         "px-3 py-1.5 rounded-full text-xs font-semibold border transition " +
-        (active ? "bg-gold text-deep border-gold" : "bg-white/5 text-soft border-white/15 hover:border-white/30")
+        (active ? "bg-blue-700 text-slate-900 border-blue-600" : "bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300")
       }
     >
       {label}
@@ -90,16 +90,16 @@ export default async function AdminReferralsPage({
   );
 
   return (
-    <div className="min-h-screen bg-deep">
+    <div className="min-h-screen bg-[#f6f8fb]">
       <div className="mx-auto max-w-5xl px-6 py-10 space-y-8">
         <div>
-          <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-1">
+          <p className="text-blue-700 text-[10px] font-bold tracking-widest uppercase mb-1">
             PT Launch Lab admin
           </p>
-          <h1 className="text-white font-bold text-2xl">Referrals</h1>
-          <p className="text-soft text-sm mt-1">
+          <h1 className="text-slate-900 font-bold text-2xl">Referrals</h1>
+          <p className="text-slate-500 text-sm mt-1">
             £200 to the referrer once the person they named enrols.{" "}
-            <Link href="/admin/partners" className="text-gold">Gym partners →</Link>
+            <Link href="/admin/partners" className="text-blue-700">Gym partners →</Link>
           </p>
         </div>
 
@@ -119,10 +119,10 @@ export default async function AdminReferralsPage({
             { label: "Owed", value: formatPence(owed), note: "due, not paid" },
             { label: "Paid out", value: formatPence(paid), note: "lifetime" },
           ].map((s) => (
-            <div key={s.label} className="rounded-xl bg-card border border-white/10 px-4 py-3">
-              <div className="text-soft text-[10px] uppercase tracking-widest font-bold">{s.label}</div>
-              <div className="text-white font-bold text-xl mt-1">{s.value}</div>
-              <div className="text-soft text-[11px] mt-0.5">{s.note}</div>
+            <div key={s.label} className="rounded-xl bg-white border border-slate-200 px-4 py-3">
+              <div className="text-slate-500 text-[10px] uppercase tracking-widest font-bold">{s.label}</div>
+              <div className="text-slate-900 font-bold text-xl mt-1">{s.value}</div>
+              <div className="text-slate-500 text-[11px] mt-0.5">{s.note}</div>
             </div>
           ))}
         </div>
@@ -132,43 +132,43 @@ export default async function AdminReferralsPage({
           {STATUSES.map((s) => tab(`/admin/referrals?status=${s}`, s, filter === s, countFor(s)))}
         </div>
 
-        <div className="rounded-xl bg-card border border-white/10 divide-y divide-white/10">
+        <div className="rounded-xl bg-white border border-slate-200 divide-y divide-slate-100">
           {rows.map((r) => (
             <div key={r.id} className="px-4 py-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4">
               <div>
-                <div className="text-white font-semibold">
+                <div className="text-slate-900 font-semibold">
                   {r.referred_name}
-                  <span className={"ml-2 text-xs font-normal " + (statusTone[r.status] ?? "text-soft")}>
+                  <span className={"ml-2 text-xs font-normal " + (statusTone[r.status] ?? "text-slate-500")}>
                     {r.status}
                   </span>
                 </div>
-                <div className="text-soft text-xs mt-0.5">
+                <div className="text-slate-500 text-xs mt-0.5">
                   {[r.referred_email, r.referred_phone].filter(Boolean).join(" · ") || "no contact details"}
                 </div>
-                <div className="text-soft text-xs mt-2">
+                <div className="text-slate-500 text-xs mt-2">
                   Referred by{" "}
-                  <span className="text-white">{r.referrer_name || r.referrer_email}</span>
+                  <span className="text-slate-900">{r.referrer_name || r.referrer_email}</span>
                   {r.referrer_name && <span> &lt;{r.referrer_email}&gt;</span>}
                   {" · "}
                   {dateUK(r.created_at)}
                   {r.source !== "nurture-email" && <span> · {r.source}</span>}
                 </div>
-                {r.note && <div className="text-soft text-xs mt-2 italic">“{r.note}”</div>}
+                {r.note && <div className="text-slate-500 text-xs mt-2 italic">“{r.note}”</div>}
               </div>
 
               <div className="flex flex-col gap-2 lg:items-end">
                 <form action={setReferralStatus} className="flex items-center gap-1.5">
                   <input type="hidden" name="id" value={r.id} />
-                  <span className="text-soft text-xs">Status</span>
+                  <span className="text-slate-500 text-xs">Status</span>
                   <select aria-label={`Status for ${r.referred_name}`} name="status" defaultValue={r.status} className={select}>
                     {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
-                  <button className="rounded-full bg-gold text-deep font-bold text-xs px-3 py-1.5">Save</button>
+                  <button className="rounded-full bg-blue-700 text-slate-900 font-bold text-xs px-3 py-1.5">Save</button>
                 </form>
 
                 <form action={setReferralReward} className="flex items-center gap-1.5">
                   <input type="hidden" name="id" value={r.id} />
-                  <span className="text-soft text-xs">{formatPence(r.reward_pence)}</span>
+                  <span className="text-slate-500 text-xs">{formatPence(r.reward_pence)}</span>
                   <select aria-label={`Reward for ${r.referred_name}`} name="reward_status" defaultValue={r.reward_status} className={select}>
                     {REWARDS.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -177,26 +177,26 @@ export default async function AdminReferralsPage({
                     defaultValue={r.reward_reference ?? ""}
                     placeholder="payment ref"
                     aria-label={`Payment reference for ${r.referred_name}`}
-                    className="rounded-md bg-deep border border-white/15 text-white px-2 py-1.5 text-xs w-28"
+                    className="rounded-md bg-[#f6f8fb] border border-slate-200 text-slate-900 px-2 py-1.5 text-xs w-28"
                   />
-                  <button className="rounded-full bg-white/10 text-white font-bold text-xs px-3 py-1.5 border border-white/15">
+                  <button className="rounded-full bg-slate-100 text-slate-900 font-bold text-xs px-3 py-1.5 border border-slate-200">
                     Save
                   </button>
                 </form>
                 {r.reward_paid_at && (
-                  <div className="text-emerald-300 text-[11px]">paid {dateUK(r.reward_paid_at)}</div>
+                  <div className="text-emerald-700 text-[11px]">paid {dateUK(r.reward_paid_at)}</div>
                 )}
               </div>
             </div>
           ))}
           {rows.length === 0 && !error && (
-            <div className="px-4 py-8 text-soft text-sm text-center">
+            <div className="px-4 py-8 text-slate-500 text-sm text-center">
               {filter ? `No referrals with status “${filter}”.` : "No referrals yet."}
             </div>
           )}
         </div>
 
-        <p className="text-soft text-xs">
+        <p className="text-slate-500 text-xs">
           Marking someone <strong>enrolled</strong> sets the reward to <strong>due</strong>. Paying is a
           separate click, so nothing is ever recorded as paid just because it converted.
         </p>
