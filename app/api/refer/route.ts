@@ -75,6 +75,34 @@ export async function POST(request: NextRequest) {
     }
 
     if (!error) {
+      // Forward to the sheet, same convention as every other form on the site
+      // (CONTACT_ZAPIER_WEBHOOK_URL, CAREER_PLANNER_ZAPIER_WEBHOOK_URL, …).
+      // Optional: the row above is the record of truth, so an unset hook or a
+      // Zapier outage must not lose a referral. It only costs visibility.
+      const hook = process.env.REFERRAL_ZAPIER_WEBHOOK_URL;
+      if (hook) {
+        try {
+          await fetch(hook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referrer_name: r.referrer_name,
+              referrer_email: r.referrer_email,
+              referred_name: r.referred_name,
+              referred_email: r.referred_email,
+              referred_phone: r.referred_phone,
+              note: r.note,
+              reward: '£200 on enrolment',
+              submitted_at: new Date().toISOString(),
+            }),
+          });
+        } catch (hookErr) {
+          console.error('[refer] zapier forward failed, row is saved', hookErr);
+        }
+      } else {
+        console.warn('[refer] REFERRAL_ZAPIER_WEBHOOK_URL not set — skipping the sheet.');
+      }
+
       // Best effort — a failed notification must never lose the row, which is
       // already committed above.
       try {
