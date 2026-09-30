@@ -16,6 +16,7 @@ import { validateEmail } from "./email";
 import { validateName, validateBusinessName } from "./name";
 import { validateUKPhone, validateAnyPhone } from "./phone";
 import { checkHoneypot, SEC_KEY, type SecCheck } from "./honeypot";
+import { hasReachableContact, isSelfReferral } from "./referralRules";
 
 const secSchema = z.object({
   hp: z.string().optional(),
@@ -29,6 +30,17 @@ const contactSchema = z.object({
   email:   z.string().max(254).optional().or(z.literal("")),
   phone:   z.string().max(40).optional().or(z.literal("")),
   message: z.string().min(2).max(4000),
+  [SEC_KEY]: secSchema,
+});
+
+// ── Referral ──────────────────────────────────────────────────────────────
+const referralSchema = z.object({
+  referrer_email: z.string().max(254),
+  referrer_name:  z.string().max(200).optional().or(z.literal("")),
+  referred_name:  z.string().max(200),
+  referred_email: z.string().max(254).optional().or(z.literal("")),
+  referred_phone: z.string().max(40).optional().or(z.literal("")),
+  note:           z.string().max(2000).optional().or(z.literal("")),
   [SEC_KEY]: secSchema,
 });
 
@@ -587,4 +599,83 @@ export function validateEnrolmentSec(raw: unknown): SecCheck {
     return { ok: false, reason: "honeypot" };
   }
   return { ok: true };
+}
+
+
+export type ReferralClean = {
+  referrer_email: string;
+  referrer_name: string;
+  referred_name: string;
+  referred_email: string;
+  referred_phone: string;
+  note: string;
+};
+
+/**
+ * A referral is a payment promise — £200 if the named person enrols — so it is
+ * validated harder than an enquiry. The referrer's email is REQUIRED because it
+ * is the only identifier we have for who gets paid; a referral we cannot
+ * attribute is worse than no referral, because someone will later be owed money
+ * we cannot trace.
+ *
+ * The referred person needs a name plus at least one way to reach them.
+ */
+export function validateReferral(raw: unknown): ValidationResult<ReferralClean> {
+  const parsed = referralSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { ok: false, silent: false, status: 400, error: "Missing required fields.", signals: ["schema-fail"] };
+  }
+  const secCheck = sec(raw);
+  if (!secCheck.ok) {
+    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
+  }
+
+  // Who gets paid. Not optional.
+  const refEmail = validateEmail(parsed.data.referrer_email);
+  if (!refEmail.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter your own email address so we can pay you.", signals: [`referrer_email:${refEmail.reason}`] };
+  }
+
+  const nameCheck = validateName(parsed.data.referred_name);
+  if (!nameCheck.ok) {
+    return { ok: false, silent: false, status: 422, error: "Please enter their full name.", signals: [`referred_name:${nameCheck.reason}`] };
+  }
+
+  const hasEmail = !!parsed.data.referred_email;
+  const hasPhone = !!parsed.data.referred_phone;
+  if (!hasReachableContact(parsed.data.referred_email, parsed.data.referred_phone)) {
+    return { ok: false, silent: false, status: 400, error: "Please give us an email or phone number for them.", signals: ["no-contact"] };
+  }
+
+  let referredEmail = "";
+  if (hasEmail) {
+    const ec = validateEmail(parsed.data.referred_email);
+    if (!ec.ok) {
+      return { ok: false, silent: false, status: 422, error: "Please enter a valid email address for them.", signals: [`referred_email:${ec.reason}`] };
+    }
+    referredEmail = ec.normalised!;
+  }
+
+  const signals: string[] = [];
+  // Referring yourself is not a referral. Caught here rather than at the
+  // database, which only knows about duplicate pairs.
+  if (isSelfReferral(refEmail.normalised!, referredEmail)) {
+    return { ok: false, silent: false, status: 422, error: "That's your own email address.", signals: ["self-referral"] };
+  }
+
+  const referrerName = String(parsed.data.referrer_name ?? "").trim().slice(0, 200);
+  if (!referrerName) signals.push("referrer_name:empty");
+
+  return {
+    ok: true,
+    signals,
+    data: {
+      referrer_email: refEmail.normalised!,
+      referrer_name: referrerName,
+      referred_name: nameCheck.normalised ?? String(parsed.data.referred_name).trim(),
+      referred_email: referredEmail,
+      referred_phone: String(parsed.data.referred_phone ?? "").trim().slice(0, 40),
+      note: String(parsed.data.note ?? "").trim().slice(0, 2000),
+    },
+  };
 }
