@@ -19,25 +19,25 @@ export default function BankReveal({
   const [full, setFull] = useState<{ accountName: string | null; sortCode: string | null; accountNumber: string | null } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  if (!masked) return <span className="text-soft text-xs">Not provided</span>;
+  if (!masked) return <span className="text-slate-500 text-xs">Not provided</span>;
 
   return (
     <div className="text-xs">
       {full ? (
-        <div className="font-mono text-white">
+        <div className="font-mono text-slate-900">
           <div>{full.accountName}</div>
           <div>{full.sortCode} · {full.accountNumber}</div>
           <button
             type="button"
             onClick={() => setFull(null)}
-            className="mt-1 text-soft font-sans hover:text-white"
+            className="mt-1 text-slate-500 font-sans hover:text-slate-900"
           >
             Hide
           </button>
         </div>
       ) : (
         <div>
-          <span className="text-soft font-mono">{masked}</span>
+          <span className="text-slate-500 font-mono">{masked}</span>
           <button
             type="button"
             disabled={loading}
@@ -46,7 +46,7 @@ export default function BankReveal({
               setFull(await revealBankDetails(partnerId));
               setLoading(false);
             }}
-            className="ml-2 text-gold hover:underline disabled:opacity-60"
+            className="ml-2 text-blue-700 hover:underline disabled:opacity-60"
           >
             {loading ? "…" : "Reveal"}
           </button>
@@ -54,7 +54,7 @@ export default function BankReveal({
       )}
 
       {changedRecently && (
-        <p className="text-amber-300 mt-1">
+        <p className="text-amber-700 mt-1">
           Changed in the last 7 days — confirm before paying
         </p>
       )}

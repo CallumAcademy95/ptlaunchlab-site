@@ -1,6 +1,23 @@
 import type { Metadata } from "next";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { formatPence } from "@/app/lib/partner-data";
+import { buildPartnerTimeline, partnerHealth } from "@/app/lib/partner-timeline";
+import { Banknote, Building2, PoundSterling, Users, Wallet } from "lucide-react";
+import {
+  AdminPage,
+  Badge,
+  Notice,
+  PageHeader,
+  StatTile,
+  TableWrap,
+  TBODY,
+  TD,
+  TH,
+  THEAD,
+  TR,
+} from "../ui/praxel";
+import { STANDING_TONE } from "./standing";
+import { canBePaid } from "@/app/lib/security/payoutRules";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
 import BankReveal from "./BankReveal";
@@ -25,11 +42,22 @@ interface PartnerRow {
   landing_page_path: string | null;
   commission_terms: string;
   is_demo?: boolean;
+  agreement_signed_at: string | null;
+  agreement_version: string | null;
+  created_at: string | null;
   bank_account_name: string | null;
   bank_sort_code: string | null;
   bank_account_number: string | null;
   bank_details_updated_at: string | null;
-  pp_partner_users: { id: string; email: string; role: string; must_change_password: boolean; last_login_at: string | null }[];
+  pp_partner_users: {
+    id: string;
+    email: string;
+    full_name: string | null;
+    role: string;
+    must_change_password: boolean;
+    last_login_at: string | null;
+    created_at: string | null;
+  }[];
 }
 
 export default async function AdminPartnersPage({
@@ -42,8 +70,9 @@ export default async function AdminPartnersPage({
     .from("pp_partners")
     .select(
       "id, slug, gym_name, status, landing_page_path, commission_terms, is_demo, " +
+      "agreement_signed_at, agreement_version, created_at, " +
       "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
-      "pp_partner_users(id, email, role, must_change_password, last_login_at)"
+      "pp_partner_users(id, email, full_name, role, must_change_password, last_login_at, created_at)"
     )
     .order("gym_name");
 
@@ -123,136 +152,190 @@ export default async function AdminPartnersPage({
   const owedTotal = [...payable.entries()]
     .filter(([id]) => !demoIds.has(id))
     .reduce((t, [, e]) => t + e.total, 0);
+  // The same derivation the detail page runs, so the list and the page can
+  // never disagree about whether a gym is doing anything. It also stops a
+  // payout WE sent from reading as the gym being active, which is what had
+  // MoF and Musclebound showing as producing.
+  const salesFor = new Map<string, typeof sales>();
+  for (const s of sales) {
+    const bucket = salesFor.get(s.partner_id) ?? [];
+    bucket.push(s);
+    salesFor.set(s.partner_id, bucket);
+  }
+  const payoutsFor = new Map<string, typeof payouts>();
+  for (const p of payouts) {
+    const bucket = payoutsFor.get(p.partner_id) ?? [];
+    bucket.push(p);
+    payoutsFor.set(p.partner_id, bucket);
+  }
+  const healthFor = new Map<string, ReturnType<typeof partnerHealth>>();
+  for (const p of partners) {
+    const events = buildPartnerTimeline({
+      partner: p,
+      users: p.pp_partner_users,
+      sales: salesFor.get(p.id) ?? [],
+      payouts: payoutsFor.get(p.id) ?? [],
+    });
+    healthFor.set(
+      p.id,
+      partnerHealth({
+        events,
+        hasEverLoggedIn: p.pp_partner_users.some((u) => u.last_login_at),
+        learners: learnersFor.get(p.id) ?? 0,
+        logins: p.pp_partner_users.length,
+      }),
+    );
+  }
+
   // Read the clock once, outside the render, so the rows stay pure.
   const recentChangeCutoff = Date.parse(nowIso) - 7 * 86400000;
 
   return (
-    <div className="min-h-screen bg-deep">
-      <div className="mx-auto max-w-5xl px-6 py-10 space-y-8">
-        <div>
-          <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-1">
-            PT Launch Lab admin
-          </p>
-          <h1 className="text-white font-bold text-2xl">Gym partners</h1>
-          <p className="text-soft text-sm mt-1">
-            {owedTotal > 0
+    <AdminPage width="max-w-7xl">
+      <div className="space-y-8">
+        <PageHeader
+          title="Gym partners"
+          subtitle={
+            owedTotal > 0
               ? `${formatPence(owedTotal)} in commission is released and unpaid across all partners.`
-              : "All released commission has been paid."}
-          </p>
-        </div>
+              : "All released commission has been paid."
+          }
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {[
-            { label: "Partners", value: String(realPartners), note: `${producing} producing` },
-            { label: "Learners", value: String(totalLearners), note: "attributed to a gym" },
-            { label: "Commission earned", value: formatPence(totalEarned), note: "lifetime" },
-            { label: "Paid out", value: formatPence(totalPaid), note: "left the bank" },
-            { label: "Owed now", value: formatPence(owedTotal), note: "released, unpaid" },
-          ].map((s) => (
-            <div key={s.label} className="rounded-xl bg-card border border-white/10 px-4 py-3">
-              <div className="text-soft text-[10px] uppercase tracking-widest font-bold">{s.label}</div>
-              <div className="text-white font-bold text-xl mt-1">{s.value}</div>
-              <div className="text-soft text-[11px] mt-0.5">{s.note}</div>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
+          <StatTile
+            icon={<Building2 className="h-5 w-5" />}
+            value={realPartners}
+            label="Partners"
+            sublabel={`${producing} producing`}
+            tone="slate"
+          />
+          <StatTile
+            icon={<Users className="h-5 w-5" />}
+            value={totalLearners}
+            label="Learners"
+            sublabel="attributed to a gym"
+            tone="blue"
+          />
+          <StatTile
+            icon={<PoundSterling className="h-5 w-5" />}
+            value={formatPence(totalEarned)}
+            label="Commission earned"
+            sublabel="lifetime"
+            tone="slate"
+          />
+          <StatTile
+            icon={<Banknote className="h-5 w-5" />}
+            value={formatPence(totalPaid)}
+            label="Paid out"
+            sublabel="left the bank"
+            tone="green"
+          />
+          <StatTile
+            icon={<Wallet className="h-5 w-5" />}
+            value={formatPence(owedTotal)}
+            label="Owed now"
+            sublabel="released, unpaid"
+            tone={owedTotal > 0 ? "amber" : "slate"}
+          />
         </div>
 
         {neverLoggedIn > 0 && (
-          <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-4 py-3 text-amber-200 text-sm">
-            <strong>{neverLoggedIn}</strong> of {realPartners} partners have never logged in.
-            An asset library nobody opens is not a distribution channel.
-          </div>
+          <Notice tone="amber">
+            <strong>{neverLoggedIn}</strong> of {realPartners} partners have never logged in. An
+            asset library nobody opens is not a distribution channel.
+          </Notice>
         )}
 
         {error && (
-          <div className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-red-200 text-sm">
+          <Notice tone="rose">
             Could not load partners: {error.message}
             {error.message.includes("pp_partners") && (
               <> — has <code>supabase/migrations/20260727_partner_platform.sql</code> been applied?</>
             )}
-          </div>
+          </Notice>
         )}
 
-        <CreateUserForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name, slug: p.slug }))} />
-
-        <UploadResourceForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name }))} />
-
-        <SetBankForm
-          partners={partners.map((p) => ({
-            id: p.id,
-            gym_name: p.gym_name,
-            hasBank: Boolean(p.bank_sort_code && p.bank_account_number),
-          }))}
-        />
-
-        <AddPlaybookForm />
-
-        <div className="rounded-xl bg-card border border-white/10 overflow-hidden">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-white/5 text-soft text-[10px] uppercase tracking-widest">
+        <TableWrap>
+          <table className="w-full min-w-[68rem] text-left text-sm">
+            <thead className={THEAD}>
               <tr>
-                <th className="px-4 py-3 font-bold">Gym</th>
-                <th className="px-4 py-3 font-bold">Slug</th>
-                <th className="px-4 py-3 font-bold">Terms</th>
-                <th className="px-4 py-3 font-bold">Learners</th>
-                <th className="px-4 py-3 font-bold">Earned</th>
-                <th className="px-4 py-3 font-bold">Paid</th>
-                <th className="px-4 py-3 font-bold">Logins</th>
-                <th className="px-4 py-3 font-bold">Bank</th>
-                <th className="px-4 py-3 font-bold">Owed now</th>
+                <th className={TH}>Gym</th>
+                <th className={TH}>Slug</th>
+                <th className={TH}>Standing</th>
+                <th className={TH}>Terms</th>
+                <th className={TH}>Learners</th>
+                <th className={TH}>Earned</th>
+                <th className={TH}>Paid</th>
+                <th className={TH}>Logins</th>
+                <th className={TH}>Bank</th>
+                <th className={TH}>Owed now</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className={TBODY}>
               {partners.map((p) => (
-                <tr key={p.id}>
+                <tr key={p.id} className={TR}>
                   <td className="px-4 py-3">
-                    <span className="text-white font-semibold">{p.gym_name}</span>
+                    <a
+                      href={`/admin/partners/${p.slug}`}
+                      className="font-semibold text-slate-900 underline-offset-2 hover:text-blue-700 hover:underline"
+                    >
+                      {p.gym_name}
+                    </a>
                     {p.is_demo && (
-                      <span className="ml-2 px-2 py-0.5 rounded-full bg-white/5 text-soft border border-white/15 text-[10px] font-semibold">
+                      <span className="ml-2 px-2 py-0.5 rounded-full bg-slate-50 text-slate-500 border border-slate-200 text-[10px] font-semibold">
                         demo
                       </span>
                     )}
                     {p.status !== "active" && (
-                      <span className="ml-2 text-amber-300 text-xs">({p.status})</span>
+                      <span className="ml-2 text-amber-700 text-xs">({p.status})</span>
                     )}
                     {p.landing_page_path && (
-                      <div className="text-soft text-xs mt-0.5">{p.landing_page_path}</div>
+                      <div className="text-slate-500 text-xs mt-0.5">{p.landing_page_path}</div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-soft font-mono text-xs">{p.slug}</td>
-                  <td className="px-4 py-3 text-soft text-xs">
+                  <td className="px-4 py-3 text-slate-500 font-mono text-xs">{p.slug}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={STANDING_TONE[healthFor.get(p.id)?.health ?? "quiet"]}>
+                      {healthFor.get(p.id)?.health}
+                    </Badge>
+                    <div className="mt-1 max-w-[15rem] text-[11px] text-slate-500">
+                      {healthFor.get(p.id)?.why}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">
                     {p.commission_terms === "on_enrolment"
                       ? "30d after enrolment (grandfathered)"
                       : "Held to instalment 2"}
                   </td>
                   <td className="px-4 py-3">
                     {(learnersFor.get(p.id) ?? 0) > 0 ? (
-                      <a href={`/admin/partners?gym=${encodeURIComponent(p.slug)}`} className="text-gold font-semibold">
+                      <a href={`/admin/partners?gym=${encodeURIComponent(p.slug)}`} className="text-blue-700 font-semibold">
                         {learnersFor.get(p.id)}
                       </a>
                     ) : (
-                      <span className="text-soft text-xs">0</span>
+                      <span className="text-slate-500 text-xs">0</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-soft text-xs">
+                  <td className="px-4 py-3 text-slate-500 text-xs">
                     {earnedFor.get(p.id) ? formatPence(earnedFor.get(p.id)!) : "—"}
                   </td>
-                  <td className="px-4 py-3 text-soft text-xs">
+                  <td className="px-4 py-3 text-slate-500 text-xs">
                     {paidFor.get(p.id) ? formatPence(paidFor.get(p.id)!) : "—"}
                   </td>
                   <td className="px-4 py-3">
                     {p.pp_partner_users.length === 0 ? (
-                      <span className="text-soft text-xs">No login yet</span>
+                      <span className="text-slate-500 text-xs">No login yet</span>
                     ) : (
                       p.pp_partner_users.map((u) => (
-                        <div key={u.email} className="text-soft text-xs mb-1.5">
+                        <div key={u.email} className="text-slate-500 text-xs mb-1.5">
                           <div>
                             {u.email}
                             {u.must_change_password && (
-                              <span className="text-amber-300"> · not signed in yet</span>
+                              <span className="text-amber-700"> · not signed in yet</span>
                             )}
                           </div>
-                          <div className={u.last_login_at ? "text-soft" : "text-amber-300"}>
+                          <div className={u.last_login_at ? "text-slate-500" : "text-amber-700"}>
                             {u.last_login_at
                               ? `last in ${new Date(u.last_login_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`
                               : "never logged in"}
@@ -277,7 +360,9 @@ export default async function AdminPartnersPage({
                     />
                   </td>
                   <td className="px-4 py-3">
-                    {payable.has(p.id) ? (
+                    {!payable.has(p.id) ? (
+                      <span className="text-xs text-slate-500">Nothing due</span>
+                    ) : canBePaid(p) ? (
                       <MarkPaidForm
                         partnerId={p.id}
                         amount={formatPence(payable.get(p.id)!.total)}
@@ -285,21 +370,52 @@ export default async function AdminPartnersPage({
                         today={today}
                       />
                     ) : (
-                      <span className="text-soft text-xs">Nothing due</span>
+                      <span className="text-xs text-slate-500">
+                        {formatPence(payable.get(p.id)!.total)} — demo, not payable
+                      </span>
                     )}
                   </td>
                 </tr>
               ))}
               {partners.length === 0 && !error && (
                 <tr>
-                  <td colSpan={9} className="px-4 py-6 text-soft text-sm text-center">
+                  <td colSpan={10} className="px-4 py-6 text-slate-500 text-sm text-center">
                     No partners yet.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
+
+        {/* Admin tools live below the record and start closed. They are how
+            you change things; the table is why you came. */}
+        <details className="group rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-slate-900 marker:content-none">
+            <span className="inline-flex items-center gap-2">
+              <span className="text-slate-400 transition group-open:rotate-90">›</span>
+              Admin tools
+            </span>
+            <span className="ml-2 font-normal text-slate-500">
+              create a login, upload a resource, record bank details, add a playbook entry
+            </span>
+          </summary>
+          <div className="space-y-6 border-t border-slate-100 p-5">
+        <CreateUserForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name, slug: p.slug }))} />
+
+        <UploadResourceForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name }))} />
+
+        <SetBankForm
+          partners={partners.map((p) => ({
+            id: p.id,
+            gym_name: p.gym_name,
+            hasBank: Boolean(p.bank_sort_code && p.bank_account_number),
+          }))}
+        />
+
+        <AddPlaybookForm />
+          </div>
+        </details>
 
         <PartnerLearners
           partners={partners.map((p) => ({ id: p.id, slug: p.slug, gym_name: p.gym_name, is_demo: p.is_demo }))}
@@ -308,6 +424,6 @@ export default async function AdminPartnersPage({
           selectedSlug={selectedSlug}
         />
       </div>
-    </div>
+    </AdminPage>
   );
 }

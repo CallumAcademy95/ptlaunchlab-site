@@ -51,13 +51,13 @@ const dateUK = (iso: string | null) =>
 
 /** Commission wording that matches how the money actually behaves. */
 function commissionLabel(s: SaleRow, now: number): { text: string; tone: string } {
-  if (s.commission_status === "paid") return { text: "Paid", tone: "text-emerald-300" };
-  if (s.commission_status === "voided") return { text: "Voided", tone: "text-soft" };
-  if (!s.commission_release_at) return { text: "Not released", tone: "text-soft" };
+  if (s.commission_status === "paid") return { text: "Paid", tone: "text-emerald-700" };
+  if (s.commission_status === "voided") return { text: "Voided", tone: "text-slate-500" };
+  if (!s.commission_release_at) return { text: "Not released", tone: "text-slate-500" };
   const rel = Date.parse(s.commission_release_at);
   return rel <= now
-    ? { text: "Due now", tone: "text-amber-300" }
-    : { text: `Releases ${dateUK(s.commission_release_at)}`, tone: "text-soft" };
+    ? { text: "Due now", tone: "text-amber-700" }
+    : { text: `Releases ${dateUK(s.commission_release_at)}`, tone: "text-slate-500" };
 }
 
 export default function PartnerLearners({
@@ -94,8 +94,8 @@ export default function PartnerLearners({
       className={
         "px-3 py-1.5 rounded-full text-xs font-semibold border transition " +
         (active
-          ? "bg-gold text-deep border-gold"
-          : "bg-white/5 text-soft border-white/15 hover:border-white/30")
+          ? "bg-blue-700 text-white border-blue-600"
+          : "bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300")
       }
     >
       {label}
@@ -106,8 +106,8 @@ export default function PartnerLearners({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-white font-bold text-lg">Learners by gym</h2>
-        <p className="text-soft text-sm mt-1">
+        <h2 className="text-slate-900 font-bold text-lg">Learners by gym</h2>
+        <p className="text-slate-500 text-sm mt-1">
           Every enrolment attributed to a partner, newest first.
         </p>
       </div>
@@ -121,9 +121,9 @@ export default function PartnerLearners({
           )}
       </div>
 
-      <div className="rounded-xl bg-card border border-white/10 overflow-x-auto">
+      <div className="rounded-xl bg-white border border-slate-200 overflow-x-auto">
         <table className="w-full text-left text-sm min-w-[820px]">
-          <thead className="bg-white/5 text-soft text-[10px] uppercase tracking-widest">
+          <thead className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-widest">
             <tr>
               <th className="px-4 py-3 font-bold">Learner</th>
               {!selected && <th className="px-4 py-3 font-bold">Gym</th>}
@@ -134,33 +134,33 @@ export default function PartnerLearners({
               <th className="px-4 py-3 font-bold">Commission</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-slate-100">
             {visibleSales.map((s) => {
               const gym = byId.get(s.partner_id);
               const c = commissionLabel(s, now);
               return (
                 <tr key={s.id} className={gym?.is_demo ? "opacity-60" : undefined}>
                   <td className="px-4 py-3">
-                    <div className="text-white font-semibold">{s.learner_name || "—"}</div>
-                    {s.learner_email && <div className="text-soft text-xs">{s.learner_email}</div>}
+                    <div className="text-slate-900 font-semibold">{s.learner_name || "—"}</div>
+                    {s.learner_email && <div className="text-slate-500 text-xs">{s.learner_email}</div>}
                   </td>
                   {!selected && (
-                    <td className="px-4 py-3 text-soft text-xs">
+                    <td className="px-4 py-3 text-slate-500 text-xs">
                       {gym?.gym_name ?? "—"}
                       {gym?.is_demo && <span className="ml-1 text-[10px]">(demo)</span>}
                     </td>
                   )}
-                  <td className="px-4 py-3 text-soft text-xs">{dateUK(s.enrolled_at ?? s.created_at)}</td>
-                  <td className="px-4 py-3 text-soft text-xs">{s.plan_type ?? "—"}</td>
-                  <td className="px-4 py-3 text-white text-xs">
+                  <td className="px-4 py-3 text-slate-500 text-xs">{dateUK(s.enrolled_at ?? s.created_at)}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{s.plan_type ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-900 text-xs">
                     {s.amount_paid_pence != null ? formatPence(s.amount_paid_pence) : "—"}
                     {s.status !== "confirmed" && (
-                      <span className="ml-1 text-amber-300">({s.status})</span>
+                      <span className="ml-1 text-amber-700">({s.status})</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-soft font-mono text-[11px]">{s.promo_code ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-500 font-mono text-[11px]">{s.promo_code ?? "—"}</td>
                   <td className="px-4 py-3 text-xs">
-                    <span className="text-white">
+                    <span className="text-slate-900">
                       {s.commission_pence != null ? formatPence(s.commission_pence) : "—"}
                     </span>
                     <div className={c.tone}>{c.text}</div>
@@ -170,7 +170,7 @@ export default function PartnerLearners({
             })}
             {visibleSales.length === 0 && (
               <tr>
-                <td colSpan={selected ? 6 : 7} className="px-4 py-6 text-soft text-sm text-center">
+                <td colSpan={selected ? 6 : 7} className="px-4 py-6 text-slate-500 text-sm text-center">
                   {selected
                     ? `${selected.gym_name} has not produced a learner yet.`
                     : "No sales recorded against any partner yet."}
@@ -182,15 +182,15 @@ export default function PartnerLearners({
       </div>
 
       <div>
-        <h2 className="text-white font-bold text-lg mt-8">
+        <h2 className="text-slate-900 font-bold text-lg mt-8">
           Payout history{selected ? ` — ${selected.gym_name}` : ""}
         </h2>
-        <p className="text-soft text-sm mt-1">What has actually left the bank.</p>
+        <p className="text-slate-500 text-sm mt-1">What has actually left the bank.</p>
       </div>
 
-      <div className="rounded-xl bg-card border border-white/10 overflow-x-auto">
+      <div className="rounded-xl bg-white border border-slate-200 overflow-x-auto">
         <table className="w-full text-left text-sm min-w-[620px]">
-          <thead className="bg-white/5 text-soft text-[10px] uppercase tracking-widest">
+          <thead className="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-widest">
             <tr>
               {!selected && <th className="px-4 py-3 font-bold">Gym</th>}
               <th className="px-4 py-3 font-bold">Period</th>
@@ -200,25 +200,25 @@ export default function PartnerLearners({
               <th className="px-4 py-3 font-bold">Paid</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-slate-100">
             {visiblePayouts.map((p) => {
               const gym = byId.get(p.partner_id);
               return (
                 <tr key={p.id} className={gym?.is_demo ? "opacity-60" : undefined}>
-                  {!selected && <td className="px-4 py-3 text-soft text-xs">{gym?.gym_name ?? "—"}</td>}
-                  <td className="px-4 py-3 text-white text-xs">{p.period_label ?? "—"}</td>
-                  <td className="px-4 py-3 text-white text-xs">{formatPence(p.total_pence)}</td>
+                  {!selected && <td className="px-4 py-3 text-slate-500 text-xs">{gym?.gym_name ?? "—"}</td>}
+                  <td className="px-4 py-3 text-slate-900 text-xs">{p.period_label ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-900 text-xs">{formatPence(p.total_pence)}</td>
                   <td className="px-4 py-3 text-xs">
-                    <span className={p.status === "paid" ? "text-emerald-300" : "text-amber-300"}>{p.status}</span>
+                    <span className={p.status === "paid" ? "text-emerald-700" : "text-amber-700"}>{p.status}</span>
                   </td>
-                  <td className="px-4 py-3 text-soft font-mono text-[11px]">{p.invoice_number ?? "—"}</td>
-                  <td className="px-4 py-3 text-soft text-xs">{dateUK(p.paid_at)}</td>
+                  <td className="px-4 py-3 text-slate-500 font-mono text-[11px]">{p.invoice_number ?? "—"}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">{dateUK(p.paid_at)}</td>
                 </tr>
               );
             })}
             {visiblePayouts.length === 0 && (
               <tr>
-                <td colSpan={selected ? 5 : 6} className="px-4 py-6 text-soft text-sm text-center">
+                <td colSpan={selected ? 5 : 6} className="px-4 py-6 text-slate-500 text-sm text-center">
                   No payouts recorded{selected ? ` for ${selected.gym_name}` : ""} yet.
                 </td>
               </tr>

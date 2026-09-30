@@ -8,6 +8,7 @@ import { getBankDetails, saveBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { payoutRefusalReason } from "@/app/lib/security/payoutRules";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -297,10 +298,15 @@ export async function setPartnerBankDetails(
   const admin = getSupabaseAdmin();
   const { data: partner } = await admin
     .from("pp_partners")
-    .select("id, gym_name")
+    .select("id, gym_name, is_demo")
     .eq("id", partnerId)
     .maybeSingle();
   if (!partner) return { error: "That partner no longer exists." };
+
+  // Checked here and not only in the render, because the button being absent
+  // from the page is not the same as the action being closed.
+  const refusal = payoutRefusalReason(partner);
+  if (refusal) return { error: refusal };
 
   const { data: users } = await admin
     .from("pp_partner_users")
