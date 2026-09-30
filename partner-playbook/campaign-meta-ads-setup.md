@@ -53,25 +53,38 @@ and costs more per person.
 Start with location and age only. Add interests later **only** if the traffic you get
 is obviously the wrong sort.
 
-⚠️ Do not use the "job" or "employment" wording anywhere in the ad. Meta reads that as
-a job advert, and a job advert loses interest targeting, loses lookalikes and is forced
-to a **15km minimum radius** — which is four times the area you actually want. The copy
-in your ad pack is already written to stay clear of this. See the rule at the bottom of
-that entry.
+⚠️ Do not use "job", "employment", "hiring" or "guaranteed interview" wording anywhere
+in the ad. Meta reads that as a job advert, and a job advert loses interest targeting,
+loses lookalikes and is forced to a **15 mile minimum radius**. That is not a slightly
+wider circle — fifteen miles covers roughly **fourteen times the area** of the four you
+want, so the same money is spread across fourteen times the people.
+
+You are advertising a course, not a vacancy, so this should not come up. The copy in
+your ad pack is written to keep it that way. **If Meta ever asks you to declare a
+Special Ad Category, stop and tell us before you accept it** — that is worth a
+two-minute conversation rather than a guess.
 
 ## 3. Budget
 
-There is no right number, and anyone who gives you one is guessing. What is not a guess
-is your break-even:
+**Our recommended starting investment is £150.** Roughly £10 a day for a fortnight, one
+campaign, one ad set, both creatives in it. Increase it if you want to — it is your
+account and your money.
 
-**Every learner who enrols through your academy is £500 to you.** So the ad pays for
-itself at one learner per £500 spent. At £10 a day that is fifty days. At £15 a day it
-is a month.
+A qualifying learner generates **£500 partner commission, inclusive of VAT**. That is
+what makes this worth testing without needing volume.
 
-A sensible first test is **£10 a day for two weeks**, one ad set, both creatives in it.
-That is £140 to find out whether anyone in your town responds. If nobody clicks, you
-have learned something cheaply. If people click and nobody enrols, the problem is the
-page or the price, not the ad.
+What we are not going to tell you is that £150 produces a learner. It might not. Nobody
+has run this campaign before, so there is no benchmark to quote you and we would rather
+say that than invent one. Treat the first month as finding out whether people in your
+town respond at all.
+
+If nobody clicks, you have learned something cheaply. If people click and nobody
+enrols, the problem is the page or the price, not the ad — tell us and we will look at
+it.
+
+Keep it simple. One local campaign, one useful audience, enough budget to learn
+something. Do not split £150 across several ad sets, and do not create separate male
+and female ad sets unless you have data of your own telling you to.
 
 Do not start and stop it. Meta needs a few days of steady delivery before it settles,
 and switching off on day three teaches you nothing.
