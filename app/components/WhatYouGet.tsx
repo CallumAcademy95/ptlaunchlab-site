@@ -63,8 +63,8 @@ const features = [
   },
   {
     Icon: HandshakeIcon,
-    title: "Guaranteed Gym Interview",
-    body: "Complete the course and we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. A warm introduction to an employer who is actually hiring, not a job board and not a PDF of tips.",
+    title: "Guaranteed Gym Introduction",
+    body: "Complete the course and we approach at least one gym on your behalf: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. A warm introduction to an employer who is actually hiring, not a job board and not a PDF of tips.",
     badge: "Guaranteed",
   },
   {

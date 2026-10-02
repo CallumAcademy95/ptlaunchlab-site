@@ -59,7 +59,7 @@ const objections = [
   },
   {
     q: "What if the income doesn't replace my current salary?",
-    a: "Employed-first is the safer bridge. We arrange at least one interview for you when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Year one salary: £20K–£28K base plus commission. You stay in your current job long enough to overlap salaries, then transition. Self-employed PTs after 2–3 years routinely hit £35K–£50K+. The pathway is gradual, not a cliff edge.",
+    a: "Employed-first is the safer bridge. We approach at least one gym on your behalf when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Year one salary: £20K–£28K base plus commission. You stay in your current job long enough to overlap salaries, then transition. Self-employed PTs after 2–3 years routinely hit £35K–£50K+. The pathway is gradual, not a cliff edge.",
   },
 ];
 
@@ -85,7 +85,7 @@ const faqs = [
   { q: "Can I really qualify as a personal trainer while working full-time in the UK?", a: "Yes. 100% online and fully self-paced. No fixed class times, no commute, no weekend workshops. Practical units are video-assessed at any gym: you film yourself coaching real movements and your tutor reviews it. Most career-changers put in 8–10 hours per week and finish in 8–16 weeks while still earning full-time." },
   { q: "Is it too late to change careers in my 30s or 40s?", a: "No, and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
   { q: "How much can I realistically earn as a PT in year one?", a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one." },
-  { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We arrange at least one interview for you when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
+  { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We approach at least one gym on your behalf when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
   { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts, contracts, plus our private Skool community for daily peer contact. Bundled free with your course, in the fee rather than sold on afterwards." },
   { q: "When can I start?", a: "Immediately. The moment you enrol, your course access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
 ];
@@ -102,7 +102,7 @@ const courseSchema = {
   "@context": "https://schema.org",
   "@type": "Course",
   name: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training (Career Change Pathway)",
-  description: "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm-introduction interviews into employed PT roles.",
+  description: "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm introductions into employed PT roles.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
   offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
@@ -314,7 +314,7 @@ export default function CareerChangeToPersonalTrainerPage() {
                 { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
                 { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly, or pay in full. Roughly matches a single PT session per week once you qualify." },
                 { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback, so the assessments stop being scary." },
-                { tag: "Exit", title: "Employed-first, then self-employed", body: "A warm-introduction interview into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
+                { tag: "Exit", title: "Employed-first, then self-employed", body: "A warm introduction into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
               ].map((row) => (
                 <div key={row.title} className="bg-card border border-white/[0.06] rounded-2xl p-6">
                   <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-2">{row.tag}</p>

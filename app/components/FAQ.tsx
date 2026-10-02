@@ -7,8 +7,8 @@ const faqs = [
     a: "Yes. The qualification is delivered through NCFE, regulated by Ofqual under reference 603/4388/6 (Ofqual is the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. Ofqual publishes the qualification on its own register, so you can check it yourself rather than take our word for it. That is the difference between a regulated qualification and a self-branded certificate.",
   },
   {
-    q: "What exactly is the \"guaranteed gym interview\"? That sounds too good to be true.",
-    a: "It's a fair challenge, so here is exactly what it means. Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. It is a warm introduction rather than a job board listing or a generic CV drop. Our founders have spent years on the hiring side of this industry, so they know how to get you in front of the right person. What we cannot guarantee is the job itself. That part is down to you on the day. Getting you in the room is on us.",
+    q: "What exactly is the \"guaranteed gym introduction\"? That sounds too good to be true.",
+    a: "It's a fair challenge, so here is exactly what it means. Once you qualify, we approach at least one gym on your behalf: either one in our partner network, or one local to you. It is a warm introduction rather than a job-board listing or a generic CV drop. Our founders have spent years on the hiring side, so they know who to put you in front of. What we cannot guarantee is the interview or the job — both are the gym's decision. Making the introduction is ours.",
   },
   {
     q: "I'm working full-time. Is there any realistic way to study around my job?",

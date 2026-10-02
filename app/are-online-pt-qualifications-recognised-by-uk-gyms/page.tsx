@@ -205,7 +205,7 @@ export default function RecognisedPage() {
                   { title: "A \"PT diploma\" priced under £200", body: "Genuine Ofqual-regulated Level 2 + Level 3 PT qualifications are not loss-leader products. The course design and assessor costs alone are £600+." },
                   { title: "An awarding body the manager has never heard of", body: "NCFE, Focus Awards, Active IQ are recognised. \"International Sports Sciences Association\", \"American Council on Exercise\", and \"ACSM\" have UK followings but are not always automatically Ofqual-mapped — check before paying." },
                   { title: "No CIMSPA recognition listed", body: "If the course provider can't tell you which CIMSPA-recognised standard the qualification meets, walk away." },
-                  { title: "A \"guaranteed gym placement\" offer", body: "No legitimate course can guarantee a hire; gyms hire on interviews, not certificates. PT Launch Lab offers warm-introduction interviews — that's an introduction, not a guarantee." },
+                  { title: "A \"guaranteed gym placement\" offer", body: "No legitimate course can guarantee a hire; gyms hire on interviews, not certificates. PT Launch Lab offers warm introductions — an introduction, not a promise of a hire." },
                   { title: "No personal tutor named", body: "Quality assurance on assessor-to-learner contact is a regulatory requirement. If your course can't tell you who your personal tutor is, the regulation isn't being met." },
                 ].map((s) => (
                   <div key={s.title} className="rounded-2xl border border-red-500/20 bg-red-950/10 p-5">

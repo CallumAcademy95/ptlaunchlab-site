@@ -68,7 +68,7 @@ const steps = [
   { n: 2, title: "Smash Level 2: Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite for Level 3, already included in your fee rather than sold separately." },
   { n: 3, title: "Move into Level 3: Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals: film yourself coaching real movements at any gym and your tutor reviews the footage." },
   { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
-  { n: 5, title: "Get your warm-introduction gym interview", body: "We've personally hired 500+ PTs across our partner gym network. A warm introduction rather than a cold CV drop." },
+  { n: 5, title: "Get your warm introduction to a gym", body: "We've personally hired 500+ PTs across our partner gym network. A warm introduction rather than a cold CV drop." },
   { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The £500 PT Launch Lab Mentorship Hub is bundled free: your dashboard from 'qualified' to 'fully booked.'" },
 ];
 
@@ -84,7 +84,7 @@ const comparisonRows = [
 const faqs = [
   { q: "How do you become a personal trainer in the UK?", a: "Two qualifications: NCFE Level 2 Gym Instructor (legal prerequisite) followed by NCFE Level 3 Personal Trainer. Both Ofqual regulated, both bundled in our £1,599 course. Once you've passed Level 3 you register with CIMSPA, get public liability insurance (~£60/year), and you can legally take paying 1-to-1 clients in any UK commercial gym. No degree required. No minimum age above 16." },
   { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes. Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
-  { q: "Will gyms actually hire me with this qualification?", a: "NCFE Level 3 is regulated by Ofqual under reference 603/4388/6 and sits on the public register, which is what a hiring manager is checking for. Our team has personally hired 500+ PTs, so we know what they look for. When you qualify we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf." },
+  { q: "Will gyms actually hire me with this qualification?", a: "NCFE Level 3 is regulated by Ofqual under reference 603/4388/6 and sits on the public register, which is what a hiring manager is checking for. Our team has personally hired 500+ PTs, so we know what they look for. When you qualify we approach at least one gym on your behalf: either with a gym in our partner network, or with a gym local to you that we approach on your behalf." },
   { q: "Can I afford it?", a: "You can pay in full, or spread it with our deposit plan: £599 deposit then 5 × £200 monthly. Once qualified, a single PT session at £30 covers a month's payment." },
   { q: "Can I really do this online from home?", a: "Yes. 100% online. Theory online, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. What matters is the qualification itself, not the room you were sitting in when you earned it." },
   { q: "When can I start?", a: "Immediately. Full access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date, and many learners are halfway through their first unit by the end of day one." },
@@ -102,7 +102,7 @@ const courseSchema = {
   "@context": "https://schema.org",
   "@type": "Course",
   name: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training",
-  description: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and a guaranteed gym interview on graduation.",
+  description: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and a guaranteed gym introduction on graduation.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
   offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
@@ -476,7 +476,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               <span className="text-gold">£200 off for serious enquiries.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm-introduction interview to our gym network. Most learners use the deposit plan: £599 then 5 × £200.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm introduction to our gym network. Most learners use the deposit plan: £599 then 5 × £200.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>

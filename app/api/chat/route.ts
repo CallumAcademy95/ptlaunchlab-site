@@ -11,7 +11,7 @@ ABOUT PT LAUNCH LAB
 
 The course is an NCFE Level 2 & 3 Personal Trainer Qualification. It's 100% online, self-paced, and takes 8 to 16 weeks. Regulated by Ofqual under reference 603/4388/6, and CIMSPA recognised. It is on the Ofqual public register, so anyone can check it. Never claim that a named gym chain accepts it, and never say every gym accepts it.
 
-What's included: the full Level 3 qualification, a personal tutor from day one (a real person who knows your name and reviews every unit you submit), business training on getting clients and building an income, guaranteed gym interview introductions when you finish, and flexible payment options.
+What's included: the full Level 3 qualification, a personal tutor from day one (a real person who knows your name and reviews every unit you submit), business training on getting clients and building an income, guaranteed gym introduction introductions when you finish, and flexible payment options.
 
 Pricing: £1,599 in full, or £599 to start then 5 monthly payments of £200 (also £1,599). The standard price is not discounted, so always quote £1,599. A £1,399 pay-in-full price exists only for people holding a time-limited funnel promotion: never offer it or mention it unprompted, but don't contradict someone who says they already have it.
 
