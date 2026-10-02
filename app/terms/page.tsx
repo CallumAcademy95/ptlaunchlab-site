@@ -47,7 +47,7 @@ export default function TermsPage() {
                 "A dedicated personal tutor",
                 "Business and marketing training",
                 "Mentorship from the PT Launch Lab team",
-                "Guaranteed gym interview support upon qualification",
+                "Guaranteed gym introduction support upon qualification",
                 "NCFE qualification registration (Ofqual regulated, CIMSPA and REPs recognised)",
               ])}
               {p("Course access begins as soon as your payment is confirmed. The standard completion timeframe is 8–16 weeks, though you are able to study at your own pace.")}
@@ -124,16 +124,16 @@ export default function TermsPage() {
           ),
         },
         {
-          title: "Gym Interview Guarantee",
+          title: "Gym Introduction Guarantee",
           content: (
             <>
-              {p("Upon successful qualification, PT Launch Lab will arrange at least one interview for you — either with a gym in our partner network, or with a gym local to you that we approach on your behalf. This guarantee applies to learners who have:")}
+              {p("Upon successful qualification, PT Launch Lab will approach at least one gym on your behalf and introduce you — either a gym in our partner network, or a gym local to you. This guarantee applies to learners who have:")}
               {ul([
                 "Completed and passed all course modules and assessments",
                 "Engaged actively with the business and mentorship elements of the programme",
                 "Updated their learner profile and CV as guided",
               ])}
-              {p("This guarantee covers interview access only — PT Launch Lab cannot guarantee employment outcomes, which remain at the discretion of the individual gym.")}
+              {p("This guarantee covers the introduction only. Whether the gym offers you an interview, and whether it offers you work, are decisions for that gym alone and are outside PT Launch Lab's control.")}
             </>
           ),
         },

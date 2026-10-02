@@ -6,7 +6,7 @@ import { isOctoberOfferOpen } from "../lib/octoberOffer";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Launch Lab",
-  description: "Enrol on the £1,599 NCFE Level 2 & 3 PT qualification. Includes our £500 business mentorship community, personal tutor, and a guaranteed gym interview — bundled, no paid upgrades. Tutor assigned within 24 hours.",
+  description: "Enrol on the £1,599 NCFE Level 2 & 3 PT qualification. Includes our £500 business mentorship community, personal tutor, and a guaranteed gym introduction — bundled, no paid upgrades. Tutor assigned within 24 hours.",
   alternates: { canonical: "https://ptlaunchlab.co.uk/enrol" },
 };
 

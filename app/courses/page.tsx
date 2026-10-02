@@ -17,7 +17,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm-introduction gym interviews — all bundled, no paid upgrades. Qualify in 8–16 weeks.",
+    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.",
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -79,7 +79,7 @@ const courseSchema = {
       author: { "@type": "Person", name: "Mac Livock" },
       datePublished: "2025-08-08",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody: "Started as a trainee and rose to manager at PureGym. The guaranteed gym interviews and mentorship got me in the door — I did the rest.",
+      reviewBody: "Started as a trainee and rose to manager at PureGym. The guaranteed gym introductions and mentorship got me in the door — I did the rest.",
     },
   ],
 };
@@ -126,7 +126,7 @@ const curriculum = [
 const method = [
   { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 8–16 weeks." },
   { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free with the £1,599 fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
-  { num: "03", title: "Gym Interview", body: "A guaranteed interview when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs, so we prepare you properly.", highlight: true },
+  { num: "03", title: "Gym Introduction", body: "A guaranteed introduction when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs, so we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
   { num: "05", title: "Online Coaching", body: "Expand beyond the gym. Build an income stream that scales without a ceiling." },
 ];
@@ -181,7 +181,7 @@ const pricing = [
     headlineSuffix: "/month",
     subPrice: "£599 deposit + £200 × 5 · £1,599 total · 0% interest",
     saving: "Most chosen — spread the cost while you study",
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym interview", "Direct access to Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Start the deposit plan →",
     ctaHref: "/enrol",
     recommended: true,
@@ -193,7 +193,7 @@ const pricing = [
     headlineSuffix: "one-off",
     subPrice: "£4.38 / day if amortised across a year",
     saving: "Best total value — pay once, never think about it again",
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym interview", "Direct access to Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay in full →",
     ctaHref: "/enrol",
     recommended: false,
@@ -205,14 +205,14 @@ const compare = [
   { what: "NCFE Level 2 & 3 qualification", typical: "£1,200 – £2,800", us: "Included" },
   { what: "Business mentorship community", typical: "£500 – £3,000", us: "Included free" },
   { what: "Personal tutor", typical: "£200 – £600 extra", us: "Included" },
-  { what: "A guaranteed gym interview", typical: "On you to find them", us: "We introduce you" },
+  { what: "A guaranteed gym introduction", typical: "On you to find them", us: "We introduce you" },
 ];
 
 const faqs = [
   { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. NCFE is the qualification name UK gym managers ask for by default — PureGym, David Lloyd, Nuffield, JD Gyms, independents. Some UK academies use Focus Awards or self-branded certifications; NCFE is the one that doesn't need explaining on a CV." },
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
   { q: "How long does it take?", a: "Most students complete in 8–16 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
-  { q: "What is the guaranteed gym interview?", a: "Once you qualify, we arrange at least one interview for you: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. It is written into our terms rather than being a vague promise. We've hired 500+ PTs ourselves, so we know what gyms look for and we prepare you for it." },
+  { q: "What is the guaranteed gym introduction?", a: "Once you qualify, we approach at least one gym on your behalf: either one in our partner network, or one local to you. It is a warm introduction rather than a job-board listing. Whether they interview you, and whether you get the job, is their call. We've hired 500+ PTs ourselves, so we know what gyms look for and we prepare you for it." },
   { q: "Can I spread the cost?", a: "Yes. Our deposit plan lets you start with a £599 deposit, then 5 monthly payments of £200 (total £1,599). Book a free call if you'd like to talk it through." },
 ];
 
@@ -258,7 +258,7 @@ export default function CoursesPage() {
               Most PT courses teach theory. We build personal trainers gyms actually want to hire.
             </p>
             <p className="text-lg text-soft/70 max-w-2xl mx-auto mb-6">
-              NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, a guaranteed gym interview, and a complete business launchpad included.
+              NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, a guaranteed gym introduction, and a complete business launchpad included.
             </p>
 
             {/* Mentorship moat — surfaced above the fold as the single biggest
@@ -473,7 +473,7 @@ export default function CoursesPage() {
               Same course. <span className="text-gold">Pick the payment that suits you.</span>
             </h3>
             <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
-              Both plans get the same qualification, the same mentorship, the same gym interview. The only difference is how you spread the cost.
+              Both plans get the same qualification, the same mentorship, the same gym introduction. The only difference is how you spread the cost.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -507,7 +507,7 @@ export default function CoursesPage() {
               ))}
             </div>
             <p className="text-center text-faint text-xs md:text-sm mt-10 max-w-2xl mx-auto leading-relaxed">
-              Both plans include the same qualification, mentorship community, personal tutor, and a guaranteed gym interview. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
+              Both plans include the same qualification, mentorship community, personal tutor, and a guaranteed gym introduction. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
             </p>
           </div>
         </section>

@@ -207,7 +207,7 @@ export default function SalaryPage() {
               <div className="space-y-4">
                 {[
                   { stage: "Months 1–3 (qualifying)", income: "£0–£500/mo", body: "You're studying NCFE Level 2 and Level 3. Some learners pick up shadow hours or practical clients (friends, family, free trial sessions). PT Launch Lab learners often pick up first paid sessions in month 2–3 because the practical units include real client coaching." },
-                  { stage: "Months 3–6 (building base)", income: "£500–£1,500/mo", body: "First paying clients via gym floor or warm-introduction interviews. Realistic load: 4–8 sessions per week at £25–£35." },
+                  { stage: "Months 3–6 (building base)", income: "£500–£1,500/mo", body: "First paying clients via gym floor or warm introductions. Realistic load: 4–8 sessions per week at £25–£35." },
                   { stage: "Months 6–12 (book filling)", income: "£1,500–£3,000/mo", body: "12–20 sessions/week. You've found your niche (women 35+, post-natal, strength, hybrid runners) and your social posts are converting. Most PTs hit a plateau here — the ones who push past it add small group or online." },
                   { stage: "Months 12–24 (established)", income: "£3,000–£5,000+/mo", body: "20–30 sessions/week, possibly with a small group offer added. Average UK self-employed PT take-home at this stage is £40k–£55k." },
                   { stage: "Year 3+", income: "£60k–£120k+", body: "If you've layered streams. Year 5+: the £500K Ryan-style scale becomes possible — but it's the 1-in-200 outcome, not the median.", highlight: true },

@@ -74,7 +74,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 "Study Around Your Job",
                 "Mentorship Included",
                 ...(showDiscount ? [] : []),
-                `Interview Opportunities At ${c.gymName}`,
+                `Introductions At ${c.gymName}`,
               ].map(i => (
                 <li key={i} className="flex items-center gap-2 text-white/80 text-sm font-medium">
                   <span style={{ color: dark }}>✔</span> {i}
@@ -255,7 +255,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-10">How It Works</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-0">
-              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Interview at ${c.gymName}`].map((step, i) => (
+              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Introduction at ${c.gymName}`].map((step, i) => (
                 <div key={step} className="flex sm:flex-col items-center gap-2 sm:gap-0 flex-1">
                   <div className="flex sm:flex-col items-center sm:mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0" style={{ backgroundColor: c.primaryColor }}>

@@ -55,6 +55,6 @@ export const eborFitness: GymConfig = {
   // ── SEO
   metaTitle: "Ebor Fitness PT Academy | Become a Qualified Personal Trainer in York",
   metaDescription:
-    "Train, qualify, and earn at Ebor Fitness in York. Level 2 & 3 PT qualification through York's premier gym. Mentorship included. Interview guarantee on qualifying.",
+    "Train, qualify, and earn at Ebor Fitness in York. Level 2 & 3 PT qualification through York's premier gym. Mentorship included. Introduction guarantee on qualifying.",
   canonicalPath: "/ebor-fitness",
 };

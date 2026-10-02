@@ -468,7 +468,7 @@ export default function RetrainAsAPersonalTrainerPage() {
               <span className="text-gold">across the school term.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and the interview we arrange when you qualify. Most returners use the £599 deposit and 5 × £200 plan, designed never to sit on top of the food shop.
+              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and the introduction we make when you qualify. Most returners use the £599 deposit and 5 × £200 plan, designed never to sit on top of the food shop.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>
