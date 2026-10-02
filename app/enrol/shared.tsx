@@ -59,7 +59,7 @@ export interface EnrolmentContext {
    */
   plan: "full" | "deposit";
   /** Set only for a September-weekend enrolment. */
-  offer?: "sept99" | "oct99";
+  offer?: "sept99" | "oct99" | "bf2026";
   amount: number;
   promoCode?: string;
   discountApplied?: number;

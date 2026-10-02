@@ -10,6 +10,7 @@ import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
   OCT99_PAYMENT_LINK, OCT99_ENTRY, OCT99_MONTHLY, OCT99_INSTALMENTS, OCT99_TOTAL,
 } from "@/app/lib/octoberOffer";
+import { BF_PAYMENT_LINK, BF_PRICE, BF_LIST_PRICE, BF_SAVING } from "@/app/lib/blackFridayOffer";
 import {
   SEPT99_PAYMENT_LINK, SEPT99_LANDING_PATH, SEPT99_ENTRY, SEPT99_TOTAL, SEPT99_SAVING,
 } from "@/app/lib/septemberOffer";
@@ -131,12 +132,16 @@ export default function EnrolmentFlow({
   // checks the window server-side before passing it. Replaces the two-plan choice
   // with the single £99 entry; never combined with a partner, who earns nothing
   // on this price.
-  offer?: "sept99" | "oct99";
+  offer?: "sept99" | "oct99" | "bf2026";
 }) {
   const isSept99 = offer === "sept99" && !partner;
   // Never on a partner page: a gym earns nothing on an entry offer, so
   // surfacing it there would take a sale off a partner.
   const isOct99 = offer === "oct99" && !partner;
+  // Never on a partner page: a gym earns £500 on a £1,599 sale, and the
+  // commission is not reduced for Black Friday, so a £999 partner sale
+  // would leave £499 of course revenue against a £500 payout.
+  const isBF = offer === "bf2026" && !partner;
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
@@ -208,7 +213,7 @@ export default function EnrolmentFlow({
   }
 
   // ─── Payment ──────────────────────────────────────────────────────────
-  async function pay(type: "full" | "deposit" | "sept99" | "oct99") {
+  async function pay(type: "full" | "deposit" | "sept99" | "oct99" | "bf2026") {
     if (submitting) return;
     const errs = validate();
     if (Object.keys(errs).length) {
@@ -223,6 +228,7 @@ export default function EnrolmentFlow({
     // worth; the deposit is NEVER discounted — it is always £599 now.
     const amount =
       type === "sept99" ? SEPT99_ENTRY
+      : type === "bf2026" ? BF_PRICE
       : type === "oct99" ? OCT99_ENTRY
       : type === "full" ? fullPricePence / 100
       : DEPOSIT_PENCE / 100;
@@ -233,8 +239,9 @@ export default function EnrolmentFlow({
     // /api/enrolment-pending maps anything that isn't "deposit" to "full".
     // Both entry offers are deposits — an entry payment with instalments to
     // follow. Anything that is not "deposit" lands as "full" downstream.
+    // Black Friday is a pay-in-full, not an entry payment — nothing follows it.
     const recordedPlan: "full" | "deposit" =
-      type === "sept99" || type === "oct99" ? "deposit" : type;
+      type === "sept99" || type === "oct99" ? "deposit" : type === "bf2026" ? "full" : type;
 
     // Stash context so the post-payment form on /enrol/success can prefill the
     // learner's name + email and carry plan / amount / attribution through.
@@ -244,6 +251,7 @@ export default function EnrolmentFlow({
       plan: recordedPlan,
       ...(type === "sept99" && { offer: "sept99" as const }),
       ...(type === "oct99" && { offer: "oct99" as const }),
+      ...(type === "bf2026" && { offer: "bf2026" as const }),
       amount,
       ...(appliedPromo && { promoCode: appliedPromo.code, discountApplied: appliedPromo.amountOffPence / 100 }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
@@ -322,6 +330,7 @@ export default function EnrolmentFlow({
     // so it must not be reachable from a gym-branded enrolment page.
     const paymentLink =
       type === "sept99" ? SEPT99_PAYMENT_LINK
+      : type === "bf2026" ? BF_PAYMENT_LINK
       : type === "oct99" ? OCT99_PAYMENT_LINK
       : type === "full" ? fullLink
       : depositLink;
@@ -547,8 +556,29 @@ export default function EnrolmentFlow({
               </button>
             )}
 
+            {/* Black Friday — the one price cut of the year. */}
+            {isBF && (
+              <button onClick={() => pay("bf2026")} disabled={submitting}
+                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Black Friday — closes Monday</p>
+                <p className="text-white font-bold text-2xl mb-1">The whole course</p>
+                <p className="text-gold text-4xl font-bold mb-1">£{BF_PRICE.toLocaleString()}</p>
+                <p className="text-soft text-xs mb-3">
+                  <span className="line-through">£{BF_LIST_PRICE.toLocaleString()}</span> — £{BF_SAVING} off, paid once
+                </p>
+                <ul className="text-soft text-xs space-y-1.5 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Nothing further to pay</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Mentorship and your tutor included, as always</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
+                </ul>
+                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                  {submitting ? "Taking you to checkout…" : `Pay £${BF_PRICE.toLocaleString()} →`}
+                </div>
+              </button>
+            )}
+
             {/* Payment options */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 || isOct99 ? " hidden" : ""}`}>
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 || isOct99 || isBF ? " hidden" : ""}`}>
               {/* Full payment */}
               <button onClick={() => pay("full")} disabled={submitting}
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">

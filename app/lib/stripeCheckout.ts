@@ -125,6 +125,9 @@ export interface LinkConfig {
 // hand-written copy of this code rather than this code — which is exactly the
 // kind of gap that lets a bug reach production. Also lets a price be swapped
 // without a deploy.
+/** Black Friday's £999 pay-in-full link. */
+export const BLACK_FRIDAY_LINK = "https://buy.stripe.com/cNi28ldb27hi1Qe8UyfEk0t";
+
 /** October's £99 entry link. Named so tests and callers cannot mistype it. */
 export const OCTOBER_LINK = "https://buy.stripe.com/5kQ14h9YQ0SUgL89YCfEk0s";
 
@@ -167,6 +170,17 @@ export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
     allowPromotionCodes: false,
     takesInstalments: true,
     contractValue: 1099,
+  },
+  // £999 pay-in-full — Black Friday, the one genuine price cut of the year.
+  // No promotion codes: the price IS the offer, and stacking a partner code
+  // on top of it is not a discount anyone decided to give.
+  [BLACK_FRIDAY_LINK]: {
+    price: process.env.STRIPE_BF2026_PRICE_ID || "price_1UMAu399z9lThumnhP9JTLkm",
+    amount: 999,
+    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
+    allowPromotionCodes: false,
+    takesInstalments: false,
+    contractValue: 999,
   },
   // £99 entry (+ 5×£300) = £1,599 — October. Same total as paying up front,
   // so this is a payment shape rather than a discount, which is what keeps
