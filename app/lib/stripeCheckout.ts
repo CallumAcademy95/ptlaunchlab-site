@@ -97,6 +97,20 @@ export interface LinkConfig {
    */
   takesInstalments: boolean;
   /**
+   * The monthly price this entry payment is followed by, and how many of
+   * them. Both optional: a link that omits them keeps INSTALMENT_PRICE_ID
+   * (£200) and instalmentTarget() (5), which is every plan that existed
+   * before October.
+   *
+   * They are per-link because October is £99 + 5 × £300 = £1,599 — the same
+   * total as paying up front — while September was £99 + 5 × £200 = £1,099,
+   * which was a £500 discount. One global instalment price cannot express
+   * both, and defaulting the new one silently to £200 would bill £1,099 for
+   * a £1,599 sale.
+   */
+  instalmentPriceId?: string;
+  instalmentCount?: number;
+  /**
    * Full contract value in GBP — what the learner owes in total, which is NOT
    * what checkout collects on an instalment plan.
    *
@@ -111,6 +125,9 @@ export interface LinkConfig {
 // hand-written copy of this code rather than this code — which is exactly the
 // kind of gap that lets a bug reach production. Also lets a price be swapped
 // without a deploy.
+/** October's £99 entry link. Named so tests and callers cannot mistype it. */
+export const OCTOBER_LINK = "https://buy.stripe.com/5kQ14h9YQ0SUgL89YCfEk0s";
+
 export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
   // £1,599 pay-in-full — the shared PIF link used by /enrol and every gym page
   "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f": {
@@ -151,7 +168,32 @@ export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
     takesInstalments: true,
     contractValue: 1099,
   },
+  // £99 entry (+ 5×£300) = £1,599 — October. Same total as paying up front,
+  // so this is a payment shape rather than a discount, which is what keeps
+  // Black Friday the only genuine price cut of the year. Reuses September's
+  // £99 entry price; only what follows it differs.
+  [OCTOBER_LINK]: {
+    price: process.env.STRIPE_SEPT99_PRICE_ID || "price_1U8JiI99z9lThumnwQlmTIJW",
+    amount: 99,
+    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
+    allowPromotionCodes: false,
+    takesInstalments: true,
+    instalmentPriceId:
+      process.env.STRIPE_OCTOBER_INSTALMENT_PRICE_ID || "price_1UM3D899z9lThumnlgeLDjSS",
+    instalmentCount: 5,
+    contractValue: 1599,
+  },
 };
+
+/** Which monthly price follows this entry payment. */
+export function instalmentPriceFor(config: LinkConfig): string {
+  return config.instalmentPriceId || INSTALMENT_PRICE_ID;
+}
+
+/** How many of them. */
+export function instalmentCountFor(config: LinkConfig): number {
+  return config.instalmentCount ?? instalmentTarget();
+}
 
 // Strip query/hash so a link carrying ?client_reference_id=… still matches.
 export function normaliseLink(url: string): string {
@@ -350,7 +392,10 @@ export function buildSessionParams(
   config: LinkConfig,
   opts: { withInstalments: boolean; target: number; cancelPath: string },
 ): Record<string, unknown> {
-  const { withInstalments, target, cancelPath } = opts;
+  const { withInstalments, cancelPath } = opts;
+  // The link's own count wins. opts.target is the fallback for links that do
+  // not state one, which is every plan that existed before October.
+  const target = config.instalmentCount ?? opts.target;
 
   // A deposit is never discounted. The rule is Callum's, from 2026-07-26, and
   // the webhook has stated it since — but the enrolment page contradicted it and
@@ -364,7 +409,7 @@ export function buildSessionParams(
     line_items: withInstalments
       ? [
           { price: config.price, quantity: 1 },            // entry payment, charged now
-          { price: INSTALMENT_PRICE_ID, quantity: 1 },     // £200/month, starts after the trial
+          { price: instalmentPriceFor(config), quantity: 1 }, // monthly, starts after the trial
         ]
       : [{ price: config.price, quantity: 1 }],
     ...(withInstalments && {
