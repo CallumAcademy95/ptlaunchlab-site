@@ -136,3 +136,24 @@ test("October is never described as a discount", async () => {
     }
   }
 });
+
+test("a link's own instalment count reaches the subscription metadata", () => {
+  // This is the test the earlier one should have been. Asserting
+  // instalmentCountFor(OCTOBER) === 5 proved nothing, because the default is
+  // also 5 — it passed while the call site was still ignoring the config
+  // entirely. A count that differs from the default is the only way to see it.
+  const seven = { ...OCTOBER, instalmentCount: 7 };
+  const p = buildSessionParams(base, seven, { ...opts, withInstalments: true, target: 5 });
+  const meta = (p.subscription_data as { metadata: Record<string, string> }).metadata;
+  assert.equal(
+    meta.instalments_target,
+    "7",
+    "the link's instalment count is ignored — the webhook would stop the plan at the default instead",
+  );
+});
+
+test("a link with no count of its own still gets the default", () => {
+  const p = buildSessionParams(base, DEPOSIT, { ...opts, withInstalments: true, target: 5 });
+  const meta = (p.subscription_data as { metadata: Record<string, string> }).metadata;
+  assert.equal(meta.instalments_target, "5");
+});

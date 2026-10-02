@@ -392,7 +392,10 @@ export function buildSessionParams(
   config: LinkConfig,
   opts: { withInstalments: boolean; target: number; cancelPath: string },
 ): Record<string, unknown> {
-  const { withInstalments, target, cancelPath } = opts;
+  const { withInstalments, cancelPath } = opts;
+  // The link's own count wins. opts.target is the fallback for links that do
+  // not state one, which is every plan that existed before October.
+  const target = config.instalmentCount ?? opts.target;
 
   // A deposit is never discounted. The rule is Callum's, from 2026-07-26, and
   // the webhook has stated it since — but the enrolment page contradicted it and
