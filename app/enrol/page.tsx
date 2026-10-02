@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import EnrolmentFlow from "./EnrolmentFlow";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { isSeptemberOfferOpen } from "../lib/septemberOffer";
+import { isOctoberOfferOpen } from "../lib/octoberOffer";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Launch Lab",
@@ -24,11 +25,14 @@ export default async function EnrolPage({
   // button after midnight — even one whose checkout would refuse — is a page
   // that takes someone's details and then tells them no.
   const septemberOffer = offer === "sept99" && isSeptemberOfferOpen();
+  // Same rule as September: the query parameter is honoured only inside the
+  // window, so a forwarded link cannot open a closed offer.
+  const octoberOffer = offer === "oct99" && isOctoberOfferOpen();
 
   return (
     <>
       <Breadcrumbs trail={[{ name: "Enrol", url: "https://ptlaunchlab.co.uk/enrol" }]} />
-      <EnrolmentFlow offer={septemberOffer ? "sept99" : undefined} />
+      <EnrolmentFlow offer={septemberOffer ? "sept99" : octoberOffer ? "oct99" : undefined} />
     </>
   );
 }

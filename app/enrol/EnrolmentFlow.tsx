@@ -8,6 +8,9 @@ import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
 import { CONTACT_EMAIL as SUPPORT_EMAIL, PHONE_NATIONAL as SUPPORT_PHONE, PHONE_TEL } from "@/app/lib/contactDetails";
 import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
+  OCT99_PAYMENT_LINK, OCT99_ENTRY, OCT99_MONTHLY, OCT99_INSTALMENTS, OCT99_TOTAL,
+} from "@/app/lib/octoberOffer";
+import {
   SEPT99_PAYMENT_LINK, SEPT99_LANDING_PATH, SEPT99_ENTRY, SEPT99_TOTAL, SEPT99_SAVING,
 } from "@/app/lib/septemberOffer";
 import {
@@ -128,9 +131,12 @@ export default function EnrolmentFlow({
   // checks the window server-side before passing it. Replaces the two-plan choice
   // with the single £99 entry; never combined with a partner, who earns nothing
   // on this price.
-  offer?: "sept99";
+  offer?: "sept99" | "oct99";
 }) {
   const isSept99 = offer === "sept99" && !partner;
+  // Never on a partner page: a gym earns nothing on an entry offer, so
+  // surfacing it there would take a sale off a partner.
+  const isOct99 = offer === "oct99" && !partner;
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
@@ -202,7 +208,7 @@ export default function EnrolmentFlow({
   }
 
   // ─── Payment ──────────────────────────────────────────────────────────
-  async function pay(type: "full" | "deposit" | "sept99") {
+  async function pay(type: "full" | "deposit" | "sept99" | "oct99") {
     if (submitting) return;
     const errs = validate();
     if (Object.keys(errs).length) {
@@ -217,6 +223,7 @@ export default function EnrolmentFlow({
     // worth; the deposit is NEVER discounted — it is always £599 now.
     const amount =
       type === "sept99" ? SEPT99_ENTRY
+      : type === "oct99" ? OCT99_ENTRY
       : type === "full" ? fullPricePence / 100
       : DEPOSIT_PENCE / 100;
 
@@ -224,7 +231,10 @@ export default function EnrolmentFlow({
     // £99 is a deposit — an entry payment with instalments to follow — so it is
     // recorded as one. Sending "sept99" here would land it as "full", because
     // /api/enrolment-pending maps anything that isn't "deposit" to "full".
-    const recordedPlan: "full" | "deposit" = type === "sept99" ? "deposit" : type;
+    // Both entry offers are deposits — an entry payment with instalments to
+    // follow. Anything that is not "deposit" lands as "full" downstream.
+    const recordedPlan: "full" | "deposit" =
+      type === "sept99" || type === "oct99" ? "deposit" : type;
 
     // Stash context so the post-payment form on /enrol/success can prefill the
     // learner's name + email and carry plan / amount / attribution through.
@@ -233,6 +243,7 @@ export default function EnrolmentFlow({
       email: email.trim().toLowerCase(),
       plan: recordedPlan,
       ...(type === "sept99" && { offer: "sept99" as const }),
+      ...(type === "oct99" && { offer: "oct99" as const }),
       amount,
       ...(appliedPromo && { promoCode: appliedPromo.code, discountApplied: appliedPromo.amountOffPence / 100 }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
@@ -311,6 +322,7 @@ export default function EnrolmentFlow({
     // so it must not be reachable from a gym-branded enrolment page.
     const paymentLink =
       type === "sept99" ? SEPT99_PAYMENT_LINK
+      : type === "oct99" ? OCT99_PAYMENT_LINK
       : type === "full" ? fullLink
       : depositLink;
     const ref = buildAttributionRef(partner?.gymReferral, partner?.gymSlug);
@@ -405,7 +417,7 @@ export default function EnrolmentFlow({
   const depositTotalPence = DEPOSIT_PENCE + INSTALMENT_COUNT * INSTALMENT_PENCE;
   // Total shown in the instalment terms block. SEPT99_TOTAL is already in
   // pounds; depositTotalPence is not.
-  const instalmentPlanTotal = isSept99 ? SEPT99_TOTAL : depositTotalPence / 100;
+  const instalmentPlanTotal = isSept99 ? SEPT99_TOTAL : isOct99 ? OCT99_TOTAL : depositTotalPence / 100;
 
   // ─── Render ───────────────────────────────────────────────────────────
   return (
@@ -513,8 +525,30 @@ export default function EnrolmentFlow({
               </button>
             )}
 
+            {/* October entry offer — a single option, no plan choice.
+                NOT a discount: the total is the pay-in-full price. */}
+            {isOct99 && (
+              <button onClick={() => pay("oct99")} disabled={submitting}
+                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">October intake</p>
+                <p className="text-white font-bold text-2xl mb-1">Start today</p>
+                <p className="text-gold text-4xl font-bold mb-1">£{OCT99_ENTRY}</p>
+                <p className="text-soft text-xs mb-3">
+                  then {OCT99_INSTALMENTS} × £{OCT99_MONTHLY} monthly — £{OCT99_TOTAL.toLocaleString()} total
+                </p>
+                <ul className="text-soft text-xs space-y-1.5 mb-6">
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> The same £{(PIF_PENCE / 100).toLocaleString()} total as paying up front — this lowers what you need to start, not the price</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments collected automatically</li>
+                </ul>
+                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                  {submitting ? "Taking you to checkout…" : `Start for £${OCT99_ENTRY} →`}
+                </div>
+              </button>
+            )}
+
             {/* Payment options */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 ? " hidden" : ""}`}>
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 || isOct99 ? " hidden" : ""}`}>
               {/* Full payment */}
               <button onClick={() => pay("full")} disabled={submitting}
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
