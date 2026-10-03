@@ -3,6 +3,7 @@ import EnrolmentFlow from "./EnrolmentFlow";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { isSeptemberOfferOpen } from "../lib/septemberOffer";
 import { isOctoberOfferOpen } from "../lib/octoberOffer";
+import { isBlackFridayOpen } from "../lib/blackFridayOffer";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Launch Lab",
@@ -28,11 +29,16 @@ export default async function EnrolPage({
   // Same rule as September: the query parameter is honoured only inside the
   // window, so a forwarded link cannot open a closed offer.
   const octoberOffer = offer === "oct99" && isOctoberOfferOpen();
+  const blackFriday = offer === "bf2026" && isBlackFridayOpen();
 
   return (
     <>
       <Breadcrumbs trail={[{ name: "Enrol", url: "https://ptlaunchlab.co.uk/enrol" }]} />
-      <EnrolmentFlow offer={septemberOffer ? "sept99" : octoberOffer ? "oct99" : undefined} />
+      <EnrolmentFlow
+        offer={
+          septemberOffer ? "sept99" : octoberOffer ? "oct99" : blackFriday ? "bf2026" : undefined
+        }
+      />
     </>
   );
 }
