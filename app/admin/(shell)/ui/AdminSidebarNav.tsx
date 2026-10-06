@@ -8,6 +8,7 @@ import {
   Circle,
   Gift,
   HelpCircle,
+  Inbox,
   MessageSquare,
   Send,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   message: MessageSquare,
   help: HelpCircle,
   send: Send,
+  inbox: Inbox,
 };
 
 export function AdminSidebarNav({ onNavigate }: { onNavigate?: () => void }) {

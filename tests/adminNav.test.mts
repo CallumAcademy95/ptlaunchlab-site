@@ -56,6 +56,8 @@ test("exactly one entry is highlighted on any admin page", () => {
     "/admin/outreach",
     "/admin/outreach/template",
     "/admin/referrals",
+    "/admin/leads",
+    "/admin/leads/abc-123",
     "/admin/ads",
     "/admin/ads/create",
     "/admin/whatsapp",
