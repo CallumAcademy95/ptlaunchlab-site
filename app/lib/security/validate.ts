@@ -117,7 +117,7 @@ const careerPlannerSchema = z.object({
     blockerNote: z.string().max(200).nullable().optional(),
     hours: z.enum(HOURS_VALUES), training: z.enum(TRAINING_VALUES),
     region: z.string().refine((r) => REGIONS.includes(r), "region"),
-    town: z.string().min(2).max(60),
+    town: z.string().trim().min(2).max(60),
     payment: z.enum(PAYMENT_VALUES),
   }),
   [SEC_KEY]: secSchema,
@@ -425,7 +425,7 @@ export function validateCareerPlannerV2(raw: unknown): ValidationResult<CareerPl
   if (!pc.ok || !isUkMobileE164(pc.normalised!)) {
     return { ok: false, silent: false, status: 422, error: "Please enter a UK mobile number starting 07.", signals: [`phone:${pc.ok ? "not-mobile" : pc.reason}`] };
   }
-  const surname = (parsed.data.surname ?? "").trim().replace(/s+/g, " ");
+  const surname = (parsed.data.surname ?? "").trim().replace(/\s+/g, " ");
   const a = parsed.data.answers;
   return {
     ok: true,
