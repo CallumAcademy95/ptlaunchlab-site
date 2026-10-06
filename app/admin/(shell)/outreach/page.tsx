@@ -152,6 +152,12 @@ export default async function OutreachPage({
         badge={paused ? <Badge tone="red">paused</Badge> : <Badge tone="green">running</Badge>}
         action={
           <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/admin/outreach/template"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-400 hover:text-blue-700"
+            >
+              Edit the copy
+            </Link>
             {!paused && !configError && (
               <Link
                 href="/admin/outreach?preview=1"
@@ -271,7 +277,23 @@ export default async function OutreachPage({
             />
           ) : preview && preview.ok ? (
             <>
+              {/*
+                Which copy composed this. A template pt-app has refused saves
+                cleanly and fails silently, so the one place it cannot hide is
+                here, next to the words it did not write.
+              */}
+              {preview.run.copy === "built-in" && (
+                <Notice tone="amber" title="This is the built-in copy, not the saved template">
+                  {preview.run.templateIssues?.length
+                    ? `pt-app refused the saved template: ${preview.run.templateIssues.join(" ")}`
+                    : "There is no saved template, so the built-in copy composed this batch."}{" "}
+                  <Link href="/admin/outreach/template" className="underline">
+                    Edit the copy
+                  </Link>
+                </Notice>
+              )}
               <p className="mb-3 text-xs text-slate-500">
+                {preview.run.copy === "template" && "Composed from your saved copy. "}
                 {preview.run.considered.toLocaleString()} considered
                 {typeof preview.run.excludedByPartnerRadius === "number" &&
                   `, ${preview.run.excludedByPartnerRadius} excluded for being too close to an existing partner`}

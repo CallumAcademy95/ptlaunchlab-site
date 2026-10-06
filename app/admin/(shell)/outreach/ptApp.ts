@@ -26,6 +26,15 @@ export interface OutreachCandidate {
 
 export interface OutreachRun {
   mode: "dry-run" | "SENT";
+  /**
+   * Which copy composed this batch — the editable row, or the built-in
+   * fallback. This is how the editor learns its template was REJECTED. Without
+   * it a broken template saves cleanly, a dry run succeeds, and every email
+   * goes out in the old words with nothing on screen to say so.
+   */
+  copy?: "template" | "built-in";
+  /** Why pt-app refused the template, in its words. */
+  templateIssues?: string[];
   considered: number;
   inBandAndContactable?: number;
   excludedByPartnerRadius?: number;

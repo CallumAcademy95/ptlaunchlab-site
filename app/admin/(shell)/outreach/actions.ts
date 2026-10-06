@@ -50,6 +50,46 @@ export async function setOutreachPaused(formData: FormData) {
 }
 
 /**
+ * Save the first-contact copy.
+ *
+ * NOTE WHAT THIS DOES NOT DO: it does not validate the template.
+ *
+ * pt-app already owns those rules — it must, because it is the thing that
+ * sends, and a template it refuses falls back to the built-in copy whatever
+ * this project believes. Re-implementing the checks here would create a second
+ * set that drifts from the first, and the drift would be invisible: the editor
+ * would say "looks fine" while the sender quietly ignored the row.
+ *
+ * So the save is unconditional, and the editor asks pt-app for its verdict
+ * immediately afterwards by running a dry run and reading `copy`. One set of
+ * rules, in the only place that can enforce them.
+ */
+export async function saveOutreachTemplate(formData: FormData) {
+  const subject = String(formData.get("subject") ?? "").trim();
+  const subject_fallback = String(formData.get("subject_fallback") ?? "").trim();
+  const body = String(formData.get("body") ?? "");
+
+  const { error } = await getSupabaseAdmin()
+    .from("outreach_templates")
+    .update({
+      subject,
+      subject_fallback,
+      body,
+      updated_at: new Date().toISOString(),
+      updated_by: "admin",
+    })
+    .eq("key", "gym-first-contact");
+
+  if (error) {
+    redirect(`/admin/outreach/template?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/admin/outreach/template");
+  revalidatePath("/admin/outreach");
+  redirect("/admin/outreach/template?saved=1");
+}
+
+/**
  * Send today's batch now, by hand.
  *
  * This exists because of Monday 5 October: the cron had no entry for that day,
