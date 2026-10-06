@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { runOutreach } from "./ptApp";
 
 // Stopping and starting the gym cold outreach, from a screen rather than a deploy.
 //
@@ -45,4 +47,47 @@ export async function setOutreachPaused(formData: FormData) {
   if (error) throw new Error(`could not ${paused ? "pause" : "resume"} outreach: ${error.message}`);
 
   revalidatePath("/admin/outreach");
+}
+
+/**
+ * Send today's batch now, by hand.
+ *
+ * This exists because of Monday 5 October: the cron had no entry for that day,
+ * nobody could tell until the morning had gone, and recovering it meant a
+ * hand-built curl with a secret in it. One button is the difference between a
+ * recoverable day and a lost one.
+ *
+ * It is NOT a way to send more. It calls the same endpoint the cron calls, so
+ * pt-app applies the identical caps: twelve per run, twelve per UK day counted
+ * from the data, 09:00-18:00 only, and the profile's kill switch. Pressing it
+ * after the morning run has gone sends nothing and says so, which is the
+ * correct behaviour rather than a failure.
+ *
+ * Reached only from the preview screen, so nobody sends a batch they have not
+ * first seen the contents of.
+ */
+export async function sendBatchNow() {
+  const outcome = await runOutreach({ send: true });
+
+  if (!outcome.ok) {
+    revalidatePath("/admin/outreach");
+    redirect(`/admin/outreach?error=${encodeURIComponent(outcome.error)}`);
+  }
+
+  const sent = outcome.run.results.filter((r) => r.ok).length;
+  const failed = outcome.run.results.filter((r) => r.ok === false);
+
+  revalidatePath("/admin/outreach");
+
+  // pt-app returns 200 with `skipped` when a guard refused — outside hours, cap
+  // already spent, kill switch on. That is a real outcome, not an error, and
+  // reporting it as success would be the "ok:true is not proof of effect"
+  // mistake in its purest form.
+  if (outcome.run.skipped) {
+    redirect(`/admin/outreach?skipped=${encodeURIComponent(outcome.run.skipped)}`);
+  }
+
+  const params = new URLSearchParams({ sent: String(sent) });
+  if (failed.length) params.set("failed", String(failed.length));
+  redirect(`/admin/outreach?${params}`);
 }
