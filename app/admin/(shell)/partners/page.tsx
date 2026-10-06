@@ -17,6 +17,7 @@ import {
   TR,
 } from "../ui/praxel";
 import { STANDING_TONE } from "./standing";
+import { demoPartnerIds } from "./demo";
 import { canBePaid } from "@/app/lib/security/payoutRules";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
@@ -123,7 +124,16 @@ export default async function AdminPartnersPage({
   const today = nowIso.slice(0, 10);
   // Demo accounts carry invented commission so a walkthrough looks like a going
   // concern. It must never reach a number anyone acts on.
-  const demoIds = new Set(partners.filter((p) => p.is_demo).map((p) => p.id));
+  const demoIds = demoPartnerIds(partners);
+  // The one list the table renders and every partner tile counts.
+  //
+  // These used to be computed separately: the tiles filtered out demo rows and
+  // the table did not, so the page said "9 Partners" above a table of ten. Both
+  // now come off `livePartners`, which is the only way they cannot drift again.
+  //
+  // `partners` itself stays complete on purpose — see where it is handed to
+  // PartnerLearners below.
+  const livePartners = partners.filter((p) => !demoIds.has(p.id));
   // Per-gym rollups. Demo partners carry invented commission, so they are
   // excluded from every total — the same rule the owed figure already used.
   const learnersFor = new Map<string, number>();
@@ -143,10 +153,10 @@ export default async function AdminPartnersPage({
   const totalLearners = [...learnersFor.entries()].filter(([id]) => real(id)).reduce((t, [, n]) => t + n, 0);
   const totalEarned = [...earnedFor.entries()].filter(([id]) => real(id)).reduce((t, [, n]) => t + n, 0);
   const totalPaid = [...paidFor.entries()].filter(([id]) => real(id)).reduce((t, [, n]) => t + n, 0);
-  const producing = partners.filter((p) => !p.is_demo && (learnersFor.get(p.id) ?? 0) > 0).length;
-  const realPartners = partners.filter((p) => !p.is_demo).length;
-  const neverLoggedIn = partners.filter(
-    (p) => !p.is_demo && !p.pp_partner_users.some((u) => u.last_login_at)
+  const producing = livePartners.filter((p) => (learnersFor.get(p.id) ?? 0) > 0).length;
+  const realPartners = livePartners.length;
+  const neverLoggedIn = livePartners.filter(
+    (p) => !p.pp_partner_users.some((u) => u.last_login_at)
   ).length;
 
   const owedTotal = [...payable.entries()]
@@ -273,7 +283,7 @@ export default async function AdminPartnersPage({
               </tr>
             </thead>
             <tbody className={TBODY}>
-              {partners.map((p) => (
+              {livePartners.map((p) => (
                 <tr key={p.id} className={TR}>
                   <td className="px-4 py-3">
                     <a
@@ -417,6 +427,15 @@ export default async function AdminPartnersPage({
           </div>
         </details>
 
+        {/*
+          `partners`, not `livePartners`, and it has to stay that way.
+
+          PartnerLearners filters demo sales by looking their partner_id up in
+          this list. It deliberately KEEPS a row whose partner it cannot resolve,
+          because an unresolvable partner_id is a broken join worth seeing.
+          Hand it a pre-filtered list and every demo sale becomes unresolvable,
+          so the rule that is meant to hide them would put all eight back.
+        */}
         <PartnerLearners
           partners={partners.map((p) => ({ id: p.id, slug: p.slug, gym_name: p.gym_name, is_demo: p.is_demo }))}
           sales={sales}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatPence } from "@/app/lib/partner-data";
+import { demoPartnerIds, withoutDemo } from "./demo";
 
 // Who each gym actually sent us, and what we paid them for it.
 //
@@ -73,19 +74,29 @@ export default function PartnerLearners({
 }) {
   const bySlug = new Map(partners.map((p) => [p.slug, p]));
   const byId = new Map(partners.map((p) => [p.id, p]));
-  const selected = selectedSlug ? bySlug.get(selectedSlug) : undefined;
+
+  // Invented rows come out of the list, the counts and the filters alike.
+  // The rule itself lives in ./demo.ts, where it is tested.
+  const demoIds = demoPartnerIds(partners);
+  const realSales = withoutDemo(sales, demoIds);
+  const realPayouts = withoutDemo(payouts, demoIds);
+
+  // A demo slug in the URL selects nothing rather than an empty gym, now that
+  // nothing links to one.
+  const requested = selectedSlug ? bySlug.get(selectedSlug) : undefined;
+  const selected = requested?.is_demo ? undefined : requested;
 
   const now = Date.now();
-  const visibleSales = (selected ? sales.filter((s) => s.partner_id === selected.id) : sales)
+  const visibleSales = (selected ? realSales.filter((s) => s.partner_id === selected.id) : realSales)
     .slice()
     .sort((a, b) => Date.parse(b.enrolled_at ?? b.created_at) - Date.parse(a.enrolled_at ?? a.created_at));
 
-  const visiblePayouts = (selected ? payouts.filter((p) => p.partner_id === selected.id) : payouts)
+  const visiblePayouts = (selected ? realPayouts.filter((p) => p.partner_id === selected.id) : realPayouts)
     .slice()
     .sort((a, b) => Date.parse(b.paid_at ?? b.created_at) - Date.parse(a.paid_at ?? a.created_at));
 
   // Counts next to each option describe what clicking would actually show.
-  const countFor = (id: string) => sales.filter((s) => s.partner_id === id).length;
+  const countFor = (id: string) => realSales.filter((s) => s.partner_id === id).length;
 
   const tab = (href: string, label: string, active: boolean, n?: number) => (
     <Link
@@ -113,9 +124,9 @@ export default function PartnerLearners({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {tab("/admin/partners", "All gyms", !selected, sales.length)}
+        {tab("/admin/partners", "All gyms", !selected, realSales.length)}
         {partners
-          .filter((p) => countFor(p.id) > 0 || p.slug === selectedSlug)
+          .filter((p) => !p.is_demo && (countFor(p.id) > 0 || p.slug === selectedSlug))
           .map((p) =>
             tab(`/admin/partners?gym=${encodeURIComponent(p.slug)}`, p.gym_name, p.slug === selectedSlug, countFor(p.id))
           )}
@@ -139,16 +150,13 @@ export default function PartnerLearners({
               const gym = byId.get(s.partner_id);
               const c = commissionLabel(s, now);
               return (
-                <tr key={s.id} className={gym?.is_demo ? "opacity-60" : undefined}>
+                <tr key={s.id}>
                   <td className="px-4 py-3">
                     <div className="text-slate-900 font-semibold">{s.learner_name || "—"}</div>
                     {s.learner_email && <div className="text-slate-500 text-xs">{s.learner_email}</div>}
                   </td>
                   {!selected && (
-                    <td className="px-4 py-3 text-slate-500 text-xs">
-                      {gym?.gym_name ?? "—"}
-                      {gym?.is_demo && <span className="ml-1 text-[10px]">(demo)</span>}
-                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">{gym?.gym_name ?? "—"}</td>
                   )}
                   <td className="px-4 py-3 text-slate-500 text-xs">{dateUK(s.enrolled_at ?? s.created_at)}</td>
                   <td className="px-4 py-3 text-slate-500 text-xs">{s.plan_type ?? "—"}</td>
@@ -204,7 +212,7 @@ export default function PartnerLearners({
             {visiblePayouts.map((p) => {
               const gym = byId.get(p.partner_id);
               return (
-                <tr key={p.id} className={gym?.is_demo ? "opacity-60" : undefined}>
+                <tr key={p.id}>
                   {!selected && <td className="px-4 py-3 text-slate-500 text-xs">{gym?.gym_name ?? "—"}</td>}
                   <td className="px-4 py-3 text-slate-900 text-xs">{p.period_label ?? "—"}</td>
                   <td className="px-4 py-3 text-slate-900 text-xs">{formatPence(p.total_pence)}</td>
