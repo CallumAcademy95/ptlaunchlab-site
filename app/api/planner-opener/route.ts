@@ -24,6 +24,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   compose,
   eligibility,
+  intakeFromFields,
+  parseSubscribedAt,
   ukHour,
   MAX_PER_RUN,
   MIN_AGE_MINUTES,
@@ -31,6 +33,7 @@ import {
   SUBJECT,
   type PlannerLead,
 } from "@/lib/planner-opener";
+import { notifyPlannerIntake } from "@/app/lib/setter-intake";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -42,6 +45,7 @@ const FROM = "Callum Brown <info@ptlaunchlab.co.uk>";
 // is picked up within a couple of minutes instead of sitting unread.
 const REPLY_TO = "info@ptlaunchlab.co.uk";
 const SENDING_HOURS = { from: 9, to: 18 };
+const MAX_SWEEP_PER_RUN = 10;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toLead(s: any): PlannerLead {
@@ -56,6 +60,11 @@ function toLead(s: any): PlannerLead {
     subscribedAt: s.subscribed_at ?? null,
     openerSent: f.plan_opener_sent ?? null,
     status: String(s.status ?? "unknown"),
+    version: f.plan_version ?? null,
+    timeframe: f.plan_timeframe ?? null,
+    blocker: f.plan_blocker ?? null,
+    phone: f.phone ?? null,
+    fields: f,
   };
 }
 
@@ -203,6 +212,32 @@ async function run(req: NextRequest) {
     return NextResponse.json({ ok: false, trigger, error: "MailerLite read failed" }, { status: 502 });
   }
 
+  // Sweep: v2 leads older than an hour with no Leads Central record get re-handed over.
+  // Runs in a dry run too (so it can be inspected) but only SENDS when `send` is true.
+  // Bounded per run; Leads Central dedupes the WhatsApp opener, so a re-hand is safe.
+  const sweep: string[] = [];
+  const sbUrl = process.env.SUPABASE_URL, sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (sbUrl && sbKey) {
+    for (const l of leads) {
+      if (sweep.length >= MAX_SWEEP_PER_RUN) break;
+      if (l.version !== "2" || l.status !== "active" || !l.subscribedAt) continue;
+      const age = now.getTime() - parseSubscribedAt(l.subscribedAt);
+      if (!(age > 60 * 60_000 && age < MAX_AGE_DAYS * 86_400_000)) continue;
+      try {
+        const q = await fetch(`${sbUrl}/rest/v1/consultations?select=id&email=eq.${encodeURIComponent(l.email)}&limit=1`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } });
+        const rows = q.ok ? await q.json() : [{}];
+        if (rows.length) continue;
+        const payload = intakeFromFields(l.email, l.fields);
+        if (!payload) continue;
+        sweep.push(l.email);
+        if (send) await notifyPlannerIntake(payload as Parameters<typeof notifyPlannerIntake>[0]);
+      } catch (err) {
+        console.error("[planner-opener] sweep failed for one lead", err);
+      }
+    }
+  }
+
   const eligible: PlannerLead[] = [];
   const rejected: Array<{ email: string; reason: string }> = [];
   for (const lead of leads) {
@@ -221,6 +256,7 @@ async function run(req: NextRequest) {
     considered: leads.length,
     eligible: eligible.length,
     queued: queue.length,
+    swept: sweep.length,
     minAgeMinutes: MIN_AGE_MINUTES,
     maxAgeDays: MAX_AGE_DAYS,
     from: FROM,

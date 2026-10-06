@@ -13,6 +13,17 @@
 //
 // It asks for a REPLY, never a click. Replies go to info@, which the setter polls.
 
+import {
+  TIMEFRAME_PHRASE,
+  BLOCKER_PHRASE,
+  bandFor,
+  BAND_SCORE,
+  CONSENT_TEXT,
+  type Timeframe,
+  type Blocker,
+  type Goal,
+} from "../app/lib/careerPlannerV2.ts";
+
 /** A lead as we need it, mapped out of a MailerLite subscriber. */
 export interface PlannerLead {
   email: string;
@@ -24,6 +35,11 @@ export interface PlannerLead {
   subscribedAt: string | null;
   openerSent: string | null;
   status: string;
+  version: string | null;
+  timeframe: string | null;
+  blocker: string | null;
+  phone: string | null;
+  fields: Record<string, string | null>;
 }
 
 /** Wait this long after signup before the opener goes. */
@@ -131,6 +147,25 @@ export function ukHour(now: Date): number {
   ) % 24;
 }
 
+// Rebuild a Leads Central intake from what MailerLite holds — the sweep uses this
+// when the original handoff never landed. Null when there's no phone to message.
+export function intakeFromFields(email: string, f: Record<string, string | null>): Record<string, unknown> | null {
+  if (f.plan_version !== "2" || !f.phone) return null;
+  const timeframe = (f.plan_timeframe ?? "researching") as Timeframe;
+  const goal = (f.plan_goal ?? "not_sure") as Goal;
+  const band = bandFor({ timeframe, goal });
+  const first = (f.name ?? "").trim();
+  return {
+    name: first, firstName: first, email, phone: f.phone, source: "career-planner", planVersion: 2,
+    band, score: BAND_SCORE[band],
+    answers: { why: f.plan_why, job: f.plan_current_job, goal, timeframe, blocker: f.plan_blocker,
+      blockerNote: f.plan_blocker_note ?? null, hours: f.plan_hours, training: f.plan_training,
+      region: f.plan_region, town: f.plan_town ?? "", payment: f.plan_payment },
+    consent: { text: CONSENT_TEXT, at: f.plan_consent_at ?? "" },
+    utm: null,
+  };
+}
+
 export function compose(lead: PlannerLead): string {
   const first = greetingName(lead.name);
   const jobLine = JOB_LINE[(lead.job ?? "").toLowerCase()] ?? "";
@@ -142,7 +177,13 @@ export function compose(lead: PlannerLead): string {
   const hasScore = !!(lead.score ?? "").trim();
   const hasMonths = !!(lead.months ?? "").trim();
   let opener: string;
-  if (hasScore && hasMonths) {
+  if (lead.version === "2") {
+    const when = TIMEFRAME_PHRASE[(lead.timeframe ?? "") as Timeframe];
+    const worry = BLOCKER_PHRASE[(lead.blocker ?? "") as Blocker];
+    opener = "You filled in our career planner"
+      + (when ? ` and said you'd like to start ${when}` : "")
+      + (worry ? `, with ${worry} the bit you're least sure about.` : ".");
+  } else if (hasScore && hasMonths) {
     opener = `You filled in our career planner and it came back at ${lead.score}, with around ${lead.months} months before going full-time looks realistic.`;
   } else if (hasScore) {
     opener = `You filled in our career planner and it came back at ${lead.score}.`;
