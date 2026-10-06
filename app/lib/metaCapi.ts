@@ -67,6 +67,29 @@ export type MetaCapiCustomData = {
   [key: string]: unknown;
 };
 
+const CUSTOM_DATA_KEY_MAP: Record<string, string> = {
+  contentName: "content_name",
+  contentCategory: "content_category",
+  contentIds: "content_ids",
+  orderId: "order_id",
+};
+
+/**
+ * Meta's Conversions API only recognises snake_case custom_data keys. Callers
+ * use the camelCase MetaCapiCustomData type, so translate here. currency,
+ * value, contents and status are already correct; other keys pass through.
+ * Undefined values are dropped.
+ */
+export function toMetaCustomData(c: MetaCapiCustomData | undefined): Record<string, unknown> | undefined {
+  if (!c) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(c)) {
+    if (value === undefined) continue;
+    out[CUSTOM_DATA_KEY_MAP[key] ?? key] = value;
+  }
+  return out;
+}
+
 export type SendCapiEventInput = {
   eventName: MetaCapiEventName;
   /**
@@ -174,7 +197,7 @@ export async function sendCapiEvent(input: SendCapiEventInput): Promise<unknown 
     event_source_url: input.eventSourceUrl,
     action_source: actionSource,
     user_data: buildUserDataPayload(input.userData),
-    custom_data: input.customData ?? undefined,
+    custom_data: toMetaCustomData(input.customData),
   };
 
   const body: Record<string, unknown> = {
