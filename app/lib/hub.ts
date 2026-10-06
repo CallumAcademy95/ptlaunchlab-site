@@ -70,7 +70,7 @@ export const HUB_ENTRIES: HubEntry[] = [
   { href: "/too-old-to-become-a-personal-trainer", title: "Am I too old to become a PT?", blurb: "Why your 30s, 40s and 50s can be an advantage, not a barrier.", cluster: "situation", kind: "guide" },
 
   // Free tools
-  { href: "/career-planner", title: "Career Escape Plan", blurb: "8 questions → when you could go full-time, what you'd earn, and how.", cluster: "tools", kind: "tool" },
+  { href: "/career-planner", title: "Free PT Career Plan", blurb: "9 quick questions → your route, your timeline, and what you'd get to help you get there.", cluster: "tools", kind: "tool" },
   { href: "/pt-salary-calculator", title: "PT salary calculator", blurb: "Estimate your earning potential by region, hours and rate.", cluster: "tools", kind: "tool" },
   { href: "/quiz", title: "60-second PT fit quiz", blurb: "See whether PT is a realistic next step for your situation.", cluster: "tools", kind: "tool" },
 

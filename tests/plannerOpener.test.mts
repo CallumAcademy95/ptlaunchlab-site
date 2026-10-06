@@ -23,6 +23,7 @@ import {
   eligibility,
   greetingName,
   isRefreshRoute,
+  intakeFromFields,
   ukHour,
   BLOCKED,
   MIN_AGE_MINUTES,
@@ -45,6 +46,11 @@ function lead(over: Partial<PlannerLead> = {}): PlannerLead {
     subscribedAt: minsAgo(MIN_AGE_MINUTES + 30),
     openerSent: null,
     status: "active",
+    version: null,
+    timeframe: null,
+    blocker: null,
+    phone: null,
+    fields: {},
     ...over,
   };
 }
@@ -159,4 +165,74 @@ test("only the first name is used, and it is title-cased", () => {
 // which is the worse trade. Greet that one by hand if it recurs.
 test("a surname-only name is still used — documented limitation, not a bug to silently fix", () => {
   assert.equal(greetingName("Parkinson"), "Parkinson");
+});
+
+// --- v2 wording and the sweep ----------------------------------------------
+
+const V2: PlannerLead = lead({
+  email: "sam@example.com", name: "Sam", score: null, months: null, job: "trades", route: null,
+  subscribedAt: "2026-10-06 09:00:00", version: "2", timeframe: "30_days", blocker: "cost",
+  phone: "+447700900123",
+});
+
+test("v2 opener uses timing and worry, never a score", () => {
+  const body = compose(V2);
+  assert.match(body, /start in the next month/);
+  assert.match(body, /the cost/);
+  assert.ok(!/came back at/.test(body));
+});
+
+test("v1 leads keep the old wording", () => {
+  assert.match(compose({ ...V2, version: null, score: "72", months: "8" }), /came back at 72/);
+});
+
+test("sweep rebuilds an intake payload from MailerLite fields", () => {
+  const p = intakeFromFields("sam@example.com", { name: "Sam", phone: "+447700900123", plan_version: "2",
+    plan_why: "freedom", plan_current_job: "trades", plan_goal: "part_time", plan_timeframe: "30_days",
+    plan_blocker: "cost", plan_blocker_note: null, plan_hours: "3_5", plan_training: "regular",
+    plan_region: "Wales", plan_town: "Cardiff", plan_payment: "full", plan_consent_at: "2026-10-06T09:00:00Z" }) as any;
+  assert.equal(p.planVersion, 2);
+  assert.equal(p.band, "prime");
+  assert.equal(p.score, 90);
+  assert.equal(p.answers.town, "Cardiff");
+  assert.equal(intakeFromFields("x@y.z", { plan_version: "2", phone: null }), null);
+});
+
+test("sweep refuses without consent evidence and lowercases the email", () => {
+  const f = { name: "Sam", phone: "+447700900123", plan_version: "2", plan_consent_at: "2026-10-06T09:00:00Z" };
+  assert.equal(intakeFromFields("sam@example.com", { ...f, plan_consent_at: null }), null);
+  assert.equal(intakeFromFields("sam@example.com", { ...f, plan_consent_at: "  " }), null);
+  assert.equal((intakeFromFields("  Sam@Example.COM ", f) as any).email, "sam@example.com");
+});
+
+// --- v2 waits for the WhatsApp window ----------------------------------------
+
+test("v2 lead is held before 10:00 UK, in both GMT and BST", () => {
+  const winter = new Date("2026-01-15T09:30:00Z"); // 09:30 London (GMT)
+  const summer = new Date("2026-07-15T08:30:00Z"); // 09:30 London (BST)
+  for (const now of [winter, summer]) {
+    const sub = new Date(now.getTime() - 5 * 3_600_000).toISOString();
+    const v = eligibility(lead({ version: "2", subscribedAt: sub }), now);
+    assert.equal(v.ok, false);
+    if (!v.ok) assert.equal(v.reason, "v2: waiting for WhatsApp window");
+  }
+});
+
+test("v2 lead is eligible from 10:00 UK, and v1 is unaffected at 09:30", () => {
+  const winter = new Date("2026-01-15T10:30:00Z");
+  const summer = new Date("2026-07-15T09:30:00Z"); // 10:30 BST
+  for (const now of [winter, summer]) {
+    const sub = new Date(now.getTime() - 5 * 3_600_000).toISOString();
+    assert.equal(eligibility(lead({ version: "2", subscribedAt: sub }), now).ok, true);
+  }
+  const early = new Date("2026-01-15T09:30:00Z");
+  const sub = new Date(early.getTime() - 5 * 3_600_000).toISOString();
+  assert.equal(eligibility(lead({ version: null, subscribedAt: sub }), early).ok, true);
+});
+
+test("sweep intake defaults a missing blocker and payment", () => {
+  const p = intakeFromFields("sam@example.com", { name: "Sam", phone: "+447700900123", plan_version: "2",
+    plan_consent_at: "2026-10-06T09:00:00Z" }) as any;
+  assert.equal(p.answers.blocker, "other");
+  assert.equal(p.answers.payment, "unsure");
 });

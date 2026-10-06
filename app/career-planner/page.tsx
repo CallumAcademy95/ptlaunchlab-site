@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import CareerPlanner from "./CareerPlanner";
 
 export const metadata: Metadata = {
-  title: "PT Career Escape Plan — Free Calculator | PT Launch Lab",
+  title: "Free PT Career Plan | PT Launch Lab",
   description:
-    "Thinking of becoming a personal trainer? Answer 8 quick questions for a realistic plan: when you could go full-time, what you could earn, and the exact route to get there. Free.",
+    "Answer 9 quick questions and get a free PT career plan: your route, your timeline, and what you'd get to help you get there.",
   alternates: { canonical: "https://ptlaunchlab.co.uk/career-planner" },
   openGraph: {
-    title: "Your PT Career Escape Plan — Free Calculator",
+    title: "Your free PT Career Plan | PT Launch Lab",
     description:
-      "When could you quit? What could you earn? Get a realistic, personalised plan to become a personal trainer in 60 seconds.",
+      "Get a free, personalised plan to become a personal trainer: your route, your timeline, and what you'd get to help you get there.",
     url: "https://ptlaunchlab.co.uk/career-planner",
     type: "website",
   },

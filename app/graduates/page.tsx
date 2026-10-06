@@ -74,7 +74,7 @@ export default function Page() {
                 href="/career-planner"
                 className="bg-gold text-base font-bold px-8 py-4 rounded-full hover:brightness-110 transition"
               >
-                Get your Career Escape Plan
+                Get your free PT Career Plan
               </Link>
               <Link
                 href="/courses"
