@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Mail, MessageSquare, Clock, Inbox } from "lucide-react";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import {
@@ -17,7 +18,8 @@ import {
   TD,
   TH,
 } from "../ui/praxel";
-import { setOutreachPaused } from "./actions";
+import { setOutreachPaused, sendBatchNow } from "./actions";
+import { runOutreach, missingConfig } from "./ptApp";
 import {
   pipelineCounts,
   needsChasing,
@@ -27,6 +29,7 @@ import {
   nextRun,
   finalRun,
   remainingSendDays,
+  sendWouldBeRefused,
   DAILY_CAP,
   type ProspectRow,
 } from "./pipeline";
@@ -74,7 +77,20 @@ const dayUK = (day: string) =>
     month: "short",
   });
 
-export default async function OutreachPage() {
+export default async function OutreachPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    preview?: string;
+    sent?: string;
+    failed?: string;
+    skipped?: string;
+    error?: string;
+  }>;
+}) {
+  // By URL rather than client state, the same way the partners filter works, so
+  // the page stays a server component and a preview is a link you can send.
+  const sp = await searchParams;
   const db = getSupabaseAdmin();
 
   // Counts come from count-only queries, never from counting rows in hand.
@@ -121,6 +137,13 @@ export default async function OutreachPage() {
   const last = finalRun(now.getUTCFullYear());
   const daysLeft = remainingSendDays(now);
 
+  // A preview is a live dry run against pt-app — it composes exactly what would
+  // go out and writes nothing, because dry run is that endpoint's default. Only
+  // run when asked: it geocodes postcodes in bulk and takes a few seconds.
+  const previewing = sp.preview === "1";
+  const preview = previewing ? await runOutreach({ send: false }) : null;
+  const configError = missingConfig();
+
   return (
     <AdminPage>
       <PageHeader
@@ -128,22 +151,62 @@ export default async function OutreachPage() {
         subtitle="One email, once, to a gym that has never heard from us."
         badge={paused ? <Badge tone="red">paused</Badge> : <Badge tone="green">running</Badge>}
         action={
-          <form action={setOutreachPaused}>
-            <input type="hidden" name="paused" value={paused ? "0" : "1"} />
-            <button
-              type="submit"
-              className={
-                "rounded-full px-4 py-2 text-sm font-semibold transition " +
-                (paused
-                  ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                  : "border border-slate-300 bg-white text-slate-700 hover:border-slate-400")
-              }
-            >
-              {paused ? "Resume sending" : "Pause sending"}
-            </button>
-          </form>
+          <div className="flex flex-wrap items-center gap-2">
+            {!paused && !configError && (
+              <Link
+                href="/admin/outreach?preview=1"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-blue-400 hover:text-blue-700"
+              >
+                Preview today&apos;s batch
+              </Link>
+            )}
+            <form action={setOutreachPaused}>
+              <input type="hidden" name="paused" value={paused ? "0" : "1"} />
+              <button
+                type="submit"
+                className={
+                  "rounded-full px-4 py-2 text-sm font-semibold transition " +
+                  (paused
+                    ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                    : "border border-slate-300 bg-white text-slate-700 hover:border-slate-400")
+                }
+              >
+                {paused ? "Resume sending" : "Pause sending"}
+              </button>
+            </form>
+          </div>
         }
       />
+
+      {/*
+        What happened last time a button was pressed. `skipped` is a 200 from
+        pt-app with a guard refusing — outside hours, cap already spent, kill
+        switch on. It is a real outcome, not an error, and must not be reported
+        as a success.
+      */}
+      {sp.sent && (
+        <Notice tone={sp.failed ? "amber" : "blue"} title={`${sp.sent} sent`}>
+          {sp.failed
+            ? `${sp.failed} failed to send and were left as 'new', so they will be picked up again rather than lost.`
+            : "Every email in the batch went out and those gyms are now marked contacted."}
+        </Notice>
+      )}
+      {sp.skipped && (
+        <Notice tone="amber" title="Nothing was sent">
+          pt-app refused the run: {sp.skipped}. That is a guard doing its job, not a fault.
+        </Notice>
+      )}
+      {sp.error && (
+        <Notice tone="rose" title="The run failed">
+          {sp.error}
+        </Notice>
+      )}
+      {configError && (
+        <Notice tone="amber" title="Preview and send are unavailable here">
+          {configError} The page still reads correctly and pausing still works, because that is a
+          database write. Only the two buttons that call pt-app need this.
+        </Notice>
+      )}
 
       {/*
         The status line. This is the part that would have caught the Saturday
@@ -178,6 +241,114 @@ export default async function OutreachPage() {
         <StatTile icon={<MessageSquare className="h-5 w-5" />} value={repliedCount.toLocaleString()} label="Replied" tone={repliedCount > 0 ? "green" : "slate"} />
         <StatTile icon={<Clock className="h-5 w-5" />} value={chase.length.toLocaleString()} label="Could be chased" sublabel={`no reply in ${CHASE_AFTER_DAYS} days`} tone="amber" />
       </div>
+
+      {/*
+        The preview, and the only route to a send.
+
+        Nobody sends a batch without first seeing the twelve gyms and the
+        actual subject lines in it. This is pt-app's own dry run, so what is
+        listed here is composed by the identical code that would send it —
+        not a reconstruction of it from this side.
+      */}
+      {previewing && (
+        <Card className="p-5">
+          <SectionTitle hint="Composed by pt-app just now. Nothing has been sent.">
+            Today&apos;s batch
+          </SectionTitle>
+
+          {preview && !preview.ok ? (
+            <Notice tone="rose" title="Could not compose the batch">
+              {preview.error}
+            </Notice>
+          ) : preview && preview.ok && preview.run.skipped ? (
+            <Notice tone="amber" title="pt-app would refuse this run">
+              {preview.run.skipped}
+            </Notice>
+          ) : preview && preview.ok && preview.run.results.length === 0 ? (
+            <EmptyState
+              title="No gyms are eligible right now"
+              hint="Either today's cap is spent or nothing in range passed the partner-radius check."
+            />
+          ) : preview && preview.ok ? (
+            <>
+              <p className="mb-3 text-xs text-slate-500">
+                {preview.run.considered.toLocaleString()} considered
+                {typeof preview.run.excludedByPartnerRadius === "number" &&
+                  `, ${preview.run.excludedByPartnerRadius} excluded for being too close to an existing partner`}
+                {typeof preview.run.sentToday === "number" && `, ${preview.run.sentToday} already sent today`}.
+              </p>
+              <TableWrap>
+                <table className="w-full text-left text-sm">
+                  <thead className={THEAD}>
+                    <tr>
+                      <th className={TH}>Gym</th>
+                      <th className={TH}>City</th>
+                      <th className={TH}>Subject</th>
+                    </tr>
+                  </thead>
+                  <tbody className={TBODY}>
+                    {preview.run.results.map((c) => (
+                      <tr key={c.to} className={TR}>
+                        <td className={TD}>
+                          <div className="font-semibold text-slate-900">{c.gym}</div>
+                          <div className="text-xs text-slate-500">{c.to}</div>
+                        </td>
+                        <td className={TD}>{c.city ?? "—"}</td>
+                        <td className={TD}>
+                          <div className="text-slate-900">{c.subject}</div>
+                          {c.preview && (
+                            <div className="mt-0.5 line-clamp-2 text-xs text-slate-500">{c.preview}…</div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </TableWrap>
+
+              {/*
+                A dry run deliberately ignores the daily cap — it composes a
+                full batch so you can see the copy whenever you like. A SEND
+                does not. So the preview can honestly show twelve gyms that a
+                send would then refuse, and the button would look broken.
+                Caught by running the real dry run after the morning cron had
+                already spent the day's twelve.
+              */}
+              {sendWouldBeRefused(preview.run.sentToday ?? 0) ? (
+                <Notice tone="amber" title="Today's cap is already spent">
+                  {preview.run.sentToday} have gone out today, so pt-app will refuse another send
+                  until tomorrow. The batch above is what <em>would</em> go next — it is shown
+                  because a dry run ignores the cap, not because it is ready to send.
+                </Notice>
+              ) : (
+                <>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <form action={sendBatchNow}>
+                      <button
+                        type="submit"
+                        className="rounded-full bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800"
+                      >
+                        Send these {preview.run.results.length} now
+                      </button>
+                    </form>
+                    <Link
+                      href="/admin/outreach"
+                      className="text-sm text-slate-500 underline-offset-2 hover:underline"
+                    >
+                      Cancel
+                    </Link>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">
+                    These are real emails to real gyms and cannot be recalled. The batch is
+                    recomposed at the moment you press send, so it stays within pt-app&apos;s cap of{" "}
+                    {DAILY_CAP} a day whatever has already gone out.
+                  </p>
+                </>
+              )}
+            </>
+          ) : null}
+        </Card>
+      )}
 
       <Card className="p-5">
         <SectionTitle hint="Newest first, by UK day.">Recent sends</SectionTitle>

@@ -27,6 +27,7 @@ import {
   nextRun,
   finalRun,
   remainingSendDays,
+  sendWouldBeRefused,
   DAILY_CAP,
 } from "../app/admin/(shell)/outreach/pipeline.ts";
 
@@ -98,6 +99,18 @@ test("remaining sends are counted from the schedule, not guessed", () => {
   // Monday 5 Oct, after that morning's run: 6-9, 12-16, 19-23, 26-30.
   assert.equal(remainingSendDays(new Date("2026-10-05T12:00:00Z")), 19);
   assert.equal(remainingSendDays(new Date("2026-10-05T12:00:00Z")) * DAILY_CAP, 228);
+});
+
+test("a preview after the morning run knows a send would be refused", () => {
+  // A dry run and a send do not agree, deliberately: pt-app composes a full
+  // batch for a dry run whatever the cap says, but a send takes only what is
+  // remaining. Found by previewing after the 10am cron had spent the day's
+  // twelve — the screen listed twelve gyms above a button that could not send
+  // any of them, which reads as broken rather than as a guard working.
+  assert.equal(sendWouldBeRefused(12), true, "cap spent");
+  assert.equal(sendWouldBeRefused(11), false, "one left");
+  assert.equal(sendWouldBeRefused(0), false, "nothing sent yet");
+  assert.equal(sendWouldBeRefused(13), true, "never go negative on an over-count");
 });
 
 test("a gym that wrote back counts as replied even though its status does not say so", () => {

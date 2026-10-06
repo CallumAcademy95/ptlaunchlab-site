@@ -36,6 +36,19 @@ export const RETRY_HOUR_UTC = 13;
 export const SEND_MONTH_UTC = 9; // zero-based: October
 export const DAILY_CAP = 12;
 
+/**
+ * Would pt-app refuse a send right now because the day's cap is spent?
+ *
+ * This exists because a dry run and a send do NOT agree, on purpose. pt-app
+ * composes a full batch for a dry run whatever the cap says, so you can read
+ * the copy at any hour — but a send takes `remaining` instead. Preview after
+ * the morning cron has run and you get twelve gyms listed and a send that
+ * refuses them, which reads as a broken button rather than a working guard.
+ */
+export function sendWouldBeRefused(sentToday: number, cap: number = DAILY_CAP): boolean {
+  return sentToday >= cap;
+}
+
 /** The UK calendar day an instant falls on, which is how sends are counted. */
 export function ukDay(iso: string | Date): string {
   const d = typeof iso === "string" ? new Date(iso) : iso;
