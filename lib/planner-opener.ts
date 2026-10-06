@@ -124,6 +124,9 @@ export function eligibility(
   if (lead.openerSent) return { ok: false, reason: `opener already sent ${lead.openerSent}` };
   if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(lead.email)) return { ok: false, reason: "unusable address" };
   if (!lead.subscribedAt) return { ok: false, reason: "no signup time" };
+  // Leads Central sends the WhatsApp opener for overnight v2 leads 09:00-09:20 UK.
+  // Hold the email until after that window so nobody gets both at once.
+  if (lead.version === "2" && ukHour(now) < 10) return { ok: false, reason: "v2: waiting for WhatsApp window" };
 
   const age = now.getTime() - parseSubscribedAt(lead.subscribedAt);
   if (Number.isNaN(age)) return { ok: false, reason: "unreadable signup time" };
@@ -161,9 +164,9 @@ export function intakeFromFields(email: string, f: Record<string, string | null>
   return {
     name: first, firstName: first, email, phone: f.phone, source: "career-planner", planVersion: 2,
     band, score: BAND_SCORE[band],
-    answers: { why: f.plan_why, job: f.plan_current_job, goal, timeframe, blocker: f.plan_blocker,
+    answers: { why: f.plan_why, job: f.plan_current_job, goal, timeframe, blocker: f.plan_blocker || "other",
       blockerNote: f.plan_blocker_note ?? null, hours: f.plan_hours, training: f.plan_training,
-      region: f.plan_region, town: f.plan_town ?? "", payment: f.plan_payment },
+      region: f.plan_region, town: f.plan_town ?? "", payment: f.plan_payment || "unsure" },
     consent: { text: CONSENT_TEXT, at: f.plan_consent_at ?? "" },
     utm: null,
   };

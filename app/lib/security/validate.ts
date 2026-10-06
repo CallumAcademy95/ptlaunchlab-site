@@ -99,8 +99,8 @@ const liveRegisterSchema = z.object({
 // ── Career Planner v2 ─────────────────────────────────────────────────────
 // Nine answers + first name + email + UK mobile + required consent.
 const utmSchema = z.object({
-  source: z.string().max(100).optional(), medium: z.string().max(100).optional(),
-  campaign: z.string().max(200).optional(), content: z.string().max(200).optional(),
+  source: z.string().transform((s) => s.slice(0, 100)).optional(), medium: z.string().transform((s) => s.slice(0, 100)).optional(),
+  campaign: z.string().transform((s) => s.slice(0, 200)).optional(), content: z.string().transform((s) => s.slice(0, 200)).optional(),
 }).nullable().optional();
 
 const careerPlannerSchema = z.object({
@@ -404,6 +404,7 @@ export type CareerPlannerV2Clean = {
   name: string; firstName: string; email: string; phone: string; answers: PlannerAnswers;
   consentAt: string; utm: { source?: string; medium?: string; campaign?: string; content?: string } | null;
   eventId: string | null;
+  surname: string;
 };
 
 export function validateCareerPlannerV2(raw: unknown): ValidationResult<CareerPlannerV2Clean> {
@@ -432,9 +433,10 @@ export function validateCareerPlannerV2(raw: unknown): ValidationResult<CareerPl
     data: {
       name: surname ? `${first.normalised!} ${surname}` : first.normalised!,
       firstName: first.normalised!,
+      surname,
       email: ec.normalised!,
       phone: pc.normalised!,
-      answers: { ...a, blockerNote: a.blockerNote?.trim() || null, town: a.town.trim() },
+      answers: { ...a, blockerNote: a.blocker === "other" ? a.blockerNote?.trim() || null : null, town: a.town.trim() },
       consentAt: new Date().toISOString(),
       utm: parsed.data.utm ?? null,
       eventId: parsed.data.event_id ?? null,

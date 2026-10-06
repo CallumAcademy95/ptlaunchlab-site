@@ -204,3 +204,35 @@ test("sweep refuses without consent evidence and lowercases the email", () => {
   assert.equal(intakeFromFields("sam@example.com", { ...f, plan_consent_at: "  " }), null);
   assert.equal((intakeFromFields("  Sam@Example.COM ", f) as any).email, "sam@example.com");
 });
+
+// --- v2 waits for the WhatsApp window ----------------------------------------
+
+test("v2 lead is held before 10:00 UK, in both GMT and BST", () => {
+  const winter = new Date("2026-01-15T09:30:00Z"); // 09:30 London (GMT)
+  const summer = new Date("2026-07-15T08:30:00Z"); // 09:30 London (BST)
+  for (const now of [winter, summer]) {
+    const sub = new Date(now.getTime() - 5 * 3_600_000).toISOString();
+    const v = eligibility(lead({ version: "2", subscribedAt: sub }), now);
+    assert.equal(v.ok, false);
+    if (!v.ok) assert.equal(v.reason, "v2: waiting for WhatsApp window");
+  }
+});
+
+test("v2 lead is eligible from 10:00 UK, and v1 is unaffected at 09:30", () => {
+  const winter = new Date("2026-01-15T10:30:00Z");
+  const summer = new Date("2026-07-15T09:30:00Z"); // 10:30 BST
+  for (const now of [winter, summer]) {
+    const sub = new Date(now.getTime() - 5 * 3_600_000).toISOString();
+    assert.equal(eligibility(lead({ version: "2", subscribedAt: sub }), now).ok, true);
+  }
+  const early = new Date("2026-01-15T09:30:00Z");
+  const sub = new Date(early.getTime() - 5 * 3_600_000).toISOString();
+  assert.equal(eligibility(lead({ version: null, subscribedAt: sub }), early).ok, true);
+});
+
+test("sweep intake defaults a missing blocker and payment", () => {
+  const p = intakeFromFields("sam@example.com", { name: "Sam", phone: "+447700900123", plan_version: "2",
+    plan_consent_at: "2026-10-06T09:00:00Z" }) as any;
+  assert.equal(p.answers.blocker, "other");
+  assert.equal(p.answers.payment, "unsure");
+});

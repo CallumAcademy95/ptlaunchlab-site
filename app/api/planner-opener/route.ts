@@ -218,23 +218,39 @@ async function run(req: NextRequest) {
   const sweep: string[] = [];
   const sbUrl = process.env.SUPABASE_URL, sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (sbUrl && sbKey) {
-    for (const l of leads) {
-      if (sweep.length >= MAX_SWEEP_PER_RUN) break;
-      if (l.version !== "2" || l.status !== "active" || !l.subscribedAt) continue;
+    const candidates = leads.filter((l) => {
+      if (l.version !== "2" || l.status !== "active" || !l.subscribedAt) return false;
       const age = now.getTime() - parseSubscribedAt(l.subscribedAt);
-      if (!(age > 60 * 60_000 && age < MAX_AGE_DAYS * 86_400_000)) continue;
+      return age > 60 * 60_000 && age < MAX_AGE_DAYS * 86_400_000;
+    });
+    const emails = [...new Set(candidates.map((l) => l.email.trim().toLowerCase()).filter(Boolean))];
+    if (emails.length) {
       try {
-        const q = await fetch(`${sbUrl}/rest/v1/consultations?select=id&email=eq.${encodeURIComponent(l.email.trim().toLowerCase())}&limit=1`,
-          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } });
-        const rows = q.ok ? await q.json() : null;
-        // Only a confirmed empty array means "never received"; anything else skips.
-        if (!Array.isArray(rows) || rows.length) continue;
-        const payload = intakeFromFields(l.email, l.fields);
-        if (!payload) continue;
-        sweep.push(l.email);
-        if (send) await notifyPlannerIntake(payload as Parameters<typeof notifyPlannerIntake>[0]);
+        // One batched lookup. PostgREST needs values quoted when they contain commas or dots.
+        const list = emails.map((e) => `"${e.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`).join(",");
+        const q = await fetch(
+          `${sbUrl}/rest/v1/lead_identities?select=external_id&channel=eq.email&external_id=in.(${encodeURIComponent(list)})`,
+          { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+        );
+        const rows: unknown = q.ok ? await q.json() : null;
+        // Only a successful array response is trusted; anything else skips the whole sweep.
+        if (q.ok && Array.isArray(rows)) {
+          const known = new Set(rows.map((r) => String((r as { external_id?: unknown }).external_id ?? "").toLowerCase()));
+          for (const l of candidates) {
+            if (sweep.length >= MAX_SWEEP_PER_RUN) break;
+            if (known.has(l.email.trim().toLowerCase())) continue;
+            const payload = intakeFromFields(l.email, l.fields);
+            if (!payload) continue;
+            sweep.push(l.email);
+            try {
+              if (send) await notifyPlannerIntake(payload as Parameters<typeof notifyPlannerIntake>[0]);
+            } catch (err) {
+              console.error("[planner-opener] sweep failed for one lead", err);
+            }
+          }
+        }
       } catch (err) {
-        console.error("[planner-opener] sweep failed for one lead", err);
+        console.error("[planner-opener] sweep lookup failed", err);
       }
     }
   }

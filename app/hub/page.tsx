@@ -107,7 +107,7 @@ export default function Page() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Link href="/career-planner" className="bg-gold text-base font-bold px-8 py-4 rounded-full hover:brightness-110 transition">
-                Get your Career Escape Plan
+                Get your free PT Career Plan
               </Link>
               <Link href="/courses" className="border border-white/[0.15] text-white font-semibold px-8 py-4 rounded-full hover:border-gold/50 transition">
                 See the course
