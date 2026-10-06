@@ -151,6 +151,9 @@ export function ukHour(now: Date): number {
 // when the original handoff never landed. Null when there's no phone to message.
 export function intakeFromFields(email: string, f: Record<string, string | null>): Record<string, unknown> | null {
   if (f.plan_version !== "2" || !f.phone) return null;
+  // Never assert consent we cannot evidence.
+  if (!(f.plan_consent_at ?? "").trim()) return null;
+  email = email.trim().toLowerCase();
   const timeframe = (f.plan_timeframe ?? "researching") as Timeframe;
   const goal = (f.plan_goal ?? "not_sure") as Goal;
   const band = bandFor({ timeframe, goal });

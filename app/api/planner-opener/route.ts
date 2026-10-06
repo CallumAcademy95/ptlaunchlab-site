@@ -224,10 +224,11 @@ async function run(req: NextRequest) {
       const age = now.getTime() - parseSubscribedAt(l.subscribedAt);
       if (!(age > 60 * 60_000 && age < MAX_AGE_DAYS * 86_400_000)) continue;
       try {
-        const q = await fetch(`${sbUrl}/rest/v1/consultations?select=id&email=eq.${encodeURIComponent(l.email)}&limit=1`,
+        const q = await fetch(`${sbUrl}/rest/v1/consultations?select=id&email=eq.${encodeURIComponent(l.email.trim().toLowerCase())}&limit=1`,
           { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } });
-        const rows = q.ok ? await q.json() : [{}];
-        if (rows.length) continue;
+        const rows = q.ok ? await q.json() : null;
+        // Only a confirmed empty array means "never received"; anything else skips.
+        if (!Array.isArray(rows) || rows.length) continue;
         const payload = intakeFromFields(l.email, l.fields);
         if (!payload) continue;
         sweep.push(l.email);

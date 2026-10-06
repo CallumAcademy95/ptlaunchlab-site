@@ -197,3 +197,10 @@ test("sweep rebuilds an intake payload from MailerLite fields", () => {
   assert.equal(p.answers.town, "Cardiff");
   assert.equal(intakeFromFields("x@y.z", { plan_version: "2", phone: null }), null);
 });
+
+test("sweep refuses without consent evidence and lowercases the email", () => {
+  const f = { name: "Sam", phone: "+447700900123", plan_version: "2", plan_consent_at: "2026-10-06T09:00:00Z" };
+  assert.equal(intakeFromFields("sam@example.com", { ...f, plan_consent_at: null }), null);
+  assert.equal(intakeFromFields("sam@example.com", { ...f, plan_consent_at: "  " }), null);
+  assert.equal((intakeFromFields("  Sam@Example.COM ", f) as any).email, "sam@example.com");
+});
