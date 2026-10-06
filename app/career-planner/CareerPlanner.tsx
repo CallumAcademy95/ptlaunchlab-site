@@ -44,6 +44,7 @@ export default function CareerPlanner() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
+  const eventIdRef = useRef<string | null>(null);
   const sec = useFormSecurity();
   const step = STEPS[idx];
 
@@ -70,8 +71,10 @@ export default function CareerPlanner() {
     if (!lead.firstName.trim() || !lead.email.trim() || !lead.phone.trim()) { setError("Please fill in your first name, email and mobile."); return; }
     if (!lead.consent) { setError("Please tick the box so we can contact you about your plan."); return; }
     setSubmitting(true);
-    const eventId = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `cp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    try { if (typeof window.fbq === "function") window.fbq("track", "Lead", { content_name: "career_planner", currency: "GBP", value: 0 }, { eventID: eventId }); } catch {}
+    if (!eventIdRef.current) {
+      eventIdRef.current = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `cp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+    const eventId = eventIdRef.current;
     const last = readTouch("ptll_last_touch") ?? readTouch("ptll_first_touch");
     try {
       const res = await fetch("/api/career-planner", {
@@ -87,6 +90,7 @@ export default function CareerPlanner() {
       const j = await res.json().catch(() => ({}));
       if (!res.ok || !j.success) { setError(j.error ?? "Something went wrong. Please try again."); return; }
       if (!j.lead || !j.plan) { setError("Something went wrong. Please try again."); return; }
+      try { if (typeof window.fbq === "function") window.fbq("track", "Lead", { content_name: "career_planner", currency: "GBP", value: 0 }, { eventID: eventId }); } catch {}
       trackEvent("career_planner_complete", { version: 2, band: j.plan.band });
       setPlan(j.plan); setPhase("results");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -162,7 +166,7 @@ export default function CareerPlanner() {
               <input id="cp-phone" name="phone" required type="tel" autoComplete="tel" placeholder="Mobile (07…)" className={INPUT} value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
               <label className="flex gap-3 items-start text-sm text-soft" htmlFor="cp-consent">
                 <input id="cp-consent" type="checkbox" className={`mt-1 accent-[#F5C518] ${FOCUS}`} checked={lead.consent} onChange={(e) => setLead({ ...lead, consent: e.target.checked })} />
-                <span>{CONSENT_TEXT} <a href="/privacy" className="underline">Privacy policy</a></span>
+                <span>{CONSENT_TEXT} <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">Privacy policy</a></span>
               </label>
               {error && <p role="alert" className="text-red-300 text-sm">{error}</p>}
               <div className="flex gap-3 mt-2">
