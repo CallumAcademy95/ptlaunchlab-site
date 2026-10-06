@@ -546,11 +546,11 @@ export async function createCheckoutSession(
   // buildSessionParams is typed Record<string, unknown> so tests/stripeDiscounts.test.mts
   // can assert on it without importing encodeForm's internal FormValue type. The
   // object it builds is the same shape as before extraction, which IS a FormValue.
-  const body = encodeForm(
-    buildSessionParams(input, config, { withInstalments, target, cancelPath }) as Record<string, FormValue>,
-  ).join("&");
-
   try {
+    const body = encodeForm(
+      buildSessionParams(input, config, { withInstalments, target, cancelPath }) as Record<string, FormValue>,
+    ).join("&");
+
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {

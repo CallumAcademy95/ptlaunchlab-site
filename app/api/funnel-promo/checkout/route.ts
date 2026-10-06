@@ -6,7 +6,7 @@ import {
 } from "@/app/lib/funnelPromo";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
 import { createCheckoutSession } from "@/app/lib/stripeCheckout";
-import { sanitizeAttribution } from "@/app/lib/attribution";
+import { sanitizeAttribution, buildFunnelClientRef } from "@/app/lib/attribution";
 
 // GET /api/funnel-promo/checkout?plan=full|deposit
 //
@@ -44,15 +44,17 @@ export async function GET(req: NextRequest) {
 
   // Pass through UTMs the existing webhook expects, plus our funnel marker
   const utm = req.nextUrl.searchParams;
-  const refData: Record<string, string> = {
-    fts: utm.get("utm_source") ?? "(direct)",
-    ftm: utm.get("utm_medium") ?? "(none)",
-    ftc: utm.get("utm_campaign") ?? "(none)",
-  };
-  if (promo) {
-    refData.funnel_promo = promo.source;
-  }
-  const clientRef = encodeClientRef(refData);
+  // Sanitised + length-guarded: browser-supplied values must never push
+  // client_reference_id past Stripe's 200-char limit (see buildFunnelClientRef).
+  const attribution = sanitizeAttribution({
+    fts: utm.get("utm_source"),
+    ftm: utm.get("utm_medium"),
+    ftc: utm.get("utm_campaign"),
+    lts: utm.get("lts"),
+    ltm: utm.get("ltm"),
+    ltc: utm.get("ltc"),
+  });
+  const clientRef = buildFunnelClientRef(attribution, promo?.source, encodeClientRef);
 
   // Pick the destination
   let dest: string;
@@ -75,14 +77,7 @@ export async function GET(req: NextRequest) {
     clientReferenceId: clientRef,
     email: email ?? undefined,
     funnelPromo: promo?.source,
-    attribution: sanitizeAttribution({
-      fts: utm.get("utm_source"),
-      ftm: utm.get("utm_medium"),
-      ftc: utm.get("utm_campaign"),
-      lts: utm.get("lts"),
-      ltm: utm.get("ltm"),
-      ltc: utm.get("ltc"),
-    }),
+    attribution,
     cancelPath: "/courses",
   });
 

@@ -104,3 +104,30 @@ export function attributionMetadata(a: Attribution): Record<string, string> {
   }
   return out;
 }
+
+const REF_VALUE_MAX = 40;
+const REF_MAX = 200;
+
+/**
+ * The funnel route's client_reference_id. Stripe rejects a session whose
+ * client_reference_id exceeds 200 chars, and the buyer then falls back to the raw
+ * Payment Link (skipping /enrol/success), so this must never overflow. Values are
+ * capped at 40 chars here (full values live in attr_* metadata); if the encoded
+ * result is still too long we keep only the funnel marker.
+ */
+export function buildFunnelClientRef(
+  a: Attribution,
+  funnelPromo: string | undefined,
+  encode: (data: Record<string, string>) => string,
+): string {
+  const cap = (v: string | undefined) => (v ? v.slice(0, REF_VALUE_MAX) : undefined);
+  const data: Record<string, string> = {
+    fts: cap(a.fts) ?? "(direct)",
+    ftm: cap(a.ftm) ?? "(none)",
+    ftc: cap(a.ftc) ?? "(none)",
+  };
+  if (funnelPromo) data.funnel_promo = funnelPromo;
+  const ref = encode(data);
+  if (ref.length <= REF_MAX) return ref;
+  return encode(funnelPromo ? { funnel_promo: funnelPromo } : {}).slice(0, REF_MAX);
+}

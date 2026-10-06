@@ -98,3 +98,28 @@ test("attributionMetadata prefixes keys, omits empties, respects Stripe limits",
 test("attributionMetadata of nothing is empty", () => {
   assert.deepEqual(attributionMetadata({}), {});
 });
+
+test("funnel client_reference_id never exceeds Stripe's 200 chars, even with 120-char UTMs", async () => {
+  const { buildFunnelClientRef, sanitizeAttribution } = await import("../app/lib/attribution.ts");
+  // Same encoding as funnelPromo.encodeClientRef (base64url of JSON).
+  const encode = (d: Record<string, string>) => Buffer.from(JSON.stringify(d), "utf8").toString("base64url");
+  const long = "x".repeat(120);
+  const a = sanitizeAttribution({ fts: long, ftm: long, ftc: long, lts: long });
+  const ref = buildFunnelClientRef(a, "quiz-funnel-promo", encode);
+  assert.ok(ref.length <= 200, `ref was ${ref.length}`);
+  const decoded = JSON.parse(Buffer.from(ref, "base64url").toString("utf8"));
+  assert.equal(decoded.funnel_promo, "quiz-funnel-promo", "funnel marker survives");
+});
+
+test("funnel ref falls back to the funnel marker alone when still too long", async () => {
+  const { buildFunnelClientRef } = await import("../app/lib/attribution.ts");
+  const encode = (d: Record<string, string>) => "z".repeat(JSON.stringify(d).length * 3);
+  const ref = buildFunnelClientRef({ fts: "a" }, "p", encode);
+  assert.ok(ref.length <= 200);
+});
+
+test("funnel ref keeps normal short values and (direct) defaults", async () => {
+  const { buildFunnelClientRef } = await import("../app/lib/attribution.ts");
+  const encode = (d: Record<string, string>) => JSON.stringify(d);
+  assert.equal(buildFunnelClientRef({}, undefined, encode), '{"fts":"(direct)","ftm":"(none)","ftc":"(none)"}');
+});
