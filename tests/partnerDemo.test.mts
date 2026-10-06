@@ -96,6 +96,25 @@ test("a row whose partner is unknown is kept, not hidden", () => {
   assert.equal(withoutDemo(orphan, demoPartnerIds(PARTNERS)).length, 1);
 });
 
+test("pre-filtering the partner list would put every demo row back", () => {
+  // The trap this guards.
+  //
+  // The partners INDEX now renders `livePartners` so the table matches the
+  // tile. The obvious next tidy-up is to hand that same filtered list to
+  // PartnerLearners. It must not happen: with Northgate absent from the list,
+  // its eight sales resolve to no partner at all, and the "keep what you
+  // cannot resolve" rule above then treats every one of them as a real
+  // learner. The fix would quietly undo itself and the list would read 19.
+  const preFiltered = PARTNERS.filter((p) => !p.is_demo);
+  const kept = withoutDemo(SALES, demoPartnerIds(preFiltered));
+  assert.equal(kept.length, 19, "demonstrates the regression, so nobody ships it");
+  assert.equal(
+    withoutDemo(SALES, demoPartnerIds(PARTNERS)).length,
+    11,
+    "the complete list is what makes the rule work",
+  );
+});
+
 test("no demo partners means nothing is removed", () => {
   const realOnly = [{ id: "ebor" }, { id: "superflex", is_demo: false }];
   const ids = demoPartnerIds(realOnly);
