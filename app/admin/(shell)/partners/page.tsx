@@ -6,8 +6,10 @@ import { Banknote, Building2, PoundSterling, Users, Wallet } from "lucide-react"
 import {
   AdminPage,
   Badge,
+  Card,
   Notice,
   PageHeader,
+  SectionTitle,
   StatTile,
   TableWrap,
   TBODY,
@@ -18,6 +20,8 @@ import {
 } from "../ui/praxel";
 import { STANDING_TONE } from "./standing";
 import { demoPartnerIds } from "./demo";
+import { formatUkPhone, isUkMobile } from "./phone";
+import SetContactForm from "./SetContactForm";
 import { canBePaid } from "@/app/lib/security/payoutRules";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
@@ -43,6 +47,11 @@ interface PartnerRow {
   landing_page_path: string | null;
   commission_terms: string;
   is_demo?: boolean;
+  contact_name?: string | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  contact_mobile?: string | null;
+  contact_instagram?: string | null;
   agreement_signed_at: string | null;
   agreement_version: string | null;
   created_at: string | null;
@@ -71,6 +80,7 @@ export default async function AdminPartnersPage({
     .from("pp_partners")
     .select(
       "id, slug, gym_name, status, landing_page_path, commission_terms, is_demo, " +
+      "contact_name, contact_email, contact_phone, contact_mobile, contact_instagram, " +
       "agreement_signed_at, agreement_version, created_at, " +
       "bank_account_name, bank_sort_code, bank_account_number, bank_details_updated_at, " +
       "pp_partner_users(id, email, full_name, role, must_change_password, last_login_at, created_at)"
@@ -266,6 +276,60 @@ export default async function AdminPartnersPage({
           </Notice>
         )}
 
+
+        {/*
+          How to reach them. Added because the question "do we have the gym
+          partners' mobile numbers?" could not be answered from this page at
+          all — pp_partners held a name and an email and nothing else, and the
+          answer had to be reconstructed from scraped prospect rows.
+        */}
+        <Card className="p-5">
+          <SectionTitle hint="Only a mobile can take a WhatsApp. Fill gaps in 'Record contact details' below.">
+            Reaching them
+          </SectionTitle>
+          <TableWrap>
+            <table className="w-full min-w-[42rem] text-left text-sm">
+              <thead className={THEAD}>
+                <tr>
+                  <th className={TH}>Gym</th>
+                  <th className={TH}>Mobile</th>
+                  <th className={TH}>Phone</th>
+                  <th className={TH}>Email</th>
+                  <th className={TH}>Instagram</th>
+                </tr>
+              </thead>
+              <tbody className={TBODY}>
+                {livePartners.map((p) => {
+                  const loginEmail = p.pp_partner_users?.[0]?.email ?? null;
+                  return (
+                    <tr key={p.id} className={TR}>
+                      <td className={TD}>{p.gym_name}</td>
+                      <td className={TD}>
+                        {isUkMobile(p.contact_mobile) ? (
+                          <span className="text-slate-900">{formatUkPhone(p.contact_mobile)}</span>
+                        ) : (
+                          <span className="text-amber-700">none</span>
+                        )}
+                      </td>
+                      <td className={TD}>{formatUkPhone(p.contact_phone) ?? <span className="text-slate-400">&mdash;</span>}</td>
+                      <td className={TD}>
+                        {p.contact_email ?? (loginEmail ? (
+                          <span className="text-slate-500" title="This is their login, not a contact address">
+                            {loginEmail} <span className="text-[10px]">(login)</span>
+                          </span>
+                        ) : <span className="text-amber-700">none</span>)}
+                      </td>
+                      <td className={TD}>
+                        {p.contact_instagram ? `@${p.contact_instagram}` : <span className="text-slate-400">&mdash;</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </TableWrap>
+        </Card>
+
         <TableWrap>
           <table className="w-full min-w-[68rem] text-left text-sm">
             <thead className={THEAD}>
@@ -414,6 +478,14 @@ export default async function AdminPartnersPage({
         <CreateUserForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name, slug: p.slug }))} />
 
         <UploadResourceForm partners={partners.map((p) => ({ id: p.id, gym_name: p.gym_name }))} />
+
+        <SetContactForm
+          partners={livePartners.map((p) => ({
+            id: p.id,
+            gym_name: p.gym_name,
+            hasMobile: isUkMobile(p.contact_mobile),
+          }))}
+        />
 
         <SetBankForm
           partners={partners.map((p) => ({

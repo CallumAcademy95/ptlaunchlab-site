@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { isUkMobile, normaliseUkPhone, normaliseInstagram, phoneKind } from "./phone";
 import { getBankDetails, saveBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
@@ -612,4 +613,72 @@ async function sendWelcomeEmail(args: {
     console.error("[admin/partners] welcome email failed:", err);
     return false;
   }
+}
+
+export type SetContactState = { error?: string; ok?: string };
+
+/**
+ * Record how to reach a partner.
+ *
+ * There was nowhere to put this until 2026-10-06: pp_partners held a name and
+ * an email and nothing else, so "do we have their mobile numbers?" had to be
+ * answered by matching partners back to scraped prospect rows. It came out at
+ * three numbers for nine partners, one of them a mobile.
+ *
+ * Normalised on the way in rather than on the way out. A number typed as
+ * "+44 7828 594328" and the same number typed as "07828594328" must not be two
+ * different records, and WhatsApp's API only accepts one of the shapes.
+ *
+ * A landline in the mobile field is REFUSED rather than quietly accepted. The
+ * field exists so that someone can tell at a glance whether WhatsApp is
+ * possible, and a landline sitting in it answers that question wrongly.
+ */
+export async function setPartnerContact(
+  _prev: SetContactState,
+  formData: FormData
+): Promise<SetContactState> {
+  const partnerId = String(formData.get("partnerId") ?? "").trim();
+  if (!partnerId) return { error: "Choose a partner." };
+
+  const rawMobile = String(formData.get("contact_mobile") ?? "").trim();
+  const rawPhone = String(formData.get("contact_phone") ?? "").trim();
+  const rawInsta = String(formData.get("contact_instagram") ?? "").trim();
+  const contactName = String(formData.get("contact_name") ?? "").trim();
+  const contactEmail = String(formData.get("contact_email") ?? "").trim();
+
+  if (rawMobile && !isUkMobile(rawMobile)) {
+    const kind = phoneKind(rawMobile);
+    return {
+      error:
+        kind === "landline"
+          ? `${rawMobile} is a landline. Put it in the phone field — only a mobile can take a WhatsApp.`
+          : `${rawMobile} is not a UK mobile number.`,
+    };
+  }
+  if (rawPhone && !normaliseUkPhone(rawPhone)) {
+    return { error: `${rawPhone} is not a UK phone number.` };
+  }
+  if (rawInsta && !normaliseInstagram(rawInsta)) {
+    return { error: `${rawInsta} is not an Instagram handle.` };
+  }
+
+  const patch: Record<string, unknown> = {
+    contact_updated_at: new Date().toISOString(),
+    contact_updated_by: "admin",
+  };
+  // Only touch what was filled in. A blank box means "I did not have this",
+  // not "delete what you already had".
+  if (rawMobile) patch.contact_mobile = normaliseUkPhone(rawMobile);
+  if (rawPhone) patch.contact_phone = normaliseUkPhone(rawPhone);
+  if (rawInsta) patch.contact_instagram = normaliseInstagram(rawInsta);
+  if (contactName) patch.contact_name = contactName;
+  if (contactEmail) patch.contact_email = contactEmail;
+
+  if (Object.keys(patch).length === 2) return { error: "Nothing to save." };
+
+  const { error } = await getSupabaseAdmin().from("pp_partners").update(patch).eq("id", partnerId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/partners");
+  return { ok: "Saved." };
 }
