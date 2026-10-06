@@ -9,6 +9,7 @@ import {
   Gift,
   HelpCircle,
   MessageSquare,
+  Send,
 } from "lucide-react";
 import { ADMIN_NAV, isActiveNav } from "../nav";
 
@@ -24,6 +25,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   chart: BarChart3,
   message: MessageSquare,
   help: HelpCircle,
+  send: Send,
 };
 
 export function AdminSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
