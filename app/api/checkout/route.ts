@@ -9,6 +9,7 @@ import {
 import { resolvePromoCode } from "@/app/lib/promoCodes";
 import { PARTNER_PROMO_PREFIXES } from "@/app/lib/partnerPromo";
 import { isSeptemberOfferLink, isSeptemberOfferOpen } from "@/app/lib/septemberOffer";
+import { sanitizeAttribution } from "@/app/lib/attribution";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/checkout
@@ -157,6 +158,7 @@ export async function POST(req: NextRequest) {
     promoCode,
     promoCodeId: resolved?.ok ? resolved.promoId : undefined,
     cancelPath: str(body.cancelPath, 200),
+    attribution: sanitizeAttribution(body.attribution),
   });
 
   if (!session) {

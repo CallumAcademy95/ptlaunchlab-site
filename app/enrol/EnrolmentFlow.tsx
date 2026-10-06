@@ -5,6 +5,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
 import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
+import { attributionFromTouches, type Attribution } from "@/app/lib/attribution";
 import { CONTACT_EMAIL as SUPPORT_EMAIL, PHONE_NATIONAL as SUPPORT_PHONE, PHONE_TEL } from "@/app/lib/contactDetails";
 import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
@@ -93,6 +94,20 @@ function buildAttributionRef(gym?: string, gymSlug?: string): string {
     return urlSafeBase64(JSON.stringify(payload)).slice(0, 200);
   } catch {
     return "";
+  }
+}
+
+// Durable counterpart to buildAttributionRef: sent as a structured field and
+// stamped into Stripe metadata server-side, so it cannot be truncated.
+function readAttribution(): Attribution {
+  try {
+    const raw = (k: string): unknown => {
+      const v = localStorage.getItem(k);
+      return v ? JSON.parse(v) : null;
+    };
+    return attributionFromTouches(raw("ptll_first_touch"), raw("ptll_last_touch"));
+  } catch {
+    return {};
   }
 }
 
@@ -356,6 +371,7 @@ export default function EnrolmentFlow({
         body: JSON.stringify({
           paymentLink,
           clientReferenceId: ref,
+          attribution: readAttribution(),
           email: email.trim().toLowerCase(),
           name: fullName.trim(),
           gymReferral: partner?.gymReferral,

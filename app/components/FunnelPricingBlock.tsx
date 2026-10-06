@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/app/lib/gtag";
+import { attributionFromTouches } from "@/app/lib/attribution";
 
 // FunnelPricingBlock
 // ----------------------------------------------------------------------------
@@ -143,7 +144,30 @@ export default function FunnelPricingBlock({
       }
     }
 
-    window.location.href = `/api/funnel-promo/checkout?plan=${plan}&ic_eid=${encodeURIComponent(icEventId)}`;
+    // The route used to read utm_* from its own query string, but this was its
+    // only caller and never sent any, so every funnel buyer was "(direct)".
+    // First touch -> utm_*, last touch (when different) -> lts/ltm/ltc.
+    let attrQuery = "";
+    try {
+      const read = (k: string): unknown => {
+        const v = localStorage.getItem(k);
+        return v ? JSON.parse(v) : null;
+      };
+      const a = attributionFromTouches(read("ptll_first_touch"), read("ptll_last_touch"));
+      const q = new URLSearchParams();
+      if (a.fts) q.set("utm_source", a.fts);
+      if (a.ftm) q.set("utm_medium", a.ftm);
+      if (a.ftc) q.set("utm_campaign", a.ftc);
+      if (a.lts) q.set("lts", a.lts);
+      if (a.ltm) q.set("ltm", a.ltm);
+      if (a.ltc) q.set("ltc", a.ltc);
+      const s = q.toString();
+      if (s) attrQuery = `&${s}`;
+    } catch {
+      // localStorage unavailable — proceed unattributed rather than block checkout
+    }
+
+    window.location.href = `/api/funnel-promo/checkout?plan=${plan}&ic_eid=${encodeURIComponent(icEventId)}${attrQuery}`;
   };
 
   return (

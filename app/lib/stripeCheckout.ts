@@ -29,6 +29,7 @@
 //   a permission health check, or run `npm run test:e2e` (see e2e/README.md).
 
 import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments.ts";
+import { attributionMetadata, type Attribution } from "./attribution.ts";
 
 // The public origin baked into success_url / cancel_url.
 //
@@ -267,6 +268,8 @@ export interface CheckoutSessionInput {
   /** Stripe promotion code id, already resolved server-side. See buildSessionParams. */
   promoCodeId?: string;
   funnelPromo?: string;
+  /** First/last-touch source, stamped into Stripe metadata as `attr_*`. */
+  attribution?: Attribution;
   /** Where to send a buyer who backs out of Stripe. Must be a ptlaunchlab.co.uk path. */
   cancelPath?: string;
 }
@@ -417,6 +420,9 @@ export function buildSessionParams(
   // is no longer the only thing standing between a deposit and a discount.
   const discountable = !withInstalments && config.allowPromotionCodes;
   const discountId = discountable ? input.promoCodeId : undefined;
+  // Flat `attr_*` keys, additive to every existing metadata key.
+  const attr = attributionMetadata(input.attribution ?? {});
+  const hasAttr = Object.keys(attr).length > 0;
 
   return {
     mode: withInstalments ? "subscription" : "payment",
@@ -450,9 +456,14 @@ export function buildSessionParams(
           gym_slug: input.gymSlug,
           promo_code: input.promoCode,
           funnel_promo: input.funnelPromo,
+          ...attr,
         },
       },
     }),
+    // One-off payments: put attribution on the PaymentIntent too so it survives
+    // on the charge. Payment mode ONLY — Stripe rejects payment_intent_data on a
+    // subscription-mode session.
+    ...(!withInstalments && hasAttr && { payment_intent_data: { metadata: attr } }),
     // A proper hosted invoice + PDF for pay-in-full buyers, issued by Stripe so
     // it always states what was actually charged — including a partner discount,
     // which an invoice we generated ourselves would have to be told about.
@@ -493,6 +504,7 @@ export function buildSessionParams(
       // subscriptions.
       source: "api-checkout-session",
       instalments: withInstalments ? String(target) : undefined,
+      ...attr,
     },
   };
 }

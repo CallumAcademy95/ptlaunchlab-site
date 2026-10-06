@@ -194,6 +194,8 @@ async function sendToGa4(session: StripeSession) {
   }
 
   const attribution = decodeClientRef(session.client_reference_id);
+  const touch = (k: string): string | undefined =>
+    session.metadata?.[`attr_${k}`] || attribution[k] || undefined;
   const amount = (session.amount_total ?? 0) / 100;
   const currency = (session.currency ?? "gbp").toUpperCase();
 
@@ -216,14 +218,16 @@ async function sendToGa4(session: StripeSession) {
           value: amount,
           currency,
           payment_status: session.payment_status ?? "paid",
-          first_touch_source: attribution["fts"] ?? "(direct)",
-          first_touch_medium: attribution["ftm"] ?? "(none)",
-          first_touch_campaign: attribution["ftc"] ?? "(none)",
-          last_touch_source: attribution["lts"] ?? attribution["fts"] ?? "(direct)",
-          last_touch_medium: attribution["ltm"] ?? attribution["ftm"] ?? "(none)",
-          last_touch_campaign: attribution["ltc"] ?? attribution["ftc"] ?? "(none)",
-          fbclid: attribution["fbclid"] ?? "",
-          gclid: attribution["gclid"] ?? "",
+          // Durable session metadata (attr_*) wins; the client_reference_id blob
+          // is the fallback for older sessions and truncated payloads.
+          first_touch_source: touch("fts") ?? "(direct)",
+          first_touch_medium: touch("ftm") ?? "(none)",
+          first_touch_campaign: touch("ftc") ?? "(none)",
+          last_touch_source: touch("lts") ?? touch("fts") ?? "(direct)",
+          last_touch_medium: touch("ltm") ?? touch("ftm") ?? "(none)",
+          last_touch_campaign: touch("ltc") ?? touch("ftc") ?? "(none)",
+          fbclid: touch("fbclid") ?? "",
+          gclid: touch("gclid") ?? "",
           gym_referral: session.metadata?.gym_referral ?? "",
           promo_code: session.metadata?.promo_code ?? "",
           funnel_promo: attribution["funnel_promo"] ?? "",
