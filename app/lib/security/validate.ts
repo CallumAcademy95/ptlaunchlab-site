@@ -16,6 +16,10 @@ import { validateEmail } from "./email";
 import { validateName, validateBusinessName } from "./name";
 import { validateUKPhone, validateAnyPhone } from "./phone";
 import { checkHoneypot, SEC_KEY, type SecCheck } from "./honeypot";
+import {
+  WHY_VALUES, JOB_VALUES, GOAL_VALUES, TIMEFRAME_VALUES, BLOCKER_VALUES, HOURS_VALUES,
+  TRAINING_VALUES, PAYMENT_VALUES, REGIONS, isUkMobileE164, type PlannerAnswers,
+} from "../careerPlannerV2";
 import { hasReachableContact, isSelfReferral } from "./referralRules";
 
 const secSchema = z.object({
@@ -92,15 +96,30 @@ const liveRegisterSchema = z.object({
   [SEC_KEY]: secSchema,
 });
 
-// ── Career Planning Suite ─────────────────────────────────────────────────
-// Lead gate on the calculator result. Name + email required, phone optional
-// (every extra required field on a free tool costs leads). The calculator
-// inputs/results ride along as a snapshot for the admin notification but are
-// not part of the security validation.
+// ── Career Planner v2 ─────────────────────────────────────────────────────
+// Nine answers + first name + email + UK mobile + required consent.
+const utmSchema = z.object({
+  source: z.string().max(100).optional(), medium: z.string().max(100).optional(),
+  campaign: z.string().max(200).optional(), content: z.string().max(200).optional(),
+}).nullable().optional();
+
 const careerPlannerSchema = z.object({
-  name:  z.string().max(200),
+  firstName: z.string().max(40),
+  surname: z.string().max(60).optional().or(z.literal("")),
   email: z.string().max(254),
-  phone: z.string().max(40).optional().or(z.literal("")),
+  phone: z.string().max(40),
+  consent: z.literal(true),
+  event_id: z.string().max(64).optional(),
+  utm: utmSchema,
+  answers: z.object({
+    why: z.enum(WHY_VALUES), job: z.enum(JOB_VALUES), goal: z.enum(GOAL_VALUES),
+    timeframe: z.enum(TIMEFRAME_VALUES), blocker: z.enum(BLOCKER_VALUES),
+    blockerNote: z.string().max(200).nullable().optional(),
+    hours: z.enum(HOURS_VALUES), training: z.enum(TRAINING_VALUES),
+    region: z.string().refine((r) => REGIONS.includes(r), "region"),
+    town: z.string().min(2).max(60),
+    payment: z.enum(PAYMENT_VALUES),
+  }),
   [SEC_KEY]: secSchema,
 });
 
@@ -381,36 +400,47 @@ export function validateLiveRegister(raw: unknown): ValidationResult<LiveRegiste
   };
 }
 
-export type CareerPlannerClean = { name: string; email: string; phone: string };
+export type CareerPlannerV2Clean = {
+  name: string; firstName: string; email: string; phone: string; answers: PlannerAnswers;
+  consentAt: string; utm: { source?: string; medium?: string; campaign?: string; content?: string } | null;
+  eventId: string | null;
+};
 
-export function validateCareerPlanner(raw: unknown): ValidationResult<CareerPlannerClean> {
+export function validateCareerPlannerV2(raw: unknown): ValidationResult<CareerPlannerV2Clean> {
   const parsed = careerPlannerSchema.safeParse(raw);
   if (!parsed.success) {
-    return { ok: false, silent: false, status: 400, error: "Please enter your name and email.", signals: ["schema-fail"] };
+    const consentMissing = parsed.error.issues.some((i) => i.path[0] === "consent");
+    return { ok: false, silent: false, status: 400,
+      error: consentMissing ? "Please tick the box so we can contact you about your plan." : "Please answer every question and fill in your details.",
+      signals: ["schema-fail"] };
   }
   const secCheck = sec(raw);
-  if (!secCheck.ok) {
-    return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
-  }
+  if (!secCheck.ok) return { ok: false, silent: true, status: 400, error: "ok", signals: [`sec:${secCheck.reason}`] };
 
-  const nameCheck = validateName(parsed.data.name);
-  if (!nameCheck.ok) {
-    return { ok: false, silent: false, status: 422, error: "Please enter your full name.", signals: [`name:${nameCheck.reason}`] };
-  }
+  const first = validateName(parsed.data.firstName, { min: 1, max: 40 });
+  if (!first.ok) return { ok: false, silent: false, status: 422, error: "Please enter your first name.", signals: [`name:${first.reason}`] };
   const ec = validateEmail(parsed.data.email);
-  if (!ec.ok) {
-    return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  if (!ec.ok) return { ok: false, silent: false, status: 422, error: "Please enter a valid email address.", signals: [`email:${ec.reason}`] };
+  const pc = validateUKPhone(parsed.data.phone);
+  if (!pc.ok || !isUkMobileE164(pc.normalised!)) {
+    return { ok: false, silent: false, status: 422, error: "Please enter a UK mobile number starting 07.", signals: [`phone:${pc.ok ? "not-mobile" : pc.reason}`] };
   }
-  let phone = "";
-  if (parsed.data.phone) {
-    const pc = validateUKPhone(parsed.data.phone);
-    if (!pc.ok) {
-      return { ok: false, silent: false, status: 422, error: "Please enter a valid UK phone number, or leave it blank.", signals: [`phone:${pc.reason}`] };
-    }
-    phone = pc.normalised!;
-  }
-
-  return { ok: true, data: { name: nameCheck.normalised!, email: ec.normalised!, phone }, signals: [] };
+  const surname = (parsed.data.surname ?? "").trim().replace(/s+/g, " ");
+  const a = parsed.data.answers;
+  return {
+    ok: true,
+    data: {
+      name: surname ? `${first.normalised!} ${surname}` : first.normalised!,
+      firstName: first.normalised!,
+      email: ec.normalised!,
+      phone: pc.normalised!,
+      answers: { ...a, blockerNote: a.blockerNote?.trim() || null, town: a.town.trim() },
+      consentAt: new Date().toISOString(),
+      utm: parsed.data.utm ?? null,
+      eventId: parsed.data.event_id ?? null,
+    },
+    signals: [],
+  };
 }
 
 export type ObjectionClean = {
