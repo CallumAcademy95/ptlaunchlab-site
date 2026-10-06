@@ -35,7 +35,8 @@ export type MetaCapiEventName =
   | "Schedule"
   | "InitiateCheckout"
   | "Purchase"
-  | "CompleteRegistration";
+  | "CompleteRegistration"
+  | "QualifiedPlannerLead";
 
 export type MetaCapiUserData = {
   email?: string;
