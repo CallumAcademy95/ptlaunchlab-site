@@ -26,6 +26,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: "Partners",
     items: [
       { href: "/admin/partners", label: "Gym partners", icon: "building", hint: "Who they are, what they've done" },
+      { href: "/admin/outreach", label: "Gym outreach", icon: "send", hint: "Who we've cold emailed, and when it sends next" },
       { href: "/admin/referrals", label: "Referrals", icon: "gift", hint: "£200 promises and who owes them" },
     ],
   },

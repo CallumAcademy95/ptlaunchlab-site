@@ -53,6 +53,7 @@ test("exactly one entry is highlighted on any admin page", () => {
   for (const pathname of [
     "/admin/partners",
     "/admin/partners/muscle-bound",
+    "/admin/outreach",
     "/admin/referrals",
     "/admin/ads",
     "/admin/ads/create",
