@@ -1,5 +1,6 @@
 "use client";
-
+// Career Planner v2: nine intent questions → name/email/mobile/consent gate →
+// server-computed plan. No income forecast; mentorship described, not named.
 import { useRef, useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -7,143 +8,91 @@ import ObjectionCapture from "../components/ObjectionCapture";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { trackEvent } from "@/app/lib/gtag";
 import { useFormSecurity } from "@/app/lib/security/client";
-import {
-  computeCareerPlan,
-  REGIONS,
-  COURSE_PRICE,
-  type CareerPlannerInputs,
-  type CareerPlannerResult,
-  type GymExperience,
-  type CareerJob,
-} from "@/app/lib/careerPlanner";
+import { QUESTIONS, REGIONS, CONSENT_TEXT, type PlannerAnswers, type CareerPlanV2 } from "@/app/lib/careerPlannerV2";
 
-// ── Step config ──────────────────────────────────────────────────────────────
-type StepKey = "salary" | "expenses" | "savings" | "job" | "region" | "experience" | "goal" | "mindset";
-const STEP_ORDER: StepKey[] = ["salary", "expenses", "savings", "job", "region", "experience", "goal", "mindset"];
+type ChoiceKey = "why" | "job" | "goal" | "timeframe" | "blocker" | "hours" | "training" | "payment";
+type StepKey = ChoiceKey | "location";
+const STEPS: StepKey[] = ["why", "job", "goal", "timeframe", "blocker", "hours", "training", "location", "payment"];
+type Draft = Partial<PlannerAnswers> & { blockerNote?: string | null };
 
-const JOBS: { value: CareerJob; label: string }[] = [
-  { value: "desk", label: "Office / desk job" },
-  { value: "trades", label: "Trades / manual" },
-  { value: "retail", label: "Retail / sales" },
-  { value: "hospitality", label: "Hospitality" },
-  { value: "warehouse", label: "Warehouse / driving" },
-  { value: "forces", label: "Forces / ex-forces" },
-  { value: "health", label: "Health / care" },
-  { value: "other", label: "Something else" },
+const MENTORSHIP = [
+  "A client profile worksheet to work out who you want to coach",
+  "A 1:1 business call when you reach the business stage",
+  "Recorded business training",
+  "Live group Q&As",
+  "Branded coaching templates: progress tracker, phase planner, logbook and meal planner",
 ];
 
-const EXPERIENCE: { value: GymExperience; label: string; sub: string }[] = [
-  { value: "none", label: "New to it", sub: "I train a bit, no coaching experience" },
-  { value: "regular", label: "Serious gym-goer", sub: "I know my way around training" },
-  { value: "trained-others", label: "I've helped others train", sub: "Friends, family, informal coaching" },
-  { value: "qualified-lapsed", label: "Previously qualified", sub: "Lapsed L2/L3 or ex-industry" },
-];
+const FOCUS = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
+const INPUT = `w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25 ${FOCUS}`;
 
-const DEFAULTS: CareerPlannerInputs = {
-  currentSalary: 0, monthlyExpenses: 0, savings: 0,
-  job: "desk", region: "", experience: "none",
-  targetMonthlyIncome: 0, hoursPerWeek: 0, confidence: 3, risk: 3,
-};
-
-const gbp = (n: number) => `£${Math.round(n).toLocaleString()}`;
+function readTouch(key: string): Record<string, string> | null {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? (JSON.parse(v) as Record<string, string>) : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function CareerPlanner() {
   const [phase, setPhase] = useState<"intro" | "steps" | "gate" | "results">("intro");
-  const [stepIdx, setStepIdx] = useState(0);
-  const [inputs, setInputs] = useState<CareerPlannerInputs>(DEFAULTS);
-  const [lead, setLead] = useState({ name: "", email: "", phone: "" });
-  const [result, setResult] = useState<CareerPlannerResult | null>(null);
+  const [idx, setIdx] = useState(0);
+  const [draft, setDraft] = useState<Draft>({ blockerNote: null });
+  const [lead, setLead] = useState({ firstName: "", surname: "", email: "", phone: "", consent: false });
+  const [plan, setPlan] = useState<CareerPlanV2 | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const startedRef = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+  const started = useRef(false);
   const sec = useFormSecurity();
-
-  const set = <K extends keyof CareerPlannerInputs>(k: K, v: CareerPlannerInputs[K]) =>
-    setInputs((p) => ({ ...p, [k]: v }));
-
-  const stepKey = STEP_ORDER[stepIdx];
+  const step = STEPS[idx];
 
   function begin() {
-    if (!startedRef.current) { trackEvent("career_planner_start"); startedRef.current = true; }
+    if (!started.current) { started.current = true; trackEvent("career_planner_start", { version: 2 }); }
     setPhase("steps");
   }
-
+  function answered(): boolean {
+    if (step === "location") return !!draft.region && (draft.town ?? "").trim().length >= 2;
+    return !!draft[step];
+  }
   function next() {
-    trackEvent("career_planner_step", { step_index: stepIdx, step_key: stepKey });
-    if (stepIdx < STEP_ORDER.length - 1) {
-      setStepIdx((i) => i + 1);
-    } else {
-      setResult(computeCareerPlan(inputs));
-      trackEvent("career_planner_result_ready");
-      setPhase("gate");
-    }
+    trackEvent("career_planner_step", { step_index: idx, step_key: step, version: 2 });
+    if (idx < STEPS.length - 1) setIdx(idx + 1); else setPhase("gate");
   }
   function back() {
     if (phase === "gate") { setPhase("steps"); return; }
-    if (stepIdx > 0) setStepIdx((i) => i - 1);
+    if (idx > 0) setIdx(idx - 1);
   }
 
-  // Is the current step answered?
-  function stepValid(): boolean {
-    switch (stepKey) {
-      case "salary": return inputs.currentSalary > 0;
-      case "expenses": return inputs.monthlyExpenses > 0;
-      case "savings": return inputs.savings >= 0 && String(inputs.savings) !== "";
-      case "job": return !!inputs.job;
-      case "region": return !!inputs.region;
-      case "experience": return !!inputs.experience;
-      case "goal": return inputs.targetMonthlyIncome > 0 && inputs.hoursPerWeek > 0;
-      case "mindset": return inputs.confidence >= 1 && inputs.risk >= 1;
-      default: return true;
-    }
-  }
-
-  async function submitLead(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit() {
     if (submitting) return;
-    setError("");
-    if (!lead.name.trim() || !lead.email.trim()) { setError("Please enter your name and email."); return; }
+    setError(null);
+    if (!lead.firstName.trim() || !lead.email.trim() || !lead.phone.trim()) { setError("Please fill in your first name, email and mobile."); return; }
+    if (!lead.consent) { setError("Please tick the box so we can contact you about your plan."); return; }
     setSubmitting(true);
-
-    const computed = result ?? computeCareerPlan(inputs);
-    const eventId =
-      (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
-      `cp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-    // Browser Pixel Lead — deduped server-side via the same eventID.
-    if (typeof window !== "undefined" && typeof window.fbq === "function") {
-      window.fbq("track", "Lead", { content_name: "career_planner", currency: "GBP", value: 0 }, { eventID: eventId });
-    }
-
+    const eventId = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `cp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    try { if (typeof window.fbq === "function") window.fbq("track", "Lead", { content_name: "career_planner", currency: "GBP", value: 0 }, { eventID: eventId }); } catch {}
+    const last = readTouch("ptll_last_touch") ?? readTouch("ptll_first_touch");
     try {
       const res = await fetch("/api/career-planner", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: lead.name.trim(),
-          email: lead.email.trim().toLowerCase(),
-          phone: lead.phone.trim(),
-          event_id: eventId,
-          inputs,
-          result: computed,
+          firstName: lead.firstName.trim(), surname: lead.surname.trim(), email: lead.email.trim().toLowerCase(),
+          phone: lead.phone.trim(), consent: lead.consent, event_id: eventId,
+          utm: last ? { source: last.utm_source, medium: last.utm_medium, campaign: last.utm_campaign, content: last.utm_content } : null,
+          answers: { ...draft, blockerNote: draft.blocker === "other" ? (draft.blockerNote ?? null) : null },
           [sec.SEC_KEY]: sec.payload(),
         }),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json.success === false) {
-        setError(json.error || "Something went wrong. Please try again.");
-        setSubmitting(false);
-        return;
-      }
-      trackEvent("career_planner_complete", {
-        readiness_score: computed.readinessScore,
-        business_model: computed.businessModel,
-        quit_months: computed.quitMonths,
-      });
-      setResult(computed);
-      setPhase("results");
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.success) { setError(j.error ?? "Something went wrong. Please try again."); return; }
+      if (!j.lead || !j.plan) { setError("Something went wrong. Please try again."); return; }
+      trackEvent("career_planner_complete", { version: 2, band: j.plan.band });
+      setPlan(j.plan); setPhase("results");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      setError("Network error. Please try again.");
+      setError("Couldn't send that. Check your connection and try again.");
+    } finally {
       setSubmitting(false);
     }
   }
@@ -154,40 +103,75 @@ export default function CareerPlanner() {
       <main className="pt-[72px] min-h-screen bg-deep">
         <div className="max-w-2xl mx-auto px-5 py-12 md:py-16">
           <sec.Honeypot />
-
           {phase === "intro" && <Intro onStart={begin} />}
-
           {phase === "steps" && (
             <div>
-              <Progress current={stepIdx + 1} total={STEP_ORDER.length} />
-              <StepCard
-                stepKey={stepKey}
-                inputs={inputs}
-                set={set}
-              />
-              <NavButtons
-                onBack={stepIdx > 0 ? back : undefined}
-                onNext={next}
-                nextDisabled={!stepValid()}
-                nextLabel={stepIdx === STEP_ORDER.length - 1 ? "See my plan →" : "Continue →"}
-              />
+              <Progress current={idx + 1} total={STEPS.length} />
+              <div className="bg-base border border-white/10 rounded-2xl p-6 md:p-8 mb-6">
+                {step === "location" ? (
+                  <div>
+                    <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight mb-4">Where are you based?</h2>
+                    <label className="block text-soft text-sm mb-1" htmlFor="cp-region">Region</label>
+                    <select id="cp-region" className={`${INPUT} mb-4`} value={draft.region ?? ""} onChange={(e) => setDraft({ ...draft, region: e.target.value })}>
+                      <option value="">Choose your region</option>
+                      {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                    <label className="block text-soft text-sm mb-1" htmlFor="cp-town">Town or city</label>
+                    <input id="cp-town" className={INPUT} maxLength={60} value={draft.town ?? ""} onChange={(e) => setDraft({ ...draft, town: e.target.value })} placeholder="e.g. Leeds" />
+                  </div>
+                ) : (
+                  <div>
+                    <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight mb-5">{QUESTIONS[step].title}</h2>
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {(QUESTIONS[step].options as readonly (readonly [string, string])[]).map(([value, label]) => (
+                        <button key={value} id={`cp-${step}-${value}`} type="button" aria-pressed={draft[step] === value}
+                          onClick={() => setDraft({ ...draft, [step]: value })}
+                          className={`text-left rounded-xl px-4 py-3.5 border text-sm font-semibold transition-all ${FOCUS} ${draft[step] === value ? "border-gold bg-gold/10 text-white" : "border-white/10 text-soft hover:border-gold/40"}`}>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    {step === "blocker" && draft.blocker === "other" && (
+                      <textarea id="cp-blocker-note" aria-label="Tell us more (optional)" className={`${INPUT} mt-3`} maxLength={200} rows={2}
+                        placeholder="Tell us more (optional)" value={draft.blockerNote ?? ""} onChange={(e) => setDraft({ ...draft, blockerNote: e.target.value })} />
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3">
+                {idx > 0 && (
+                  <button type="button" onClick={back} className={`px-6 py-3.5 rounded-full border border-white/15 text-soft font-semibold text-sm hover:border-white/30 transition-all ${FOCUS}`}>← Back</button>
+                )}
+                <button type="button" onClick={next} disabled={!answered()} className={`flex-1 py-3.5 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-40 ${FOCUS}`}>
+                  {idx === STEPS.length - 1 ? "See my plan →" : "Continue →"}
+                </button>
+              </div>
             </div>
           )}
-
-          {phase === "gate" && result && (
-            <Gate
-              lead={lead}
-              setLead={setLead}
-              onBack={back}
-              onSubmit={submitLead}
-              submitting={submitting}
-              error={error}
-              teaserScore={result.readinessScore}
-              teaserQuit={result.quitLabel}
-            />
+          {phase === "gate" && (
+            <form onSubmit={(e) => { e.preventDefault(); void submit(); }} className="grid gap-3">
+              <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight">Where should we send your plan?</h2>
+              <p className="text-soft">We&apos;ll email it now, and someone from the team will WhatsApp you about it. Real person, no spam.</p>
+              <label htmlFor="cp-first" className="sr-only">First name</label>
+              <input id="cp-first" name="firstName" required autoComplete="given-name" placeholder="First name" maxLength={40} className={INPUT} value={lead.firstName} onChange={(e) => setLead({ ...lead, firstName: e.target.value })} />
+              <label htmlFor="cp-surname" className="sr-only">Surname (optional)</label>
+              <input id="cp-surname" name="surname" autoComplete="family-name" placeholder="Surname (optional)" maxLength={60} className={INPUT} value={lead.surname} onChange={(e) => setLead({ ...lead, surname: e.target.value })} />
+              <label htmlFor="cp-email" className="sr-only">Email address</label>
+              <input id="cp-email" name="email" required type="email" autoComplete="email" placeholder="Email address" className={INPUT} value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })} />
+              <label htmlFor="cp-phone" className="sr-only">Mobile</label>
+              <input id="cp-phone" name="phone" required type="tel" autoComplete="tel" placeholder="Mobile (07…)" className={INPUT} value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })} />
+              <label className="flex gap-3 items-start text-sm text-soft" htmlFor="cp-consent">
+                <input id="cp-consent" type="checkbox" className={`mt-1 accent-[#F5C518] ${FOCUS}`} checked={lead.consent} onChange={(e) => setLead({ ...lead, consent: e.target.checked })} />
+                <span>{CONSENT_TEXT} <a href="/privacy" className="underline">Privacy policy</a></span>
+              </label>
+              {error && <p role="alert" className="text-red-300 text-sm">{error}</p>}
+              <div className="flex gap-3 mt-2">
+                <button type="button" onClick={back} className={`px-6 py-3.5 rounded-full border border-white/15 text-soft font-semibold text-sm hover:border-white/30 transition-all ${FOCUS}`}>← Back</button>
+                <button type="submit" disabled={submitting} className={`flex-1 py-3.5 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-60 ${FOCUS}`}>{submitting ? "Building your plan…" : "Show my plan →"}</button>
+              </div>
+            </form>
           )}
-
-          {phase === "results" && result && <Results r={result} name={lead.name.split(" ")[0]} />}
+          {phase === "results" && plan && <Results plan={plan} name={lead.firstName.trim()} />}
         </div>
       </main>
       <Footer />
@@ -195,40 +179,6 @@ export default function CareerPlanner() {
   );
 }
 
-// ── Intro ────────────────────────────────────────────────────────────────────
-function Intro({ onStart }: { onStart: () => void }) {
-  return (
-    <div className="text-center">
-      <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">Free · 60 seconds · No obligation</p>
-      <h1 className="font-display font-extrabold text-4xl md:text-5xl text-white leading-none tracking-tight mb-4">
-        Your PT <span className="text-gold">Career Escape Plan</span>
-      </h1>
-      <p className="text-soft text-base md:text-lg leading-relaxed mb-8 max-w-xl mx-auto">
-        Answer 8 quick questions and get a realistic picture: when you could go full-time, what you
-        could earn, and the exact route to get there. Built by gym owners who&apos;ve hired 500+ trainers.
-      </p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-9 text-left">
-        {[
-          ["Quit date", "When you could go full-time"],
-          ["Year-1 income", "What you could realistically earn"],
-          ["Readiness score", "How ready you are today"],
-          ["Your route", "Qualification, payment & model"],
-        ].map(([t, s]) => (
-          <div key={t} className="bg-deep border border-white/10 rounded-xl p-3">
-            <p className="text-gold text-xs font-bold uppercase tracking-wide mb-1">{t}</p>
-            <p className="text-faint text-[11px] leading-snug">{s}</p>
-          </div>
-        ))}
-      </div>
-      <button onClick={onStart}
-        className="w-full sm:w-auto px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all">
-        Build my plan →
-      </button>
-    </div>
-  );
-}
-
-// ── Progress ─────────────────────────────────────────────────────────────────
 function Progress({ current, total }: { current: number; total: number }) {
   return (
     <div className="mb-7">
@@ -243,368 +193,63 @@ function Progress({ current, total }: { current: number; total: number }) {
   );
 }
 
-// ── Step card ────────────────────────────────────────────────────────────────
-function StepCard({
-  stepKey, inputs, set,
-}: {
-  stepKey: StepKey;
-  inputs: CareerPlannerInputs;
-  set: <K extends keyof CareerPlannerInputs>(k: K, v: CareerPlannerInputs[K]) => void;
-}) {
-  const heading: Record<StepKey, [string, string]> = {
-    salary: ["What do you earn now?", "Your current gross salary (before tax)."],
-    expenses: ["What are your monthly outgoings?", "Rent/mortgage, bills, food — what you need to cover each month."],
-    savings: ["How much have you got saved?", "A rough buffer figure. It's fine if it's £0."],
-    job: ["What's your current job?", "So we can frame the move realistically."],
-    region: ["Where are you based?", "PT rates vary across the UK."],
-    experience: ["How much coaching experience have you got?", "Be honest — it changes your route, not your welcome."],
-    goal: ["What are you aiming for?", "Your target take-home from PT and the time you can give it."],
-    mindset: ["Where's your head at?", "Two quick sliders — no wrong answers."],
-  };
-  const [title, sub] = heading[stepKey];
-
+function Intro({ onStart }: { onStart: () => void }) {
   return (
-    <div className="bg-base border border-white/10 rounded-2xl p-6 md:p-8 mb-6">
-      <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight mb-1.5">{title}</h2>
-      <p className="text-soft text-sm mb-6">{sub}</p>
-
-      {stepKey === "salary" && (
-        <MoneyInput value={inputs.currentSalary} onChange={(v) => set("currentSalary", v)} suffix="/ year" placeholder="28,000" />
-      )}
-      {stepKey === "expenses" && (
-        <MoneyInput value={inputs.monthlyExpenses} onChange={(v) => set("monthlyExpenses", v)} suffix="/ month" placeholder="1,800" />
-      )}
-      {stepKey === "savings" && (
-        <MoneyInput value={inputs.savings} onChange={(v) => set("savings", v)} placeholder="2,000" allowZero />
-      )}
-      {stepKey === "job" && (
-        <OptionGrid
-          options={JOBS}
-          value={inputs.job}
-          onSelect={(v) => set("job", v)}
-        />
-      )}
-      {stepKey === "region" && (
-        <OptionGrid
-          options={REGIONS.map((r) => ({ value: r, label: r }))}
-          value={inputs.region}
-          onSelect={(v) => set("region", v)}
-        />
-      )}
-      {stepKey === "experience" && (
-        <div className="grid gap-2.5">
-          {EXPERIENCE.map((o) => (
-            <button key={o.value} type="button" onClick={() => set("experience", o.value)}
-              className={`text-left rounded-xl p-4 border transition-all ${
-                inputs.experience === o.value ? "border-gold bg-gold/10" : "border-white/10 hover:border-gold/40"
-              }`}>
-              <p className="text-white font-bold text-sm">{o.label}</p>
-              <p className="text-faint text-xs mt-0.5">{o.sub}</p>
-            </button>
-          ))}
-        </div>
-      )}
-      {stepKey === "goal" && (
-        <div className="space-y-6">
-          <div>
-            <label className="text-soft text-xs font-semibold uppercase tracking-wide mb-2 block">Target take-home from PT</label>
-            <MoneyInput value={inputs.targetMonthlyIncome} onChange={(v) => set("targetMonthlyIncome", v)} suffix="/ month" placeholder="3,000" />
-          </div>
-          <div>
-            <label className="text-soft text-xs font-semibold uppercase tracking-wide mb-2 block">Hours a week you can give it: <span className="text-gold">{inputs.hoursPerWeek || 0}h</span></label>
-            <input type="range" min={0} max={40} step={1} value={inputs.hoursPerWeek}
-              onChange={(e) => set("hoursPerWeek", Number(e.target.value))}
-              className="w-full accent-[#F5C518]" />
-            <div className="flex justify-between text-faint text-[11px] mt-1"><span>0h</span><span>40h</span></div>
-          </div>
-        </div>
-      )}
-      {stepKey === "mindset" && (
-        <div className="space-y-7">
-          <Scale label="How confident are you about making the switch?" lowLabel="Nervous" highLabel="Certain"
-            value={inputs.confidence} onChange={(v) => set("confidence", v)} />
-          <Scale label="How comfortable are you taking a risk on yourself?" lowLabel="Cautious" highLabel="All in"
-            value={inputs.risk} onChange={(v) => set("risk", v)} />
-        </div>
-      )}
+    <div className="text-center">
+      <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">Free PT Career Plan</p>
+      <h1 className="font-display font-extrabold text-4xl md:text-5xl text-white leading-none tracking-tight mb-4">Could personal training be your next career?</h1>
+      <p className="text-soft text-base md:text-lg leading-relaxed mb-8 max-w-xl mx-auto">Answer 9 quick questions and get a plan built around your life: your route, your timeline, and what you&apos;d get to help you get there. Takes about two minutes.</p>
+      <button type="button" onClick={onStart} className={`w-full sm:w-auto px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all ${FOCUS}`}>Build my career plan →</button>
     </div>
   );
 }
 
-function MoneyInput({
-  value, onChange, suffix, placeholder, allowZero,
-}: { value: number; onChange: (n: number) => void; suffix?: string; placeholder?: string; allowZero?: boolean }) {
+function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center bg-deep border border-white/10 rounded-xl px-4 py-3.5 focus-within:border-gold/50 transition-colors">
-      <span className="text-gold font-bold text-xl mr-2">£</span>
-      <input
-        type="text" inputMode="numeric" autoFocus
-        value={value ? value.toLocaleString() : (allowZero && value === 0 ? "" : "")}
-        onChange={(e) => {
-          const n = Number(e.target.value.replace(/[^\d]/g, ""));
-          onChange(Number.isFinite(n) ? n : 0);
-        }}
-        placeholder={placeholder}
-        className="flex-1 bg-transparent text-white text-xl font-bold outline-none placeholder-white/20"
-      />
-      {suffix && <span className="text-faint text-sm ml-2 whitespace-nowrap">{suffix}</span>}
-    </div>
+    <section className="rounded-xl bg-base border border-white/10 p-5">
+      <h3 className="text-gold text-xs font-semibold uppercase tracking-widest mb-2">{label}</h3>
+      <div className="text-soft leading-relaxed">{children}</div>
+    </section>
   );
 }
 
-function OptionGrid<T extends string>({
-  options, value, onSelect,
-}: { options: { value: T; label: string }[]; value: T; onSelect: (v: T) => void }) {
+function Results({ plan, name }: { plan: CareerPlanV2; name: string }) {
+  const t = plan.timeline;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-      {options.map((o) => (
-        <button key={o.value} type="button" onClick={() => onSelect(o.value)}
-          className={`text-left rounded-xl px-4 py-3.5 border text-sm font-semibold transition-all ${
-            value === o.value ? "border-gold bg-gold/10 text-white" : "border-white/10 text-soft hover:border-gold/40"
-          }`}>
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Scale({
-  label, lowLabel, highLabel, value, onChange,
-}: { label: string; lowLabel: string; highLabel: string; value: number; onChange: (n: number) => void }) {
-  return (
-    <div>
-      <p className="text-white font-semibold text-sm mb-3">{label}</p>
-      <div className="grid grid-cols-5 gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} type="button" onClick={() => onChange(n)}
-            className={`py-3 rounded-xl border font-bold transition-all ${
-              value === n ? "border-gold bg-gold text-deep" : "border-white/10 text-soft hover:border-gold/40"
-            }`}>
-            {n}
-          </button>
+    <div className="grid gap-4">
+      <h1 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-tight tracking-tight">Your PT Career Plan{name ? `, ${name}` : ""}</h1>
+      <p className="text-gold text-xl">{plan.headline}</p>
+      <Block label="Your goal">{plan.goal}</Block>
+      <Block label="Your route">{plan.route}</Block>
+      <Block label="Your timeline">
+        <ul className="grid gap-1"><li><b>Start:</b> {t.start}</li><li><b>Qualify:</b> {t.qualify} <span className="text-faint">(the course takes 8–16 weeks)</span></li><li><b>Then:</b> {t.next}</li></ul>
+      </Block>
+      <Block label={`Your biggest concern: ${plan.concern.title}`}>{plan.concern.answer}</Block>
+      <Block label="What you get">
+        <p>NCFE Level 2 and Level 3, Ofqual regulated and CIMSPA recognised, studied online with a personal tutor.</p>
+        <p className="mt-3 font-semibold">Business mentorship included:</p>
+        <ul className="list-disc pl-5 mt-1 grid gap-1">{MENTORSHIP.map((m) => <li key={m}>{m}</li>)}</ul>
+      </Block>
+      <Block label={`Session rates in ${plan.rateRange.region}`}>
+        PTs typically charge £{plan.rateRange.low}–£{plan.rateRange.high} a session. <span className="text-faint">(PT Launch Lab estimate)</span>
+      </Block>
+      <p className="text-soft">{plan.paymentLine}</p>
+      <div className="mt-2"><FunnelPricingBlock /></div>
+      <div className="grid sm:grid-cols-3 gap-3 mt-2">
+        {plan.buttons.map((b, i) => (
+          <a key={b.href + b.label} href={b.href} onClick={() => trackEvent("career_planner_cta", { href: b.href, position: i, band: plan.band })}
+            className={`${i === 0 ? "bg-gold text-deep font-bold" : "border border-white/25 text-white font-semibold"} rounded-full px-4 py-3 text-center text-sm ${FOCUS}`}>
+            {b.label}
+          </a>
         ))}
       </div>
-      <div className="flex justify-between text-faint text-[11px] mt-1.5"><span>{lowLabel}</span><span>{highLabel}</span></div>
-    </div>
-  );
-}
-
-function NavButtons({
-  onBack, onNext, nextDisabled, nextLabel,
-}: { onBack?: () => void; onNext: () => void; nextDisabled: boolean; nextLabel: string }) {
-  return (
-    <div className="flex gap-3">
-      {onBack && (
-        <button onClick={onBack} className="px-6 py-3.5 rounded-full border border-white/15 text-soft font-semibold text-sm hover:border-white/30 transition-all">
-          ← Back
-        </button>
-      )}
-      <button onClick={onNext} disabled={nextDisabled}
-        className="flex-1 px-6 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-        {nextLabel}
-      </button>
-    </div>
-  );
-}
-
-// ── Email gate ───────────────────────────────────────────────────────────────
-function Gate({
-  lead, setLead, onBack, onSubmit, submitting, error, teaserScore, teaserQuit,
-}: {
-  lead: { name: string; email: string; phone: string };
-  setLead: (l: { name: string; email: string; phone: string }) => void;
-  onBack: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  submitting: boolean;
-  error: string;
-  teaserScore: number;
-  teaserQuit: string;
-}) {
-  return (
-    <div>
-      <div className="text-center mb-7">
-        <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">Your plan is ready</p>
-        <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-tight tracking-tight mb-3">
-          Where should we send it?
-        </h2>
-        <p className="text-soft text-sm max-w-md mx-auto">
-          Your readiness score is <span className="text-gold font-bold">{teaserScore}/100</span> and {teaserQuit.toLowerCase()}.
-          Enter your details to unlock the full breakdown.
-        </p>
-      </div>
-      <form onSubmit={onSubmit} className="bg-base border border-white/10 rounded-2xl p-6 md:p-8 space-y-4">
-        <input type="text" required placeholder="Full name"
-          value={lead.name} onChange={(e) => setLead({ ...lead, name: e.target.value })}
-          className="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25" />
-        <input type="email" required placeholder="Email address"
-          value={lead.email} onChange={(e) => setLead({ ...lead, email: e.target.value })}
-          className="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25" />
-        <input type="tel" placeholder="Mobile — optional, if you'd like us to call"
-          value={lead.phone} onChange={(e) => setLead({ ...lead, phone: e.target.value })}
-          className="w-full bg-deep border border-white/10 rounded-xl px-4 py-3.5 text-white outline-none focus:border-gold/50 transition-colors placeholder-white/25" />
-        <p className="text-white/35 text-xs leading-relaxed -mt-1">
-          Leave a mobile and one of us will call within a working day to talk your plan through. No number, no call — your plan still lands by email either way.
-        </p>
-        {error && <p className="text-red-400 text-sm">{error}</p>}
-        <button type="submit" disabled={submitting}
-          className="w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-60">
-          {submitting ? "Building your plan…" : "Show my Career Escape Plan →"}
-        </button>
-        <div className="flex justify-between items-center pt-1">
-          <button type="button" onClick={onBack} className="text-faint text-xs hover:text-soft transition-colors">← Back</button>
-          <p className="text-faint text-[11px]">No spam. Unsubscribe anytime.</p>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-// ── Results ──────────────────────────────────────────────────────────────────
-function Results({ r, name }: { r: CareerPlannerResult; name: string }) {
-  return (
-    <div>
-      <div className="text-center mb-8">
-        <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">{name ? `${name}'s` : "Your"} Career Escape Plan</p>
-        <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-tight tracking-tight">
-          {r.quitLabel}.
-        </h2>
-      </div>
-
-      {/* Headline stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-        <StatCard big={`${r.readinessScore}`} unit="/100" label="Readiness score" note={r.readinessBand} />
-        <StatCard big={gbp(r.year1Income)} label="Year-1 income" note={`potential ${gbp(r.steadyIncome)} by yr 2–3`} />
-        <StatCard big={`~${r.quitMonths}`} unit="mo" label="To full-time" note="building part-time first" />
-      </div>
-
-      <Insight title="What to focus on" body={r.readinessMessage} />
-      <div className="grid sm:grid-cols-2 gap-3 mb-3">
-        <Card label="Your income potential" value={`${gbp(r.year1Income)} year one`} note={r.incomeNote} />
-        <Card label="Recommended route" value={r.recommendedRoute} note={r.routeNote} />
-        <Card label="Best business model" value={r.businessModel} note={r.businessNote} />
-        <Card label="How to pay for it" value={r.financeOption} note={r.financeNote} />
-      </div>
-      <Insight title="Your course pays for itself fast" body={r.paybackNote} />
-
-      <FinanceModule r={r} />
-
-      {/* CTAs */}
-      <div className="bg-base border border-gold/30 rounded-2xl p-6 md:p-8 text-center mt-8">
-        <p className="text-gold text-xs font-bold tracking-widest uppercase mb-2">Your next step</p>
-        <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight mb-3">
-          Turn this plan into reality.
-        </h3>
-        <p className="text-soft text-sm mb-2 max-w-md mx-auto">
-          The {r.recommendedRoute} is how you get there — Ofqual-regulated, with the mentorship that
-          actually teaches you to get clients.
-        </p>
-        <div className="flex justify-center">
-          <a href="/book-call" className="px-8 py-3.5 rounded-full border border-gold text-gold font-bold text-sm hover:bg-gold/10 transition-all">
-            Talk it through on a call
-          </a>
-        </div>
-      </div>
-
-      {/* Pricing + the 48h promo.
-          Until 2026-09-10 this section hard-coded "You've unlocked £200 off for
-          48 hours" above a link to /enrol. /enrol cannot apply that discount: it
-          chooses between three payment links and never reads the promo cookie,
-          and /api/checkout only resolves PARTNER codes (gated on gymSlug), which
-          a direct funnel lead does not have. So the planner promised £200 off and
-          then sent the buyer to a £1,599 checkout.
-          FunnelPricingBlock is what the other ten surfaces already use. It reads
-          the real cookie state and routes to /api/funnel-promo/checkout, which
-          serves the discounted link. It also fails honestly: no live promo means
-          it renders full price rather than a discount nothing can deliver. */}
-      <div className="mt-6">
-        <FunnelPricingBlock />
-      </div>
-
-      <div className="mt-6">
+      <div className="mt-2">
         <ObjectionCapture
           context="career_planner_result"
           heading="Not ready to take the next step? Tell us why."
-          sub="One tap — no email needed. It helps us make this easier for people in your situation."
+          sub="One tap, no email needed. It helps us make this easier for people in your situation."
         />
       </div>
-
-      <p className="text-faint text-[11px] text-center mt-6 leading-relaxed max-w-lg mx-auto">
-        These figures are illustrative estimates based on your answers and typical UK PT rates — a guide to
-        help you plan, not a guarantee of earnings.
-      </p>
-    </div>
-  );
-}
-
-// ── Finance / ROI module ─────────────────────────────────────────────────────
-function FinanceModule({ r }: { r: CareerPlannerResult }) {
-  const f = r.finance;
-  return (
-    <div className="bg-base border border-white/10 rounded-2xl p-6 md:p-8 mt-8">
-      <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1">The numbers on the investment</p>
-      <h3 className="font-display font-extrabold text-2xl text-white leading-tight tracking-tight mb-5">
-        £{COURSE_PRICE.toLocaleString()} in. Here&apos;s what it returns.
-      </h3>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-        <StatCard big={`${f.roiYear1}×`} label="Year-1 return" note="projected income vs course fee" />
-        <StatCard
-          big={f.breakEvenWeeks ? `~${f.breakEvenWeeks}` : "—"}
-          unit={f.breakEvenWeeks ? "wk" : undefined}
-          label="Break-even"
-          note="weeks of clients to recoup the fee"
-        />
-        <StatCard big={gbp(f.threeYearGross)} label="3-year gross" note="cumulative, years 1–3" />
-      </div>
-
-      {/* Finance plan comparison */}
-      <div className="grid sm:grid-cols-2 gap-3 mb-4">
-        {f.plans.map((p) => (
-          <div key={p.name} className="bg-deep border border-white/10 rounded-xl p-5">
-            <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1.5">{p.name}</p>
-            <p className="text-white font-bold text-lg leading-tight">
-              {p.monthly > 0
-                ? <>{gbp(p.upfront)} <span className="text-soft text-sm font-semibold">+ {p.months} × {gbp(p.monthly)}</span></>
-                : <>{gbp(p.upfront)} <span className="text-soft text-sm font-semibold">one-off</span></>}
-            </p>
-            <p className="text-faint text-xs leading-snug mt-1.5">{p.note}</p>
-          </div>
-        ))}
-      </div>
-
-      <Insight title="Can you afford the payments?" body={f.planNote} />
-    </div>
-  );
-}
-
-function StatCard({ big, unit, label, note }: { big: string; unit?: string; label: string; note?: string }) {
-  return (
-    <div className="bg-base border border-white/10 rounded-2xl p-5 text-center">
-      <p className="font-display font-extrabold text-4xl text-gold leading-none">
-        {big}{unit && <span className="text-2xl text-gold/70">{unit}</span>}
-      </p>
-      <p className="text-white text-xs font-bold uppercase tracking-wide mt-2">{label}</p>
-      {note && <p className="text-faint text-[11px] mt-1">{note}</p>}
-    </div>
-  );
-}
-
-function Card({ label, value, note }: { label: string; value: string; note: string }) {
-  return (
-    <div className="bg-base border border-white/10 rounded-2xl p-5">
-      <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1.5">{label}</p>
-      <p className="text-white font-bold text-base leading-tight mb-1.5">{value}</p>
-      <p className="text-faint text-xs leading-snug">{note}</p>
-    </div>
-  );
-}
-
-function Insight({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="bg-deep border-l-2 border-gold rounded-r-xl px-5 py-4 mb-3">
-      <p className="text-gold text-[10px] font-bold uppercase tracking-widest mb-1">{title}</p>
-      <p className="text-soft text-sm leading-relaxed">{body}</p>
     </div>
   );
 }
