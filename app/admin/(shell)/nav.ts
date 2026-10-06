@@ -33,6 +33,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: "Marketing",
     items: [
+      { href: "/admin/leads", label: "Leads", icon: "inbox", hint: "Every conversation the setter is having" },
       { href: "/admin/ads", label: "Ad performance", icon: "chart" },
       { href: "/admin/whatsapp", label: "WhatsApp inbox", icon: "message" },
       { href: "/admin/live-questions", label: "Audience questions", icon: "help" },
