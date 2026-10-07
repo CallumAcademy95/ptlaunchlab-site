@@ -11,7 +11,7 @@ import { Bell, BellOff } from "lucide-react";
 
 const SW_URL = "/admin/sw.js";
 const SW_SCOPE = "/admin/";
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
+const VAPID_PUBLIC_KEY = (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "").trim();
 
 type Status = "loading" | "unsupported" | "ios-install" | "off" | "blocked" | "on";
 
@@ -58,6 +58,26 @@ async function existingSubscription(): Promise<PushSubscription | null> {
   return reg.pushManager.getSubscription();
 }
 
+// Was this subscription made with the VAPID key we have now? If the key was
+// rotated, pushes to it would 403 forever. A browser that doesn't expose the
+// key (null) gets the benefit of the doubt rather than an unsubscribe loop.
+function keyMatches(sub: PushSubscription): boolean {
+  const current = sub.options?.applicationServerKey;
+  if (!current) return true;
+  const a = new Uint8Array(current);
+  const b = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+// Drop a subscription made with an old key, on the server and in the browser.
+async function dropStale(sub: PushSubscription): Promise<void> {
+  const endpoint = sub.endpoint;
+  await postJson("/api/admin-push/unsubscribe", { endpoint }).catch(() => {});
+  await sub.unsubscribe().catch(() => false);
+}
+
 export function PhoneAlerts() {
   const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
@@ -83,7 +103,15 @@ export function PhoneAlerts() {
       return;
     }
     try {
-      const sub = await existingSubscription();
+      // Register up front so the worker is installed and active before the
+      // "Turn on" tap — on iPhone the permission prompt must come straight
+      // from the tap, with no slow install in between.
+      const reg = await navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE });
+      let sub = await reg.pushManager.getSubscription();
+      if (sub && !keyMatches(sub)) {
+        await dropStale(sub);
+        sub = null;
+      }
       if (sub) {
         setStatus("on");
         if (!resynced) {
@@ -112,19 +140,28 @@ export function PhoneAlerts() {
     setBusy(true);
     setMessage(null);
     try {
-      await navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE });
-      const reg = await navigator.serviceWorker.ready;
+      // Permission FIRST, as the very first await, so it still counts as
+      // part of the tap (iOS drops the prompt otherwise).
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
         setStatus(permission === "denied" ? "blocked" : "off");
         return;
       }
-      const sub =
-        (await reg.pushManager.getSubscription()) ??
-        (await reg.pushManager.subscribe({
+      if (!(await navigator.serviceWorker.getRegistration(SW_SCOPE))) {
+        await navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE });
+      }
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (sub && !keyMatches(sub)) {
+        await dropStale(sub);
+        sub = null;
+      }
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-        }));
+        });
+      }
       await postJson("/api/admin-push/subscribe", sub.toJSON());
       setStatus("on");
       setMessage("Alerts are on for this device.");
@@ -140,8 +177,12 @@ export function PhoneAlerts() {
     setMessage(null);
     try {
       const data = await postJson("/api/admin-push/test");
-      const sent = Number(data.sent ?? 0);
-      setMessage(`Sent to ${sent} device${sent === 1 ? "" : "s"}`);
+      if (typeof data.message === "string") {
+        setMessage(data.message);
+      } else {
+        const sent = Number(data.sent ?? 0);
+        setMessage(`Sent to ${sent} device${sent === 1 ? "" : "s"}`);
+      }
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Test failed.");
     } finally {
@@ -152,17 +193,35 @@ export function PhoneAlerts() {
   async function turnOff() {
     setBusy(true);
     setMessage(null);
+    let serverError: string | null = null;
     try {
       const sub = await existingSubscription();
       if (sub) {
-        const endpoint = sub.endpoint;
-        await sub.unsubscribe();
-        await postJson("/api/admin-push/unsubscribe", { endpoint });
+        // Server first (so it stops sending), then the browser regardless.
+        try {
+          await postJson("/api/admin-push/unsubscribe", { endpoint: sub.endpoint });
+        } catch (err) {
+          serverError = err instanceof Error ? err.message : "Server didn't confirm.";
+        }
+        await sub.unsubscribe().catch(() => false);
       }
-      setStatus("off");
-      setMessage("Alerts are off for this device.");
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Could not turn off alerts.");
+    } catch {
+      // fall through to re-reading the real state
+    }
+    try {
+      // Show what the browser actually has now, not what we hoped.
+      const still = await existingSubscription().catch(() => null);
+      if (still) {
+        setStatus("on");
+        setMessage("Couldn't turn alerts off on this device. Try again.");
+      } else {
+        setStatus("off");
+        setMessage(
+          serverError
+            ? `Alerts are off on this device (server: ${serverError})`
+            : "Alerts are off for this device."
+        );
+      }
     } finally {
       setBusy(false);
     }

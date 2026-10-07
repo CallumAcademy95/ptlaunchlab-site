@@ -193,7 +193,7 @@ test("sendOwnerPush: never throws, even when the db and sender both blow up", as
       throw new Error("sync throw");
     },
   });
-  assert.deepEqual(res, { sent: 0, removed: 0, failed: 0 });
+  assert.deepEqual(res, { sent: 0, removed: 0, failed: 0, error: "Push send failed unexpectedly." });
 
   const { db } = fakeDb([row("a")]);
   const res2 = await sendOwnerPush(db, PAYLOAD, {
@@ -225,4 +225,150 @@ test("sw.js only opens same-origin /admin/ URLs on tap", () => {
   assert.equal(safe("javascript:alert(1)", O), `${O}/admin/leads`);
   assert.equal(safe("//evil.example/admin/x", O), `${O}/admin/leads`);
   assert.equal(safe(undefined, O), `${O}/admin/leads`);
+});
+
+test("sendOwnerPush: 403 prunes only once failure_count has reached 5", async () => {
+  const { db, ops } = fakeDb([row("old", 5), row("new", 4)]);
+  const res = await sendOwnerPush(db, PAYLOAD, {
+    env: ENV,
+    send: async () => {
+      throw Object.assign(new Error("forbidden"), { statusCode: 403 });
+    },
+  });
+  assert.deepEqual(res, { sent: 0, removed: 1, failed: 1 });
+  const byId = Object.fromEntries(ops.map((o) => [o.val, o]));
+  assert.equal(byId.old.op, "delete");
+  assert.equal(byId.new.op, "update");
+  assert.deepEqual(byId.new.values, { failure_count: 5 });
+});
+
+test("sendOwnerPush: a failed subscription load is reported, not hidden as zero sends", async () => {
+  const db = {
+    from: () => ({
+      select: () => Promise.resolve({ data: null, error: { message: "permission denied" } }),
+      delete: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
+      update: () => ({ eq: () => Promise.resolve({ data: null, error: null }) }),
+    }),
+  };
+  const res = await sendOwnerPush(db, PAYLOAD, { env: ENV, send: async () => {} });
+  assert.equal(res.sent, 0);
+  assert.equal(typeof res.error, "string");
+});
+
+test("sendOwnerPush: trims whitespace off the VAPID env values", async () => {
+  const { db } = fakeDb([row("a")]);
+  let opts: any;
+  await sendOwnerPush(db, PAYLOAD, {
+    env: { VAPID_PUBLIC_KEY: " pub\n", VAPID_PRIVATE_KEY: "priv \r\n", VAPID_SUBJECT: " mailto:x@y.z " },
+    send: async (_s, _b, o) => {
+      opts = o;
+    },
+  });
+  assert.deepEqual(opts.vapidDetails, { subject: "mailto:x@y.z", publicKey: "pub", privateKey: "priv" });
+});
+
+// ── service worker: push + notificationclick handlers ───────────────────────
+
+function loadSw(clients: Record<string, unknown> = {}) {
+  const handlers: Record<string, (e: any) => void> = {};
+  const shown: { title: string; options: any }[] = [];
+  const self = {
+    location: { origin: "https://ptlaunchlab.co.uk" },
+    addEventListener: (name: string, fn: (e: any) => void) => {
+      handlers[name] = fn;
+    },
+    registration: {
+      showNotification: async (title: string, options: any) => {
+        shown.push({ title, options });
+      },
+    },
+    clients,
+  };
+  vm.runInNewContext(readFileSync("public/admin/sw.js", "utf8"), { self, URL, Date });
+  return { handlers, shown };
+}
+
+async function firePush(handlers: Record<string, (e: any) => void>, data: any) {
+  const waits: Promise<unknown>[] = [];
+  handlers.push({ data, waitUntil: (p: Promise<unknown>) => waits.push(p) });
+  await Promise.all(waits);
+}
+
+test("sw.js push: a malformed payload still shows a PTLL Admin notification", async () => {
+  const { handlers, shown } = loadSw();
+  await firePush(handlers, { json: () => { throw new SyntaxError("bad"); }, text: () => "raw text" });
+  await firePush(handlers, { json: () => null, text: () => "null" });
+  await firePush(handlers, { json: () => "just a string", text: () => "" });
+  await firePush(handlers, null);
+  assert.equal(shown.length, 4);
+  for (const n of shown) {
+    assert.equal(n.title, "PTLL Admin");
+    assert.equal(n.options.data.url, "/admin/leads");
+    assert.equal(n.options.tag, undefined);
+  }
+  assert.equal(shown[0].options.body, "raw text");
+});
+
+test("sw.js push: a full payload sets tag + renotify and the url", async () => {
+  const { handlers, shown } = loadSw();
+  await firePush(handlers, {
+    json: () => ({ title: "Needs you: Sam", body: "wants a call", url: "/admin/leads/42", tag: "handover-42" }),
+  });
+  assert.equal(shown[0].title, "Needs you: Sam");
+  assert.equal(shown[0].options.tag, "handover-42");
+  assert.equal(shown[0].options.renotify, true);
+  assert.equal(shown[0].options.data.url, "/admin/leads/42");
+  assert.equal(shown[0].options.icon, "/admin-icon-192.png");
+});
+
+async function fireClick(clientList: any[], url: string) {
+  const opened: string[] = [];
+  const { handlers } = loadSw({
+    matchAll: async () => clientList,
+    openWindow: async (u: string) => {
+      opened.push(u);
+    },
+  });
+  const waits: Promise<unknown>[] = [];
+  handlers.notificationclick({
+    notification: { close() {}, data: { url } },
+    waitUntil: (p: Promise<unknown>) => waits.push(p),
+  });
+  await Promise.all(waits);
+  return opened;
+}
+
+test("sw.js click: navigates + focuses an open admin window, no extra window", async () => {
+  const log: string[] = [];
+  const client = {
+    url: "https://ptlaunchlab.co.uk/admin/partners",
+    navigate: async (u: string) => {
+      log.push(`navigate ${u}`);
+      return client;
+    },
+    focus: async () => {
+      log.push("focus");
+      return client;
+    },
+  };
+  const opened = await fireClick([client], "/admin/leads/7");
+  assert.deepEqual(log, ["navigate https://ptlaunchlab.co.uk/admin/leads/7", "focus"]);
+  assert.deepEqual(opened, []);
+});
+
+test("sw.js click: navigate rejecting or missing falls back to openWindow", async () => {
+  const rejecting = {
+    url: "https://ptlaunchlab.co.uk/admin/leads",
+    navigate: async () => {
+      throw new TypeError("not controlled");
+    },
+    focus: async () => {},
+  };
+  assert.deepEqual(await fireClick([rejecting], "/admin/leads/1"), ["https://ptlaunchlab.co.uk/admin/leads/1"]);
+
+  const noNavigate = { url: "https://ptlaunchlab.co.uk/admin/leads", focus: async () => {} };
+  assert.deepEqual(await fireClick([noNavigate], "/admin/leads/2"), ["https://ptlaunchlab.co.uk/admin/leads/2"]);
+
+  const publicTab = { url: "https://ptlaunchlab.co.uk/", navigate: async () => { throw new Error("must not"); } };
+  assert.deepEqual(await fireClick([publicTab], "https://evil.example/x"), ["https://ptlaunchlab.co.uk/admin/leads"]);
 });

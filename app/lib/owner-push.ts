@@ -14,7 +14,16 @@ export const OWNER_PUSH_TABLE = "owner_push_subscriptions";
 
 export type OwnerPushPayload = { title: string; body?: string; url?: string; tag?: string };
 
-export type OwnerPushResult = { sent: number; removed: number; failed: number };
+export type OwnerPushResult = {
+  sent: number;
+  removed: number;
+  failed: number;
+  /** Set when the subscriptions couldn't be loaded at all (nothing was attempted). */
+  error?: string;
+};
+
+/** 403 usually means the row was made with a different VAPID key; prune once it keeps happening. */
+export const PRUNE_403_AFTER_FAILURES = 5;
 
 export type ParsedSubscription = { endpoint: string; p256dh: string; auth: string };
 
@@ -91,9 +100,9 @@ export async function sendOwnerPush(
 ): Promise<OwnerPushResult> {
   const result: OwnerPushResult = { sent: 0, removed: 0, failed: 0 };
   const env = deps.env ?? process.env;
-  const publicKey = env.VAPID_PUBLIC_KEY;
-  const privateKey = env.VAPID_PRIVATE_KEY;
-  const subject = env.VAPID_SUBJECT || "mailto:info@ptlaunchlab.co.uk";
+  const publicKey = env.VAPID_PUBLIC_KEY?.trim();
+  const privateKey = env.VAPID_PRIVATE_KEY?.trim();
+  const subject = env.VAPID_SUBJECT?.trim() || "mailto:info@ptlaunchlab.co.uk";
   if (!publicKey || !privateKey) {
     if (!warnedMissingEnv) {
       console.warn("[owner-push] VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY not set — push disabled");
@@ -111,6 +120,7 @@ export async function sendOwnerPush(
       .select("id, endpoint, p256dh, auth, failure_count");
     if (error) {
       console.error("[owner-push] failed to load subscriptions", error);
+      result.error = "Could not load push subscriptions.";
       return result;
     }
     if (!subs?.length) return result;
@@ -144,7 +154,8 @@ export async function sendOwnerPush(
         } catch (err) {
           const status = (err as { statusCode?: number } | null)?.statusCode;
           try {
-            if (status === 404 || status === 410) {
+            const stale403 = status === 403 && (s.failure_count ?? 0) >= PRUNE_403_AFTER_FAILURES;
+            if (status === 404 || status === 410 || stale403) {
               result.removed++;
               await db.from(OWNER_PUSH_TABLE).delete().eq("id", s.id);
             } else {
@@ -163,6 +174,7 @@ export async function sendOwnerPush(
     );
   } catch (err) {
     console.error("[owner-push] sendOwnerPush failed", err);
+    result.error = "Push send failed unexpectedly.";
   }
   return result;
 }

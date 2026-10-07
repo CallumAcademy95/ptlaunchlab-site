@@ -18,6 +18,35 @@ function safeAdminUrl(raw, origin) {
   return new URL(FALLBACK_URL, origin).href;
 }
 
+// Reuse an open admin window if we can, otherwise open a new one. Only
+// windows this worker controls can be navigated (navigate() rejects for
+// uncontrolled ones), so only those are candidates; if navigating fails we
+// fall back to openWindow — never both.
+async function openAdmin(target, origin) {
+  const list = await self.clients.matchAll({ type: "window" });
+  for (const client of list) {
+    let path;
+    try {
+      const cu = new URL(client.url);
+      if (cu.origin !== origin) continue;
+      path = cu.pathname;
+    } catch {
+      continue;
+    }
+    if (!path.startsWith("/admin/")) continue;
+    if (typeof client.navigate !== "function") break;
+    try {
+      const navigated = await client.navigate(target);
+      const c = navigated || client;
+      if (typeof c.focus === "function") await c.focus().catch(() => {});
+      return;
+    } catch {
+      break;
+    }
+  }
+  if (self.clients.openWindow) await self.clients.openWindow(target);
+}
+
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
@@ -48,30 +77,5 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const origin = self.location.origin;
   const target = safeAdminUrl(event.notification.data && event.notification.data.url, origin);
-  event.waitUntil(
-    (async () => {
-      const list = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      for (const client of list) {
-        let path = "";
-        try {
-          const cu = new URL(client.url);
-          if (cu.origin !== origin) continue;
-          path = cu.pathname;
-        } catch {
-          continue;
-        }
-        if (!path.startsWith("/admin/")) continue;
-        try {
-          const focused = await client.focus();
-          if ("navigate" in client) {
-            await (focused || client).navigate(target);
-          }
-          return;
-        } catch {
-          // fall through to openWindow
-        }
-      }
-      if (self.clients.openWindow) await self.clients.openWindow(target);
-    })()
-  );
+  event.waitUntil(openAdmin(target, origin));
 });

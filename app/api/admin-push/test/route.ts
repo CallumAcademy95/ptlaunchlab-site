@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const denied = await requireAdmin(req);
   if (denied) return denied;
 
-  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+  if (!process.env.VAPID_PUBLIC_KEY?.trim() || !process.env.VAPID_PRIVATE_KEY?.trim()) {
     return NextResponse.json(
       { ok: false, error: "Push is not configured on the server (VAPID keys missing)." },
       { status: 503 }
@@ -32,5 +32,12 @@ export async function POST(req: NextRequest) {
     url: "/admin/leads",
     tag: "test",
   });
+  if (result.error) {
+    return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
+  }
+  // Every subscription lands in exactly one bucket, so all-zero means there were none.
+  if (result.sent + result.removed + result.failed === 0) {
+    return NextResponse.json({ ok: true, ...result, message: "No devices subscribed yet." });
+  }
   return NextResponse.json({ ok: true, ...result });
 }
