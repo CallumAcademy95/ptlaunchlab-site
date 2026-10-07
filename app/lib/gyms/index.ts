@@ -19,6 +19,7 @@
 import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 import { sixFitAcademy } from "./6fit-academy.ts";
+import { atpFelixstoweAcademy } from "./atp-felixstowe-academy.ts";
 import { eborFitness } from "./ebor-fitness.ts";
 import { gymNGoAcademy } from "./gym-n-go-academy.ts";
 import { hitioOrpingtonAcademy } from "./hitio-orpington-academy.ts";
@@ -31,6 +32,7 @@ import { demoAcademy } from "./demo-academy.ts";
 
 export const GYMS: Record<string, GymConfig> = {
   "6fit-academy": sixFitAcademy,
+  "atp-felixstowe-academy": atpFelixstoweAcademy,
   "ebor-fitness": eborFitness,
   "gym-n-go-academy": gymNGoAcademy,
   "hitio-orpington-academy": hitioOrpingtonAcademy,

@@ -64,6 +64,7 @@ export const MONTHS = [
 /** @type {Record<string, string>} */
 export const MONTH_CODE_PREFIX = {
   "6fit": "6FIT",
+  "atp-felixstowe": "ATP",
   ebor: "EBOR",
   "gym-n-go": "GYMNGO",
   "hitio-orpington": "HITIO",

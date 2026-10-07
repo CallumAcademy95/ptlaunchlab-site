@@ -32,8 +32,8 @@ const BRANDS: Record<string, GymBrand> = JSON.parse(
 );
 const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 
-test("there are 9 real partner gyms", () => {
-  assert.equal(REAL.length, 9);
+test("there are 10 real partner gyms", () => {
+  assert.equal(REAL.length, 10);
 });
 
 test("every real gym has a location and a short adTown", () => {

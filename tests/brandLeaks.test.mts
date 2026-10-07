@@ -167,7 +167,7 @@ test("no partner-playbook entry names PT Launch Lab anywhere in its body, fenced
 // space means applyPlaybookTokens' own \w+ regex never matches it either.
 // That is a different, legitimate convention, not an unresolved token.
 test("every partner-playbook entry, rendered the way the portal renders it, has no unresolved {{token}}", () => {
-  assert.ok(REAL.length === 9, `expected 9 real gyms in gym-brands.json, found ${REAL.length}`);
+  assert.ok(REAL.length === 10, `expected 10 real gyms in gym-brands.json, found ${REAL.length}`);
 
   for (const file of FILES) {
     const raw = readFileSync(new URL(file, PLAYBOOK_DIR), "utf8");

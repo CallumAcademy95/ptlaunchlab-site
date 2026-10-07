@@ -20,6 +20,7 @@ const gymPartners = [
   // Their logos already existed under /gym-logos/ for their own landing pages.
   { name: "Gym n Go",              src: "/gym-logos/gym-n-go.png",        dark: false },
   { name: "Xcelerate Gyms",        src: "/gym-logos/xcelerate.png",       dark: false },
+  { name: "ATP Fitness Felixstowe", src: "/logos/atp-fitness.png",        dark: true  },
   // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
   // and still missing here, because no logo file exists anywhere in the repo.
   // Drop one at public/logos/superflex.png and add the row.

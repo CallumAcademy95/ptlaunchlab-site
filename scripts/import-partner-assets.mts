@@ -36,6 +36,7 @@ const H = { apikey: KEY, Authorization: `Bearer ${KEY}` };
 /** Folder name on disk → pp_partners.slug. */
 const FOLDER_TO_SLUG: Record<string, string> = {
   "6fitgyms": "6fit",
+  "atp-felixstowe": "atp-felixstowe",
   "ebor": "ebor",
   "gym n go": "gym-n-go",
   "hitio-orpington": "hitio-orpington",
