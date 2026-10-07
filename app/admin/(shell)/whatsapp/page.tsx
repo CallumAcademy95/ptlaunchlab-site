@@ -152,9 +152,9 @@ function ChatBubble({ message }: { message: Message }) {
   return (
     <div className={`flex ${isOutbound ? "justify-end" : "justify-start"} mb-1.5`}>
       <div
-        className={`max-w-[78%] rounded-2xl shadow-sm overflow-hidden ${
+        className={`max-w-[85%] sm:max-w-[78%] min-w-0 rounded-2xl shadow-sm overflow-hidden ${
           isOutbound
-            ? "bg-blue-700 text-slate-900 rounded-br-sm"
+            ? "bg-blue-700 text-white rounded-br-sm"
             : "bg-white text-slate-900 border border-slate-200 rounded-bl-sm"
         } ${hasMedia ? "p-1.5" : "px-3.5 py-2"}`}
       >
@@ -222,7 +222,7 @@ function ChatBubble({ message }: { message: Message }) {
         {/* Text or caption */}
         <div className={hasMedia ? "px-2.5 pt-1.5 pb-1" : ""}>
           {text && (
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{text}</p>
+            <p className="whitespace-pre-wrap text-[15px] leading-relaxed [overflow-wrap:anywhere]">{text}</p>
           )}
           {!text && !hasMedia && (
             <p className="whitespace-pre-wrap text-[15px] leading-relaxed italic opacity-70">
@@ -231,7 +231,7 @@ function ChatBubble({ message }: { message: Message }) {
           )}
           <div
             className={`flex items-center gap-1 justify-end mt-0.5 -mb-0.5 ${
-              isOutbound ? "text-slate-900/55" : "text-slate-900/45"
+              isOutbound ? "text-white/70" : "text-slate-900/45"
             }`}
           >
             <span className="text-[10px] leading-none">{formatTime(message.created_at)}</span>
@@ -509,7 +509,10 @@ export default function WhatsAppInboxPage() {
   const selected = conversations.find((c) => c.phone === selectedPhone);
 
   return (
-    <div className="flex h-screen [height:100dvh] overflow-hidden">
+    // Below md the inbox fills the space under the shell's 56px top bar edge to
+    // edge (cancelling <main>'s padding), so the compose box sits on the bottom
+    // of the screen instead of one top-bar's height below it. Desktop as before.
+    <div className="-mx-4 -mb-[calc(2.5rem+env(safe-area-inset-bottom))] -mt-5 flex h-[calc(100dvh-3.5rem-1px-env(safe-area-inset-top))] overflow-hidden md:m-0 md:h-screen md:[height:100dvh]">
       {/* SIDEBAR — full width on mobile when no conversation selected; hidden on mobile when one is */}
       <aside
         className={`flex-shrink-0 bg-slate-50 border-r border-slate-200 flex-col sm:flex sm:w-[340px] md:w-[380px] ${
@@ -528,7 +531,7 @@ export default function WhatsAppInboxPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search name, number, message…"
-            className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:border-blue-400 focus:outline-none"
+            className="w-full px-3 py-2.5 sm:py-2 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-[16px] sm:text-sm focus:border-blue-400 focus:outline-none"
           />
         </div>
 
@@ -550,26 +553,26 @@ export default function WhatsAppInboxPage() {
               <button
                 key={c.phone}
                 onClick={() => setSelectedPhone(c.phone)}
-                className={`w-full text-left px-5 py-3 border-b border-white/[0.04] transition-colors ${
+                className={`w-full text-left px-4 sm:px-5 py-3.5 sm:py-3 border-b border-slate-200/70 sm:border-white/[0.04] transition-colors active:bg-white ${
                   isActive
                     ? "bg-white"
                     : "hover:bg-white/[0.03]"
                 }`}
               >
                 <div className="flex items-baseline justify-between gap-2 mb-1">
-                  <p className="text-slate-900 font-semibold text-sm truncate">
+                  <p className="text-slate-900 font-semibold text-[15px] sm:text-sm truncate">
                     {c.contact_name || formatPhoneDisplay(c.phone)}
                   </p>
-                  <p className="text-slate-500 text-[11px] flex-shrink-0">
+                  <p className="text-slate-500 text-xs sm:text-[11px] flex-shrink-0">
                     {formatTime(c.latest_at)}
                   </p>
                 </div>
                 {c.contact_name && (
-                  <p className="text-slate-500 text-[11px] mb-0.5">
+                  <p className="text-slate-500 text-xs sm:text-[11px] mb-0.5">
                     {formatPhoneDisplay(c.phone)}
                   </p>
                 )}
-                <p className="text-slate-900/70 text-[13px] truncate leading-snug">
+                <p className="text-slate-900/70 text-sm sm:text-[13px] truncate leading-snug">
                   {c.latest_direction === "outbound" && (
                     <span className="text-blue-700">→ </span>
                   )}
@@ -618,7 +621,7 @@ export default function WhatsAppInboxPage() {
               <button
                 onClick={() => setSelectedPhone(null)}
                 aria-label="Back to conversations"
-                className="text-slate-900 hover:text-blue-700 transition-colors sm:hidden flex-shrink-0 -ml-1 p-1"
+                className="text-slate-900 hover:text-blue-700 transition-colors sm:hidden flex-shrink-0 -ml-2 inline-flex h-11 w-11 items-center justify-center"
               >
                 <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
                   <path
@@ -670,7 +673,7 @@ export default function WhatsAppInboxPage() {
             </div>
 
             {error && (
-              <div className="px-6 py-2 bg-red-500/10 border-t border-red-500/30 text-red-200 text-sm">
+              <div className="px-4 sm:px-6 py-2 bg-red-500/10 border-t border-red-500/30 text-red-700 text-sm [overflow-wrap:anywhere]">
                 {error}
               </div>
             )}
@@ -730,7 +733,7 @@ export default function WhatsAppInboxPage() {
 
             <form
               onSubmit={handleSend}
-              className="border-t border-slate-200 bg-slate-50 px-3 sm:px-4 py-3 flex items-end gap-2 sm:gap-3"
+              className="border-t border-slate-200 bg-slate-50 px-2 sm:px-4 py-3 flex items-end gap-1.5 sm:gap-3"
               style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
             >
               <input
@@ -823,7 +826,7 @@ export default function WhatsAppInboxPage() {
                 }}
                 rows={1}
                 placeholder="Type a message…"
-                className="flex-1 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-[15px] resize-none focus:border-blue-400 focus:outline-none max-h-32"
+                className="min-w-0 flex-1 px-4 py-3 rounded-2xl bg-white border border-slate-200 text-slate-900 placeholder:text-slate-400 text-[16px] sm:text-[15px] resize-none focus:border-blue-400 focus:outline-none max-h-32"
                 style={{ minHeight: "48px" }}
                 disabled={sending}
               />
@@ -834,7 +837,7 @@ export default function WhatsAppInboxPage() {
                   (!compose.trim() && !attachment?.mediaId) ||
                   Boolean(attachment && attachment.uploading)
                 }
-                className="px-5 py-3 rounded-full bg-blue-700 text-slate-900 font-bold text-sm hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                className="px-4 sm:px-5 py-3 rounded-full bg-blue-700 text-white font-bold text-sm hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
               >
                 {sending ? "Sending…" : "Send"}
               </button>

@@ -90,8 +90,9 @@ export default async function AdminReferralsPage({
   );
 
   return (
-    <div className="min-h-screen bg-[#f6f8fb]">
-      <div className="mx-auto max-w-5xl px-6 py-10 space-y-8">
+    <div className="bg-[#f6f8fb] md:min-h-screen">
+      {/* The shell already pads the page on a phone; this padding is for desktop. */}
+      <div className="mx-auto max-w-5xl space-y-6 md:space-y-8 md:px-6 md:py-10">
         <div>
           <p className="text-blue-700 text-[10px] font-bold tracking-widest uppercase mb-1">
             PT Launch Lab admin
@@ -142,7 +143,7 @@ export default async function AdminReferralsPage({
                     {r.status}
                   </span>
                 </div>
-                <div className="text-slate-500 text-xs mt-0.5">
+                <div className="text-slate-500 text-xs mt-0.5 [overflow-wrap:anywhere]">
                   {[r.referred_email, r.referred_phone].filter(Boolean).join(" · ") || "no contact details"}
                 </div>
                 <div className="text-slate-500 text-xs mt-2">
@@ -157,7 +158,7 @@ export default async function AdminReferralsPage({
               </div>
 
               <div className="flex flex-col gap-2 lg:items-end">
-                <form action={setReferralStatus} className="flex items-center gap-1.5">
+                <form action={setReferralStatus} className="flex flex-wrap items-center gap-1.5">
                   <input type="hidden" name="id" value={r.id} />
                   <span className="text-slate-500 text-xs">Status</span>
                   <select aria-label={`Status for ${r.referred_name}`} name="status" defaultValue={r.status} className={select}>
@@ -166,7 +167,7 @@ export default async function AdminReferralsPage({
                   <button className="rounded-full bg-blue-700 text-slate-900 font-bold text-xs px-3 py-1.5">Save</button>
                 </form>
 
-                <form action={setReferralReward} className="flex items-center gap-1.5">
+                <form action={setReferralReward} className="flex flex-wrap items-center gap-1.5">
                   <input type="hidden" name="id" value={r.id} />
                   <span className="text-slate-500 text-xs">{formatPence(r.reward_pence)}</span>
                   <select aria-label={`Reward for ${r.referred_name}`} name="reward_status" defaultValue={r.reward_status} className={select}>

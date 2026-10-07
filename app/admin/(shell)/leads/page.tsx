@@ -92,7 +92,7 @@ export default async function LeadsPage({
       key={key}
       href={`/admin/leads?show=${key}`}
       className={
-        "rounded-full border px-3 py-1.5 text-xs font-semibold transition " +
+        "shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-[13px] font-semibold transition md:px-3 md:py-1.5 md:text-xs " +
         (show === key
           ? "border-blue-600 bg-blue-700 text-white"
           : "border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300")
@@ -130,12 +130,13 @@ export default async function LeadsPage({
         <StatTile icon={<Inbox className="h-5 w-5" />} value={counts.closed} label="Closed" tone="slate" />
       </div>
 
-      <Card className="p-5">
+      <Card className="p-4 sm:p-5">
         <SectionTitle hint="Waiting on us first, then needing a human, then by recency.">
           Conversations
         </SectionTitle>
 
-        <div className="mb-3 flex flex-wrap gap-2">
+        {/* One scrolling row on a phone rather than two wrapped ones. */}
+        <div className="-mx-4 mb-3 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-5 sm:px-5 md:mx-0 md:mt-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           {tab("live", "Live", counts.live)}
           {tab("waiting", "Waiting on us", counts.waiting)}
           {tab("human", "Needs a human", counts.needsHuman)}
@@ -145,7 +146,65 @@ export default async function LeadsPage({
         {rows.length === 0 ? (
           <EmptyState title="Nothing here" hint="Try another tab." />
         ) : (
-          <TableWrap>
+          <>
+          {/* Phone: one card per conversation. A six-column table at 390px
+              showed two columns and hid the rest off to the right. */}
+          <ul className="space-y-2.5 md:hidden">
+            {rows.map((l) => {
+              const waiting = !isClosed(l) && waitingOnUs(l);
+              const hrs = hoursWaiting(l, now);
+              return (
+                <li key={l.id}>
+                  <Link
+                    href={`/admin/leads/${l.id}`}
+                    className={
+                      "block rounded-xl border bg-white p-3.5 shadow-sm transition active:bg-slate-50 " +
+                      (waiting ? "border-amber-200" : "border-slate-200")
+                    }
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-[15px] font-semibold text-slate-900">
+                          {l.name || l.email || "Unnamed"}
+                        </p>
+                        {l.name && l.email && (
+                          <p className="truncate text-xs text-slate-500">{l.email}</p>
+                        )}
+                      </div>
+                      <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                        {channelLabel(l.primary_channel)}
+                      </span>
+                    </div>
+                    <dl className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                      <div className="min-w-0">
+                        <dt className="text-slate-400">They said</dt>
+                        <dd className="font-medium text-slate-700">{when(l.last_inbound_at)}</dd>
+                      </div>
+                      <div className="min-w-0">
+                        <dt className="text-slate-400">We said</dt>
+                        <dd className="font-medium text-slate-700">{when(l.last_outbound_at)}</dd>
+                      </div>
+                    </dl>
+                    <div className="mt-2.5 flex flex-wrap items-center gap-1">
+                      {l.setter_stage && (
+                        <span className="mr-1 text-xs text-slate-500">{l.setter_stage}</span>
+                      )}
+                      {waiting && (
+                        <Badge tone="amber">
+                          waiting{hrs !== null && hrs >= 1 ? ` ${hrs}h` : ""}
+                        </Badge>
+                      )}
+                      {!isClosed(l) && needsHuman(l) && <Badge tone="red">needs a human</Badge>}
+                      {l.unsubscribed && <Badge tone="neutral">unsubscribed</Badge>}
+                      {isClosed(l) && !l.unsubscribed && <Badge tone="neutral">closed</Badge>}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <TableWrap className="hidden md:block">
             <table className="w-full min-w-[56rem] text-left text-sm">
               <thead className={THEAD}>
                 <tr>
@@ -194,6 +253,7 @@ export default async function LeadsPage({
               </tbody>
             </table>
           </TableWrap>
+          </>
         )}
       </Card>
     </AdminPage>

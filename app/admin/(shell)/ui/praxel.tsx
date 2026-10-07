@@ -49,19 +49,19 @@ export function PageHeader({
       {backHref && (
         <Link
           href={backHref}
-          className="mb-2 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-800"
+          className="-ml-1 mb-1 inline-flex min-h-11 items-center gap-1 px-1 text-sm text-slate-500 transition hover:text-slate-800 md:mb-2 md:ml-0 md:min-h-0 md:px-0"
         >
           <ChevronLeft className="h-4 w-4" /> {backLabel}
         </Link>
       )}
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">{title}</h1>
+            <h1 className="text-xl font-bold tracking-tight text-slate-900 [overflow-wrap:anywhere] sm:text-2xl">{title}</h1>
             {badge}
           </div>
           {subtitle && (
-            <p className="mt-1 text-sm leading-snug text-slate-600 sm:text-[15px] sm:leading-relaxed">
+            <p className="mt-1 text-sm leading-snug text-slate-600 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-relaxed">
               {subtitle}
             </p>
           )}
@@ -257,7 +257,7 @@ export function DefRow({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-slate-100 py-2 last:border-0">
       <dt className="shrink-0 text-sm text-slate-500">{k}</dt>
-      <dd className="text-right text-sm font-medium text-slate-800">{v}</dd>
+      <dd className="min-w-0 text-right text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">{v}</dd>
     </div>
   );
 }

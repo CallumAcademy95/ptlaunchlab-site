@@ -21,10 +21,13 @@ export function SignOutButton() {
           window.location.href = "/admin/login";
         }
       }}
-      className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60"
+      aria-label={busy ? "Signing out" : "Sign out"}
+      title="Sign out"
+      className="inline-flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-60 md:h-auto md:min-w-0 md:py-1.5"
     >
-      <LogOut className="h-3.5 w-3.5" />
-      {busy ? "Signing out…" : "Sign out"}
+      <LogOut className="h-[18px] w-[18px] md:h-3.5 md:w-3.5" />
+      {/* Icon-only on a phone, like "View site" beside it. */}
+      <span className="hidden md:inline">{busy ? "Signing out…" : "Sign out"}</span>
     </button>
   );
 }

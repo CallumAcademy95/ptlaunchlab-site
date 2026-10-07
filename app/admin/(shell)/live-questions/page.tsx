@@ -57,7 +57,7 @@ function StatusButton({
       <input type="hidden" name="status" value={status} />
       <button
         type="submit"
-        className="px-3 py-1.5 rounded-full border border-slate-200 text-xs font-semibold text-slate-500 hover:border-blue-300 hover:text-blue-700 transition-colors"
+        className="px-3.5 py-2 sm:px-3 sm:py-1.5 rounded-full border border-slate-200 text-[13px] sm:text-xs font-semibold text-slate-500 hover:border-blue-300 hover:text-blue-700 transition-colors"
       >
         {label}
       </button>
@@ -69,7 +69,7 @@ function QuestionCard({ q }: { q: QuestionRow }) {
   const badge = STATUS_STYLES[q.status] ?? STATUS_STYLES.new;
   return (
     <div
-      className={`rounded-2xl border p-5 ${
+      className={`rounded-2xl border p-4 sm:p-5 ${
         q.status === "starred"
           ? "border-blue-300 bg-blue-50"
           : "border-white/[0.08] bg-white"
@@ -84,9 +84,9 @@ function QuestionCard({ q }: { q: QuestionRow }) {
         <span className="text-slate-400 text-xs whitespace-nowrap">{fmt(q.created_at)}</span>
       </div>
 
-      <p className="text-slate-900 text-lg leading-relaxed mb-3 whitespace-pre-wrap">{q.question}</p>
+      <p className="text-slate-900 text-[17px] sm:text-lg leading-relaxed mb-3 whitespace-pre-wrap [overflow-wrap:anywhere]">{q.question}</p>
 
-      <p className="text-slate-500 text-sm mb-4">
+      <p className="text-slate-500 text-sm mb-4 [overflow-wrap:anywhere]">
         {q.name ? <span className="text-slate-500">{q.name}</span> : <span className="italic">No name</span>}
         {" · "}
         <a href={`mailto:${q.email}`} className="hover:text-blue-700">
@@ -137,15 +137,16 @@ export default async function LiveQuestionsPage() {
   const hidden = rows.filter((q) => q.status === "hidden").length;
 
   return (
-    <main className="max-w-3xl mx-auto px-5 py-10">
+    <main className="max-w-3xl mx-auto md:px-5 md:py-10">
       <div className="flex items-start justify-between gap-4 mb-2">
         <div>
           <p className="text-blue-700 text-[11px] font-bold tracking-widest uppercase mb-1">
             PT Launch Lab LIVE
           </p>
-          <h1 className="font-display font-extrabold text-3xl md:text-4xl">Audience questions</h1>
+          <h1 className="font-display font-extrabold text-[28px] leading-tight md:text-4xl">Audience questions</h1>
         </div>
-        <form action="/api/admin-logout" method="post">
+        {/* The shell's top bar has sign-out on a phone; this one is for desktop. */}
+        <form action="/api/admin-logout" method="post" className="hidden md:block">
           <button type="submit" className="text-slate-500 text-xs hover:text-blue-700">
             Sign out
           </button>
