@@ -143,7 +143,7 @@ export default async function LiveQuestionsPage() {
           <p className="text-blue-700 text-[11px] font-bold tracking-widest uppercase mb-1">
             PT Launch Lab LIVE
           </p>
-          <h1 className="font-display font-extrabold text-[28px] leading-tight md:text-4xl">Audience questions</h1>
+          <h1 className="font-display font-extrabold text-[28px] max-md:leading-tight md:text-4xl">Audience questions</h1>
         </div>
         {/* The shell's top bar has sign-out on a phone; this one is for desktop. */}
         <form action="/api/admin-logout" method="post" className="hidden md:block">

@@ -563,16 +563,16 @@ export default function WhatsAppInboxPage() {
                   <p className="text-slate-900 font-semibold text-[15px] sm:text-sm truncate">
                     {c.contact_name || formatPhoneDisplay(c.phone)}
                   </p>
-                  <p className="text-slate-500 text-xs sm:text-[11px] flex-shrink-0">
+                  <p className="text-slate-500 text-[12px] sm:text-[11px] flex-shrink-0">
                     {formatTime(c.latest_at)}
                   </p>
                 </div>
                 {c.contact_name && (
-                  <p className="text-slate-500 text-xs sm:text-[11px] mb-0.5">
+                  <p className="text-slate-500 text-[12px] sm:text-[11px] mb-0.5">
                     {formatPhoneDisplay(c.phone)}
                   </p>
                 )}
-                <p className="text-slate-900/70 text-sm sm:text-[13px] truncate leading-snug">
+                <p className="text-slate-900/70 text-[14px] sm:text-[13px] truncate leading-snug">
                   {c.latest_direction === "outbound" && (
                     <span className="text-blue-700">→ </span>
                   )}

@@ -100,7 +100,7 @@ export default function AdsAdminPage() {
       {/* Header row */}
       {/* Wraps on a phone: title on its own line, then the controls. */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 md:mb-8">
-        <h1 className="m-0 text-[22px] font-bold md:text-2xl">Ad Performance</h1>
+        <h1 className="m-0 text-[22px] font-bold md:text-[24px]">Ad Performance</h1>
         <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:flex-nowrap md:gap-3">
           <select
             value={datePreset}
@@ -114,14 +114,14 @@ export default function AdsAdminPage() {
           <button
             onClick={runOptimisation}
             disabled={optimising || loading}
-            className="min-h-11 flex-1 cursor-pointer whitespace-nowrap rounded-lg border-none bg-blue-700 px-4 py-2.5 text-sm font-bold text-[#f6f8fb] md:min-h-0 md:flex-none md:px-5"
+            className="min-h-11 flex-1 cursor-pointer whitespace-nowrap rounded-lg border-none bg-blue-700 px-4 py-2.5 text-[14px] font-bold text-[#f6f8fb] md:min-h-0 md:flex-none md:px-5"
             style={{ opacity: optimising ? 0.7 : 1 }}
           >
             {optimising ? 'Optimising...' : '⚡ Run AI Optimisation'}
           </button>
           <Link
             href="/admin/ads/create"
-            className="inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white no-underline md:min-h-0 md:flex-none md:px-5"
+            className="inline-flex min-h-11 flex-1 items-center justify-center whitespace-nowrap rounded-lg bg-blue-700 px-4 py-2.5 text-[14px] font-semibold text-white no-underline md:min-h-0 md:flex-none md:px-5"
           >
             + Create Campaign
           </Link>
@@ -146,7 +146,7 @@ export default function AdsAdminPage() {
           ].map((card) => (
             <div key={card.label} className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 md:p-5">
               <div style={{ color: '#64748b', fontSize: '12px', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{card.label}</div>
-              <div className="text-xl font-bold md:text-2xl">{card.value}</div>
+              <div className="text-[20px] font-bold md:text-[24px]">{card.value}</div>
             </div>
           ))}
         </div>
