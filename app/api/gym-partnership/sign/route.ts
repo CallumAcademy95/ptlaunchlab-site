@@ -183,7 +183,8 @@ export async function POST(req: NextRequest) {
         resend.emails.send({
           from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
           to: ADMIN_EMAIL,
-
+          // Hitting reply on the admin copy should reach the gym that signed.
+          replyTo: repEmail,
           subject: `Gym Partnership Signed: ${gymName} — ${repName}`,
           html: adminHtml,
           attachments: pdfAttachment,
@@ -192,6 +193,8 @@ export async function POST(req: NextRequest) {
         resend.emails.send({
           from: "PT Launch Lab <partnerships@ptlaunchlab.co.uk>",
           to: repEmail,
+          // partnerships@ is send-only; a gym replying about its contract must reach a person.
+          replyTo: "info@ptlaunchlab.co.uk",
           subject: "Your PT Launch Lab Partnership Agreement",
           html: gymHtml,
           attachments: pdfAttachment,

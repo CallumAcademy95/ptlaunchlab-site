@@ -180,6 +180,9 @@ async function notifyBankDetailsChanged(args: {
     await new Resend(process.env.RESEND_API_KEY).emails.send({
       from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
       to: recipients,
+      // A partner who didn't make this change may well hit reply rather than call.
+      // partnerships@ is send-only; that reply has to reach a person.
+      replyTo: "info@ptlaunchlab.co.uk",
       subject: `Payment details changed — ${args.gymName}`,
       html,
     });

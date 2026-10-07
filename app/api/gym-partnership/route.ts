@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       // applicant it was received.
       console.error('[gym-partnership] level:lead-lost — GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL not set.');
       return NextResponse.json(
-        { success: false, error: "We couldn't submit your application — please email partnerships@ptlaunchlab.co.uk." },
+        { success: false, error: "We couldn't submit your application — please email info@ptlaunchlab.co.uk." },
         { status: 500 },
       );
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (!(await push())) {
       return NextResponse.json(
-        { success: false, error: "We couldn't submit your application — please email partnerships@ptlaunchlab.co.uk." },
+        { success: false, error: "We couldn't submit your application — please email info@ptlaunchlab.co.uk." },
         { status: 502 },
       );
     }
