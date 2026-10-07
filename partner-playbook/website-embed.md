@@ -1,4 +1,10 @@
-# Put Your PT Academy On Your Own Website
+---
+title: Put your PT Academy on your own website
+type: idea
+channel: Getting started
+when_to_use: Once, in your first week, so your website sends people to your academy
+order: 30
+---
 
 **Who this is for:** any partner gym with its own website — Wix, Squarespace,
 WordPress, Shopify, Webflow, or anything else that lets you add a block of HTML.
@@ -87,7 +93,7 @@ In order of how well they work for us so far:
 Add a short line of your own copy above it. Something like:
 
 > **Thinking about becoming a personal trainer?** We run a PT Academy here at
-> the gym — qualify with us, train on our floor, and interview with us at the end.
+> the gym — qualify with us, train on our floor, and learn the job where it's actually done.
 
 ---
 

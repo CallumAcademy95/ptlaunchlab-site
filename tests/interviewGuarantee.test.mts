@@ -49,6 +49,10 @@ const FORBIDDEN: [RegExp, string][] = [
   [/arrange[sd]?\s+(\w+\s+){0,4}interview/i, "promises to arrange an interview"],
   [/warm-introduction\s+interview/i, "warm-introduction interview"],
   [/interview\s+access/i, "promises interview access"],
+  // The same promise in the passive, which the active-voice pattern above
+  // missed on every partner page: "at least one interview is arranged for
+  // you", "At least one interview arranged on qualifying".
+  [/interviews?\s+(?:is |are |will be |gets? |being )?arranged/i, "promises an interview will be arranged"],
 ];
 
 test("nothing on the site promises to deliver a gym interview", () => {
