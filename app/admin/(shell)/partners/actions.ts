@@ -603,6 +603,10 @@ async function sendWelcomeEmail(args: {
     await new Resend(process.env.RESEND_API_KEY).emails.send({
       from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
       to: args.to,
+      // The body says "reply to this email". partnerships@ sends but nobody
+      // reads it, so a partner locked out of the portal would be replying into
+      // a void. info@ is monitored.
+      replyTo: "info@ptlaunchlab.co.uk",
       subject: args.isReset
         ? "Your PT Launch Lab portal password has been reset"
         : "Your PT Launch Lab partner portal",
