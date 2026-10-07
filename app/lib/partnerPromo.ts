@@ -13,6 +13,7 @@
 // A single prefix each would refuse their own launch codes.
 export const PARTNER_PROMO_PREFIXES: Record<string, string[]> = {
   "6fit": ["6FIT"],
+  "atp-felixstowe": ["ATP"],
   "ebor": ["EBOR"],
   "gym-n-go": ["GYMNGO"],
   "hitio-orpington": ["HITIO"],
@@ -26,6 +27,7 @@ export const PARTNER_PROMO_PREFIXES: Record<string, string[]> = {
 /** The code applied automatically on each partner's page, with no typing. */
 export const PARTNER_STANDING_CODE: Record<string, string> = {
   "6fit": "6FITPTDISCOUNT",
+  "atp-felixstowe": "ATPPT",
   "ebor": "EBORPTDISCOUNT",
   "gym-n-go": "GYMNGOPT",
   "hitio-orpington": "HITIOPT",

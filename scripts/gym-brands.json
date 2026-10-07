@@ -1,4 +1,27 @@
 {
+  "atp-felixstowe": {
+    "gymName": "ATP Fitness Felixstowe",
+    "primaryColor": "#9D6A00",
+    "darkAccent": "#FFC03A",
+    "heroBg": "#000000",
+    "sectionBg": "#191919",
+    "logoUrl": "/gym-logos/atp-felixstowe.png",
+    "promoCode": "ATPPT",
+    "discountAmount": 200,
+    "fullPrice": 1399,
+    "depositPrice": 599,
+    "location": "Felixstowe, Suffolk",
+    "adTown": "Felixstowe",
+    "siteUrl": "https://www.atpfitnessfelixstowe.com",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "At ATP Fitness\\nFelixstowe"
+    ],
+    "canonicalPath": "/atp-felixstowe-academy",
+    "logoHasAlpha": true
+  },
   "6fit": {
     "gymName": "6fit Gyms",
     "primaryColor": "#ed0000",

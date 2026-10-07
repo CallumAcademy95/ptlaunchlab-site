@@ -103,6 +103,7 @@ test("slugs are url-safe — they are pasted into a partner's html", () => {
 // app/lib/gyms/index.ts. Commission joins on the gym slug, never the route.
 const GYM_SLUG_BY_ROUTE: Record<string, string> = {
   "6fit-academy": "6fit",
+  "atp-felixstowe-academy": "atp-felixstowe",
   "ebor-fitness": "ebor",
   "gym-n-go-academy": "gym-n-go",
   "hitio-orpington-academy": "hitio-orpington",
