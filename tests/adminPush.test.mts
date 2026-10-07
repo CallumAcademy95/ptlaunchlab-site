@@ -55,6 +55,9 @@ test("isProtectedAdminPath gates the push API and admin pages, not login", () =>
   assert.equal(isProtectedAdminPath("/api/admin-push/test"), true);
   assert.equal(isProtectedAdminPath("/api/admin-push/subscribe"), true);
   assert.equal(isProtectedAdminPath("/api/admin-push/unsubscribe"), true);
+  for (const p of ["/api/meta-ads/performance", "/api/meta-ads/optimise", "/api/meta-ads/campaigns", "/api/meta-ads/campaigns/123"]) {
+    assert.equal(isProtectedAdminPath(p), true, p);
+  }
   assert.equal(isProtectedAdminPath("/admin/leads"), true);
   assert.equal(isProtectedAdminPath("/admin"), true);
   assert.equal(isProtectedAdminPath("/admin/login"), false);

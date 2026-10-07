@@ -17,5 +17,7 @@ export function isProtectedAdminPath(pathname: string): boolean {
   if (pathname === "/api/whatsapp-upload-media") return true;
   // Phone alerts (web push) subscribe / unsubscribe / test
   if (pathname.startsWith("/api/admin-push/")) return true;
+  // Meta ads (read, create, edit, AI optimise) — only the /admin/ads pages call these.
+  if (pathname === "/api/meta-ads" || pathname.startsWith("/api/meta-ads/")) return true;
   return false;
 }
