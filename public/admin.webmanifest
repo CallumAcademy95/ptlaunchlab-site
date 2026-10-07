@@ -1,0 +1,15 @@
+{
+  "name": "PTLL Admin",
+  "short_name": "PTLL Admin",
+  "id": "/admin/",
+  "scope": "/admin/",
+  "start_url": "/admin/leads",
+  "display": "standalone",
+  "theme_color": "#0f172a",
+  "background_color": "#0f172a",
+  "icons": [
+    { "src": "/admin-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/admin-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/admin-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { AdminSidebarNav } from "./AdminSidebarNav";
+import { PhoneAlerts } from "../PhoneAlerts";
 
 // The rail, as a drawer, for the phone. The admin gets opened on a phone more
 // than anywhere else — usually to check one gym — so the nav has to exist
@@ -45,6 +46,9 @@ export function AdminMobileNav() {
             </div>
             <div className="px-3">
               <AdminSidebarNav onNavigate={() => setOpen(false)} />
+            </div>
+            <div className="mt-6 px-3">
+              <PhoneAlerts />
             </div>
           </div>
         </div>

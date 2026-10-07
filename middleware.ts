@@ -4,21 +4,11 @@ import { hubSlugs, getHubForLocation } from "./app/lib/ukLocations";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "./app/lib/admin-auth";
 import { isProtectedFormPath, checkFormRequest } from "./app/lib/security/middleware-checks";
 import { isProtectedPartnerPath, gatePartnerRequest } from "./app/lib/partner-session-edge";
+import { isProtectedAdminPath } from "./app/lib/admin-paths";
 
-// Paths that require a valid admin auth cookie.
-// Webhook is intentionally excluded — Meta hits it without our cookie and
-// has its own verify token defence.
-function isProtectedAdminPath(pathname: string): boolean {
-  if (pathname === "/admin/login") return false;
-  if (pathname.startsWith("/admin/")) return true;
-  if (pathname === "/admin") return true;
-  // Protected WhatsApp API endpoints (everything except the webhook + login + logout)
-  if (pathname === "/api/whatsapp-send") return true;
-  if (pathname === "/api/whatsapp-conversations") return true;
-  if (pathname === "/api/whatsapp-messages") return true;
-  if (pathname === "/api/whatsapp-upload-media") return true;
-  return false;
-}
+// Paths that require a valid admin auth cookie — see app/lib/admin-paths.ts.
+// Static files (anything with a dot, e.g. /admin/sw.js, /admin.webmanifest)
+// never reach this middleware: the matcher below skips them.
 
 /**
  * Redirect old site location URLs to the new structure.
