@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { ExternalLink } from "lucide-react";
 import { AdminSidebarNav } from "./ui/AdminSidebarNav";
 import { AdminMobileNav } from "./ui/AdminMobileNav";
 import { SignOutButton } from "./ui/SignOutButton";
+import { PhoneAlerts } from "./PhoneAlerts";
 
 // The admin shell.
 //
@@ -19,8 +20,17 @@ import { SignOutButton } from "./ui/SignOutButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
+// Installable as "PTLL Admin" on a phone (for push alerts). Only this shell
+// gets the manifest — the public site and /admin/login stay untouched.
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
+  manifest: "/admin.webmanifest",
+  icons: { apple: "/admin-apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "PTLL Admin", statusBarStyle: "default" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
 };
 
 export default function AdminShellLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +50,9 @@ export default function AdminShellLayout({ children }: { children: React.ReactNo
         </Link>
         <div className="px-3 pb-8">
           <AdminSidebarNav />
+        </div>
+        <div className="mt-auto px-3 pb-6">
+          <PhoneAlerts />
         </div>
       </aside>
 
