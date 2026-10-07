@@ -118,10 +118,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         </Notice>
       )}
 
-      <Card className="p-5">
+      <Card className="p-4 sm:p-5">
         <SectionTitle hint="What the setter believes about this conversation.">Summary</SectionTitle>
         {lead.ai_summary ? (
-          <p className="text-sm leading-relaxed text-slate-700">{lead.ai_summary}</p>
+          <p className="text-sm leading-relaxed text-slate-700 [overflow-wrap:anywhere]">{lead.ai_summary}</p>
         ) : (
           <p className="text-sm text-slate-500">No summary yet.</p>
         )}
@@ -146,7 +146,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         </dl>
       </Card>
 
-      <Card className="p-5">
+      <Card className="p-4 sm:p-5">
         <SectionTitle hint={`${messages.length} message${messages.length === 1 ? "" : "s"}, oldest first.`}>
           The conversation
         </SectionTitle>
@@ -163,7 +163,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                 <li
                   key={m.id}
                   className={
-                    "rounded-xl border p-3.5 " +
+                    "min-w-0 rounded-xl border p-3 sm:p-3.5 " +
                     (inbound ? "border-slate-200 bg-white" : "border-blue-100 bg-blue-50/50")
                   }
                 >
@@ -182,7 +182,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                     {!inbound && m.ai_generated && <Badge tone="violet">written by the setter</Badge>}
                     {m.status && m.status !== "sent" && <Badge tone="amber">{m.status}</Badge>}
                   </div>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 [overflow-wrap:anywhere]">
                     {(m.body ?? "").trim() || "(empty)"}
                   </p>
                 </li>

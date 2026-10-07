@@ -30,7 +30,17 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   inbox: Inbox,
 };
 
-export function AdminSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+/**
+ * `touch` is for the phone drawer: taller rows (44px minimum, Apple's touch
+ * target) and slightly larger type. The desktop rail stays as it was.
+ */
+export function AdminSidebarNav({
+  onNavigate,
+  touch = false,
+}: {
+  onNavigate?: () => void;
+  touch?: boolean;
+}) {
   const pathname = usePathname() ?? "";
 
   return (
@@ -50,7 +60,9 @@ export function AdminSidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={on ? "page" : undefined}
-                  className={`group flex items-start gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                  className={`group flex items-start gap-3 rounded-lg px-3 transition ${
+                    touch ? "min-h-11 py-2.5 text-[15px]" : "py-2 text-sm"
+                  } ${
                     on
                       ? "bg-blue-700 text-white shadow-sm"
                       : "text-slate-300 hover:bg-white/5 hover:text-white"
