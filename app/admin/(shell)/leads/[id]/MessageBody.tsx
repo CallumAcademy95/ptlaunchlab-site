@@ -14,19 +14,24 @@ export function MessageBody({
   text,
   hadQuote,
   original,
+  hasMedia = false,
 }: {
   text: string;
   hadQuote: boolean;
   /** The stored body, newline-normalised. Only passed when it was HTML or had a quote cut. */
   original?: string;
+  /** The message carries attachments, so an empty text is not "(empty)" — it's an image-only message. */
+  hasMedia?: boolean;
 }) {
   const [showOriginal, setShowOriginal] = useState(false);
 
   return (
     <div className="min-w-0">
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 [overflow-wrap:anywhere]">
-        {text || "(empty)"}
-      </p>
+      {(text || !hasMedia) && (
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 [overflow-wrap:anywhere]">
+          {text || "(empty)"}
+        </p>
+      )}
       {original !== undefined && (
         <div className="mt-2 min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
