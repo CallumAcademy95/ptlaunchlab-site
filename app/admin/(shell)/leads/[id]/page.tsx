@@ -21,7 +21,9 @@ import {
   type LeadRow,
 } from "../pipeline";
 import { messageToDisplayText, originalForDisplay, looksLikeHtml } from "@/app/lib/message-display";
+import { parseMedia, signablePaths, mediaViews, LEAD_MEDIA_BUCKET } from "@/app/lib/message-media";
 import { MessageBody } from "./MessageBody";
+import { MessageMedia } from "./MessageMedia";
 
 // One conversation, in full.
 //
@@ -44,6 +46,29 @@ interface Message {
   ai_generated: boolean | null;
   status: string | null;
   created_at: string;
+  media: unknown;
+}
+
+// Signed URLs for this page's images, in one call. The bucket is private and
+// the paths have already been checked against this consultation (see
+// message-media.ts). Any failure returns an empty map, so each image shows
+// "Image unavailable" and the conversation still renders.
+async function signImages(db: ReturnType<typeof getSupabaseAdmin>, paths: string[]): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (paths.length === 0) return out;
+  try {
+    const { data, error } = await db.storage.from(LEAD_MEDIA_BUCKET).createSignedUrls(paths, 600);
+    if (error || !data) {
+      console.error("[admin/leads] signing lead-media failed:", error?.message ?? "no data");
+      return out;
+    }
+    for (const row of data) {
+      if (row.path && row.signedUrl && !row.error) out.set(row.path, row.signedUrl);
+    }
+  } catch (err) {
+    console.error("[admin/leads] signing lead-media threw:", err instanceof Error ? err.message : err);
+  }
+  return out;
 }
 
 const stamp = (iso: string) =>
@@ -73,7 +98,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
       .maybeSingle(),
     db
       .from("lead_messages")
-      .select("id, channel, direction, body, ai_generated, status, created_at")
+      .select("id, channel, direction, body, ai_generated, status, created_at, media")
       .eq("consultation_id", id)
       .order("created_at", { ascending: true })
       .limit(500),
@@ -87,6 +112,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
     setter_paused_reason: string | null;
   };
   const messages = (msgRes.data ?? []) as unknown as Message[];
+  const mediaById = new Map(messages.map((m) => [m.id, parseMedia(m.media)]));
+  const signed = await signImages(db, signablePaths([...mediaById.values()].flat(), lead.id));
   const waiting = !isClosed(lead) && waitingOnUs(lead);
   const hrs = hoursWaiting(lead, Date.now());
 
@@ -163,6 +190,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
               const inbound = m.direction === "inbound";
               const shown = messageToDisplayText(m.body);
               const original = originalForDisplay(m.body);
+              const views = mediaViews(mediaById.get(m.id) ?? [], signed, lead.id);
               return (
                 <li
                   key={m.id}
@@ -195,7 +223,9 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                     text={shown.text}
                     hadQuote={shown.hadQuote}
                     original={shown.hadQuote || looksLikeHtml(original) ? original : undefined}
+                    hasMedia={views.length > 0}
                   />
+                  <MessageMedia views={views} />
                 </li>
               );
             })}
