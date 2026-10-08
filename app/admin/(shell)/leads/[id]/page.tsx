@@ -20,6 +20,8 @@ import {
   nudgesSinceTheySpoke,
   type LeadRow,
 } from "../pipeline";
+import { messageToDisplayText, originalForDisplay, looksLikeHtml } from "@/app/lib/message-display";
+import { MessageBody } from "./MessageBody";
 
 // One conversation, in full.
 //
@@ -159,6 +161,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           <ol className="space-y-3">
             {messages.map((m) => {
               const inbound = m.direction === "inbound";
+              const shown = messageToDisplayText(m.body);
+              const original = originalForDisplay(m.body);
               return (
                 <li
                   key={m.id}
@@ -182,9 +186,16 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                     {!inbound && m.ai_generated && <Badge tone="violet">written by the setter</Badge>}
                     {m.status && m.status !== "sent" && <Badge tone="amber">{m.status}</Badge>}
                   </div>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 [overflow-wrap:anywhere]">
-                    {(m.body ?? "").trim() || "(empty)"}
-                  </p>
+                  {/*
+                    Many inbound emails were stored as their HTML part, quoted
+                    history and all. Shown cleaned; the stored body is untouched
+                    and one click away.
+                  */}
+                  <MessageBody
+                    text={shown.text}
+                    hadQuote={shown.hadQuote}
+                    original={shown.hadQuote || looksLikeHtml(original) ? original : undefined}
+                  />
                 </li>
               );
             })}
