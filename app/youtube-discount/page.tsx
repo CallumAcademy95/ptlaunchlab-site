@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import YouTubeDiscountClient from "./YouTubeDiscountClient";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Subscribe & Save £200 | PT Launch Lab",
-  description: "Subscribe to the PT Launch Lab YouTube channel and unlock £200 off the NCFE Level 3 Personal Trainer course.",
-  robots: { index: false, follow: true },
-};
-
+// /youtube-discount — RETIRED (October 2026 change-over).
+//
+// This page promised "subscribe and unlock £200 off". There are no discounts
+// any more — the course is £999.99 in full or 10 × £99.99 a month for everyone —
+// so the page's whole premise is gone. Rather than keep a subscribe page that
+// would need its promise rewritten, old links (YouTube descriptions, pinned
+// comments) are sent to /courses, which sets out the course and both prices.
 export default function Page() {
-  return <YouTubeDiscountClient />;
+  permanentRedirect("/courses");
 }

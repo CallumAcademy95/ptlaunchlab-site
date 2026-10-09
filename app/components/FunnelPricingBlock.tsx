@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { trackEvent } from "@/app/lib/gtag";
-import { attributionFromTouches } from "@/app/lib/attribution";
+import {
+  COURSE_PRICE_LABEL,
+  MONTHLY_PRICE_LABEL,
+  MONTHLY_PAYMENTS,
+  MONTHLY_PLAN_TOTAL_PENCE,
+  formatPence,
+  type CoursePlanChoice,
+} from "@/app/lib/pricing";
 
 // FunnelPricingBlock
 // ----------------------------------------------------------------------------
 // Drop-in pricing card for the avatar landing pages, the quiz result screen,
-// and prospectus thank-you page. Polls /api/funnel-promo/status on mount; if
-// the lead has an active 48h promo cookie it renders £1,599 struck through,
-// £1,399 live, and a countdown to expiry. Otherwise it shows a "full price"
-// view with no promo.
+// and prospectus thank-you page.
 //
-// CTAs always go to /api/funnel-promo/checkout?plan=full|deposit so the
-// discounted Stripe Payment Link URL is never present in the DOM.
+// From the October 2026 change-over it shows the same two options everyone
+// gets — £999.99 in full, or 10 × £99.99 a month — with no promo, no
+// countdown and no "window". Both CTAs go to /enrol, where the buyer chooses
+// and pays. (It used to poll a 48-hour discount cookie and route through
+// /api/funnel-promo/checkout; both are retired.)
 //
-// Hormozi-style offer stack renders above the tier cards by default. It
-// quantifies every component of the £1,599 bundle against believable RRPs to
-// make the perceived value materially higher than the ask. Set
+// The value stack renders above the options by default. Set
 // showValueStack={false} on call sites that already render their own stack.
-
-type Status =
-  | { active: true; source: string; expiresAt: number; secondsRemaining: number }
-  | { active: false };
+// Props are unchanged so existing call sites keep compiling.
 
 type StackRow = { label: string; sub?: string; rrp: string };
 
@@ -42,18 +43,6 @@ const VALUE_STACK: StackRow[] = [
   { label: "Free resubmissions — no cap",        sub: "Resubmit until your tutor says it's a pass",   rrp: "£199" },
 ];
 
-// Numeric total used for the strikethrough. Excludes "Priceless" rows.
-// = 499 + 1099 + 499 + 500 + 199 = £2,796
-const TOTAL_VALUE_DISPLAY = "£2,796";
-
-function formatCountdown(seconds: number): string {
-  if (seconds <= 0) return "00:00:00";
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
 export default function FunnelPricingBlock({
   variant = "dark",
   showValueStack = true,
@@ -61,113 +50,15 @@ export default function FunnelPricingBlock({
   variant?: "dark" | "light";
   showValueStack?: boolean;
 }) {
-  const [status, setStatus] = useState<Status | null>(null);
-  const [now, setNow] = useState<number>(() => Date.now());
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/funnel-promo/status", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data: Status) => {
-        if (!cancelled) setStatus(data);
-      })
-      .catch(() => {
-        if (!cancelled) setStatus({ active: false });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!status || !status.active) return;
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, [status]);
-
-  // Initial loading state: don't flash full-price view, but don't block either
-  if (status === null) {
-    return (
-      <div className="bg-card rounded-2xl p-6 border border-white/[0.07] mb-8 min-h-[320px] animate-pulse" />
-    );
-  }
-
-  const isActive = status.active;
-  const secondsRemaining = isActive
-    ? Math.max(0, Math.floor((status.expiresAt - now) / 1000))
-    : 0;
-  const hardExpired = isActive && secondsRemaining <= 0;
-  const showPromo = isActive && !hardExpired;
-
   const accent = variant === "light" ? "#F5C518" : "#FFD24A";
   const cardBg = variant === "light" ? "bg-[#0D3559]" : "bg-card";
   const cardBorder = variant === "light" ? "border-[#F5C518]/40" : "border-gold/30";
 
-  const youPay = showPromo ? "£1,399" : "£1,599";
-
-  const handleCheckout = (plan: "full" | "deposit") => {
-    trackEvent("promo_checkout_clicked", { plan, has_promo: showPromo });
-
-    // Meta InitiateCheckout — hybrid dedup: browser fbq fires now with a UUID
-    // event_id, the server-side /api/funnel-promo/checkout route reads the
-    // same id from `ic_eid` and dispatches a matching CAPI IC event before
-    // 302-redirecting to Stripe. Meta dedups on event_name + event_id within
-    // 7 days, so the two fire as one event. The discounted Stripe URL stays
-    // server-side (the bounce-page alternative would have leaked it to the DOM).
-    const icEventId =
-      (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
-      `ic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-    // Plan economics — funnel-promo holders see £1,399 PIF / £599 deposit
-    // (admin cancels the 5th instalment to land on £1,399 total). Without
-    // an active cookie, full PIF is £1,599. Pick the right value per state.
-    const value =
-      plan === "full"
-        ? (showPromo ? 1399 : 1599)
-        : 599;
-    const contentName = plan === "full" ? "course_pif" : "course_deposit";
-
-    if (typeof window !== "undefined") {
-      const win = window as { fbq?: (...args: unknown[]) => void };
-      if (typeof win.fbq === "function") {
-        win.fbq(
-          "track",
-          "InitiateCheckout",
-          {
-            currency: "GBP",
-            value,
-            content_name: contentName,
-            content_category: showPromo ? "funnel_promo" : undefined,
-          },
-          { eventID: icEventId },
-        );
-      }
-    }
-
-    // The route used to read utm_* from its own query string, but this was its
-    // only caller and never sent any, so every funnel buyer was "(direct)".
-    // First touch -> utm_*, last touch (when different) -> lts/ltm/ltc.
-    let attrQuery = "";
-    try {
-      const read = (k: string): unknown => {
-        const v = localStorage.getItem(k);
-        return v ? JSON.parse(v) : null;
-      };
-      const a = attributionFromTouches(read("ptll_first_touch"), read("ptll_last_touch"));
-      const q = new URLSearchParams();
-      if (a.fts) q.set("utm_source", a.fts);
-      if (a.ftm) q.set("utm_medium", a.ftm);
-      if (a.ftc) q.set("utm_campaign", a.ftc);
-      if (a.lts) q.set("lts", a.lts);
-      if (a.ltm) q.set("ltm", a.ltm);
-      if (a.ltc) q.set("ltc", a.ltc);
-      const s = q.toString();
-      if (s) attrQuery = `&${s}`;
-    } catch {
-      // localStorage unavailable — proceed unattributed rather than block checkout
-    }
-
-    window.location.href = `/api/funnel-promo/checkout?plan=${plan}&ic_eid=${encodeURIComponent(icEventId)}${attrQuery}`;
+  const handleCheckout = (plan: CoursePlanChoice) => {
+    trackEvent("promo_checkout_clicked", { plan, has_promo: false });
+    // InitiateCheckout fires on /enrol at the actual pay step, with the real
+    // amount — firing it here as well would double-count.
+    window.location.href = "/enrol";
   };
 
   return (
@@ -210,181 +101,85 @@ export default function FunnelPricingBlock({
             ))}
           </ul>
 
-          {/* Subtotal — "stacked value vs you pay" */}
           <div className="rounded-xl bg-deep/40 border border-white/[0.06] p-4 mb-6">
-            <div className="flex items-baseline justify-between gap-3 mb-1">
-              <span className="text-soft/70 text-sm">Stacked value</span>
-              <span className="text-soft/50 text-lg line-through tabular-nums">{TOTAL_VALUE_DISPLAY}</span>
-            </div>
             <div className="flex items-baseline justify-between gap-3">
-              <span className="text-white font-semibold text-base">You pay today</span>
+              <span className="text-white font-semibold text-base">You pay</span>
               <span
                 className="font-display font-extrabold text-3xl tabular-nums"
                 style={{ color: accent }}
               >
-                {youPay}
+                {COURSE_PRICE_LABEL}
               </span>
             </div>
-            {showPromo && (
-              <p className="text-faint text-[11px] mt-2">
-                Includes your £200 funnel discount — auto-applied at checkout.
-              </p>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* ─── PROMO / TIER CARDS ─── */}
-      {/* Priority Intake Incentive framing (Priority 9 — replaces scarcity-style
-          "£200 OFF HURRY" tone with an education-brand framing: this is
-          standard practice in regulated training providers, not a flash sale. */}
-      {showPromo ? (
-        <>
-          <div className="rounded-xl bg-deep/40 border border-white/[0.08] p-4 mb-5">
-            <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
-              <span
-                className="text-[11px] font-semibold tracking-widest uppercase px-3 py-1.5 rounded-full"
-                style={{ color: accent, background: `${accent}15`, border: `1px solid ${accent}40` }}
-              >
-                Priority Intake Incentive
-              </span>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-soft/60">Window closes in</span>
-                <span
-                  className="font-mono font-bold text-sm tabular-nums"
-                  style={{ color: accent }}
-                >
-                  {formatCountdown(secondsRemaining)}
-                </span>
-              </div>
-            </div>
-            <p className="text-soft/65 text-[12px] leading-relaxed">
-              Available for 48 hours after completing your pathway assessment — covers your enrolment admin and reserves your tutor on the next intake.
+            <p className="text-faint text-[11px] mt-2">
+              Or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}. Same price for everyone.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2">
-            {/* Pay in full tier */}
-            <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-                Pay in full
-              </p>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-soft/40 text-lg line-through">£1,599</span>
-                <span
-                  className="font-display font-extrabold text-3xl"
-                  style={{ color: accent }}
-                >
-                  £1,399
-                </span>
-              </div>
-              <p className="text-faint text-xs mb-4">Best total value — save £200</p>
-              <button
-                onClick={() => handleCheckout("full")}
-                className="w-full py-3 rounded-full font-bold text-sm hover:brightness-110 transition-all"
-                style={{ background: accent, color: "#072B4A" }}
-              >
-                Pay £1,399 →
-              </button>
-            </div>
-
-            {/* Deposit tier */}
-            <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-                Deposit + monthlies
-              </p>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-soft/40 text-lg line-through">£599 + 5×£200</span>
-              </div>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span
-                  className="font-display font-extrabold text-2xl"
-                  style={{ color: accent }}
-                >
-                  £599
-                </span>
-                <span className="text-white/80 text-sm">+ 4 × £200</span>
-              </div>
-              <p className="text-faint text-xs mb-4">£1,399 total — save £200</p>
-              <button
-                onClick={() => handleCheckout("deposit")}
-                className="w-full py-3 rounded-full font-bold text-sm border-2 hover:bg-white/5 transition-all"
-                style={{ borderColor: accent, color: accent }}
-              >
-                Pay £599 deposit →
-              </button>
-            </div>
-          </div>
-
-          <p className="text-faint text-xs text-center mt-4">
-            Incentive auto-applies via your personalised link. Honoured until the timer ends.
-          </p>
-        </>
-      ) : (
-        <>
-          {!showValueStack && (
-            <>
-              <h3 className="font-display font-extrabold text-white text-xl leading-tight tracking-tight mb-2">
-                Enrol on the course
-              </h3>
-              <p className="text-soft/60 text-sm mb-5 leading-relaxed">
-                £1,599 total. Pay in full or £599 deposit + 5 monthly payments of £200.
-              </p>
-            </>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Pay in full tier (no promo) */}
-            <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-                Pay in full
-              </p>
-              <span
-                className="font-display font-extrabold text-3xl block mb-1"
-                style={{ color: accent }}
-              >
-                £1,599
-              </span>
-              <p className="text-faint text-xs mb-4">One-off · Best total value</p>
-              <button
-                onClick={() => handleCheckout("full")}
-                className="w-full py-3 rounded-full font-bold text-sm hover:brightness-110 transition-all"
-                style={{ background: accent, color: "#072B4A" }}
-              >
-                Pay £1,599 →
-              </button>
-            </div>
-
-            {/* Deposit tier (no promo) */}
-            <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-              <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-                Deposit + monthlies
-              </p>
-              <div className="flex items-baseline gap-2 mb-1">
-                <span
-                  className="font-display font-extrabold text-2xl"
-                  style={{ color: accent }}
-                >
-                  £599
-                </span>
-                <span className="text-white/80 text-sm">+ 5 × £200</span>
-              </div>
-              <p className="text-faint text-xs mb-4">£1,599 total · Spread over 6 months</p>
-              <button
-                onClick={() => handleCheckout("deposit")}
-                className="w-full py-3 rounded-full font-bold text-sm border-2 hover:bg-white/5 transition-all"
-                style={{ borderColor: accent, color: accent }}
-              >
-                £599 deposit →
-              </button>
-            </div>
-          </div>
         </>
       )}
+
+      {/* ─── THE TWO WAYS TO PAY ─── */}
+      {!showValueStack && (
+        <>
+          <h3 className="font-display font-extrabold text-white text-xl leading-tight tracking-tight mb-2">
+            Enrol on the course
+          </h3>
+          <p className="text-soft/60 text-sm mb-5 leading-relaxed">
+            {COURSE_PRICE_LABEL} in full, or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}.
+          </p>
+        </>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
+          <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
+            Pay in full
+          </p>
+          <span
+            className="font-display font-extrabold text-3xl block mb-1"
+            style={{ color: accent }}
+          >
+            {COURSE_PRICE_LABEL}
+          </span>
+          <p className="text-faint text-xs mb-4">One payment · nothing further to pay</p>
+          <button
+            onClick={() => handleCheckout("pif")}
+            className="w-full py-3 rounded-full font-bold text-sm hover:brightness-110 transition-all"
+            style={{ background: accent, color: "#072B4A" }}
+          >
+            Pay {COURSE_PRICE_LABEL} →
+          </button>
+        </div>
+
+        <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
+          <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
+            Pay monthly
+          </p>
+          <div className="flex items-baseline gap-2 mb-1">
+            <span
+              className="font-display font-extrabold text-3xl"
+              style={{ color: accent }}
+            >
+              {MONTHLY_PRICE_LABEL}
+            </span>
+            <span className="text-white/80 text-sm">/month × {MONTHLY_PAYMENTS}</span>
+          </div>
+          <p className="text-faint text-xs mb-4">
+            First payment today · {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total
+          </p>
+          <button
+            onClick={() => handleCheckout("monthly")}
+            className="w-full py-3 rounded-full font-bold text-sm border-2 hover:bg-white/5 transition-all"
+            style={{ borderColor: accent, color: accent }}
+          >
+            Pay {MONTHLY_PRICE_LABEL} today →
+          </button>
+        </div>
+      </div>
 
       {/* ─── RISK REVERSAL (Hormozi: reduce perceived risk to zero) ─── */}
       <div className="mt-6 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-3">
         {[
-          { title: "Tutor in 24 hours", body: "Personally introduced — or your deposit back, no questions." },
+          { title: "Tutor in 24 hours", body: "Personally introduced — or your payment back, no questions." },
           { title: "7-day cancellation", body: "Change your mind in the first week, full refund. Simple." },
           { title: "Free resubmissions", body: "Resubmit any assessment, no extra fees, no time pressure." },
           { title: "Pass support guarantee", body: "Tutor reviews every submission first — most learners never fail." },

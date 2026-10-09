@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
-import { attachPromoCookie } from "@/app/lib/funnelPromo";
 import { validateCareerPlannerV2 } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from "@/app/lib/metaCapi";
@@ -53,11 +52,6 @@ export async function POST(request: NextRequest) {
 
     // 1. Respond first. Everything else is background and non-fatal.
     const response = NextResponse.json({ success: true, lead: true, plan });
-    try {
-      attachPromoCookie(response, "career-planner");
-    } catch (err) {
-      console.warn("[career-planner] promo cookie not set:", err);
-    }
     logSec({ level: "security", endpoint: ENDPOINT, outcome: "accepted", signals: [], ip, email_domain: d.email.split("@")[1] });
 
     const eventId = d.eventId || deterministicEventId("career_planner_lead", d.email);

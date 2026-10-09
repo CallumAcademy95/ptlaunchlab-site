@@ -149,14 +149,6 @@ export default function PhoneCallbackForm() {
         }),
       }).catch((err) => console.warn("[book-call] CAPI schedule relay failed:", err));
 
-      // Fire and forget — issues the 48h £200 promo cookie so the
-      // FunnelPricingBlock below renders the discounted state.
-      fetch("/api/funnel-promo/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: "book-call" }),
-      }).catch((err) => console.warn("[book-call] promo cookie not set:", err));
-
       setSubmitted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong.";

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { attachPromoCookie } from '@/app/lib/funnelPromo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/youtube-subscribe
-// Honor-system YouTube subscribe funnel. After the user clicks the subscribe
-// button on /youtube-discount and confirms they subscribed, they submit their
-// email here to unlock the £200 promo. Forwards to Zapier so the YouTube
-// audience growth + lead capture both land in the existing Sheets pipeline.
+// YouTube subscriber lead capture. Forwards to Zapier so the YouTube audience
+// growth + lead capture both land in the existing Sheets pipeline.
+//
+// It used to unlock a 48-hour £200 promo; that is retired (October 2026
+// change-over) along with the /youtube-discount page, which now redirects to
+// /courses. The route is kept so any cached form still records the lead.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -57,11 +58,6 @@ export async function POST(req: NextRequest) {
     }
 
     const response = NextResponse.json({ success: true });
-    try {
-      attachPromoCookie(response, 'youtube');
-    } catch (err) {
-      console.warn('[youtube-subscribe] promo cookie not set:', err);
-    }
     return response;
   } catch (err) {
     console.error('[youtube-subscribe]', err);

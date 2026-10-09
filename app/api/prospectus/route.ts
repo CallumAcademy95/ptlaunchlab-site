@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { after } from "next/server";
 import { createRateLimiter, getIP } from '@/app/lib/rate-limit';
-import { attachPromoCookie } from '@/app/lib/funnelPromo';
 import { validateProspectus } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
@@ -106,11 +105,6 @@ export async function POST(request: NextRequest) {
     }));
 
     const response = NextResponse.json({ success: true });
-    try {
-      attachPromoCookie(response, 'prospectus');
-    } catch (err) {
-      console.warn('[prospectus] promo cookie not set:', err);
-    }
     return response;
   } catch (err) {
     console.error('[prospectus]', err);
