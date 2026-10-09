@@ -1,4 +1,6 @@
 # Meta Ads Readiness Audit — PT Launch Lab
+
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
 **Date:** 2026-05-26  
 **Pixel:** 1133525198707842 (PT LAUNCH LAB - WEBSITE)  
 **Scope:** Full pixel + CAPI + funnel-page review pre-launch

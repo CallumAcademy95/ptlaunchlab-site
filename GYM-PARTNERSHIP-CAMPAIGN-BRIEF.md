@@ -1,21 +1,23 @@
 # Gym Partnership — B2B Campaign Brief
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **Status:** Strategy captured 2026-07-03. Audiences + paused campaign BUILT (see bottom). Creative + landing-page rebuild + rebrand decision pending.
 
 > **The core reframe (do this first):** stop selling *"become a partner."* Sell *"fix your PT recruitment/pipeline problem."* Nobody wakes up wanting a white-label academy — they wake up thinking *"why can't we find good PTs?"*. The academy is the **solution**; the **pipeline problem is the sale.** The page already hints at it ("Most gyms don't have a recruitment problem. They have a pipeline problem.") — make that the spine of everything.
 
 ## Why this may be PTLL's highest-ROI campaign
-Not the £500 commission — the **compounding acquisition channel.** One gym partnership can produce, every year: ~10 students · £5,000 upfront · 10 new PTs · referrals · local brand awareness · another case study · another recruitment partner. Treat it like **B2B SaaS, not education** — sell on LTV of a partnership, not the referral fee.
+Not the £250 fee — the **compounding acquisition channel.** One gym partnership could produce, every year: ~10 students · £2,500 in fees · potential new PTs · referrals · local brand awareness · another case study · another recruitment partner. Treat it like **B2B SaaS, not education** — sell on LTV of a partnership, not the referral fee.
 
 ## The offer (headline options — NOT "become a partner")
 - **Build Your Own PT Academy — without teaching a single lesson.**
-- **Add £20,000+ Annual Revenue To Your Gym — without hiring staff.**
+- **A New Revenue Stream For Your Gym — at zero cost.**
 - **Never Recruit PTs The Hard Way Again.**
 - **Stop Hiring. Start Building Your Own PT Pipeline.**
 
 ## Ad angles
-1. **Recruitment / pipeline (favourite).** Hook: *"Most gyms don't have a recruitment problem. They have a pipeline problem."* You're constantly hiring because nobody's producing trainers already invested in your gym. We build + run a fully branded PT academy inside your gym — you do zero teaching/admin/compliance, earn £500/learner, and those learners become PTs inside your business. Fix the pipeline once. Stop recruiting forever. CTA: See how it works.
-2. **New revenue.** "How much unused floor space do you have?" Every future PT through your doors → £500 upfront → PT rent → membership → referrals → long-term revenue. Without employing another member of staff.
+1. **Recruitment / pipeline (favourite).** Hook: *"Most gyms don't have a recruitment problem. They have a pipeline problem."* You're constantly hiring because nobody's producing trainers already invested in your gym. We build + run a fully branded PT academy inside your gym — you do zero teaching/admin/compliance, earn £250/learner (inc. VAT), and grow a pipeline of trainers who already know your gym. CTA: See how it works.
+2. **New revenue.** "How much unused floor space do you have?" Every learner → £250 inc. VAT (30 days after pay-in-full, or at the 5th monthly payment) → potential PT rent → membership → referrals. Without employing another member of staff.
 3. **White-label.** "Imagine launching '[Gym Name] PT Academy' next month." Your branding, members, reputation — we run teaching/compliance/assessment/certification/support behind the scenes.
 4. **Founder story (likely best performer).** Callum direct-to-camera: *"We've hired over 500 PTs. And we've realised most gyms are solving the wrong problem."* The 500+ hires is one of PTLL's strongest credibility assets.
 
@@ -34,9 +36,9 @@ Avoid polished corporate. Shoot **inside real gyms** — owner talking, PTs coac
 - **Meta-vs-consultant note:** the consultant's 4 ad sets (independent / owners / multi-site / retarget) are list-segmentation concepts Meta can't target distinctly — the List/Lookalike/Retarget split above is the practical Meta translation. The independent-vs-multi-site split belongs on **LinkedIn** (job-title targeting: Gym Owner, MD, Ops Director, Fitness/Club Manager, Founder) and in **list segmentation** for the direct-target ad set + cold email.
 - **Other data available to layer in:** MailerLite Gym Batch groups 001–011 (~700 contacts) + "Gym Warm Lead List"/"UK Independant Gyms" (can push as audiences); `apollo_gym_import.csv` (243 named decision-makers w/ titles) — highest quality, good for a separate high-intent audience.
 
-## Landing-page changes (make it commercial — the current page leads with white-label/£500)
-- **Hero:** "Stop Hiring. Start Building Your Own PT Pipeline." — your own branded academy · zero teaching · £500/learner · future PT rental income.
-- **Show the maths:** 10 students = £5,000 → 7 become PTs → avg rent → annual recurring → 5-year value. Show the **lifetime value of one partnership**, not just £500.
+## Landing-page changes (make it commercial — the current page leads with white-label/£250)
+- **Hero:** "Stop Hiring. Start Building Your Own PT Pipeline." — your own branded academy · zero teaching · £250/learner inc. VAT · potential PT rental income.
+- **Show the maths:** 10 students = £2,500 in fees. Rent from graduates is potential only: no partner learner has qualified yet, so never present it as what happens.
 - **Problem section as statistics** (every owner recognises): constant recruitment · poor-quality applicants · high PT churn · empty floor space · no succession plan.
 - **"Cost of doing nothing"** section (currently missing): lost rent, lost members, staff time, advertising, recruitment, opportunity cost.
 - **The flywheel graphic** (killer visual): Members → future PTs → qualify → stay at your gym → pay rent → coach members → improve retention → refer friends → more members.
