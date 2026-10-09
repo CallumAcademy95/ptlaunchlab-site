@@ -20,7 +20,7 @@ out.
 
 | # | Check | Catches |
 |---|---|---|
-| 1 | Every Payment Link in `PAYMENT_LINK_PRICES` produces a session whose `success_url` is `/enrol/success?session_id={CHECKOUT_SESSION_ID}` | `success_url` edited, broken, or moved back to the Dashboard |
+| 1 | Each plan (`pif`, `monthly`) produces a session whose `success_url` is `/enrol/success?session_id={CHECKOUT_SESSION_ID}` | `success_url` edited, broken, or moved back to the Dashboard |
 | 2 | `/api/checkout` returns a real session, never `url: null` | Lost `checkout_sessions_write` scope, deleted price — i.e. **silent** fallback to the raw Payment Link |
 | 3 | A real card payment in a real browser lands back on `/enrol/success` and creates an enrolment record carrying the Stripe session id | The whole chain, end to end |
 | 4 | Every in-code Payment Link **in live Stripe** still redirects to `/enrol/success` | The original bug: Dashboard config drift, invisible to code review |

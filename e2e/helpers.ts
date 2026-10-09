@@ -1,38 +1,35 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { expect, type Page } from "@playwright/test";
-import { PAYMENT_LINK_PRICES } from "../app/lib/stripeCheckout";
+import { RETIRED_PAYMENT_LINKS } from "../app/lib/paymentLinks";
 
 export const REPO_ROOT = join(__dirname, "..");
 export const PORT = Number(process.env.PTLL_E2E_PORT || 3100);
 export const BASE_URL = `http://localhost:${PORT}`;
 
 /**
- * The Payment Links the browser walks, by name.
- *
- * Named because two specs drive them individually (pif / deposit / funnelPif).
- * Do NOT use this to answer "is every live link known to the app" — it is a
- * hand-written list and it drifted the first time a fourth link was added: the
- * £99 September link was in PAYMENT_LINK_PRICES and the completeness check
- * failed anyway, because it was comparing against this object rather than
- * against the app. Use ALL_MAPPED_LINK_URLS for that.
+ * The two plans the site sells (October 2026 change-over), by the name
+ * /api/checkout takes. Each is driven individually by the specs.
  */
-export const PAYMENT_LINKS = {
-  pif: "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  deposit: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
-  funnelPif: "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06",
-} as const;
+export const PLANS = ["pif", "monthly"] as const;
+export type Plan = (typeof PLANS)[number];
 
 /**
- * Every link the app actually maps, read from the app itself.
+ * The raw fallback Payment Links the app is configured with, if any.
  *
- * One source of truth, so a new price added to PAYMENT_LINK_PRICES is known to
- * the test the moment it is added, and a live link missing from the app is a
- * real finding rather than a stale test fixture.
+ * Read from the same env the app reads (NEXT_PUBLIC_STRIPE_LINK_*_999). There
+ * is deliberately no hardcoded default: when unset the enrol page shows a
+ * contact error instead of falling back to a retired price.
  */
-export const ALL_MAPPED_LINK_URLS: ReadonlySet<string> = new Set(
-  Object.keys(PAYMENT_LINK_PRICES),
-);
+export function configuredFallbackLinks(): Record<Plan, string | undefined> {
+  return {
+    pif: envValue("NEXT_PUBLIC_STRIPE_LINK_PIF_999") || undefined,
+    monthly: envValue("NEXT_PUBLIC_STRIPE_LINK_MONTHLY_999") || undefined,
+  };
+}
+
+/** Every Payment Link the site has retired. They should be deactivated in Stripe. */
+export const RETIRED_LINK_URLS: ReadonlySet<string> = new Set(RETIRED_PAYMENT_LINKS);
 
 /** The origin live checkout must always return buyers to. */
 export const PRODUCTION_ORIGIN = "https://ptlaunchlab.co.uk";
