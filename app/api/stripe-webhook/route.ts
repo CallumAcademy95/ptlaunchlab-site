@@ -460,7 +460,6 @@ async function sendPaidReconciliation(session: StripeSession) {
   const name = buyerName(session);
   const phone = session.customer_details?.phone || "";
   const sale = saleShape(session);
-  const planType = planTypeForSale(sale);
   const label = planLabel(sale);
   const attribution = decodeClientRef(session.client_reference_id);
   const gymReferral = session.metadata?.gym_referral || attribution.gym || "";

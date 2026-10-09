@@ -4,10 +4,7 @@ import Image from "next/image";
 
 /**
  * @param ctaHref  Destination for the gold "Start Today" button. Defaults to
- *   /enrol. /september overrides it: that page renders this nav, and with the
- *   default the most prominent button on a £99 landing page sent buyers to the
- *   £1,599 enrolment instead — and in the pre-open state it was the only
- *   clickable CTA on the page.
+ *   /enrol. (The /september offer page that used to override it is retired.)
  */
 export default function Nav({ ctaHref = "/enrol" }: { ctaHref?: string } = {}) {
   const [open, setOpen] = useState(false);

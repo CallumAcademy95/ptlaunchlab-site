@@ -25,8 +25,6 @@ export const ironwolfGym: GymConfig = {
   whyThisGymHeading: "Learn Inside Iron Wolf Gym",
   gymIntro: "Forged in strength. Driven by grit. Learn in a real gym, with real lifters, in a proper training environment.",
 
-  // ── Stripe (shared payment links — promo tracked via referral form)
-
   // ── Why this gym (4 stat boxes)
   stats: [
     { value: "New",      label: "Bigger Goole facility (2025)" },

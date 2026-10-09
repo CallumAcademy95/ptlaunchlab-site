@@ -200,7 +200,7 @@ export default function EnrolmentFlow({
       source: "website-enrolment-flow-v3",
       ts: new Date().toISOString(),
     };
-    try { localStorage.setItem(ENROLMENT_CONTEXT_KEY, JSON.stringify(context)); } catch (_) {}
+    try { localStorage.setItem(ENROLMENT_CONTEXT_KEY, JSON.stringify(context)); } catch { /* storage unavailable — non-fatal */ }
 
     trackEvent('enrolment_payment_attempted', {
       payment_type: plan,

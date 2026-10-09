@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/salary-calculator
 // Captures email after the salary-calculator preliminary result is shown,
-// then unlocks the full projection + 48h £200 promo via the cookie.
+// then unlocks the full projection.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {

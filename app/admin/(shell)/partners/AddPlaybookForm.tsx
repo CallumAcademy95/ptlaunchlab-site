@@ -37,7 +37,7 @@ export default function AddPlaybookForm() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="sm:col-span-2">
           <label htmlFor="pb-title" className="block text-slate-500 text-xs font-semibold mb-1.5">Title</label>
-          <input id="pb-title" name="title" type="text" required placeholder="January intake — story post" className={inputClass} />
+          <input id="pb-title" name="title" type="text" required placeholder="January — story post" className={inputClass} />
         </div>
         <div>
           <label htmlFor="pb-type" className="block text-slate-500 text-xs font-semibold mb-1.5">Section</label>
