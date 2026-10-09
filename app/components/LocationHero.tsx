@@ -48,7 +48,7 @@ export default function LocationHero({ location, headline }: { location: string;
 
             {/* Sub */}
             <p className="text-base text-blue-100/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              The NCFE Level 3 qualification UK gym managers ask for by name — plus our £500 business mentorship community, included free with the £1,599 course fee. Most UK academies sell mentorship separately. We bundle it.
+              The NCFE Level 3 qualification UK gym managers ask for by name — plus our £500 business mentorship community, included free in the course fee. Most UK academies sell mentorship separately. We bundle it.
             </p>
 
             {/* CTA buttons */}
