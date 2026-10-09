@@ -20,7 +20,11 @@ import path from "node:path";
 import { marked } from "marked";
 import { getSupabaseAdmin } from "./supabase-admin";
 import { PLAYBOOK_TYPES, type PlaybookType } from "./partner-playbook-types";
-import { applyPlaybookTokens, type PlaybookTokens } from "./partner-playbook-tokens";
+import {
+  applyPlaybookTokens,
+  isRetiredPlaybookEntry,
+  type PlaybookTokens,
+} from "./partner-playbook-tokens";
 import { extractSnippets } from "./partner-playbook-snippets";
 
 const PLAYBOOK_DIR = path.join(process.cwd(), "partner-playbook");
@@ -154,5 +158,9 @@ export async function getPlaybook(tokens: PlaybookTokens | null = null): Promise
   for (const entry of uploaded) bySlug.set(entry.slug, entry);
   for (const entry of repo) bySlug.set(entry.slug, entry);
 
-  return [...bySlug.values()].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+  // Retired campaigns (dated offers and promo codes, gone since the October
+  // 2026 change-over) are never shown, even while their markdown still exists.
+  return [...bySlug.values()]
+    .filter((entry) => !isRetiredPlaybookEntry(entry.slug))
+    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 }

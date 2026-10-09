@@ -10,14 +10,20 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { MONTHS, MONTH_CODE_PREFIX, monthCodeFor, tokensForMonth, allMonthStrings } from "../scripts/lib/promo-calendar.mjs";
 import { findBannedClaims, findBrandLeaks } from "../scripts/lib/ad-guards.mjs";
-import { PARTNER_PROMO_PREFIXES } from "../app/lib/partnerPromo.ts";
 
 const BRANDS = JSON.parse(readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"));
 const REAL = Object.entries(BRANDS).filter(([slug]) => slug !== "demo");
 const ORIGIN = "https://ptlaunchlab.co.uk";
 
-test("October and November are both defined", () => {
-  assert.deepEqual(MONTHS.map((m) => m.key), ["oct", "nov"]);
+test("only reveal months remain — the Black Friday money month is retired", () => {
+  assert.deepEqual(MONTHS.map((m) => m.key), ["oct"]);
+  assert.equal(MONTHS.some((m) => m.offerType === "money"), false, "no promo codes, for anyone");
+});
+
+test("no gym gets a month code for any month", () => {
+  for (const [slug] of REAL) {
+    for (const key of ["oct", "nov"]) assert.equal(monthCodeFor(slug, key), null, `${slug}/${key}`);
+  }
 });
 
 test("no month, for any gym, contains job-offer language", () => {
@@ -53,17 +59,6 @@ test("every token resolves — no {{placeholder}} survives to a graphic", () => 
   }
 });
 
-test("every gym has a month-code prefix the validator accepts", () => {
-  for (const [slug] of REAL) {
-    const prefix = MONTH_CODE_PREFIX[slug];
-    assert.ok(prefix, `${slug} has no month-code prefix`);
-    assert.ok(
-      PARTNER_PROMO_PREFIXES[slug]?.includes(prefix),
-      `${slug}: prefix ${prefix} is not in PARTNER_PROMO_PREFIXES (${PARTNER_PROMO_PREFIXES[slug]?.join(", ")}) — the code would be refused`,
-    );
-  }
-});
-
 test("money months carry a code, reveal months do not", () => {
   for (const month of MONTHS) {
     for (const [slug] of REAL) {
@@ -78,10 +73,3 @@ test("money months carry a code, reveal months do not", () => {
   }
 });
 
-test("November is £600 off, landing at £999", () => {
-  const nov = MONTHS.find((m) => m.key === "nov");
-  assert.ok(nov, "November is missing from MONTHS");
-  assert.equal(nov.offerType, "money");
-  assert.equal(nov.discountPence, 60_000);
-  assert.equal(159_900 - nov.discountPence, 99_900);
-});
