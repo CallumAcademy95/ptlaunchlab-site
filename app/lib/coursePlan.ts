@@ -17,13 +17,28 @@
 //      is the reliable signal, and it is on every sale from 2026-07-26 onward.
 //   3. amount ≤ £700            → deposit. Only reached by sales made through a
 //      raw Payment Link (the fallback path) or before metadata.plan shipped.
-//      Safe because the cheapest pay-in-full is £1,099.
+//      Safe because the cheapest pay-in-full is £999.99.
 //
-// No imports on purpose: this is the one rule, unit-tested in
-// tests/coursePlan.test.mts, and it has to be importable without dragging
-// Supabase or Stripe in behind it.
+// FROM OCTOBER 2026 there is a third shape: the 10 × £99.99 MONTHLY plan
+// (metadata.plan = "monthly"). It is a payment plan — balance still owed after
+// checkout — so for the binary PlanType below it is "deposit", which is what
+// pp_sales.plan_type and the Praxel invite contract accept. Anything that needs
+// to tell it apart from a legacy deposit uses planKindForSale().
+//
+// Only imports ./pricing, which itself imports nothing: this is the one rule,
+// unit-tested in tests/coursePlan.test.mts, and it has to be importable without
+// dragging Supabase or Stripe in behind it.
 
+import {
+  formatPence,
+  MONTHLY_PLAN_LABEL,
+  MONTHLY_PLAN_TOTAL_PENCE,
+} from "./pricing.ts";
+
+/** Binary: paid in full, or a payment plan with a balance still to collect. */
 export type PlanType = "PIF" | "deposit";
+/** Finer: which payment plan. "deposit" = a legacy £599/£99-entry plan. */
+export type PlanKind = "PIF" | "deposit" | "monthly";
 
 /** £599 deposit; every pay-in-full variant (1,099 / 1,299 / 1,399 / 1,599) sits above this. */
 export const DEPOSIT_CEILING_PENCE = 70_000;
@@ -43,7 +58,7 @@ export interface SaleShape {
   /** Stripe checkout mode. "subscription" always means a deposit plan. */
   mode?: string | null;
   amountTotalPence: number;
-  /** `metadata.plan` off the Checkout Session — "PIF" | "deposit". Absent on raw-link sales. */
+  /** `metadata.plan` off the Checkout Session — "PIF" | "deposit" | "monthly". Absent on old raw-link sales. */
   metadataPlan?: string | null;
   /**
    * `metadata.contract_value` off the session, in PENCE — the full amount the
@@ -53,19 +68,32 @@ export interface SaleShape {
   contractValuePence?: number | null;
 }
 
-/** The full contract for this sale, falling back to the standard £1,599 plan. */
+/**
+ * The full contract for this sale. Falls back to 10 × £99.99 for a monthly
+ * sale and to the standard £1,599 plan for anything else unstamped.
+ */
 export function contractTotalPence(sale: SaleShape): number {
   const stamped = sale.contractValuePence;
-  return typeof stamped === "number" && Number.isFinite(stamped) && stamped > 0
-    ? stamped
-    : DEPOSIT_PLAN_TOTAL_PENCE;
+  if (typeof stamped === "number" && Number.isFinite(stamped) && stamped > 0) return stamped;
+  return isMonthlyPlanSale(sale) ? MONTHLY_PLAN_TOTAL_PENCE : DEPOSIT_PLAN_TOTAL_PENCE;
 }
 
+/** The 10 × £99.99 plan. Decided by metadata only — never by the £99.99 amount. */
+export function isMonthlyPlanSale(sale: SaleShape): boolean {
+  return sale.metadataPlan === "monthly";
+}
+
+/** Any payment plan — legacy deposit OR the monthly plan. */
 export function isDepositSale(sale: SaleShape): boolean {
   if (sale.mode === "subscription") return true;
   if (sale.metadataPlan === "PIF") return false;
-  if (sale.metadataPlan === "deposit") return true;
+  if (sale.metadataPlan === "deposit" || sale.metadataPlan === "monthly") return true;
   return sale.amountTotalPence <= DEPOSIT_CEILING_PENCE;
+}
+
+export function planKindForSale(sale: SaleShape): PlanKind {
+  if (isMonthlyPlanSale(sale)) return "monthly";
+  return isDepositSale(sale) ? "deposit" : "PIF";
 }
 
 export function planTypeForSale(sale: SaleShape): PlanType {
@@ -89,13 +117,23 @@ export function outstandingBalancePence(sale: SaleShape): number {
   return Math.max(0, contractTotalPence(sale) - sale.amountTotalPence);
 }
 
-/** "£1,099" — pence in, display pounds out. Whole pounds; every price here is one. */
+/**
+ * "£1,099", "£999.99" — pence in, display pounds out.
+ *
+ * Used to round to whole pounds, which is right for every legacy price and
+ * prints £999.99 as £1,000. Pence are now kept whenever they are non-zero.
+ */
 export function formatGbp(pence: number): string {
-  return `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
+  return formatPence(pence);
 }
 
-/** Buyer- and admin-facing plan description, e.g. "Pay in Full — £1,099". */
+/**
+ * Buyer- and admin-facing plan description.
+ *   "Pay in Full — £999.99", "Pay Monthly — 10 × £99.99", "Deposit — £599".
+ */
 export function planLabel(sale: SaleShape): string {
+  const kind = planKindForSale(sale);
+  if (kind === "monthly") return `Pay Monthly — ${MONTHLY_PLAN_LABEL}`;
   const price = formatGbp(sale.amountTotalPence);
-  return isDepositSale(sale) ? `Deposit — ${price}` : `Pay in Full — ${price}`;
+  return kind === "deposit" ? `Deposit — ${price}` : `Pay in Full — ${price}`;
 }

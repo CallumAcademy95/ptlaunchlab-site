@@ -41,3 +41,6 @@ export const COURSE_PRICE_LABEL = formatPence(COURSE_PRICE_PENCE); // £999.99
 export const MONTHLY_PRICE_LABEL = formatPence(MONTHLY_PRICE_PENCE); // £99.99
 /** "10 × £99.99" */
 export const MONTHLY_PLAN_LABEL = `${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL}`;
+
+/** The two ways to pay, as the enrol page and /api/checkout name them. */
+export type CoursePlanChoice = "pif" | "monthly";
