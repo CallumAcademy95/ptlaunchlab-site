@@ -16,14 +16,8 @@ export const xcelerateAcademy: GymConfig = {
   ],
   heroSubline: "Made Different. Made Better.",
   location: "Edgware, North London",
-  promoCode: "XCELERATEPT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside Xcelerate Gyms Edgware: a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Xcelerate Gyms Edgware",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
   stats: [
     { value: "HA8",      label: "Edgware, North London" },
     { value: "2021",     label: "Open Since · Award-Winning Gym" },
@@ -38,6 +32,6 @@ export const xcelerateAcademy: GymConfig = {
   ],
   metaTitle: "Xcelerate PT Academy | Become a Qualified Personal Trainer in Edgware",
   metaDescription:
-    "Train, qualify and earn at Xcelerate Gyms Edgware. Get £200 off your Level 2 & 3 PT qualification exclusively for Xcelerate members. Mentorship included.",
+    "Train, qualify and earn at Xcelerate Gyms Edgware. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/xcelerate-academy",
 };

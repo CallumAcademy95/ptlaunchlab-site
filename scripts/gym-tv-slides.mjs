@@ -24,6 +24,9 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
 import { renderHtml } from "./render-image.mjs";
+// Prices come from the one source the site uses — never from gym-brands.json,
+// which no longer carries any (October 2026: same price everywhere, no codes).
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL } from "../app/lib/pricing.ts";
 
 const BRANDS = JSON.parse(readFileSync(new URL("./gym-brands.json", import.meta.url), "utf8"));
 const ROOT = process.cwd();
@@ -126,8 +129,6 @@ function slides(brand, qr, photos) {
   const next = () => (photos.length ? photos[shot++ % photos.length] : null);
   const accent = accentFor(brand);
   const gym = brand.gymName;
-  const price = brand.fullPrice;
-  const deposit = brand.depositPrice;
 
   const S = (kicker, h1, sub, opts = {}) =>
     shell(
@@ -158,7 +159,7 @@ function slides(brand, qr, photos) {
       `Most people who start are changing career in their thirties and forties. Experience counts for a lot in this job.`)],
 
     ["06-price", S("What it costs",
-      `£${price}<br><span class="hl">or £${deposit} to start.</span>`,
+      `${COURSE_PRICE_LABEL}<br><span class="hl">or ${MONTHLY_PRICE_LABEL} a month.</span>`,
       `Payment plans available. Ask at reception and we'll go through the options properly — no pressure.`)],
 
     ["07-ask", S("The first step",

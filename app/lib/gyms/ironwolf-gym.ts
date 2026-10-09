@@ -20,20 +20,12 @@ export const ironwolfGym: GymConfig = {
   heroSubline: "Train. Qualify. Earn.",
   location: "Goole",
 
-  // ── Discount
-  promoCode: "IWGPTDISCOUNT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
-
   // ── Positioning
   positioningSubline: "Built inside Goole's strength-first gym, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside Iron Wolf Gym",
   gymIntro: "Forged in strength. Driven by grit. Learn in a real gym, with real lifters, in a proper training environment.",
 
   // ── Stripe (shared payment links — promo tracked via referral form)
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 
   // ── Why this gym (4 stat boxes)
   stats: [
@@ -56,6 +48,6 @@ export const ironwolfGym: GymConfig = {
   // ── SEO
   metaTitle: "Iron Wolf PT Academy | Become a Qualified Personal Trainer at Iron Wolf Gym, Goole",
   metaDescription:
-    "Train, qualify, and earn at Iron Wolf Gym in Goole. Get £200 off your Level 2 & 3 PT qualification exclusively through Iron Wolf Gym. Mentorship included. Introduction guarantee on qualifying.",
+    "Train, qualify, and earn at Iron Wolf Gym in Goole. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included. Introduction guarantee on qualifying.",
   canonicalPath: "/ironwolf-gym",
 };

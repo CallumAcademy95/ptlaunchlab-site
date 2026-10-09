@@ -4,14 +4,13 @@ import type { PartnerConfig } from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | Iron Wolf PT Academy",
-  description: "Claim your £200 Iron Wolf member discount and start your Level 2 & 3 PT qualification today.",
+  description: "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
 const PARTNER: PartnerConfig = {
   gymSlug: "ironwolf",
   gymReferral: "Iron Wolf Gym",
-  fullPrice: 1399,
 };
 
 export default function IronWolfEnrolPage() {
@@ -31,11 +30,8 @@ export default function IronWolfEnrolPage() {
             />
             <div>
               <p className="text-white font-black text-sm uppercase leading-none">Iron Wolf PT Academy</p>
-              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+              <p className="text-white/40 text-[10px] mt-0.5">Enrolment</p>
             </div>
-          </div>
-          <div className="bg-[#f15927] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            IWGPTDISCOUNT
           </div>
         </div>
       </div>

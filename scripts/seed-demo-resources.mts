@@ -18,6 +18,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import QRCode from "qrcode";
 import { renderHtml } from "./render-image.mjs";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "../app/lib/pricing.ts";
 
 for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split(/\r?\n/)) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
@@ -119,8 +120,8 @@ li{font-size:23px;line-height:1.75;color:#3A4A5C}
   </ul>
   <h2>What it costs</h2>
   <div class="box">
-    <div class="big">£1,399 &nbsp;or&nbsp; £599 to start</div>
-    <p style="margin:8px 0 0;font-size:21px;">Flexible payment plans available. Ask at reception and
+    <div class="big">${COURSE_PRICE_LABEL} &nbsp;or&nbsp; ${MONTHLY_PRICE_LABEL} a month</div>
+    <p style="margin:8px 0 0;font-size:21px;">Pay in full, or ${MONTHLY_PAYMENTS} monthly payments. Ask at reception and
        we'll go through the options properly.</p>
   </div>
   <h2>How long</h2>

@@ -14,14 +14,8 @@ export const superflexAcademy: GymConfig = {
   ],
   heroSubline: "Train. Qualify. Earn.",
   location: "Upton, West Yorkshire",
-  promoCode: "SUPERFLEXPT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside Superflex 2.0 Gym in Upton: a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Superflex 2.0 Gym",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
   stats: [
     { value: "WF9",     label: "Upton, West Yorkshire" },
     { value: "S&C",     label: "Strength & Conditioning Floor" },
@@ -36,6 +30,6 @@ export const superflexAcademy: GymConfig = {
   ],
   metaTitle: "Superflex PT Academy | Become a Qualified Personal Trainer in Upton",
   metaDescription:
-    "Train, qualify and earn at Superflex 2.0 Gym in Upton. Get £200 off your Level 2 & 3 PT qualification exclusively for Superflex members. Mentorship included.",
+    "Train, qualify and earn at Superflex 2.0 Gym in Upton. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/superflex-academy",
 };

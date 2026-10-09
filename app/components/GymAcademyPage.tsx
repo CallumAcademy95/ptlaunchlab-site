@@ -1,5 +1,12 @@
 import Image from "next/image";
 import type { GymConfig } from "@/app/lib/gymPartnerConfig";
+import {
+  COURSE_PRICE_LABEL,
+  MONTHLY_PRICE_LABEL,
+  MONTHLY_PAYMENTS,
+  MONTHLY_PLAN_TOTAL_PENCE,
+  formatPence,
+} from "@/app/lib/pricing";
 
 function Check({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -15,13 +22,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
   const sectionBg = c.sectionBg ?? c.primaryColor;
   const dark = c.darkAccent ?? c.primaryColor;
   const enrolPath = `${c.canonicalPath}/enrol`;
-  // Fixed at Stripe: the deposit plan is always the £599 deposit followed by
-  // 5 × £200/month, totalling £1,599 — regardless of what a partner's
-  // (pre-discount) fullPrice config says. Deriving this from fullPrice used
-  // to render "£1,399" on eight of nine pages while Stripe billed £1,599.
-  const monthlyPayments = 5;
-  const depositPlanTotal = 1599;
-  const showDiscount = c.showDiscount !== false;
+  // Prices come from app/lib/pricing.ts and are the same on every gym's page
+  // as everywhere else: £999.99 in full or 10 × £99.99 a month. No member
+  // discount, no code, no "was" price — those are retired (October 2026).
 
   return (
     <>
@@ -45,7 +48,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 className={c.logoWidth && c.logoHeight ? "h-11 w-auto object-contain" : "rounded-xl"}
               />
               <div>
-                <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Powered by PT Launch Lab</p>
+                <p className="text-white/40 text-[10px] uppercase tracking-widest font-semibold">Personal Training Academy</p>
                 <p className="text-white font-bold text-sm">{c.gymName} PT Academy</p>
               </div>
             </div>
@@ -61,19 +64,16 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               <p className="text-white/60 text-lg font-semibold uppercase tracking-widest mb-8">{c.heroSubline}</p>
             )}
 
-            {showDiscount && (
-              <div className="inline-flex items-center gap-3 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
-                <span className="text-white font-black text-xl uppercase tracking-wide">£{c.discountAmount} OFF</span>
-                <span className="text-white/80 text-sm">exclusively for {c.gymName} members</span>
-              </div>
-            )}
+            <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
+              <span className="text-white font-black text-xl uppercase tracking-wide">{MONTHLY_PRICE_LABEL} a month</span>
+              <span className="text-white/80 text-sm">× {MONTHLY_PAYMENTS}, or {COURSE_PRICE_LABEL} in full</span>
+            </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-10">
               {[
                 "Level 2 + Level 3 PT Qualification",
                 "Study Around Your Job",
                 "Mentorship Included",
-                ...(showDiscount ? [] : []),
                 `Introductions At ${c.gymName}`,
               ].map(i => (
                 <li key={i} className="flex items-center gap-2 text-white/80 text-sm font-medium">
@@ -85,7 +85,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <a href={enrolPath}
               className="inline-block px-10 py-4 rounded-full font-black uppercase tracking-wide text-base hover:opacity-90 transition-all shadow-xl"
               style={{ backgroundColor: dark, color: bg }}>
-              {showDiscount ? `Claim Your £${c.discountAmount} Discount →` : "Enrol Now →"}
+              Enrol Now →
             </a>
           </div>
         </section>
@@ -191,33 +191,6 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           </div>
         </section>
 
-        {/* ── DISCOUNT FEATURE ── */}
-        {showDiscount && (
-          <section className="bg-white py-16 md:py-24">
-            <div className="max-w-2xl mx-auto px-6">
-              <div className="bg-black rounded-3xl p-10 md:p-14 text-center">
-                <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4">Exclusive {c.gymName} Offer</p>
-                <h2 className="text-5xl md:text-7xl font-black text-white uppercase leading-none mb-2">£{c.discountAmount}</h2>
-                <h3 className="text-2xl font-black uppercase mb-6" style={{ color: dark }}>Off Your Course</h3>
-                <p className="text-white/60 text-sm mb-8">Only available when you join through {c.gymName}.</p>
-                <div className="grid grid-cols-3 gap-3 mb-8">
-                  {["Save instantly", "Secure your place", "Start immediately"].map(i => (
-                    <div key={i} className="bg-white/10 rounded-xl p-3 text-center">
-                      <span style={{ color: dark }} className="block font-bold text-base mb-1">✔</span>
-                      <span className="text-white/70 text-xs">{i}</span>
-                    </div>
-                  ))}
-                </div>
-                <a href={enrolPath}
-                  className="inline-block px-10 py-4 rounded-full font-black uppercase text-base hover:opacity-90 transition-all"
-                  style={{ backgroundColor: dark, color: bg }}>
-                  Claim Your £{c.discountAmount} Discount Now →
-                </a>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* ── WHO IT'S FOR ── */}
         <section className="bg-gray-50 py-16 md:py-24">
           <div className="max-w-4xl mx-auto px-6">
@@ -255,7 +228,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <div className="max-w-4xl mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-10">How It Works</h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-0">
-              {[`Apply through ${c.gymName}`, showDiscount ? `Get your £${c.discountAmount} discount` : "Secure your place", "Start your course", "Get qualified", `Introduction at ${c.gymName}`].map((step, i) => (
+              {[`Apply through ${c.gymName}`, "Choose how to pay", "Start your course", "Get qualified", `Introduction at ${c.gymName}`].map((step, i) => (
                 <div key={step} className="flex sm:flex-col items-center gap-2 sm:gap-0 flex-1">
                   <div className="flex sm:flex-col items-center sm:mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0" style={{ backgroundColor: c.primaryColor }}>
@@ -276,21 +249,21 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <h2 className={`text-3xl md:text-4xl font-black text-black uppercase mb-10`}>Your Investment</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
-                <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>Best Value</p>
+                <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>One Payment</p>
                 <p className="text-black font-black text-2xl mb-1">Pay in Full</p>
-                <p className={`font-black text-4xl ${showDiscount ? "mb-1" : "mb-4"}`} style={{ color: c.primaryColor }}>£{c.fullPrice.toLocaleString()}</p>
-                {showDiscount && <p className="text-gray-400 text-sm line-through mb-4">Was £1,599</p>}
+                <p className="font-black text-4xl mb-1" style={{ color: c.primaryColor }}>{COURSE_PRICE_LABEL}</p>
+                <p className="text-gray-400 text-sm mb-4">Nothing further to pay</p>
                 <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-white text-sm text-center hover:opacity-90 transition-all" style={{ backgroundColor: c.primaryColor }}>
                   Enrol Now →
                 </a>
               </div>
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Spread the Cost</p>
-                <p className="text-black font-black text-2xl mb-1">Deposit Plan</p>
-                <p className="font-black text-4xl text-black mb-1">£{c.depositPrice.toLocaleString()}</p>
-                <p className="text-gray-400 text-sm mb-4">then £200 × {monthlyPayments} monthly payments, £{depositPlanTotal.toLocaleString()} total</p>
+                <p className="text-black font-black text-2xl mb-1">Pay Monthly</p>
+                <p className="font-black text-4xl text-black mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-gray-400 font-bold"> /month</span></p>
+                <p className="text-gray-400 text-sm mb-4">{MONTHLY_PAYMENTS} monthly payments, the first today, {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total</p>
                 <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                  Start with Deposit →
+                  Pay Monthly →
                 </a>
               </div>
             </div>
@@ -303,9 +276,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <h2 className="text-4xl md:text-5xl font-black text-white uppercase leading-tight mb-3">
               Start Your PT Journey Today
             </h2>
-            {showDiscount && (
-              <p className="text-white/70 font-bold uppercase tracking-wide mb-8">Claim Your £{c.discountAmount} Discount Now</p>
-            )}
+            <p className="text-white/70 font-bold uppercase tracking-wide mb-8">
+              {COURSE_PRICE_LABEL} in full, or {MONTHLY_PAYMENTS} × {MONTHLY_PRICE_LABEL} a month
+            </p>
             <a href={enrolPath}
               className="inline-block bg-white font-black uppercase tracking-wide text-base px-12 py-5 rounded-full hover:opacity-90 transition-all shadow-xl mb-5"
               style={{ color: c.primaryColor }}>

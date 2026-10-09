@@ -4,7 +4,7 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 export const metadata: Metadata = {
   title: "Enrol | HITIO PT Academy Orpington",
   description:
-    "Claim your £200 HITIO member discount and start your Level 2 & 3 PT qualification today.",
+    "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 const HITIO_PARTNER = {
   gymSlug: "hitio-orpington",
   gymReferral: "HITIO Gym Orpington",
-  fullPrice: 1399,
 };
 
 export default function HitioOrpingtonEnrolPage() {
@@ -37,13 +36,10 @@ export default function HitioOrpingtonEnrolPage() {
               <p className="text-white/40 text-[10px] mt-0.5">Orpington</p>
             </div>
           </div>
-          <div className="bg-[#e70034] text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            HITIOPT
-          </div>
         </div>
       </div>
 
-      {/* Enrolment flow — referral pre-set, promo available */}
+      {/* Enrolment flow — referral pre-set */}
       <EnrolmentFlow partner={HITIO_PARTNER} standalone />
 
       {/* Minimal footer */}

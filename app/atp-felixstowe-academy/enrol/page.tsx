@@ -4,7 +4,7 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 export const metadata: Metadata = {
   title: "Enrol | ATP PT Academy Felixstowe",
   description:
-    "Claim your £200 ATP member discount and start your Level 2 & 3 PT qualification today.",
+    "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 const ATP_PARTNER = {
   gymSlug: "atp-felixstowe",
   gymReferral: "ATP Fitness Felixstowe",
-  fullPrice: 1399,
 };
 
 export default function AtpFelixstoweEnrolPage() {
@@ -37,13 +36,10 @@ export default function AtpFelixstoweEnrolPage() {
               <p className="text-white/40 text-[10px] mt-0.5">Felixstowe</p>
             </div>
           </div>
-          <div className="bg-[#FFC03A] text-black text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            ATPPT
-          </div>
         </div>
       </div>
 
-      {/* Enrolment flow — referral pre-set, standing discount auto-applied */}
+      {/* Enrolment flow — referral pre-set */}
       <EnrolmentFlow partner={ATP_PARTNER} standalone />
 
       {/* Minimal footer */}

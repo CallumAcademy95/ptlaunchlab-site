@@ -23,7 +23,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 import { GYMS, GYM_SLUGS, getGym } from "../app/lib/gyms/index.ts";
-import { PARTNER_STANDING_CODE } from "../app/lib/partnerPromo.ts";
 
 const APP_DIR = new URL("../app/", import.meta.url);
 
@@ -121,50 +120,50 @@ test("the route-to-gym-slug map covers every registered gym", () => {
   }
 });
 
-test("every gym with an active standing code advertises the discounted price", () => {
+// October 2026 change-over: every gym sells the same two plans at the same
+// prices (app/lib/pricing.ts) — no member discount, no code, no per-gym Stripe
+// link. A price or code left in a gym's config is how a page ends up quoting
+// £1,399 while Stripe charges something else, which has happened before.
+const RETIRED_PRICE_FIELDS = [
+  "promoCode", "discountAmount", "fullPrice", "depositPrice",
+  "showDiscount", "stripeFullLink", "stripeDepositLink",
+];
+
+test("no gym config carries a price, a promo code or a Stripe link", () => {
   for (const [routeSlug, config] of Object.entries(GYMS)) {
-    const gymSlug = GYM_SLUG_BY_ROUTE[routeSlug];
-    if (gymSlug === "demo") continue;
-    if (!PARTNER_STANDING_CODE[gymSlug]) continue;
-    assert.equal(
-      config.fullPrice,
-      1399,
-      `${gymSlug} has standing code ${PARTNER_STANDING_CODE[gymSlug]} but advertises £${config.fullPrice}`,
-    );
+    for (const field of RETIRED_PRICE_FIELDS) {
+      assert.equal(field in config, false, `${routeSlug} still carries ${field}`);
+    }
   }
 });
 
-// gym-brands.json is a SECOND source of per-gym pricing, and the one the in-gym
-// screens read. scripts/gym-tv-slides.mjs and scripts/gym-gamma-decks.mjs both
-// render `brand.fullPrice` straight onto a slide, so a gym whose page says £1,399
-// and whose brands entry says £1,599 quotes two different prices in two places a
-// member can see. That is exactly what happened to Ebor: the page config was
-// corrected and this file was not, so its TV slides kept advertising £1,599 while
-// its website advertised £1,399.
-//
-// The check above guards app/lib/gyms/*. This one guards the other source, so the
-// two cannot drift apart again without a test failing.
-test("gym-brands.json advertises the same discounted price as the gym registry", () => {
+test("no gym enrol page hardcodes a price or a Stripe link", () => {
+  for (const routeSlug of Object.keys(GYMS)) {
+    const page = new URL(`../app/${routeSlug}/enrol/page.tsx`, import.meta.url);
+    if (!existsSync(page)) continue;
+    const src = readFileSync(page, "utf8");
+    assert.doesNotMatch(src, /buy\.stripe\.com/, `${routeSlug}/enrol hardcodes a Stripe link`);
+    assert.doesNotMatch(src, /fullPrice|£200|1,?399|1,?599/, `${routeSlug}/enrol still states an old price`);
+  }
+});
+
+// gym-brands.json is a SECOND source of per-gym data, and the one the in-gym
+// screens and decks read (scripts/gym-tv-slides.mjs, gym-gamma-decks.mjs). It
+// must carry no price or code either — the generators take prices from
+// app/lib/pricing.ts.
+test("gym-brands.json carries no price and no promo code", () => {
   const brands = JSON.parse(
     readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
-  ) as Record<string, { fullPrice?: number; discountAmount?: number | null; promoCode?: string | null }>;
+  ) as Record<string, Record<string, unknown>>;
 
   // A silently-renamed or moved file would make every assertion below vacuous.
   assert.ok(Object.keys(brands).length >= 9, `expected at least 9 gyms in gym-brands.json, found ${Object.keys(brands).length}`);
 
   for (const [gymSlug, brand] of Object.entries(brands)) {
-    if (gymSlug === "demo") continue;
-    if (!PARTNER_STANDING_CODE[gymSlug]) continue;
-    assert.equal(
-      brand.fullPrice,
-      1399,
-      `gym-brands.json: ${gymSlug} has standing code ${PARTNER_STANDING_CODE[gymSlug]} but its TV slides would advertise £${brand.fullPrice}`,
-    );
-    assert.equal(
-      brand.discountAmount,
-      200,
-      `gym-brands.json: ${gymSlug} advertises £1,399 but carries discountAmount ${brand.discountAmount}`,
-    );
+    for (const field of ["discountAmount", "fullPrice", "depositPrice"]) {
+      assert.equal(field in brand, false, `gym-brands.json: ${gymSlug} still carries ${field}`);
+    }
+    assert.equal(brand.promoCode, null, `gym-brands.json: ${gymSlug} still carries promo code ${brand.promoCode}`);
   }
 });
 
@@ -190,24 +189,3 @@ test("the route-to-gym-slug map matches the real source in each enrol/page.tsx",
   }
 });
 
-// scripts/gym-brands.json is a SEPARATE registry from app/lib/gyms/ — used by
-// the ad renderer and the partner playbook, keyed on gymSlug rather than the
-// route slug. It drifted from PARTNER_STANDING_CODE for Ebor specifically:
-// this file said `promoCode: null` (the pre-e2a91b5 "grandfathered, no
-// discount" state) while PARTNER_STANDING_CODE and app/lib/gyms/ebor-fitness.ts
-// both already said EBORPTDISCOUNT — so any playbook copy gated on
-// {{#promoCode}} silently hid Ebor's own live discount from Ebor.
-test("gym-brands.json's promoCode agrees with PARTNER_STANDING_CODE for every gym", () => {
-  const brands: Record<string, { promoCode: string | null }> = JSON.parse(
-    readFileSync(new URL("../scripts/gym-brands.json", import.meta.url), "utf8"),
-  );
-
-  for (const [gymSlug, code] of Object.entries(PARTNER_STANDING_CODE)) {
-    assert.equal(
-      brands[gymSlug]?.promoCode,
-      code,
-      `${gymSlug}: gym-brands.json says promoCode ${JSON.stringify(brands[gymSlug]?.promoCode)} but ` +
-        `PARTNER_STANDING_CODE says ${JSON.stringify(code)}`,
-    );
-  }
-});

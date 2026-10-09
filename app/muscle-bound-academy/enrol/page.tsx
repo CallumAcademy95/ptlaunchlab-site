@@ -3,7 +3,7 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | Muscle Bound PT Academy",
-  description: "Claim your £200 Muscle Bound member discount and start your Level 2 & 3 PT qualification today.",
+  description: "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 const MUSCLE_BOUND_PARTNER = {
   gymSlug: "muscle-bound",
   gymReferral: "Muscle Bound Gym",
-  fullPrice: 1399,
 };
 
 export default function MuscleBoundEnrolPage() {
@@ -31,16 +30,13 @@ export default function MuscleBoundEnrolPage() {
             />
             <div>
               <p className="text-white font-black text-sm uppercase leading-none">Muscle Bound PT Academy</p>
-              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+              <p className="text-white/40 text-[10px] mt-0.5">Enrolment</p>
             </div>
-          </div>
-          <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide" style={{ background: "#ca1413" }}>
-            MBGPTDISCOUNT
           </div>
         </div>
       </div>
 
-      {/* Enrolment flow — referral pre-set, promo available */}
+      {/* Enrolment flow — referral pre-set */}
       <EnrolmentFlow partner={MUSCLE_BOUND_PARTNER} standalone />
 
       {/* Minimal footer */}

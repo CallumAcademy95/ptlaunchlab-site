@@ -11,14 +11,8 @@ export const sixFitAcademy: GymConfig = {
     "Inside The Best\nGym In The North",
   ],
   heroSubline: "Train. Qualify. Earn.",
-  promoCode: "6FITPTDISCOUNT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside the Best Gym In The North, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside The Best Gym In The North",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
   stats: [
     { value: "#1", label: "Best Gym In The North" },
     { value: "2×", label: "Best Gym In Bradford" },
@@ -33,6 +27,6 @@ export const sixFitAcademy: GymConfig = {
   ],
   metaTitle: "6fit PT Academy | Become a Qualified Personal Trainer at 6fit Gyms",
   metaDescription:
-    "Train, qualify, and earn at Bradford's best gym. Get £200 off your Level 2 & 3 PT qualification exclusively through 6fit Gyms. Mentorship included. Introduction guarantee on qualifying.",
+    "Train, qualify, and earn at Bradford's best gym. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included. Introduction guarantee on qualifying.",
   canonicalPath: "/6fit-academy",
 };

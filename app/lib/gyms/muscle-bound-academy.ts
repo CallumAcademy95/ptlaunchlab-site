@@ -12,14 +12,8 @@ export const muscleBoundAcademy: GymConfig = {
   ],
   heroSubline: "Train. Qualify. Earn.",
   location: "Bradford & Huddersfield",
-  promoCode: "MBGPTDISCOUNT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside Muscle Bound Gym, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside Muscle Bound Gym",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
   stats: [
     { value: "17k", label: "Sq ft Facility" },
     { value: "2×", label: "Locations (Bradford & Huddersfield)" },
@@ -35,6 +29,6 @@ export const muscleBoundAcademy: GymConfig = {
   ],
   metaTitle: "Muscle Bound PT Academy | Become a Qualified Personal Trainer at Muscle Bound Gym",
   metaDescription:
-    "Train, qualify, and earn at Bradford's biggest gym. Get £200 off your Level 2 & 3 PT qualification exclusively through Muscle Bound Gym. Mentorship included. Introduction guarantee on qualifying.",
+    "Train, qualify, and earn at Bradford's biggest gym. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included. Introduction guarantee on qualifying.",
   canonicalPath: "/muscle-bound-academy",
 };
