@@ -26,7 +26,7 @@ export const CONCEPTS = [
     headline: ["YOU'RE ALREADY HERE", "FIVE DAYS A WEEK."],
     accentLine: "QUALIFY WHILE YOU TRAIN.",
     sub: "A nationally recognised Level 3 Personal Training qualification, through {{gymName}}.",
-    footer: "Next intake open",
+    footer: "Enrol any time",
   },
   {
     id: "local",
@@ -35,7 +35,7 @@ export const CONCEPTS = [
     headline: ["QUALIFY AS A", "PERSONAL TRAINER"],
     accentLine: "WITHOUT LEAVING {{town}}.",
     sub: "A nationally recognised Level 3 qualification, through {{gymName}}.",
-    footer: "Next intake open",
+    footer: "Enrol any time",
   },
 ];
 
