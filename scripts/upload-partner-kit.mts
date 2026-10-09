@@ -76,11 +76,18 @@ function itemsFor(slug: string): Item[] {
     { slug, abs: findOne(tv, "-gym-screen-slides-editable.pptx"), category: "digital", title: "Gym screen slides (editable)",
       description: "The PowerPoint version. Change the wording and export it again yourself." },
   ];
-  return list.map((i) => {
-    if (!i.abs || !existsSync(i.abs)) throw new Error(`${slug}: "${i.title}" not rendered (${i.abs ?? "no file"})`);
-    return i as Item;
-  });
+  // A missing render is reported and skipped, not fatal: one gym's failed
+  // video shouldn't hold back every other gym's kit. The run still exits 1.
+  const ready: Item[] = [];
+  for (const i of list) {
+    if (!i.abs || !existsSync(i.abs)) {
+      console.warn(`  [MISSING] ${slug}: "${i.title}" not rendered — skipped`);
+      missing++;
+    } else ready.push(i as Item);
+  }
+  return ready;
 }
+let missing = 0;
 
 const slugs = Object.keys(BRANDS).filter((s) => s !== "demo" && (!only.length || only.includes(s)));
 const items: Item[] = slugs.flatMap(itemsFor);
@@ -167,6 +174,6 @@ for (const item of items) {
   else added++;
 }
 
-console.log(`\nadded ${added}, replaced ${replaced}, skipped ${skipped}, failed ${failed}`);
+console.log(`\nadded ${added}, replaced ${replaced}, skipped ${skipped}, failed ${failed}, missing ${missing}`);
 if (!APPLY) console.log("Nothing uploaded. Re-run with --apply.");
-if (failed) process.exit(1);
+if (failed || missing) process.exit(1);
