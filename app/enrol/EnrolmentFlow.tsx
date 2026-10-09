@@ -396,7 +396,7 @@ export default function EnrolmentFlow({
                 className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay Monthly</p>
-                <p className="text-gold text-4xl font-bold mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-soft font-semibold"> /month</span></p>
+                <p className="text-white text-3xl font-bold mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-soft font-semibold"> /month</span></p>
                 <p className="text-soft text-xs mb-3">
                   {MONTHLY_PAYMENTS} monthly payments, the first today — {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total
                 </p>
