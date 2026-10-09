@@ -13,7 +13,7 @@ import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 //
 // Body shape:
 //   { event_id: string, name?: string, email?: string, phone?: string,
-//     plan?: 'course_pif'|'course_deposit', value?: number,
+//     plan?: 'course_pif'|'course_monthly', value?: number,
 //     currency?: string, source?: string }
 //
 // Mirrors the pattern of /api/capi-schedule. Permissive validation — we

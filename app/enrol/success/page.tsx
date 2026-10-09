@@ -59,7 +59,6 @@ async function signedEnrolUrl(sessionId: string | undefined): Promise<{ url: str
             : "PIF",
         amount: (session.amount_total ?? 0) / 100,
         gym: session.metadata?.gym_slug || undefined,
-        promo: session.metadata?.promo_code || undefined,
         ts: Date.now(),
       },
       secret,

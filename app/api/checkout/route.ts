@@ -2,35 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import {
   createCheckoutSession,
-  priceForLink,
-  PAYMENT_LINK_PRICES,
+  planFromChoice,
+  COURSE_PLANS,
   ENROL_SUCCESS_URL,
 } from "@/app/lib/stripeCheckout";
-import { resolvePromoCode } from "@/app/lib/promoCodes";
-import { PARTNER_PROMO_PREFIXES } from "@/app/lib/partnerPromo";
-import { isSeptemberOfferLink, isSeptemberOfferOpen } from "@/app/lib/septemberOffer";
 import { sanitizeAttribution } from "@/app/lib/attribution";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/checkout
 //
-// Turns the enrolment flow's chosen Payment Link into a server-created Stripe
-// Checkout Session whose `success_url` points at /enrol/success — the page
-// that collects the NCFE learner record and signed agreement.
+// Turns the enrolment flow's chosen plan — "pif" (£999.99) or "monthly"
+// (10 × £99.99) — into a server-created Stripe Checkout Session whose
+// `success_url` points at /enrol/success.
 //
 // Previously the browser redirected straight to the Payment Link and relied on
 // a redirect configured in the Stripe Dashboard. Two of the three links never
 // had one set, so those buyers paid and were dumped on stripe.com, never
 // completing enrolment. See app/lib/stripeCheckout.ts for the full history.
 //
-// The client still decides WHICH link (partner config, promo, funnel) — this
-// route only maps that link to its price and creates the session. Behaviour is
-// otherwise identical to the old redirect.
+// The client chooses one of the two plans; the price comes from the server-side
+// plan config and nothing in the request can change it. There are no promo
+// codes, so nothing here accepts one.
 //
-// Body: { paymentLink, clientReferenceId?, email?, name?, gymReferral?,
-//         promoCode?, cancelPath? }
-// Returns: { url } on success, or { url: null } so the client falls back to
-//          redirecting to the Payment Link directly. NEVER blocks the buyer.
+// Body: { plan: "pif" | "monthly", clientReferenceId?, email?, name?,
+//         gymReferral?, gymSlug?, cancelPath?, attribution? }
+// Returns: { url } on success, or { url: null } so the client falls back to the
+//          plan's raw Payment Link (or shows a contact message if none is set).
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const runtime = "nodejs";
@@ -44,7 +41,7 @@ const healthLimiter = createRateLimiter(6, 60_000);
 // "Checkout Sessions → write" silently drops buyers back onto the raw Payment
 // Links, which is the exact silent breakage this whole change exists to stop.
 // So there needs to be a way to ask production "is it actually on?" without
-// paying £599 to find out.
+// making a real payment to find out.
 //
 // Confirms permission with an intentionally empty create call — Stripe checks
 // key permissions before validating params, so 403 means no access and 400
@@ -91,7 +88,9 @@ export async function GET(req: NextRequest) {
     keyPresent: true,
     keyType: key.startsWith("rk_") ? "restricted" : key.startsWith("sk_") ? "secret" : "unknown",
     canCreateSessions,
-    mappedPaymentLinks: Object.keys(PAYMENT_LINK_PRICES).length,
+    plans: Object.fromEntries(
+      Object.values(COURSE_PLANS).map((p) => [p.choice, { price: p.price, checkoutPence: p.checkoutPence }]),
+    ),
     successUrl: ENROL_SUCCESS_URL,
     detail,
   });
@@ -111,52 +110,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: null, reason: "bad-json" });
   }
 
-  const paymentLink = typeof body.paymentLink === "string" ? body.paymentLink : "";
-  if (!paymentLink || !priceForLink(paymentLink)) {
-    // Unknown/absent link — client falls back and goes straight to Stripe.
-    return NextResponse.json({ url: null, reason: "unmapped-link" });
-  }
-
-  // ─── The September weekend gate ───────────────────────────────────────────
-  //
-  // This is the ONLY server-side thing standing between a closed offer and a
-  // £99 sale, so it is deliberately NOT a `{ url: null }` soft failure like
-  // every other branch in this route. Those tell the client "fall back to the
-  // raw Payment Link", which for this price would sell the offer after it had
-  // closed — the exact opposite of refusing it.
-  //
-  // 403 + an explicit reason instead. EnrolmentFlow must not fall back on it.
-  if (isSeptemberOfferLink(paymentLink) && !isSeptemberOfferOpen()) {
-    return NextResponse.json(
-      { url: null, reason: "offer-closed", offerClosed: true },
-      { status: 403 },
-    );
+  const plan = planFromChoice(body.plan);
+  if (!plan) {
+    // Unknown/absent plan — the client falls back to its own error handling.
+    return NextResponse.json({ url: null, reason: "unknown-plan" });
   }
 
   const str = (v: unknown, max = 300) =>
     typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
 
-  // The browser sends the code STRING, never a promotion code id. Resolving it
-  // again here means a tampered client cannot nominate an arbitrary discount.
-  const promoCode = str(body.promoCode, 60);
-  const gymSlug = str(body.gymSlug, 60);
-  // Checked by shape, not truthiness — see app/api/promo/validate/route.ts,
-  // whose guard this mirrors. A gymSlug of "constructor" or "__proto__"
-  // resolves to a truthy non-array (an inherited function) that a plain
-  // `prefix ? … : …` check would not catch.
-  const prefix = gymSlug ? PARTNER_PROMO_PREFIXES[gymSlug] : undefined;
-  const validPrefix = Array.isArray(prefix) && prefix.length > 0 ? prefix : undefined;
-  const resolved = promoCode && validPrefix ? await resolvePromoCode(promoCode, validPrefix) : null;
-
   const session = await createCheckoutSession({
-    paymentLink,
+    plan,
     clientReferenceId: str(body.clientReferenceId, 200),
     email: str(body.email, 200),
     name: str(body.name, 200),
     gymReferral: str(body.gymReferral, 100),
-    gymSlug,
-    promoCode,
-    promoCodeId: resolved?.ok ? resolved.promoId : undefined,
+    gymSlug: str(body.gymSlug, 60),
     cancelPath: str(body.cancelPath, 200),
     attribution: sanitizeAttribution(body.attribution),
   });
