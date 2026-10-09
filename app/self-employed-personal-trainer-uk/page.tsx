@@ -1,4 +1,5 @@
 import Nav from "@/app/components/Nav";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import RelatedGuides from "@/app/components/RelatedGuides";
 import PainPoints from "@/app/components/PainPoints";
 import Reframe from "@/app/components/Reframe";
@@ -18,7 +19,7 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
   title: "Self-Employed Personal Trainer UK | Build Your Own PT Business | PT Launch Lab",
-  description: "Go self-employed as a UK personal trainer with NCFE Level 3 + our £500 business mentorship community bundled in for £1,599. The mentorship piece — pricing, client acquisition, marketing — is included in the fee rather than sold on afterwards. We bundle it.",
+  description: `Go self-employed as a UK personal trainer with NCFE Level 3 + our £500 business mentorship community bundled in for ${COURSE_PRICE_LABEL}. The mentorship piece — pricing, client acquisition, marketing — is included in the fee rather than sold on afterwards. We bundle it.`,
   alternates: { canonical: "https://ptlaunchlab.co.uk/self-employed-personal-trainer-uk" },
 };
 

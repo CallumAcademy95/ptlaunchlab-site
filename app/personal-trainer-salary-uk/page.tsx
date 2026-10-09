@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -229,7 +230,7 @@ export default function SalaryPage() {
         <section className="bg-surface py-16 md:py-20 px-6 border-t border-blue/15">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-4">Ready to build your PT income?</h2>
-            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">£1,599 all-in</strong> — including the £500 Skool mentorship community where Callum, Ryan and Miles (the people quoted throughout this article) coach you weekly on the business side the course covers.</p>
+            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">{COURSE_PRICE_LABEL} all-in</strong> — including the £500 Skool mentorship community where Callum, Ryan and Miles (the people quoted throughout this article) coach you weekly on the business side the course covers.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
               <Link href="/quiz" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Take the 60-Second Quiz →</Link>
               <Link href="/book-call" className="px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all">Book a Free 15-Min Call</Link>
