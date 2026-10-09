@@ -44,6 +44,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "exceljs": "^4.4.0",
+    "pptxgenjs": "^4.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
