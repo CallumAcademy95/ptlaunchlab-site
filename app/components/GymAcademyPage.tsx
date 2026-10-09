@@ -65,8 +65,8 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             )}
 
             <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
-              <span className="text-white font-black text-xl uppercase tracking-wide">{MONTHLY_PRICE_LABEL} a month</span>
-              <span className="text-white/80 text-sm">× {MONTHLY_PAYMENTS}, or {COURSE_PRICE_LABEL} in full</span>
+              <span className="text-white font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
+              <span className="text-white/80 text-sm">or {MONTHLY_PRICE_LABEL} a month for {MONTHLY_PAYMENTS} months</span>
             </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-10">
