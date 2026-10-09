@@ -7,6 +7,8 @@
 // accident, which `select("*")` would allow.
 
 import { getSupabaseAdmin } from "./supabase-admin";
+import { heldCommissionLabel } from "./paymentPlans";
+import { formatPence as formatPricePence } from "./pricing";
 
 /** Columns a partner is allowed to see from pp_sales. Note: no learner_email. */
 export const PARTNER_SALE_COLUMNS =
@@ -179,14 +181,16 @@ export type CommissionState =
  * WHEN it releases, or what it is waiting for — a bare pending balance with no
  * explanation is the thing that generates emails.
  */
-export function commissionState(sale: PartnerSale): CommissionState {
+export function commissionState(sale: PartnerSale, terms?: string | null): CommissionState {
   if (sale.commission_status === "voided" || sale.status === "refunded") {
     return { key: "voided", label: "Not payable" };
   }
   if (sale.commission_status === "paid") return { key: "paid", label: "Paid" };
 
   if (!sale.commission_release_at) {
-    return { key: "held", label: "Releases after 2nd instalment" };
+    // What it is waiting for depends on the partner's terms: the 2nd instalment
+    // (instalment_2) or the learner's 5th payment (payment_5, v4.0).
+    return { key: "held", label: heldCommissionLabel(terms) };
   }
 
   const release = new Date(sale.commission_release_at);
@@ -199,11 +203,33 @@ export function commissionState(sale: PartnerSale): CommissionState {
   };
 }
 
+/**
+ * "£250", "£1,500", "£499.95" — pence kept whenever they are non-zero. Used to
+ * round to whole pounds, which is right for every fee but not for an amount
+ * collected on the 10 × £99.99 plan.
+ */
 export function formatPence(pence: number): string {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(pence / 100);
+  return formatPricePence(pence);
+}
+
+/**
+ * When a partner's commission is released, in plain words, for their terms.
+ * One wording for the portal's home, sales and payments pages so they cannot
+ * disagree with each other.
+ */
+export function commissionReleaseRule(terms: string | null | undefined): string {
+  if (terms === "payment_5") {
+    return (
+      "If the learner pays in full, your fee is released 30 days after they enrol. " +
+      "If they pay monthly, it's released when their 5th monthly payment clears (their first payment counts as 1). " +
+      "Once paid, it is not clawed back."
+    );
+  }
+  if (terms === "instalment_2") {
+    return (
+      "If the learner pays in full, your fee is released 30 days after they enrol. " +
+      "If they're on an instalment plan, it's released once their second instalment clears, then paid 30 days after that."
+    );
+  }
+  return "Your fee is released 30 days after the learner enrols, whichever way they choose to pay.";
 }

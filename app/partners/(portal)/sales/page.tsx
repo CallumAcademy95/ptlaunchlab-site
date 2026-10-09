@@ -3,6 +3,7 @@ import { requirePartner } from "@/app/lib/partner-auth";
 import {
   getPartnerSales,
   commissionState,
+  commissionReleaseRule,
   formatPence,
   type PartnerSale,
 } from "@/app/lib/partner-data";
@@ -62,7 +63,7 @@ export default async function SalesPage({
   // settled and outstanding lives on the Payments page.
   let earned = 0, payable = 0, held = 0;
   for (const s of sales) {
-    const state = commissionState(s);
+    const state = commissionState(s, partner.commission_terms);
     if (state.key === "voided") continue;
     earned += s.commission_pence;
     if (state.key === "payable") payable += s.commission_pence;
@@ -145,7 +146,7 @@ export default async function SalesPage({
               </thead>
               <tbody className="divide-y divide-white/10">
                 {sales.map((s) => {
-                  const state = commissionState(s);
+                  const state = commissionState(s, partner.commission_terms);
                   return (
                     <tr key={s.id} className={s.status !== "confirmed" ? "opacity-60" : undefined}>
                       <td className="px-4 py-3 text-soft whitespace-nowrap">
@@ -179,9 +180,7 @@ export default async function SalesPage({
           </div>
 
           <p className="text-soft text-xs leading-relaxed">
-            {partner.commission_terms === "instalment_2"
-              ? "Commission on an instalment plan is released once the learner's second instalment clears, then paid 30 days later. Pay-in-full enrolments are paid 30 days after enrolment."
-              : "Commission is paid 30 days after enrolment, per your partnership agreement."}{" "}
+            {commissionReleaseRule(partner.commission_terms)}{" "}
             Anything that looks wrong?{" "}
             <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
               Tell us

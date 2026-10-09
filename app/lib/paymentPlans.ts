@@ -209,3 +209,10 @@ function ordinal(n: number): string {
   const v = n % 100;
   return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
 }
+
+/** Short admin-facing label for a partner's commission terms. */
+export function commissionTermsLabel(terms: string | null | undefined): string {
+  if (terms === "on_enrolment") return "30d after enrolment (grandfathered)";
+  if (terms === "payment_5") return "v4.0: PIF 30d · monthly at payment 5";
+  return "Held to instalment 2";
+}

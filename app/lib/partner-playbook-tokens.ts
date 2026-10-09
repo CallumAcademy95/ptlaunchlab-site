@@ -45,7 +45,8 @@ interface GymBrand {
  * the portal actually renders.
  */
 export const RETIRED_PLAYBOOK_SLUGS: ReadonlySet<string> = new Set([
-  "campaign-november-black-friday",
+  "campaign-november-black-friday", // £999 Black Friday code
+  "campaign-launch-promo", // "£500 off, then £300 off" launch offer
 ]);
 
 export function isRetiredPlaybookEntry(slug: string): boolean {

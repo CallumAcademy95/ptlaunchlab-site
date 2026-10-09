@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { commissionTermsLabel } from "@/app/lib/paymentPlans";
 import { notFound } from "next/navigation";
 import {
   Banknote,
@@ -260,11 +261,7 @@ export default async function PartnerDetailPage({
               />
               <DefRow
                 k="Terms"
-                v={
-                  p.commission_terms === "on_enrolment"
-                    ? "30d after enrolment"
-                    : "Held to instalment 2"
-                }
+                v={commissionTermsLabel(p.commission_terms)}
               />
               <DefRow
                 k="Bank details"

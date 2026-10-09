@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { commissionTermsLabel } from "@/app/lib/paymentPlans";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { formatPence } from "@/app/lib/partner-data";
 import { buildPartnerTimeline, partnerHealth } from "@/app/lib/partner-timeline";
@@ -378,9 +379,7 @@ export default async function AdminPartnersPage({
                     </div>
                   </td>
                   <td className="px-4 py-3 text-slate-500 text-xs">
-                    {p.commission_terms === "on_enrolment"
-                      ? "30d after enrolment (grandfathered)"
-                      : "Held to instalment 2"}
+                    {commissionTermsLabel(p.commission_terms)}
                   </td>
                   <td className="px-4 py-3">
                     {(learnersFor.get(p.id) ?? 0) > 0 ? (
