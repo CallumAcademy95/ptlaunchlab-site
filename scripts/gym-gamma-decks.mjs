@@ -21,6 +21,8 @@
  */
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+// Prices come from the site's single source (October 2026 change-over).
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "../app/lib/pricing.ts";
 
 const env = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
 const KEY = (env.match(/^GAMMA_API_KEY=(.*)$/m) || [])[1]?.trim();
@@ -63,7 +65,7 @@ function deckFor(brand) {
 
     `# You're not too old\n\nMost people who start are changing career in their thirties and forties.\n\nLife experience counts for a lot in this job.`,
 
-    `# What it costs\n\n## £${brand.fullPrice} — or £${brand.depositPrice} to start\n\nPayment plans available. Ask at reception and we'll go through the options properly.\n\nNo pressure.`,
+    `# What it costs\n\n## ${COURSE_PRICE_LABEL} — or ${MONTHLY_PRICE_LABEL} a month\n\nPay in full, or ${MONTHLY_PAYMENTS} monthly payments. Ask at reception and we'll go through the options properly.\n\nNo pressure.`,
 
     `# The first step is just asking\n\nAny member of the team can tell you how it works.\n\nIt costs nothing to have the conversation.`,
 

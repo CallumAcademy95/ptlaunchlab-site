@@ -36,6 +36,23 @@ interface GymBrand {
   canonicalPath: string;
 }
 
+/**
+ * Playbook entries the portal no longer shows. October 2026 change-over: no
+ * promo codes, discounts or dated offers for anyone, so a campaign built on one
+ * is retired even if its markdown is still in the repo. The portal filters
+ * these out (partner-playbook.ts getPlaybook) and the unresolved-token test in
+ * tests/brandLeaks.test.mts skips them for the same reason — it checks what
+ * the portal actually renders.
+ */
+export const RETIRED_PLAYBOOK_SLUGS: ReadonlySet<string> = new Set([
+  "campaign-november-black-friday", // £999 Black Friday code
+  "campaign-launch-promo", // "£500 off, then £300 off" launch offer
+]);
+
+export function isRetiredPlaybookEntry(slug: string): boolean {
+  return RETIRED_PLAYBOOK_SLUGS.has(slug);
+}
+
 export function tokensForGym(brand: GymBrand, origin: string): PlaybookTokens {
   return {
     gymName: brand.gymName,

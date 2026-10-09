@@ -70,8 +70,9 @@ two-minute conversation rather than a guess.
 campaign, one ad set, both creatives in it. Increase it if you want to — it is your
 account and your money.
 
-A qualifying learner generates **£500 partner commission, inclusive of VAT**. That is
-what makes this worth testing without needing volume.
+Each learner who enrols through your academy earns you **£250, inclusive of VAT**,
+paid 30 days after a pay-in-full enrolment or when their 5th monthly payment clears.
+That is what makes this worth testing without needing volume.
 
 What we are not going to tell you is that £150 produces a learner. It might not. Nobody
 has run this campaign before, so there is no benchmark to quote you and we would rather
@@ -103,10 +104,8 @@ The destination is your own academy page:
 {{academyUrl}}
 ```
 
-{{#promoCode}}Your code `{{promoCode}}` is applied automatically on that page, so the
-ad does not need to mention it. In the months that carry a lower price you will get a
-different code, and that one is worth putting in the ad because the deadline is the
-reason to act.{{/promoCode}}
+There are no codes or discounts to add. The price on that page is the same for
+everyone, every month.
 
 ## 5. Judging it
 

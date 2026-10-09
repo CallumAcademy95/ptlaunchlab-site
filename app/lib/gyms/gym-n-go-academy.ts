@@ -16,14 +16,8 @@ export const gymNGoAcademy: GymConfig = {
   ],
   heroSubline: "Train. Qualify. Earn.",
   location: "Forest Hill, South London",
-  promoCode: "GYMNGOPT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside Gym n Go Forest Hill, a real coaching floor rather than a classroom.",
   whyThisGymHeading: "Learn Inside Gym n Go Forest Hill",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
   stats: [
     { value: "SE23",     label: "Forest Hill, South London" },
     { value: "Strength", label: "Premium Free-Weights Floor" },
@@ -38,6 +32,6 @@ export const gymNGoAcademy: GymConfig = {
   ],
   metaTitle: "Gym n Go PT Academy | Become a Qualified Personal Trainer in Forest Hill",
   metaDescription:
-    "Train, qualify and earn at Gym n Go Forest Hill. Get £200 off your Level 2 & 3 PT qualification exclusively for Gym n Go members. Mentorship included.",
+    "Train, qualify and earn at Gym n Go Forest Hill. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/gym-n-go-academy",
 };

@@ -6,7 +6,7 @@ import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 
 // /prospectus/thank-you
 // Landing page after a successful prospectus form submission.
-// Opens the PDF in a new tab on mount and presents the 48h £200 discount.
+// Opens the PDF in a new tab on mount and shows the two ways to pay.
 
 export default function ProspectusThankYouClient() {
   useEffect(() => {

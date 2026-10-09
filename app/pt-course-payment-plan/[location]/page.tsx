@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 import Nav from "@/app/components/Nav";
 import LocationHero from "@/app/components/LocationHero";
 import PainPoints from "@/app/components/PainPoints";
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   if (!loc) return {};
   return {
     title: `PT Course Payment Plan in ${loc.name} | Spread the Cost | PT Launch Lab`,
-    description: `Study your personal trainer course from ${loc.name} with flexible payment plans. NCFE Level 3, 100% online, spread the cost over 12 months. Start today.`,
+    description: `Study your personal trainer course from ${loc.name} and pay monthly: ${MONTHLY_PAYMENTS} payments of ${MONTHLY_PRICE_LABEL}, no interest, the first at checkout. NCFE Level 3, 100% online. Start today.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }
@@ -46,7 +47,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
     <>
       <Nav />
       <main>
-        <LocationHero location={loc.name} headline="PT Course With Payment Plan in {location}.|Spread the cost. No upfront fees required." />
+        <LocationHero location={loc.name} headline={`PT Course With Payment Plan in {location}.|${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. No interest.`} />
         <LocationContext locationSlug={loc.slug} locationName={loc.name} region={loc.region} />
         <PainPoints />
         <Reframe />

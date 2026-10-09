@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import Nav from "@/app/components/Nav";
 import LocationHero from "@/app/components/LocationHero";
 import PainPoints from "@/app/components/PainPoints";
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   if (!loc) return {};
   return {
     title: `NCFE Level 3 PT Qualification in ${loc.name} | Ofqual Regulated | PT Launch Lab`,
-    description: `NCFE Level 3 PT qualification in ${loc.name} — the qualification UK gym managers ask for by name. £1,599 includes our £500 business mentorship community. Ofqual regulated. Qualify in 8–16 weeks.`,
+    description: `NCFE Level 3 PT qualification in ${loc.name} — the qualification UK gym managers ask for by name. ${COURSE_PRICE_LABEL} includes our £500 business mentorship community. Ofqual regulated. Qualify in 8–16 weeks.`,
     alternates: { canonical: `https://ptlaunchlab.co.uk/level-3-personal-trainer-course/${location}` },
   };
 }

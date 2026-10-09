@@ -11,13 +11,13 @@ Every post, email and conversation in this playbook is written in **your** voice
 **Say this**
 
 > "We've opened our own Personal Training academy."
-> "Our next intake opens in January."
+> "You can start any day."
 > "We help people qualify here."
 
 **Not this**
 
 > "We've partnered with a training provider."
-> "Applications are open for the training provider's intake."
+> "Applications are open with the training provider."
 > "They run the course, we just refer you."
 
 ## Why it matters
@@ -42,6 +42,6 @@ know.
 
 ## The one exception
 
-Your team need to know where to send a question they can't answer: pricing, finance, eligibility, anything about the qualification itself. Internally, that's us.
+Your team need to know where to send a question they can't answer: pricing, payments, eligibility, anything about the qualification itself. Internally, that's us.
 
 To a member, it's **"the academy team"**. Same people, and it keeps the conversation about their gym rather than about a company they've never heard of.

@@ -1,4 +1,5 @@
 import Nav from "@/app/components/Nav";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import PainPoints from "@/app/components/PainPoints";
 import Reframe from "@/app/components/Reframe";
 import FounderStory from "@/app/components/FounderStory";
@@ -45,7 +46,7 @@ export default function Page() {
                   Every PT Launch Lab student gets our £500 Mentorship Hub — built around one job: walking you from qualifying to your first paying client. Direct access to mentors who&apos;ve built real careers in fitness, not tutors who&apos;ve only ever taught.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  Most UK PT academies charge £500–£3,000 separately for ongoing mentorship — or skip it entirely. We bundle it into the £1,599 course fee. From your first lesson through to your first paying client, we&apos;re with you every step.
+                  Most UK PT academies charge £500–£3,000 separately for ongoing mentorship — or skip it entirely. We bundle it into the {COURSE_PRICE_LABEL} course fee. From your first lesson through to your first paying client, we&apos;re with you every step.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>

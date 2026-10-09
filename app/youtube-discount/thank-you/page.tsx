@@ -1,12 +1,6 @@
-import type { Metadata } from "next";
-import YouTubeThankYouClient from "./YouTubeThankYouClient";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Discount Unlocked | PT Launch Lab",
-  description: "Your £200 discount is unlocked for the next 48 hours.",
-  robots: { index: false, follow: false },
-};
-
+// /youtube-discount/thank-you — RETIRED with /youtube-discount. See that page.
 export default function Page() {
-  return <YouTubeThankYouClient />;
+  permanentRedirect("/courses");
 }

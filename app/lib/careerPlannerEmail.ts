@@ -1,6 +1,6 @@
 // app/lib/careerPlannerEmail.ts
 // Instant "Your PT Career Plan" email, sent the moment the plan is shown.
-// Deterministic, no AI. Makes NO £200 claim: the promo is a browser cookie.
+// Deterministic, no AI. Makes no discount or deadline claim: there are none.
 import type { CareerPlanV2 } from "./careerPlannerV2.ts";
 
 const NAVY = "#072B4A"; const NAVY_DEEP = "#051D33"; const CARD = "#0D3559"; const GOLD = "#F5C518"; const SOFT = "#B4C2D6";

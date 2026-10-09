@@ -111,7 +111,7 @@ const QUALIFY: Record<Hours, string> = {
 };
 const START_OFFSET: Record<Timeframe, number | null> = { now: 0, "30_days": 1, "1_3_months": 2, "3_6_months": 4, researching: null };
 const CONCERN: Record<Blocker, { title: string; answer: string }> = {
-  cost: { title: "The cost", answer: "You can pay in full or spread it: a deposit today, then monthly payments. The options are below." },
+  cost: { title: "The cost", answer: "You can pay in full or spread it over 10 monthly payments, the first taken when you enrol. The options are below." },
   time: { title: "Finding the time", answer: "It's studied online at your own pace, so it fits around the job you already have. Most people study in the evenings and at weekends." },
   confidence: { title: "Whether you'd be good enough", answer: "You're not on your own. A personal tutor supports you throughout, and assessments can be resubmitted until your tutor is happy." },
   clients: { title: "Finding clients once you're qualified", answer: "That's what the business mentorship is for: working out who you want to coach, how you'll reach them, and what to offer. See what's included below." },
@@ -122,7 +122,7 @@ const PAYMENT_LINE: Record<Payment, string> = {
   full: "You said you'd most likely pay in full.",
   monthly: "You said you'd most likely spread it monthly. Both options are below.",
   unsure: "Not sure how you'd pay yet? Both options are below.",
-  save_first: "Saving first? You can start with a deposit and spread the rest. Both options are below.",
+  save_first: "Saving first? You can spread it over 10 monthly payments instead of paying up front. Both options are below.",
 };
 const BTN = {
   start: { label: "Start now", href: "/enrol" },

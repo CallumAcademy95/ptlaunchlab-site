@@ -9,7 +9,7 @@ import type { PartnerConfig } from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | GYM NAME PT Academy",
-  description: "Claim your £200 discount and start your Level 2 & 3 PT qualification today.",
+  description: "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
@@ -19,19 +19,9 @@ const PARTNER: PartnerConfig = {
   // and add the same value as `slug` on the pp_partners row.
   gymSlug: "GYM-SLUG-HERE",
   gymReferral: "GYM NAME HERE",
-  // Match app/lib/gyms/<slug>.ts's fullPrice — 1399 for every gym with an
-  // active standing code (see tests/gymRegistry.test.mts). DISPLAY ONLY: this
-  // is what the enrolment page may cross out, never what Stripe charges.
-  // Forgetting it falls back to the general £1,599 rate, which crosses out a
-  // price this gym's own page has never advertised — the defect this field
-  // exists to close.
-  fullPrice: 1399,
-  // No promo config here on purpose. Prices and discounts come from Stripe at
-  // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Add this
-  // gym's standing code and prefix(es) there, not here.
+  // No prices, payment links or promo codes here: every gym sells the same two
+  // plans (app/lib/pricing.ts) and is attributed by gymSlug, not a code.
 };
-
-const PRIMARY = "#000000"; // match gym primary colour
 
 export default function GymEnrolPage() {
   return (
@@ -49,11 +39,8 @@ export default function GymEnrolPage() {
             />
             <div>
               <p className="text-white font-black text-sm uppercase leading-none">GYM NAME PT Academy</p>
-              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+              <p className="text-white/40 text-[10px] mt-0.5">Enrolment</p>
             </div>
-          </div>
-          <div className="text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide" style={{ backgroundColor: PRIMARY }}>
-            GYMPROMOCODE
           </div>
         </div>
       </div>

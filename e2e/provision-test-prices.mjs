@@ -28,11 +28,12 @@ async function stripe(path, method = "GET", body) {
   return json;
 }
 
+// The two plans sold from the October 2026 change-over: £999.99 in full and
+// £99.99/month (x10, no trial). New lookup keys rather than reusing the old
+// £1,599 ones, so a stale test price can never be picked up by mistake.
 const WANTED = [
-  { key: "pif",       lookup: "ptll_regression_pif",        name: "[E2E TEST] PIF £1,599",            amount: 159900, recurring: false },
-  { key: "deposit",   lookup: "ptll_regression_deposit",    name: "[E2E TEST] Deposit £599",          amount:  59900, recurring: false },
-  { key: "funnelPif", lookup: "ptll_regression_funnel_pif", name: "[E2E TEST] Funnel PIF £1,399",     amount: 139900, recurring: false },
-  { key: "instalment", lookup: "ptll_regression_instalment", name: "[E2E TEST] Instalment £200/mo",   amount:  20000, recurring: true  },
+  { key: "pif",     lookup: "ptll_regression_pif_999",     name: "[E2E TEST] PIF £999.99",          amount: 99999, recurring: false },
+  { key: "monthly", lookup: "ptll_regression_monthly_999", name: "[E2E TEST] Monthly £99.99 x10",  amount:  9999, recurring: true  },
 ];
 
 const query = WANTED.map((w) => `lookup_keys[]=${encodeURIComponent(w.lookup)}`).join("&");

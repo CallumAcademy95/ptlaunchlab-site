@@ -75,11 +75,12 @@ export function serverEnv() {
     ...process.env,
     PTLL_E2E_BASE_URL: BASE_URL,
     STRIPE_SECRET_KEY: testSecretKey(),
-    STRIPE_PIF_PRICE_ID: prices.pif,
-    STRIPE_DEPOSIT_PRICE_ID: prices.deposit,
-    STRIPE_FUNNEL_PIF_PRICE_ID: prices.funnelPif,
-    STRIPE_INSTALMENT_PRICE_ID: prices.instalment,
-    NEXT_PUBLIC_STRIPE_INSTALMENTS_ENABLED: "true",
+    STRIPE_PIF_999_PRICE_ID: prices.pif,
+    STRIPE_MONTHLY_999_PRICE_ID: prices.monthly,
+    // No raw fallback links in a test run: if session creation fails the buyer
+    // must see the "checkout unavailable" error, never a live Payment Link.
+    NEXT_PUBLIC_STRIPE_LINK_PIF_999: "",
+    NEXT_PUBLIC_STRIPE_LINK_MONTHLY_999: "",
     // Side effects the test must never trigger. Next.js does not overwrite a
     // variable that is already present in process.env, so these win over
     // .env.local even though they are empty.

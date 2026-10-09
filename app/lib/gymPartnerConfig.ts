@@ -24,16 +24,11 @@ export interface GymConfig {
   heroSubline?: string;      // e.g. "Train. Qualify. Earn."
   location?: string;         // e.g. "Bradford's best gym"
 
-  // ── Discount
-  showDiscount?: boolean;    // defaults to true — set false to hide all discount UI
-  promoCode?: string;        // e.g. "6FITPTDISCOUNT"
-  discountAmount?: number;   // e.g. 200
-  fullPrice: number;         // Full price (discounted if showDiscount true, else standard)
-  depositPrice: number;      // Deposit price
-
-  // ── Stripe
-  stripeFullLink: string;
-  stripeDepositLink: string;
+  // ── Pricing
+  // Deliberately absent. Every gym sells the same two plans at the same prices
+  // (app/lib/pricing.ts): £999.99 in full or 10 × £99.99 a month. No promo
+  // code, member discount, "was" price or per-gym Stripe link — partner
+  // attribution is gym_slug in checkout metadata from the gym's own enrol page.
 
   // ── Positioning section — required, gym-specific copy
   positioningSubline: string;   // under "This Is The X PT Academy" heading

@@ -16,6 +16,18 @@
 
 import { readFileSync } from "node:fs";
 
+// ─── RETIRED (October 2026 change-over) ──────────────────────────────────────
+// No promo codes, discounts or dated offers for anyone: the course is £999.99
+// in full or 10 × £99.99 a month (app/lib/pricing.ts), and partner attribution
+// is gym_slug in checkout metadata, not a code. This script would create Stripe
+// promotion codes against retired prices, so it refuses to run. Kept for history.
+// `as boolean` stops TypeScript treating everything below as unreachable.
+const RETIRED = true as boolean;
+if (RETIRED) {
+  console.error("onboard-hitio is retired: promo codes no longer exist (October 2026 price change-over). Refusing to run.");
+  process.exit(1);
+}
+
 for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split(/\r?\n/)) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, "");

@@ -3,7 +3,7 @@
 //   node --use-system-ca scripts/gbp-partnership.mjs
 //
 // Replaces the previous version, which had eleven competing boxes and read as
-// AI-generated clutter. This one carries a single number (£500), the five-step
+// AI-generated clutter. This one carries a single number (£250), the five-step
 // mechanism, one reassurance line and one call to action — in that order of
 // visual weight, so a gym owner glancing at it gets the offer in two seconds.
 //
@@ -25,8 +25,8 @@ const STEPS = [
   ["We promote", "To your members, prospects and ex-members"],
   ["They enrol", "Through your unique link or QR code"],
   ["We qualify", "NCFE Level 2 and 3, delivered online"],
-  ["We place", "Back into your gym as a qualified PT"],
-  ["You get paid", "£500 per learner, upfront"],
+  ["We introduce", "You meet them first when they qualify"],
+  ["You get paid", "£250 per learner, inc. VAT"],
 ];
 
 const html = `<!doctype html>
@@ -123,14 +123,14 @@ const html = `<!doctype html>
       <div class="eyebrow">Gym Partnership Programme</div>
     </div>
 
-    <h1>The smarter way<br>to <span class="gold">grow your gym</span></h1>
-    <p class="lede">We turn your members, prospects and ex-members into qualified personal trainers — working on your gym floor.</p>
+    <h1>A new revenue stream<br>at <span class="gold">zero cost</span></h1>
+    <p class="lede">Run your own PT academy and grow your own trainers from your members, prospects and ex-members.</p>
 
     <div class="hero">
-      <div class="num">£500</div>
+      <div class="num">£250</div>
       <div class="num-side">
         <div class="a">Per learner<br>enrolled</div>
-        <div class="b">Paid upfront. No cost to you.</div>
+        <div class="b">Inc. VAT. No cost to you.</div>
       </div>
     </div>
 

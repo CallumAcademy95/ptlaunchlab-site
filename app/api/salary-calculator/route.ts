@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { attachPromoCookie } from '@/app/lib/funnelPromo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/salary-calculator
 // Captures email after the salary-calculator preliminary result is shown,
-// then unlocks the full projection + 48h £200 promo via the cookie.
+// then unlocks the full projection.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -59,11 +58,6 @@ export async function POST(req: NextRequest) {
     }
 
     const response = NextResponse.json({ success: true });
-    try {
-      attachPromoCookie(response, 'salary-calculator');
-    } catch (err) {
-      console.warn('[salary-calculator] promo cookie not set:', err);
-    }
     return response;
   } catch (err) {
     console.error('[salary-calculator]', err);

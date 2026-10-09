@@ -31,7 +31,9 @@ export default async function OctoberCampaignPage() {
   const tokens = {
     gymName: partner.gym_name,
     town: partner.gym_name, // overwritten below when we have a real town
-    promoCode: partner.promo_code ?? "",
+    // Promo codes are retired (October 2026): never surface the code still
+    // stored on the partner row, so any {{#promoCode}} block drops out.
+    promoCode: null,
     academyUrl: academyUrl ?? "",
     firstName: "there",
   };

@@ -58,6 +58,18 @@
 import { readFileSync } from "node:fs";
 import { MONTHS, MONTH_CODE_PREFIX, monthCodeFor } from "./lib/promo-calendar.mjs";
 
+// ─── RETIRED (October 2026 change-over) ──────────────────────────────────────
+// No promo codes, discounts or dated offers for anyone: the course is £999.99
+// in full or 10 × £99.99 a month (app/lib/pricing.ts), and partner attribution
+// is gym_slug in checkout metadata, not a code. This script would create Stripe
+// promotion codes against retired prices, so it refuses to run. Kept for history.
+// `as boolean` stops TypeScript treating everything below as unreachable.
+const RETIRED = true as boolean;
+if (RETIRED) {
+  console.error("mint-month-codes is retired: promo codes no longer exist (October 2026 price change-over). Refusing to run.");
+  process.exit(1);
+}
+
 for (const line of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split(/\r?\n/)) {
   const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, "");
@@ -68,7 +80,11 @@ const APPLY = process.argv.includes("--apply");
 const monthKey = process.argv.find((a) => a.startsWith("--month="))?.split("=")[1];
 const couponArg = process.argv.find((a) => a.startsWith("--coupon="))?.split("=")[1];
 
-const month = MONTHS.find((m) => m.key === monthKey);
+// Typed loosely: every money month (the only kind with expiresAt) is retired,
+// so MONTHS no longer declares the field at all.
+const month = MONTHS.find((m) => m.key === monthKey) as
+  | ((typeof MONTHS)[number] & { expiresAt?: string })
+  | undefined;
 if (!month) {
   console.error(`no such month: "${monthKey}". Known months: ${MONTHS.map((m) => m.key).join(", ")}`);
   process.exit(1);
@@ -100,7 +116,7 @@ const MONTH = month;
 
 // Unix seconds -- what Stripe's API wants -- derived from the month's own
 // ISO string rather than hardcoded, so this travels with MONTH automatically.
-const EXPIRES_AT_UNIX = Math.floor(new Date(MONTH.expiresAt).getTime() / 1000);
+const EXPIRES_AT_UNIX = Math.floor(new Date(MONTH.expiresAt ?? "").getTime() / 1000);
 if (!Number.isFinite(EXPIRES_AT_UNIX)) {
   console.error(`"${MONTH.key}": expiresAt "${MONTH.expiresAt}" does not parse as a date.`);
   process.exit(1);

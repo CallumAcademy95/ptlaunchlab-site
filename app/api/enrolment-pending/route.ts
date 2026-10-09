@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { validateEnrolmentSec } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
+import { COURSE_PRICE_LABEL, MONTHLY_PLAN_LABEL } from "@/app/lib/pricing";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/enrolment-pending
@@ -24,8 +25,8 @@ import { logSec } from "@/app/lib/security/log";
 // unconsumed row in Praxel's enrolment_invites (the chase list).
 //
 // Body shape:
-//   { name, email, plan: 'full'|'deposit', amount?, gymReferral?, promoCode?,
-//     [SEC_KEY]: {...} }
+//   { name, email, plan: 'full'|'monthly', gymReferral?, [SEC_KEY]: {...} }
+// The plan label comes from app/lib/pricing.ts, never from a client amount.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Lazy because `new Resend(undefined)` throws,
@@ -63,20 +64,18 @@ export async function POST(req: NextRequest) {
 
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const plan = body.plan === "deposit" ? "deposit" : "full";
-  const amount = typeof body.amount === "number" && Number.isFinite(body.amount)
-    ? body.amount
-    : (plan === "deposit" ? 599 : 1599);
+  // "deposit" is what a page cached from before the October change-over sends;
+  // the only payment plan sold now is the monthly one.
+  const plan = body.plan === "monthly" || body.plan === "deposit" ? "monthly" : "full";
   const gymReferral = typeof body.gymReferral === "string" ? body.gymReferral : "";
-  const promoCode = typeof body.promoCode === "string" ? body.promoCode : "";
 
   if (!name || !email) {
     return NextResponse.json({ ok: true }); // nothing useful to alert on
   }
 
   const planLabel = plan === "full"
-    ? `Pay in Full — £${amount.toLocaleString()}`
-    : `Deposit Plan — £${amount.toLocaleString()} deposit`;
+    ? `Pay in Full — ${COURSE_PRICE_LABEL}`
+    : `Pay Monthly — ${MONTHLY_PLAN_LABEL}`;
 
   const startedAt = new Date().toLocaleString("en-GB", {
     day: "numeric", month: "long", year: "numeric",
@@ -103,7 +102,6 @@ export async function POST(req: NextRequest) {
         <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;width:120px;">Email</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;"><a href="mailto:${email}" style="color:#F5C518;">${email}</a></td></tr>
         <tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Plan</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${planLabel}</td></tr>
         ${gymReferral ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Gym referral</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${gymReferral}</td></tr>` : ""}
-        ${promoCode ? `<tr><td style="color:#4A6280;font-size:12px;padding:4px 0;">Promo code</td><td style="color:#ffffff;font-size:13px;font-weight:600;padding:4px 0;">${promoCode}</td></tr>` : ""}
       </table>
 
       <div style="margin-top:18px;padding:14px 16px;background:#061F36;border:1px solid #1A3A5C;border-radius:10px;color:#8CA3BF;font-size:12px;line-height:1.6;">
@@ -148,8 +146,6 @@ export async function POST(req: NextRequest) {
         email,
         plan: planLabel,
         gym_referral: gymReferral,
-        promo_code: promoCode,
-        amount,
       }),
     }).catch((err) => console.error("[enrolment-pending] Zapier webhook error:", err));
   }

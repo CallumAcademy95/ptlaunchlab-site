@@ -10,6 +10,11 @@
 
 import { getSupabaseAdmin } from "./supabase-admin";
 import { contractTotalPence, isDepositSale } from "./coursePlan";
+import {
+  commissionHeldAtSale,
+  commissionReleasedByPayment,
+  type SubscriptionPlanKind,
+} from "./paymentPlans";
 
 // The deposit-vs-PIF rule lives in ./coursePlan (unit-tested, no dependencies)
 // so the portal, the Sheet tracker and every email answer it identically. It
@@ -93,9 +98,10 @@ async function resolvePartner(
  *
  * Grandfathered partners ('on_enrolment') keep the terms they signed: 30 days
  * after enrolment, whatever the plan. Partners on the 2026-07-27 terms
- * ('instalment_2') get the same for pay-in-full, but a deposit sale returns null
- * — it stays held until the second instalment clears, at which point
- * applyInstalmentToPartnerSale stamps the date.
+ * ('instalment_2') and the v4.0 terms ('payment_5') get the same for
+ * pay-in-full, but a payment-plan sale returns null — it stays held until the
+ * 2nd instalment / 5th payment clears, at which point
+ * applyInstalmentToPartnerSale stamps the date. See app/lib/paymentPlans.ts.
  */
 function commissionReleaseAt(
   terms: string,
@@ -103,7 +109,7 @@ function commissionReleaseAt(
   enrolledAt: Date,
   payoutTermsDays: number
 ): string | null {
-  if (terms === "instalment_2" && isDeposit) return null;
+  if (commissionHeldAtSale(terms, isDeposit)) return null;
   const release = new Date(enrolledAt);
   release.setUTCDate(release.getUTCDate() + payoutTermsDays);
   return release.toISOString();
@@ -125,7 +131,7 @@ export async function recordPartnerSale(
       if (!input.gymSlug && !input.gymDisplayName) return { ok: true, reason: "no-gym" };
 
       // A sale that names a gym we can't resolve is different: someone is owed
-      // £500 and nothing will show it. Loud, because the fix is a one-line
+      // a partner fee and nothing will show it. Loud, because the fix is a one-line
       // addition to pp_partners.legacy_referral_names and nobody will make it
       // if this only ever appears as a return value.
       console.error(
@@ -180,17 +186,21 @@ export async function recordPartnerSale(
 }
 
 /**
- * Credit an instalment against a deposit sale, and release the commission once
- * the second one has cleared.
+ * Credit a payment against a payment-plan sale, and release a held commission
+ * when the partner's terms say so ('instalment_2' → 2nd instalment, 'payment_5'
+ * → the learner's 5th payment, checkout payment counted as 1).
  *
- * `settledInstalments` is the recomputed-from-Stripe count the webhook already
- * derives via countSettledInstalments() — deliberately reused rather than
- * incremented here, so a duplicate delivery cannot advance the count.
+ * `settled` is the recomputed-from-Stripe count the webhook already derives —
+ * legacy instalments (deposit excluded) for kind 'legacy', every payment for
+ * kind 'monthly' — deliberately reused rather than incremented here, so a
+ * duplicate delivery cannot advance it. `collectedPence` is likewise derived
+ * from that count by the webhook (paymentPlans.collectedPence).
  */
 export async function applyInstalmentToPartnerSale(args: {
   subscriptionId: string;
-  settledInstalments: number;
-  amountPaidPence: number;
+  kind: SubscriptionPlanKind;
+  settled: number;
+  collectedPence: number;
 }): Promise<void> {
   try {
     const admin = getSupabaseAdmin();
@@ -209,28 +219,37 @@ export async function applyInstalmentToPartnerSale(args: {
     // gym behind them.
     if (!sale) return;
 
-    // Recomputed from the instalment count rather than added to, so a redelivered
-    // invoice.paid cannot inflate what the partner sees as collected.
-    const paidPence = 59_900 + args.settledInstalments * 20_000;
+    // Recomputed from the payment count rather than added to, so a redelivered
+    // invoice.paid cannot inflate what the partner sees as collected. Used to be
+    // a hardcoded 59_900 + n × 20_000, wrong for every £99 entry, every £300
+    // instalment and the whole monthly plan.
+    const update: Record<string, unknown> = { amount_paid_pence: args.collectedPence };
 
-    const update: Record<string, unknown> = { amount_paid_pence: paidPence };
-
-    // Release the hold once the second instalment has cleared — but only for a
-    // sale still waiting on one. A grandfathered partner already has a date.
-    if (args.settledInstalments >= 2 && !sale.commission_release_at) {
+    // Release a held commission once the partner's trigger payment has cleared —
+    // but only for a sale still waiting on one. A grandfathered partner, or a
+    // sale already released, already has a date and is left alone.
+    if (!sale.commission_release_at) {
       const { data: partner } = await admin
         .from("pp_partners")
-        .select("payout_terms_days")
+        .select("payout_terms_days, commission_terms")
         .eq("id", sale.partner_id)
         .maybeSingle();
 
-      const release = new Date();
-      release.setUTCDate(release.getUTCDate() + Number(partner?.payout_terms_days ?? 30));
-      update.commission_release_at = release.toISOString();
+      const terms = String(partner?.commission_terms ?? "instalment_2");
+      if (commissionReleasedByPayment(terms, args.kind, args.settled)) {
+        // payment_5 releases on the 5th payment itself — no further wait: the
+        // fee is payable from that point. instalment_2 keeps its old rule of
+        // payout_terms_days after the trigger.
+        const release = new Date();
+        if (terms !== "payment_5") {
+          release.setUTCDate(release.getUTCDate() + Number(partner?.payout_terms_days ?? 30));
+        }
+        update.commission_release_at = release.toISOString();
 
-      console.log(
-        `[partner-sales] instalment 2 cleared for ${args.subscriptionId} — commission releases ${release.toISOString().slice(0, 10)}`
-      );
+        console.log(
+          `[partner-sales] ${terms} trigger reached for ${args.subscriptionId} (${args.kind}, ${args.settled} settled) — commission releases ${release.toISOString().slice(0, 10)}`
+        );
+      }
     }
 
     const { error: updateError } = await admin.from("pp_sales").update(update).eq("id", sale.id);

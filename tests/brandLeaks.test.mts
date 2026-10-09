@@ -34,7 +34,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { extractSnippets } from "../app/lib/partner-playbook-snippets.ts";
-import { applyPlaybookTokens } from "../app/lib/partner-playbook-tokens.ts";
+import { applyPlaybookTokens, isRetiredPlaybookEntry } from "../app/lib/partner-playbook-tokens.ts";
 import { tokensForPortal } from "../scripts/lib/promo-calendar.mjs";
 import { findBrandLeaks } from "../scripts/lib/ad-guards.mjs";
 
@@ -170,6 +170,9 @@ test("every partner-playbook entry, rendered the way the portal renders it, has 
   assert.ok(REAL.length === 10, `expected 10 real gyms in gym-brands.json, found ${REAL.length}`);
 
   for (const file of FILES) {
+    // The portal never renders a retired campaign (dated offers / promo codes,
+    // retired October 2026), so neither does this check.
+    if (isRetiredPlaybookEntry(file.replace(/\.md$/, ""))) continue;
     const raw = readFileSync(new URL(file, PLAYBOOK_DIR), "utf8");
     const body = stripFrontmatter(raw);
 

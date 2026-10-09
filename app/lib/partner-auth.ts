@@ -73,7 +73,7 @@ export interface PartnerRecord {
   logo_url: string | null;
   primary_color: string | null;
   fee_per_learner_pence: number;
-  commission_terms: "on_enrolment" | "instalment_2";
+  commission_terms: "on_enrolment" | "instalment_2" | "payment_5";
 }
 
 export interface PartnerSession {

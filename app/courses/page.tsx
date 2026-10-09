@@ -3,10 +3,11 @@ import Footer from "../components/Footer";
 import ProspectusButton from "../components/ProspectusButton";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { faqPageSchema } from "@/app/lib/faqSchema";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, COURSE_PRICE_PENCE, formatPence } from "@/app/lib/pricing";
 
 export const metadata = {
   title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
-  description: "NCFE Level 2 & 3 PT qualification — the one UK gym managers ask for by name. £1,599 includes our £500 business mentorship community at no extra cost. Fast-track, Ofqual regulated, done around your job.",
+  description: `The straightforward route from your current job into personal training. NCFE Level 2 & 3, Ofqual regulated, done around your job. ${COURSE_PRICE_LABEL} or ${MONTHLY_PLAN_LABEL} monthly, with our £500 business mentorship community included.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/courses",
   },
@@ -17,7 +18,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    "100% online NCFE Level 2 & 3 PT qualification at £1,599. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.",
+    `100% online NCFE Level 2 & 3 PT qualification. ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.`,
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -28,19 +29,19 @@ const courseSchema = {
   offers: [
     {
       "@type": "Offer",
-      name: "6-Month Deposit Plan",
-      price: "1599",
+      name: "Pay In Full",
+      price: (COURSE_PRICE_PENCE / 100).toFixed(2),
       priceCurrency: "GBP",
       url: "https://ptlaunchlab.co.uk/enrol",
-      description: "£599 deposit + £200 × 5 monthly. 0% interest.",
+      description: `One payment of ${COURSE_PRICE_LABEL}.`,
     },
     {
       "@type": "Offer",
-      name: "Pay In Full",
-      price: "1599",
+      name: "10 Monthly Payments",
+      price: (MONTHLY_PLAN_TOTAL_PENCE / 100).toFixed(2),
       priceCurrency: "GBP",
       url: "https://ptlaunchlab.co.uk/enrol",
-      description: "One-off payment. Best total value.",
+      description: `${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, no interest. First payment at checkout, then monthly. ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total.`,
     },
   ],
   hasCourseInstance: {
@@ -125,7 +126,7 @@ const curriculum = [
 
 const method = [
   { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 8–16 weeks." },
-  { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free with the £1,599 fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
+  { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free in the course fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
   { num: "03", title: "Gym Introduction", body: "A guaranteed introduction when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs, so we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
   { num: "05", title: "Online Coaching", body: "Expand beyond the gym. Build an income stream that scales without a ceiling." },
@@ -157,9 +158,9 @@ const objections = [
     link: null,
   },
   {
-    quote: "£1,599 is still a lot of money.",
+    quote: `${COURSE_PRICE_LABEL} is still a lot of money.`,
     answer:
-      "Spread over 6 months it's £266/month — less than most gym memberships plus a coffee a day. A working PT in the UK charges £30–50 per session. Once you're qualified and have 6–8 regular clients, the course pays itself back in around 60 days.",
+      `You can pay it as ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, with no interest. A working PT in the UK charges £30–50 a session. Six regular clients at £30, once a week, is £180 a week. At that rate the course fee is covered in under six weeks.`,
     link: null,
   },
   {
@@ -170,34 +171,33 @@ const objections = [
   },
 ];
 
-// Two payment options — identical product, different cadence. Deposit plan
-// is the highlighted middle: small commitment to get in, manageable monthly,
-// no interest. Pay-In-Full is positioned as "best total value" anchor on the
-// right. (Payl8r 12-mo dropped — not commercially viable.)
+// Two payment options — identical product, different cadence. Prices come
+// from app/lib/pricing.ts. The monthly plan totals 9p less than paying in
+// full, so never call pay-in-full "best value".
 const pricing = [
   {
-    title: "6-Month Deposit Plan",
-    headlineFigure: "£200",
+    title: "10 Monthly Payments",
+    headlineFigure: MONTHLY_PRICE_LABEL,
     headlineSuffix: "/month",
-    subPrice: "£599 deposit + £200 × 5 · £1,599 total · 0% interest",
-    saving: "Most chosen — spread the cost while you study",
+    subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total · no interest`,
+    saving: "Spread the cost while you study",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
-    cta: "Start the deposit plan →",
+    cta: "Pay monthly →",
     ctaHref: "/enrol",
     recommended: true,
-    badge: "Most popular" as string | null,
+    badge: "Spread the cost" as string | null,
   },
   {
     title: "Pay In Full",
-    headlineFigure: "£1,599",
+    headlineFigure: COURSE_PRICE_LABEL,
     headlineSuffix: "one-off",
-    subPrice: "£4.38 / day if amortised across a year",
-    saving: "Best total value — pay once, never think about it again",
+    subPrice: "About £2.74 a day spread across a year",
+    saving: "Pay once and never think about it again",
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay in full →",
     ctaHref: "/enrol",
     recommended: false,
-    badge: "Best total value" as string | null,
+    badge: "Pay once" as string | null,
   },
 ];
 
@@ -213,7 +213,7 @@ const faqs = [
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
   { q: "How long does it take?", a: "Most students complete in 8–16 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
   { q: "What is the guaranteed gym introduction?", a: "Once you qualify, we approach at least one gym on your behalf: either one in our partner network, or one local to you. It is a warm introduction rather than a job-board listing. Whether they interview you, and whether you get the job, is their call. We've hired 500+ PTs ourselves, so we know what gyms look for and we prepare you for it." },
-  { q: "Can I spread the cost?", a: "Yes. Our deposit plan lets you start with a £599 deposit, then 5 monthly payments of £200 (total £1,599). Book a free call if you'd like to talk it through." },
+  { q: "Can I spread the cost?", a: `Yes. You can pay ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, with no interest. The first is taken when you enrol, then one a month. Book a free call if you'd like to talk it through.` },
 ];
 
 function CheckIcon() {
@@ -453,8 +453,8 @@ export default function CoursesPage() {
               ))}
               <div className="grid grid-cols-3 bg-deep/70 border-t-2 border-gold/40">
                 <div className="p-4 md:p-5 text-white text-sm md:text-base font-bold uppercase tracking-wide">Total</div>
-                <div className="p-4 md:p-5 text-white/85 text-base md:text-lg text-center font-bold line-through decoration-white/50">£1,900 – £6,400</div>
-                <div className="p-4 md:p-5 text-gold text-base md:text-xl text-center font-display font-extrabold">£1,599</div>
+                <div className="p-4 md:p-5 text-white/85 text-base md:text-lg text-center font-bold">£1,900 – £6,400</div>
+                <div className="p-4 md:p-5 text-gold text-base md:text-xl text-center font-display font-extrabold">{COURSE_PRICE_LABEL}</div>
               </div>
             </div>
 
@@ -464,7 +464,7 @@ export default function CoursesPage() {
             <div className="max-w-3xl mx-auto mb-10 px-6 py-5 rounded-2xl border border-white/10 bg-deep/40 text-center">
               <p className="text-white text-base md:text-lg leading-relaxed">
                 <span className="text-gold font-bold">We&apos;re not the £29 weekend course</span> — and we&apos;re proud of it.
-                If a £29 cert was enough to be hired by a UK gym, we&apos;d sell that. It isn&apos;t. Here&apos;s what £1,599 actually buys you.
+                If a £29 cert was enough to be hired by a UK gym, we&apos;d sell that. It isn&apos;t. Here&apos;s what {COURSE_PRICE_LABEL} actually buys you.
               </p>
             </div>
 

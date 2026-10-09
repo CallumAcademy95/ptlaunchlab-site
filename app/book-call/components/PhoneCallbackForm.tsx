@@ -149,14 +149,6 @@ export default function PhoneCallbackForm() {
         }),
       }).catch((err) => console.warn("[book-call] CAPI schedule relay failed:", err));
 
-      // Fire and forget — issues the 48h £200 promo cookie so the
-      // FunnelPricingBlock below renders the discounted state.
-      fetch("/api/funnel-promo/start", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: "book-call" }),
-      }).catch((err) => console.warn("[book-call] promo cookie not set:", err));
-
       setSubmitted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Something went wrong.";
@@ -228,14 +220,15 @@ export default function PhoneCallbackForm() {
           .
         </p>
 
-        {/* PROMO — while-you-wait £200 incentive (48h cookie set on submit) */}
+        {/* While you wait — the two ways to pay. No discount or deadline:
+            the price is the same for everyone (October 2026). */}
         <div className="max-w-xl mx-auto">
           <div className="text-center mb-4">
             <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-1">
               While you wait for the call
             </p>
             <h4 className="font-display font-extrabold text-xl md:text-2xl text-white leading-tight tracking-tight">
-              We&apos;ve unlocked a £200 discount for you.
+              Here&apos;s how paying for the course works.
             </h4>
           </div>
           <FunnelPricingBlock />

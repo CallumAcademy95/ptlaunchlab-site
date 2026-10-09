@@ -5,13 +5,11 @@
  * Same split, and the same reason, as ad-concepts.mjs: the copy for 9 gyms is
  * gated by `npm run test:unit` before Chrome ever launches.
  *
- * October reveals something the course already includes. November is the only
- * money month of the two, and the only point in the year the price starts with
- * a 9 -- which is what stops January, April and September cannibalising it.
- *
- * Discounts land on pay-in-full only. Stripe takes ONE promotion code, so a
- * month code REPLACES the standing £200 rather than stacking with it: £600 off
- * the £1,599 list is £999, not £1,399 - £600.
+ * RETIRED MONEY MONTHS (October 2026 change-over). There are no promo codes,
+ * discounts or dated offers any more, for anyone: the course is £999.99 in full
+ * or 10 × £99.99 a month. Black Friday (the only money month) has been removed,
+ * so MONTHS holds reveal months only, monthCodeFor() never returns a code, and
+ * scripts/mint-month-codes.mts refuses to run. Do not add a money month back.
  */
 import { conceptText, allConceptStrings } from "./ad-concepts.mjs";
 import { tokensForGym } from "../../app/lib/partner-playbook-tokens.ts";
@@ -28,27 +26,7 @@ export const MONTHS = [
     headline: ["TWO QUALIFICATIONS.", "ONE COURSE."],
     accentLine: "LEVEL 2 AND LEVEL 3.",
     sub: "The NCFE Level 2 Certificate in Gym Instructing and the Level 3 Certificate in Personal Training, through {{gymName}}.",
-    footer: "Next intake open",
-  },
-  {
-    key: "nov",
-    label: "Black Friday",
-    belief: "all",
-    offerType: "money",
-    discountPence: 60_000,
-    codeSuffix: "BF600",
-    // Every money month's codes must expire and be capped -- SUMMER500PTLL is
-    // the precedent for what "archive it later" means in practice, i.e.
-    // nothing, indefinitely. mint-month-codes.mts reads this and refuses to
-    // mint a money month that has none, rather than defaulting to "forever".
-    // ISO 8601 UTC so a human reads it directly; the minter converts to the
-    // Unix seconds Stripe's API wants.
-    expiresAt: "2026-12-01T00:00:00Z",
-    eyebrow: "{{gymName}} ACADEMY",
-    headline: ["BLACK FRIDAY", "£999 PAID IN FULL"],
-    accentLine: "NORMALLY £1,399.",
-    sub: "Level 2 and Level 3 Personal Training at {{gymName}}. Pay-in-full price, Black Friday only.",
-    footer: "Code {{monthCode}}",
+    footer: "Enrolling now",
   },
 ];
 
@@ -78,7 +56,8 @@ export const MONTH_CODE_PREFIX = {
 /** The gym's code for a month, or null if that month is not a money month. */
 export function monthCodeFor(slug, monthKey) {
   const month = MONTHS.find((m) => m.key === monthKey);
-  if (!month?.codeSuffix) return null;
+  // Promo codes are retired: there is no money month, so no month has a code.
+  if (!month?.codeSuffix || month.offerType !== "money") return null;
   const prefix = MONTH_CODE_PREFIX[slug];
   if (!prefix) throw new Error(`no month-code prefix for gym: ${slug}`);
   return `${prefix}${month.codeSuffix}`;

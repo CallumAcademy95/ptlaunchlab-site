@@ -23,6 +23,10 @@ import {
   isDepositSale,
   outstandingBalancePence,
   planLabel,
+  planKindForSale,
+  isMonthlyPlanSale,
+  contractTotalPence,
+  formatGbp,
 } from "../app/lib/coursePlan.ts";
 
 // ── The bug: a discounted partner pay-in-full ───────────────────────────────
@@ -88,4 +92,47 @@ test("a £599 deposit is labelled as one", () => {
     planLabel({ mode: "payment", amountTotalPence: 59_900, metadataPlan: "deposit" }),
     "Deposit — £599",
   );
+});
+
+// ── October 2026: £999.99 in full, or 10 × £99.99 a month ────────────────────
+
+test("£999.99 pay-in-full is a PIF, by metadata and by shape alone", () => {
+  const sale = { mode: "payment", amountTotalPence: 99_999, metadataPlan: "PIF" };
+  assert.equal(planKindForSale(sale), "PIF");
+  assert.equal(outstandingBalancePence(sale), 0);
+  assert.equal(planLabel(sale), "Pay in Full — £999.99", "never rounded to £1,000");
+  // A raw-link £999.99 with no metadata is still above the deposit ceiling.
+  assert.equal(planTypeForSale({ mode: "payment", amountTotalPence: 99_999 }), "PIF");
+});
+
+test("the monthly plan is classified by metadata, never by its £99.99 amount", () => {
+  const sale = { mode: "subscription", amountTotalPence: 9_999, metadataPlan: "monthly" };
+  assert.equal(isMonthlyPlanSale(sale), true);
+  assert.equal(planKindForSale(sale), "monthly");
+  // Binary sinks (pp_sales.plan_type, the Praxel invite) see a payment plan.
+  assert.equal(planTypeForSale(sale), "deposit");
+  assert.equal(planLabel(sale), "Pay Monthly — 10 × £99.99");
+});
+
+test("a £99.99 sale WITHOUT monthly metadata is not called monthly", () => {
+  // The amount alone decides nothing: a £99 legacy entry and a £99.99 monthly
+  // payment are a penny apart.
+  assert.equal(isMonthlyPlanSale({ mode: "subscription", amountTotalPence: 9_999 }), false);
+  assert.equal(planKindForSale({ mode: "subscription", amountTotalPence: 9_900, metadataPlan: "deposit" }), "deposit");
+});
+
+test("monthly outstanding balance is 9 × £99.99 after the first payment", () => {
+  const sale = { mode: "subscription", amountTotalPence: 9_999, metadataPlan: "monthly", contractValuePence: 99_990 };
+  assert.equal(contractTotalPence(sale), 99_990);
+  assert.equal(outstandingBalancePence(sale), 89_991);
+  // Unstamped monthly falls back to the monthly contract, not £1,599.
+  assert.equal(contractTotalPence({ ...sale, contractValuePence: null }), 99_990);
+});
+
+test("formatGbp keeps pence: £999.99 and £99.99, and legacy whole pounds unchanged", () => {
+  assert.equal(formatGbp(99_999), "£999.99");
+  assert.equal(formatGbp(9_999), "£99.99");
+  assert.equal(formatGbp(89_991), "£899.91");
+  assert.equal(formatGbp(159_900), "£1,599");
+  assert.equal(formatGbp(100_000), "£1,000");
 });

@@ -8,6 +8,10 @@
  *
  * PHOTO-FREE BY DEFAULT, for the same reason as gym-ad-creatives.mjs: generic
  * stock in the gym's own town undercuts the exact claim the graphic makes.
+ *
+ * October 2026 change-over: promo codes and money months are retired (see
+ * scripts/lib/promo-calendar.mjs). Only code-free reveal months remain, so
+ * nothing this script handles carries a code or a discounted price.
  */
 import { readFileSync, existsSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";

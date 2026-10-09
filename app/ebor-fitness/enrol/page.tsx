@@ -11,9 +11,6 @@ export const metadata: Metadata = {
 const PARTNER: PartnerConfig = {
   gymSlug: "ebor",
   gymReferral: "Ebor Fitness",
-  fullPrice: 1399,
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
 };
 
 export default function EborFitnessEnrolPage() {
@@ -31,7 +28,7 @@ export default function EborFitnessEnrolPage() {
           />
           <div>
             <p className="text-white font-black text-sm uppercase leading-none">Ebor Fitness PT Academy</p>
-            <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+            <p className="text-white/40 text-[10px] mt-0.5">Enrolment</p>
           </div>
         </div>
       </div>

@@ -66,6 +66,10 @@
  *
  * PNGs go up individually rather than as a zip: the portal renders image
  * thumbnails, and a gym owner should see the graphic before downloading it.
+ *
+ * October 2026 change-over: promo codes and money months are retired (see
+ * scripts/lib/promo-calendar.mjs). Only code-free reveal months remain, so
+ * nothing this script handles carries a code or a discounted price.
  */
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";

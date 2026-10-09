@@ -1,9 +1,11 @@
 # Retarget Ad — "Why PT Launch Lab" / Career Blueprint
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **Status:** Brief captured 2026-07-03 (Callum's notes). NOT built yet.
 Sits after the cold **Career Planner** ad ([PTLL-ADS-PORTFOLIO.md](PTLL-ADS-PORTFOLIO.md)) in the funnel: cold calculator ad → `/career-planner` → email captured → **this retarget ad** confirms & de-risks → sales page → enrol / book call.
 
-> ⚠️ **FINANCE IS SCRAPPED (Callum, 2026-07-03).** These notes were written before that call and mention "Finance Available", a finance calculator embed, and a "How finance works" email. **Only two payment options now exist: pay in full (£1,599) or the deposit plan (£599 + 5 × £200).** Everywhere below that says "finance", read **"payment options"**. No Payl8er / Klarna / Stripe 0% / third-party lending anywhere.
+> ⚠️ **FINANCE IS SCRAPPED (Callum, 2026-07-03).** These notes were written before that call and mention "Finance Available", a finance calculator embed, and a "How finance works" email. **Only two payment options now exist: pay in full (£999.99) or 10 monthly payments of £99.99.** Everywhere below that says "finance", read **"payment options"**. No Payl8er / Klarna / Stripe 0% / third-party lending anywhere.
 
 ---
 
@@ -64,7 +66,7 @@ Not the traditional course page. A **sales page** positioned as a Career Bluepri
 - **Graduate journey** timeline: join → study → qualify → business mentoring → first client → career.
 - **Graduate stories** — three only (career changer / young PT / parent), **video first**.
 - **What's inside** — real screenshots: portal · app · lessons · assessments · support · community.
-- **Payment** *(was "Finance")* — instead of "finance available", show the **weekly cost** vs coffee / gym membership / streaming, then average PT income → frame as an investment. Two plans only: pay in full £1,599, or £599 deposit + 5 × £200.
+- **Payment** *(was "Finance")* — instead of "finance available", show the **weekly cost** vs coffee / gym membership / streaming, then average PT income → frame as an investment. Two plans only: pay in full £999.99, or 10 × £99.99 monthly with no interest.
 - **FAQ** — answer **objections**, not curriculum: Can I do this while working? · How long? · No gym experience? · Too old? · Will you help me get clients? · Will employers recognise it? · Payment options?
 - **Final CTA:** "Ready to build your fitness career?" (not "Buy now").
 

@@ -1,5 +1,7 @@
 # Link outreach — ptlaunchlab.co.uk
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **Why this exists.** The site has ~262k words across 79 pages and near-zero organic
 visibility: 0 keywords in positions 1–3, best commercial term ("level 3 fitness
 instructor courses", 1,600/mo) at **position 65**. Cause is not content. It is
@@ -25,8 +27,8 @@ existing pages competitive. Everything below is a relationship we already have.
 
 ## Tier 1 — Partner gyms (8) · easiest, do first
 
-We have already built each of these a dedicated landing page and they earn £500 per
-learner. A link back is a normal partnership term, not a favour. Highest conversion
+We have already built each of these a dedicated landing page and they earn £250 per
+learner (inc. VAT). A link back is a normal partnership term, not a favour. Highest conversion
 rate of any tier — ask during a partnership call, not by cold email.
 
 | Our page | Gym | Their site | Ask them to link to |
@@ -133,7 +135,7 @@ it easy. Most people link without being asked once they have the URL in hand.
 > Quick one — we've built your gym its own page: [our page URL]
 >
 > Everything your members need to enrol is on it, and it's the link that tracks your
-> £500 per learner.
+> £250 per learner.
 >
 > Worth adding it to your site so members can find it — a "Become a PT" link in your
 > nav and a line on your about page usually does it. Happy to send wording.

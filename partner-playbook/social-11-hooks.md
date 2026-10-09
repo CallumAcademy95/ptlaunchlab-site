@@ -54,9 +54,9 @@ Nobody starts qualified.
 
 **Direct**
 ```
-Applications close [DATE].
+You can start any day.
 We're running an academy in this gym. Here's what that means for you.
-Two spaces left on this intake.
+You can pay monthly.
 If you've been thinking about it, this is the bit where you ask.
 ```
 

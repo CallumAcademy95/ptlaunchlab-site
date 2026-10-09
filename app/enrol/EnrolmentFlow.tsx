@@ -1,20 +1,22 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { trackEvent } from "@/app/lib/gtag";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { useFormSecurity } from "@/app/lib/security/client";
-import { INSTALMENTS_ENABLED } from "@/app/lib/instalments";
 import { attributionFromTouches, type Attribution } from "@/app/lib/attribution";
 import { CONTACT_EMAIL as SUPPORT_EMAIL, PHONE_NATIONAL as SUPPORT_PHONE, PHONE_TEL } from "@/app/lib/contactDetails";
-import { PARTNER_STANDING_CODE } from "@/app/lib/partnerPromo";
 import {
-  OCT99_PAYMENT_LINK, OCT99_ENTRY, OCT99_MONTHLY, OCT99_INSTALMENTS, OCT99_TOTAL,
-} from "@/app/lib/octoberOffer";
-import { BF_PAYMENT_LINK, BF_PRICE, BF_LIST_PRICE, BF_SAVING } from "@/app/lib/blackFridayOffer";
-import {
-  SEPT99_PAYMENT_LINK, SEPT99_LANDING_PATH, SEPT99_ENTRY, SEPT99_TOTAL, SEPT99_SAVING,
-} from "@/app/lib/septemberOffer";
+  COURSE_PRICE_PENCE,
+  COURSE_PRICE_LABEL,
+  MONTHLY_PRICE_PENCE,
+  MONTHLY_PRICE_LABEL,
+  MONTHLY_PAYMENTS,
+  MONTHLY_PLAN_TOTAL_PENCE,
+  formatPence,
+  type CoursePlanChoice,
+} from "@/app/lib/pricing";
+import { fallbackPaymentLink } from "@/app/lib/paymentLinks";
 import {
   type PartnerConfig,
   ENROLMENT_CONTEXT_KEY,
@@ -112,7 +114,7 @@ function readAttribution(): Attribution {
 }
 
 // Fallback path only — the direct-to-Payment-Link redirect used when
-// /api/checkout can't create a session. Stripe Payment Links accept both
+// /api/checkout can't create a session and a current-price link is configured. Stripe Payment Links accept both
 // `client_reference_id` and `prefilled_email` as query params.
 function appendStripeAttribution(url: string, email: string, ref: string): string {
   try {
@@ -125,51 +127,31 @@ function appendStripeAttribution(url: string, email: string, ref: string): strin
   }
 }
 
-// ─── Configuration ───────────────────────────────────────────────────────
-const FULL_PAYMENT_STRIPE_LINK  = "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f";
-const DEPOSIT_STRIPE_LINK       = "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05";
-// Contact details come from the shared module — this page had the landline
-// hardcoded, and it is the page a buyer reads immediately before paying £1,599.
-
 // ─── Main Component — Pre-payment checkout ───────────────────────────────
 // Collects the minimum needed to send the buyer to Stripe (name + email +
 // plan choice). The full learner record + signed agreement are collected on
 // Praxel once payment has cleared, from a signed link that prefills their name
 // and email out of the Stripe session.
+//
+// Two ways to pay, for everyone — direct, funnel or partner gym:
+//   £999.99 in full, or 10 × £99.99 a month (the first taken today).
+// No codes, no discounts, no dated offers. Figures come from app/lib/pricing.ts.
 export default function EnrolmentFlow({
   partner,
   standalone,
-  offer,
 }: {
   partner?: PartnerConfig;
   standalone?: boolean;
-  // Set only by /enrol?offer=sept99, and only while the offer is open — the page
-  // checks the window server-side before passing it. Replaces the two-plan choice
-  // with the single £99 entry; never combined with a partner, who earns nothing
-  // on this price.
-  offer?: "sept99" | "oct99" | "bf2026";
 }) {
-  const isSept99 = offer === "sept99" && !partner;
-  // Never on a partner page: a gym earns nothing on an entry offer, so
-  // surfacing it there would take a sale off a partner.
-  const isOct99 = offer === "oct99" && !partner;
-  // Never on a partner page: a gym earns £500 on a £1,599 sale, and the
-  // commission is not reduced for Black Friday, so a £999 partner sale
-  // would leave £499 of course revenue against a £500 payout.
-  const isBF = offer === "bf2026" && !partner;
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [promoInput, setPromoInput]     = useState("");
-  const [appliedPromo, setAppliedPromo] = useState<{ code: string; amountOffPence: number } | null>(null);
-  const [promoError, setPromoError]     = useState("");
+  // Set when checkout cannot be reached at all: session creation failed AND
+  // no fallback Payment Link is configured for the plan. Never silently sends
+  // the buyer to an older link — every older link sells a retired price.
+  const [payError, setPayError]   = useState("");
   const sec = useFormSecurity();
-  // Guards against a slow response committing stale state. The standing code is
-  // requested on mount; if a learner applies a launch code before that returns,
-  // the late standing response must NOT overwrite the larger discount. Last
-  // request wins, not last response.
-  const promoRequestId = useRef(0);
 
   useEffect(() => {
     trackEvent('enrolment_started', {
@@ -177,45 +159,6 @@ export default function EnrolmentFlow({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ─── Promo code ───────────────────────────────────────────────────────
-  // The partner's standing discount is applied automatically. The page already
-  // advertises the discounted price, so making the learner type a code to reach
-  // the advertised figure was pure friction — and it is what made HITIO think
-  // codes were broken when they typed a launch code the site had never heard of.
-  useEffect(() => {
-    if (!partner?.gymSlug) return;
-    const standing = PARTNER_STANDING_CODE[partner.gymSlug];
-    if (standing) void applyCode(standing, { silent: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [partner?.gymSlug]);
-
-  async function applyCode(code: string, { silent = false } = {}) {
-    const requestId = ++promoRequestId.current;
-    const res = await fetch("/api/promo/validate", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ code, gymSlug: partner?.gymSlug }),
-    }).then((r) => r.json()).catch(() => ({ valid: false, message: "" }));
-
-    if (requestId !== promoRequestId.current) return; // superseded by a later request — drop it
-
-    if (res.valid) {
-      setAppliedPromo({ code: res.code, amountOffPence: res.amountOffPence });
-      setPromoError("");
-      return;
-    }
-    // A failed STANDING code must never shout at the learner — they did not type
-    // it. The page simply shows full price, which is recoverable; showing a
-    // discount we cannot deliver is the fault being removed.
-    if (!silent) setPromoError(res.message || "We don't recognise that code.");
-  }
-
-  function applyPromo() {
-    const code = promoInput.trim().toUpperCase();
-    if (!code) return;
-    void applyCode(code);
-  }
 
   // ─── Validation ───────────────────────────────────────────────────────
   function validate() {
@@ -228,7 +171,7 @@ export default function EnrolmentFlow({
   }
 
   // ─── Payment ──────────────────────────────────────────────────────────
-  async function pay(type: "full" | "deposit" | "sept99" | "oct99" | "bf2026") {
+  async function pay(plan: CoursePlanChoice) {
     if (submitting) return;
     const errs = validate();
     if (Object.keys(errs).length) {
@@ -237,50 +180,32 @@ export default function EnrolmentFlow({
       return;
     }
     setErrors({});
+    setPayError("");
     setSubmitting(true);
 
-    // Pay-in-full is discounted by whatever Stripe says the applied code is
-    // worth; the deposit is NEVER discounted — it is always £599 now.
-    const amount =
-      type === "sept99" ? SEPT99_ENTRY
-      : type === "bf2026" ? BF_PRICE
-      : type === "oct99" ? OCT99_ENTRY
-      : type === "full" ? fullPricePence / 100
-      : DEPOSIT_PENCE / 100;
+    // What is charged TODAY, in pence and pounds. The monthly plan's checkout
+    // payment is its first £99.99.
+    const todayPence = plan === "pif" ? COURSE_PRICE_PENCE : MONTHLY_PRICE_PENCE;
+    const amount = todayPence / 100;
+    const recordedPlan: EnrolmentContext["plan"] = plan === "pif" ? "full" : "monthly";
 
-    // Everything downstream classifies a sale as PIF-or-deposit. The September
-    // £99 is a deposit — an entry payment with instalments to follow — so it is
-    // recorded as one. Sending "sept99" here would land it as "full", because
-    // /api/enrolment-pending maps anything that isn't "deposit" to "full".
-    // Both entry offers are deposits — an entry payment with instalments to
-    // follow. Anything that is not "deposit" lands as "full" downstream.
-    // Black Friday is a pay-in-full, not an entry payment — nothing follows it.
-    const recordedPlan: "full" | "deposit" =
-      type === "sept99" || type === "oct99" ? "deposit" : type === "bf2026" ? "full" : type;
-
-    // Stash context so the post-payment form on /enrol/success can prefill the
-    // learner's name + email and carry plan / amount / attribution through.
+    // Stash context so the thank-you page can show the plan back to the buyer.
     const context: EnrolmentContext = {
       fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
       plan: recordedPlan,
-      ...(type === "sept99" && { offer: "sept99" as const }),
-      ...(type === "oct99" && { offer: "oct99" as const }),
-      ...(type === "bf2026" && { offer: "bf2026" as const }),
       amount,
-      ...(appliedPromo && { promoCode: appliedPromo.code, discountApplied: appliedPromo.amountOffPence / 100 }),
       ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
       ...(partner?.gymSlug && { gymSlug: partner.gymSlug }),
-      source: "website-enrolment-flow-v2",
+      source: "website-enrolment-flow-v3",
       ts: new Date().toISOString(),
     };
-    try { localStorage.setItem(ENROLMENT_CONTEXT_KEY, JSON.stringify(context)); } catch (_) {}
+    try { localStorage.setItem(ENROLMENT_CONTEXT_KEY, JSON.stringify(context)); } catch { /* storage unavailable — non-fatal */ }
 
     trackEvent('enrolment_payment_attempted', {
-      payment_type: type,
+      payment_type: plan,
       amount,
       currency: 'GBP',
-      ...(appliedPromo && { promo_code: appliedPromo.code }),
       ...(partner?.gymReferral && { gym_referral: partner.gymReferral }),
     });
 
@@ -288,10 +213,7 @@ export default function EnrolmentFlow({
     // sees the high-intent moment between Lead and Purchase. Browser fbq +
     // server CAPI share one eventID for dedup. Both calls are fire-and-forget
     // so they NEVER delay the Stripe redirect.
-    const planName =
-      type === "sept99" ? "course_sept99"
-      : type === "full" ? "course_pif"
-      : "course_deposit";
+    const planName = plan === "pif" ? "course_pif" : "course_monthly";
     const icEventId =
       (typeof window !== "undefined" && window.crypto?.randomUUID?.()) ||
       `ic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -303,7 +225,7 @@ export default function EnrolmentFlow({
           currency: "GBP",
           value: amount,
           content_name: planName,
-          content_category: partner?.gymReferral || (appliedPromo?.code ?? undefined),
+          content_category: partner?.gymReferral || undefined,
         },
         { eventID: icEventId },
       );
@@ -324,7 +246,6 @@ export default function EnrolmentFlow({
 
     // Pay-first safety net — alert admin that checkout has started so an
     // abandoned post-payment form (paid but never enrolled) can be chased.
-    // Fire-and-forget so it never delays the Stripe redirect.
     fetch("/api/enrolment-pending", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -332,34 +253,21 @@ export default function EnrolmentFlow({
         name: fullName.trim(),
         email: email.trim().toLowerCase(),
         plan: recordedPlan,
-        amount,
         ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
-        ...(appliedPromo && { promoCode: appliedPromo.code }),
         [sec.SEC_KEY]: sec.payload(),
       }),
     }).catch(() => { /* fire-and-forget — never block Stripe redirect */ });
 
-    const fullLink    = partner?.stripeFullLink    ?? FULL_PAYMENT_STRIPE_LINK;
-    const depositLink = partner?.stripeDepositLink ?? DEPOSIT_STRIPE_LINK;
-    // The September offer is never a partner link — a gym earns nothing on it,
-    // so it must not be reachable from a gym-branded enrolment page.
-    const paymentLink =
-      type === "sept99" ? SEPT99_PAYMENT_LINK
-      : type === "bf2026" ? BF_PAYMENT_LINK
-      : type === "oct99" ? OCT99_PAYMENT_LINK
-      : type === "full" ? fullLink
-      : depositLink;
     const ref = buildAttributionRef(partner?.gymReferral, partner?.gymSlug);
 
     // Ask the server to create a Checkout Session so the post-payment return
-    // URL (/enrol/success) is set in code rather than in the Stripe Dashboard.
-    // Dashboard-configured redirects had drifted on two of the three Payment
-    // Links, dropping paying buyers on stripe.com and skipping the enrolment
-    // form entirely — see app/lib/stripeCheckout.ts.
+    // URL (/enrol/success) is set in code rather than in the Stripe Dashboard,
+    // and so the price is chosen server-side from the plan.
     //
-    // If that fails for ANY reason we redirect to the raw Payment Link instead:
-    // a buyer must never be blocked from paying. The 5s abort covers a slow or
-    // unreachable API so nobody is left staring at a disabled button.
+    // If that fails we fall back to the plan's raw Payment Link — but only one
+    // configured for the CURRENT price. If none is configured, we stop and say
+    // so with a way to reach us, rather than send anyone to a retired price.
+    // The 5s abort covers a slow or unreachable API.
     let checkoutUrl = "";
     try {
       const controller = new AbortController();
@@ -369,80 +277,38 @@ export default function EnrolmentFlow({
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
-          paymentLink,
+          plan,
           clientReferenceId: ref,
           attribution: readAttribution(),
           email: email.trim().toLowerCase(),
           name: fullName.trim(),
           gymReferral: partner?.gymReferral,
           gymSlug: partner?.gymSlug,
-          promoCode: appliedPromo?.code,
           cancelPath: typeof window !== "undefined" ? window.location.pathname : "/enrol",
         }),
       });
       clearTimeout(timeout);
-      const data = (await res.json()) as { url?: string | null; offerClosed?: boolean };
-      // The ONE case where falling back to the raw Payment Link is wrong.
-      // Every other failure here means "we couldn't mint a session, let them pay
-      // anyway"; this one means "this offer has closed, do not sell it". Falling
-      // through would take £99 for an offer that had ended.
-      if (data?.offerClosed) {
-        // Back to the offer page, which renders the closed state and points at
-        // the standard options. Not an inline error — this component has no
-        // form-level error slot, so one set here would never be shown and the
-        // buyer would sit on a dead button.
-        window.location.href = SEPT99_LANDING_PATH;
-        return;
-      }
+      const data = (await res.json()) as { url?: string | null };
       if (data?.url) checkoutUrl = data.url;
     } catch { /* fall through to the Payment Link */ }
 
-    window.location.href = checkoutUrl || appendStripeAttribution(paymentLink, email, ref);
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+      return;
+    }
+    const fallback = fallbackPaymentLink(plan);
+    if (fallback) {
+      window.location.href = appendStripeAttribution(fallback, email, ref);
+      return;
+    }
+    setSubmitting(false);
+    setPayError(
+      "We couldn't open the secure checkout just now, and you have not been charged. " +
+        "Please try again in a minute, or contact us and we'll get you enrolled.",
+    );
   }
 
   const firstName = fullName.trim().split(" ")[0];
-
-  // Pay-in-full is £1,599 less whatever Stripe says the applied code is
-  // worth. This is what Stripe actually charges — untouched by the display
-  // fix below, because every code's amount_off is defined against this same
-  // £1,599 base regardless of what any one partner advertises.
-  const PIF_PENCE = 159_900;
-  const fullPricePence = PIF_PENCE - (appliedPromo?.amountOffPence ?? 0);
-
-  // DISPLAY ONLY. What this page crosses out as the "was" price — the
-  // partner's own advertised full price (config.fullPrice, e.g. £1,399),
-  // never the internal £1,599 base Stripe discounts against. Showing the
-  // £1,599 base here was the bug: a 6fit member's own page has never
-  // mentioned £1,599, so crossing it out and captioning "Save £200" advertised
-  // a saving against a number nobody had seen, and for a Black Friday code it
-  // reproduced the exact "£600 off" framing the owner banned outright. A
-  // discount is only shown at all when it beats what the partner already
-  // advertises — the routine standing-code case (£1,399 -> £1,399) shows a
-  // plain price, not a price struck through against itself.
-  const listPricePence = (partner?.fullPrice ?? PIF_PENCE / 100) * 100;
-  const showDiscountUI = Boolean(appliedPromo) && fullPricePence < listPricePence;
-  // Until appliedPromo resolves (it starts null — set only by the client-side
-  // round-trip to /api/promo/validate fired from a mount effect, never during
-  // SSR or first paint), the CTA below is already showing PIF_PENCE — nothing
-  // has discounted fullPricePence yet. This must match it, not listPricePence,
-  // or the page reads "£1,399" above a "Pay £1,599 →" button on every load
-  // until the round-trip returns, and PERMANENTLY if the standing code ever
-  // fails to validate — the exact "page advertises one price, Stripe charges
-  // another" defect this file's own PartnerConfig.fullPrice comment warns
-  // about, reintroduced by the fix meant to remove it.
-  const displayPricePence = appliedPromo ? fullPricePence : PIF_PENCE;
-
-  // The deposit is NEVER discounted: £599 now, then 5 × £200. The old code
-  // computed instalments as (fullPrice - depositPrice) / 200, which produced 4
-  // instalments and a £1,399 total against a Stripe charge of £1,599. Delete
-  // that arithmetic; do not adapt it.
-  const DEPOSIT_PENCE = 59_900;
-  const INSTALMENT_PENCE = 20_000;
-  const INSTALMENT_COUNT = 5;
-  const depositTotalPence = DEPOSIT_PENCE + INSTALMENT_COUNT * INSTALMENT_PENCE;
-  // Total shown in the instalment terms block. SEPT99_TOTAL is already in
-  // pounds; depositTotalPence is not.
-  const instalmentPlanTotal = isSept99 ? SEPT99_TOTAL : isOct99 ? OCT99_TOTAL : depositTotalPence / 100;
 
   // ─── Render ───────────────────────────────────────────────────────────
   return (
@@ -452,17 +318,18 @@ export default function EnrolmentFlow({
         <div className="max-w-2xl mx-auto px-5 py-16">
           <sec.Honeypot />
 
-          {/* Page header */}
+          {/* Page header. On a gym's page this is the GYM'S academy, so the
+              eyebrow never names us. */}
           <div className="text-center mb-10">
             <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">
-              PT Launch Lab — Enrolment
+              {partner ? "Enrolment" : "PT Launch Lab — Enrolment"}
             </p>
             <h1 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-3">
               {firstName ? `Secure your place, ${firstName}.` : "Secure your place."}
             </h1>
             <p className="text-soft text-sm">
-              Choose your payment option to lock in your spot. You&apos;ll complete your
-              enrolment details straight after — it only takes a couple of minutes.
+              Choose how you&apos;d like to pay. You&apos;ll complete your enrolment details
+              straight after — it only takes a couple of minutes.
             </p>
           </div>
 
@@ -495,185 +362,76 @@ export default function EnrolmentFlow({
               </div>
             </div>
 
-            {/* Launch codes — the partner's own standing discount is already applied
-                automatically above; this box is only for a one-off code from the
-                gym that replaces it. */}
-            {partner?.gymSlug && (
-              <div className="bg-deep border border-white/10 rounded-xl p-4">
-                <p className="text-soft text-sm mb-2 font-semibold">Got a launch code from the gym?</p>
-                {appliedPromo && (
-                  // States the code and the resulting price only — never the raw
-                  // Stripe amount_off. That figure is relative to the internal
-                  // £1,599 base a partner's own page never mentions, and for a
-                  // month code it reproduces the exact "£X off" framing the
-                  // owner has ruled must never reach a member.
-                  <p className="text-gold font-bold text-sm mb-2">
-                    ✓ {appliedPromo.code} applied — pay in full now £{(fullPricePence / 100).toLocaleString()}
-                  </p>
-                )}
-                <div className="flex gap-2">
-                  <input
-                    value={promoInput}
-                    onChange={e => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
-                    placeholder="Enter code"
-                    className="flex-1 bg-deep border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/[0.15] text-sm focus:outline-none focus:border-gold/50 transition-colors uppercase"
-                  />
-                  <button
-                    onClick={applyPromo}
-                    className="px-4 py-2 rounded-lg bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {promoError && <p className="text-red-400 text-xs mt-1.5">{promoError}</p>}
+            {payError && (
+              <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                <p className="text-red-400 text-sm font-bold mb-1">Checkout unavailable</p>
+                <p className="text-red-300 text-xs leading-relaxed">
+                  {payError}{" "}
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="underline">{SUPPORT_EMAIL}</a>
+                  {" · "}
+                  <a href={`tel:${PHONE_TEL}`} className="underline">{SUPPORT_PHONE}</a>
+                </p>
               </div>
             )}
 
-            {/* September weekend offer — a single option, no plan choice. */}
-            {isSept99 && (
-              <button onClick={() => pay("sept99")} disabled={submitting}
-                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Closes 11:59pm Sunday</p>
-                <p className="text-white font-bold text-2xl mb-1">Start today</p>
-                <p className="text-gold text-4xl font-bold mb-1">£{SEPT99_ENTRY}</p>
-                <p className="text-soft text-xs mb-3">
-                  then {INSTALMENT_COUNT} × £{(INSTALMENT_PENCE / 100).toLocaleString()} monthly — £{SEPT99_TOTAL.toLocaleString()} total
-                </p>
-                <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> £{SEPT99_SAVING} less than the £{(PIF_PENCE / 100).toLocaleString()} direct price</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments collected automatically</li>
-                </ul>
-                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Start for £${SEPT99_ENTRY} →`}
-                </div>
-              </button>
-            )}
-
-            {/* October entry offer — a single option, no plan choice.
-                NOT a discount: the total is the pay-in-full price. */}
-            {isOct99 && (
-              <button onClick={() => pay("oct99")} disabled={submitting}
-                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">October intake</p>
-                <p className="text-white font-bold text-2xl mb-1">Start today</p>
-                <p className="text-gold text-4xl font-bold mb-1">£{OCT99_ENTRY}</p>
-                <p className="text-soft text-xs mb-3">
-                  then {OCT99_INSTALMENTS} × £{OCT99_MONTHLY} monthly — £{OCT99_TOTAL.toLocaleString()} total
-                </p>
-                <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> The same £{(PIF_PENCE / 100).toLocaleString()} total as paying up front — this lowers what you need to start, not the price</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Monthly payments collected automatically</li>
-                </ul>
-                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Start for £${OCT99_ENTRY} →`}
-                </div>
-              </button>
-            )}
-
-            {/* Black Friday — the one price cut of the year. */}
-            {isBF && (
-              <button onClick={() => pay("bf2026")} disabled={submitting}
-                className="bg-deep border-2 border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Black Friday — closes Monday</p>
-                <p className="text-white font-bold text-2xl mb-1">The whole course</p>
-                <p className="text-gold text-4xl font-bold mb-1">£{BF_PRICE.toLocaleString()}</p>
-                <p className="text-soft text-xs mb-3">
-                  <span className="line-through">£{BF_LIST_PRICE.toLocaleString()}</span> — £{BF_SAVING} off, paid once
-                </p>
-                <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Nothing further to pay</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Mentorship and your tutor included, as always</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full course access on day one</li>
-                </ul>
-                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay £${BF_PRICE.toLocaleString()} →`}
-                </div>
-              </button>
-            )}
-
-            {/* Payment options */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${isSept99 || isOct99 || isBF ? " hidden" : ""}`}>
-              {/* Full payment */}
-              <button onClick={() => pay("full")} disabled={submitting}
+            {/* The two ways to pay */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Pay in full */}
+              <button onClick={() => pay("pif")} disabled={submitting}
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Best Value</p>
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">One payment</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
-                {showDiscountUI ? (
-                  <div className="mb-3">
-                    <p className="text-faint text-2xl font-bold line-through leading-none">£{(listPricePence / 100).toLocaleString()}</p>
-                    <p className="text-gold text-4xl font-bold leading-none">£{(displayPricePence / 100).toLocaleString()}</p>
-                  </div>
-                ) : (
-                  <p className="text-gold text-4xl font-bold mb-3">£{(displayPricePence / 100).toLocaleString()}</p>
-                )}
+                <p className="text-gold text-4xl font-bold mb-3">{COURSE_PRICE_LABEL}</p>
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Immediate course access</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> One single payment</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Nothing further to pay</li>
                 </ul>
                 <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay £${(fullPricePence / 100).toLocaleString()} →`}
+                  {submitting ? "Taking you to checkout…" : `Pay ${COURSE_PRICE_LABEL} →`}
                 </div>
               </button>
 
-              {/* Deposit plan — never discounted, whatever code is applied. */}
-              <button onClick={() => pay("deposit")} disabled={submitting}
+              {/* Pay monthly */}
+              <button onClick={() => pay("monthly")} disabled={submitting}
                 className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the Cost</p>
-                <p className="text-white font-bold text-2xl mb-1">Deposit Plan</p>
-                <p className="text-gold text-4xl font-bold mb-1">£{(DEPOSIT_PENCE / 100).toLocaleString()}</p>
+                <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
+                <p className="text-white font-bold text-2xl mb-1">Pay Monthly</p>
+                <p className="text-gold text-4xl font-bold mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-soft font-semibold"> /month</span></p>
                 <p className="text-soft text-xs mb-3">
-                  then {INSTALMENT_COUNT} × £{(INSTALMENT_PENCE / 100).toLocaleString()} monthly — £{(depositTotalPence / 100).toLocaleString()} total
+                  {MONTHLY_PAYMENTS} monthly payments, the first today — {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total
                 </p>
-                {appliedPromo && (
-                  <p className="text-faint text-xs mb-3">Discounts apply to pay-in-full only.</p>
-                )}
                 <ul className="text-soft text-xs space-y-1.5 mb-6">
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Start today with a deposit</li>
-                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> {INSTALMENTS_ENABLED ? "Monthly payments collected automatically" : "Monthly payments to follow"}</li>
                   <li className="flex items-center gap-2"><span className="text-gold">✓</span> Full access from day one</li>
+                  <li className="flex items-center gap-2"><span className="text-gold">✓</span> Payments taken automatically, then they stop</li>
                 </ul>
-                {/* Taking a recurring mandate means saying so before they pay,
-                    not after. Shown only when instalments are actually live. */}
-                {INSTALMENTS_ENABLED && (
-                  <p className="text-faint text-[11px] leading-relaxed mb-4">
-                    Your card is securely saved and £{(INSTALMENT_PENCE / 100).toLocaleString()} is taken automatically each month for{" "}
-                    {INSTALMENT_COUNT} months, starting 30 days from today. Total £{(depositTotalPence / 100).toLocaleString()}.
-                    Payments stop on their own once the course is paid in full.
-                  </p>
-                )}
                 <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay £${(DEPOSIT_PENCE / 100).toLocaleString()} Deposit →`}
+                  {submitting ? "Taking you to checkout…" : `Pay ${MONTHLY_PRICE_LABEL} today →`}
                 </div>
               </button>
             </div>
 
-            {/* The certificate condition and the instalment mandate are material
+            {/* The certificate condition and the monthly mandate are material
                 terms of what someone is buying, so they belong on the screen
                 where the purchase is agreed rather than only behind a link to
-                the T&Cs. Wording mirrors "Certification" in app/terms/page.tsx.
-                Rendered unconditionally: an instalment option is always on this
-                screen, either the September £99 entry or the £599 deposit. */}
+                the T&Cs. */}
             <div className="bg-deep border border-gold/25 rounded-2xl p-6">
               <p className="text-white font-bold text-sm mb-3">
-                If you spread the cost, here is what you are agreeing to
+                If you pay monthly, here is what you are agreeing to
               </p>
               <ul className="text-soft text-[13px] leading-relaxed space-y-2.5">
-                {INSTALMENTS_ENABLED && (
-                  <li className="flex gap-2.5">
-                    <span className="text-gold shrink-0">·</span>
-                    <span>
-                      Your card is securely saved and £{(INSTALMENT_PENCE / 100).toLocaleString()} is
-                      taken automatically each month for {INSTALMENT_COUNT} months, starting 30 days
-                      from today. Total £{instalmentPlanTotal.toLocaleString()}.
-                    </span>
-                  </li>
-                )}
                 <li className="flex gap-2.5">
                   <span className="text-gold shrink-0">·</span>
                   <span>
-                    The {INSTALMENT_COUNT} payments are due in full. They run whether you finish the
+                    {MONTHLY_PRICE_LABEL} is taken today, then your card is securely saved and{" "}
+                    {MONTHLY_PRICE_LABEL} is taken automatically each month for {MONTHLY_PAYMENTS - 1} more
+                    months — {MONTHLY_PAYMENTS} payments, {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total.
+                    Payments stop on their own after the {MONTHLY_PAYMENTS}th.
+                  </span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="text-gold shrink-0">·</span>
+                  <span>
+                    The {MONTHLY_PAYMENTS} payments are due in full. They run whether you finish the
                     course in three months or ten, and finishing your assessments early does not bring
                     them forward.
                   </span>
@@ -705,7 +463,7 @@ export default function EnrolmentFlow({
             <div className="bg-deep border border-white/10 rounded-2xl p-6 text-center">
               <p className="text-white font-bold mb-2">Need help before you continue?</p>
               <p className="text-soft text-sm mb-5">
-                If you have any questions before choosing your payment option, the team is here.
+                If you have any questions before choosing how to pay, the team is here.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4 text-sm">
                 <a href={`mailto:${SUPPORT_EMAIL}`} className="text-gold hover:underline">

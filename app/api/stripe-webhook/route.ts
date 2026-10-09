@@ -7,17 +7,33 @@ import {
   getSubscription,
   setSubscriptionMetadata,
   cancelSubscription,
+  endSubscriptionWithoutProration,
   countSettledInstalments,
+  countSettledMonthlyPayments,
+  subscriptionPriceIds,
+  MONTHLY_999_PRICE_ID,
+  type StripeSubscription,
 } from "@/app/lib/stripeCheckout";
 import { recordPartnerSale, applyInstalmentToPartnerSale } from "@/app/lib/partner-sales";
 import {
   isDepositSale,
   planTypeForSale,
+  planKindForSale,
   planLabel,
   outstandingBalancePence,
   formatGbp,
   type SaleShape,
 } from "@/app/lib/coursePlan";
+import {
+  subscriptionPlanKind,
+  collectedPence,
+  contractPence,
+  legacyEntryPence,
+  legacyInstalmentPence,
+  monthlyTarget,
+  planIsComplete,
+} from "@/app/lib/paymentPlans";
+import { formatPence, MONTHLY_PAYMENTS, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_TOTAL_PENCE } from "@/app/lib/pricing";
 import { PHONE_NATIONAL } from "@/app/lib/contactDetails";
 import { buildInviteUrl, invitePostBody, type InvitePayload } from "@/app/lib/enrolmentInvite";
 
@@ -68,11 +84,19 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
 // only on the path that runs when something else has already gone wrong. It is
 // admitted by its Payment Link id rather than by its amount: a bare "£99 counts"
 // rule would also admit any unrelated one-off £99 charge on this shared account.
+// (Legacy: the September link is retired, kept so a late sale is still seen.)
 const SEPT99_PAYMENT_LINK_ID =
   process.env.STRIPE_SEPT99_PAYMENT_LINK_ID || "plink_1U8Jic99z9lThumnrEWofv3y";
 
+// From October 2026 the monthly plan's first payment is £99.99 on a SUBSCRIPTION
+// — under the £500 floor AND in the mode the floor test rejects outright. So the
+// two current plans are admitted by metadata, never by amount: API sessions
+// carry source=api-checkout-session, and the two raw fallback Payment Links must
+// be created with metadata ptll_product=course (Stripe copies a Payment Link's
+// metadata onto every session it creates).
 function isCourseSale(session: StripeSession): boolean {
   if (session.metadata?.source === "api-checkout-session") return true;
+  if (session.metadata?.ptll_product === "course") return true;
   if (session.mode === "subscription") return false;
   if (session.payment_link === SEPT99_PAYMENT_LINK_ID) return true;
   const amountGbp = (session.amount_total ?? 0) / 100;
@@ -131,16 +155,22 @@ type StripeEvent = {
 // Everything downstream — the alarm, both emails, the Sheet, Meta — classifies
 // off this, so they cannot disagree with each other again. See app/lib/coursePlan.
 function saleShape(session: StripeSession): SaleShape {
-  // contract_value is stamped in POUNDS by buildSessionParams; SaleShape works
-  // in pence throughout, so convert here rather than letting two units meet
-  // anywhere near a balance calculation.
+  // contract_value_pence is exact and stamped from October 2026. Older sessions
+  // only carry contract_value in POUNDS; SaleShape works in pence throughout, so
+  // convert here (rounded — 999.9 × 100 is not an integer in floating point)
+  // rather than letting two units meet anywhere near a balance calculation.
+  const stampedPence = Number(session.metadata?.contract_value_pence);
   const contractPounds = Number(session.metadata?.contract_value);
   return {
     mode: session.mode,
     amountTotalPence: session.amount_total ?? 0,
     metadataPlan: session.metadata?.plan,
     contractValuePence:
-      Number.isFinite(contractPounds) && contractPounds > 0 ? contractPounds * 100 : null,
+      Number.isFinite(stampedPence) && stampedPence > 0
+        ? Math.round(stampedPence)
+        : Number.isFinite(contractPounds) && contractPounds > 0
+          ? Math.round(contractPounds * 100)
+          : null,
   };
 }
 
@@ -237,44 +267,10 @@ async function sendToGa4(session: StripeSession) {
     ],
   };
 
-  // Funnel-promo redemption marker, logged for visibility only.
-  //
-  // This used to tell admin to cancel the 5th instalment for promo buyers who
-  // chose the deposit plan, honouring £200 off. That practice is retired:
-  // discounts do not apply to deposit plans, because the plan itself is the
-  // concession and the full £1,599 is what gets spread. The promo only ever
-  // discounts pay-in-full. Confirmed by Callum 2026-07-26.
-  if (attribution["funnel_promo"]) {
-    const isPif = !isDepositSale(saleShape(session));
-    console.warn(
-      `[stripe-webhook] FUNNEL PROMO ${isPif ? "PIF" : "DEPOSIT"} — ` +
-        `source=${attribution["funnel_promo"]} ` +
-        `email=${session.customer_email || session.customer_details?.email || "?"} ` +
-        `session=${session.id} ` +
-        `amount=£${amount}` +
-        (isPif ? "" : " — deposit plan, full £1,599 over 5 instalments (no promo discount)"),
-    );
-
-    const hookUrl = process.env.FUNNEL_PROMO_ADMIN_WEBHOOK;
-    if (hookUrl && !isPif) {
-      // Fire-and-forget admin notification for deposit-plan promo redemptions
-      fetch(hookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "funnel_promo_deposit",
-          source: attribution["funnel_promo"],
-          email: session.customer_email || session.customer_details?.email || "",
-          phone: session.customer_details?.phone || "",
-          name: buyerName(session),
-          stripe_session_id: session.id,
-          amount,
-          currency,
-          action_required: "None — deposit plans take the full £1,599 over 5 instalments; the promo discount applies to pay-in-full only",
-        }),
-      }).catch((err) => console.error("[stripe-webhook] admin hook failed:", err));
-    }
-  }
+  // GA4 `value` is the cash actually collected in this session: £999.99 for a
+  // pay-in-full, £99.99 for the first monthly payment. GA4 is the revenue
+  // record, so it reports money received, not money promised. Meta (below) is
+  // sent the contract value instead, for bid optimisation.
 
   const url = `https://www.google-analytics.com/mp/collect?measurement_id=${encodeURIComponent(
     measurementId,
@@ -314,7 +310,8 @@ async function sendToMetaCapi(session: StripeSession) {
   // value-based lookalike of most of each instalment enrolment's worth.
   //
   //   PIF                  → amount already equals the full value
-  //   £599 entry           → uplift to £1,599 (£1,399 with a funnel/PIF promo)
+  //   £99.99 monthly       → uplift to the 10 × £99.99 contract, £999.90
+  //   £599 entry (legacy)  → uplift to £1,599 (£1,399 with a funnel/PIF promo)
   //   £99 entry (Sept-26)  → uplift to £1,099
   //
   // The contract value is stamped into session metadata at checkout by
@@ -358,7 +355,11 @@ async function sendToMetaCapi(session: StripeSession) {
       currency,
       value: courseValue,                 // full contract value for optimisation
       amount_paid: amountPaid,            // cash collected in this session (ref)
-      contentName: isPif ? "course_pif" : "course_deposit",
+      contentName: isPif
+        ? "course_pif"
+        : planKindForSale(saleShape(session)) === "monthly"
+          ? "course_monthly"
+          : "course_deposit",
       contentCategory: attribution["funnel_promo"] || undefined,
       orderId: session.id,
       promo_code: session.metadata?.promo_code ?? "",
@@ -373,9 +374,10 @@ async function sendToMetaCapi(session: StripeSession) {
 // Required env var:
 //   GYM_TRACKER_WEBHOOK_URL  — the Make.com custom-webhook URL
 //
-// Filter: only PTLL course sales (deposit £599 or PIF £1,399 ± promo).
-// USA gym-membership signups go through the same Stripe account but use
-// monthly subscription pricing in a different range, so we cap at £1,500.
+// Filter: only PTLL course sales. USA gym-membership signups go through the
+// same Stripe account but use monthly subscription pricing in a different
+// range, so we cap at £1,500. Both current prices (£999.99 in full, £99.99 first
+// monthly payment) sit inside it, as did every legacy price.
 async function sendToGymTracker(session: StripeSession) {
   const url = process.env.GYM_TRACKER_WEBHOOK_URL;
   if (!url) return; // not configured — no-op
@@ -383,9 +385,9 @@ async function sendToGymTracker(session: StripeSession) {
   const amount = (session.amount_total ?? 0) / 100;
   const currency = (session.currency ?? "gbp").toUpperCase();
 
-  // Heuristic: PTLL course sales are one-off entry payments (£99 or £599) or a
-  // pay-in-full (£1,399/£1,599). Skip USA-membership monthly subscriptions,
-  // which land here too.
+  // Heuristic: PTLL course sales are £999.99 pay-in-full or a £99.99 first
+  // monthly payment (legacy: £99/£599 entries, £1,399/£1,599 pay-in-full).
+  // Skip USA-membership monthly subscriptions, which land here too.
   const isPtllCourseSale = amount > 0 && amount <= 1500;
   if (!isPtllCourseSale) return;
 
@@ -401,7 +403,9 @@ async function sendToGymTracker(session: StripeSession) {
   // a deposit — 8 of the 9 gym sales in the Sheet were labelled wrong. Shares
   // the partner portal's rule now so the two records agree. Rows written before
   // 2026-07-28 still carry the old label.
-  const plan_type = planTypeForSale(saleShape(session));
+  // "PIF" | "deposit" | "monthly" — the monthly plan is named as itself in the
+  // Sheet rather than folded into "deposit".
+  const plan_type = planKindForSale(saleShape(session));
 
   await fetch(url, {
     method: "POST",
@@ -415,7 +419,7 @@ async function sendToGymTracker(session: StripeSession) {
       customer_phone: phone,
       amount_gbp: amount,
       currency,
-      plan_type,                     // "deposit" | "PIF"
+      plan_type,                     // "deposit" | "PIF" | "monthly"
       stripe_session_id: session.id,
       stripe_link: `https://dashboard.stripe.com/payments/${session.id}`,
     }),
@@ -456,7 +460,6 @@ async function sendPaidReconciliation(session: StripeSession) {
   const name = buyerName(session);
   const phone = session.customer_details?.phone || "";
   const sale = saleShape(session);
-  const planType = planTypeForSale(sale);
   const label = planLabel(sale);
   const attribution = decodeClientRef(session.client_reference_id);
   const gymReferral = session.metadata?.gym_referral || attribution.gym || "";
@@ -469,11 +472,15 @@ async function sendPaidReconciliation(session: StripeSession) {
   // collection, and there is now no mechanism to collect the balance. Silence
   // here would mean discovering it a month later, or never.
   //
-  // `planType` decides this, so it must never be derived from the amount: a
+  // The plan kind decides this, so it must never be derived from the amount: a
   // £1,099 partner pay-in-full read as a deposit fires this alarm at a learner
   // who owes nothing, and a false alarm is how a real one gets ignored.
+  //
+  // LEGACY deposits only. The monthly plan is always a subscription, and a
+  // monthly sale is never a "deposit with no mandate" — if it is not a
+  // subscription it is not a monthly sale at all.
   const missingMandate =
-    INSTALMENTS_ENABLED && planType === "deposit" && session.mode !== "subscription";
+    INSTALMENTS_ENABLED && planKindForSale(sale) === "deposit" && session.mode !== "subscription";
   // Derived, not the flat "£1,000" this used to state — that figure is only
   // right for a £599 deposit and was wrong on the sale that exposed the bug.
   const uncollected = formatGbp(outstandingBalancePence(sale));
@@ -497,7 +504,7 @@ async function sendPaidReconciliation(session: StripeSession) {
       <div style="font-size:13px;color:#8CA3BF;margin-top:4px;">💳 Payment confirmed via Stripe</div>
     </div>
     <div style="background:#0A2A44;padding:22px 26px;border-radius:0 0 12px 12px;">
-      <div style="font-size:17px;font-weight:700;color:#F5C518;margin-bottom:6px;">${name || "(name not captured)"} — £${amount.toLocaleString()}</div>
+      <div style="font-size:17px;font-weight:700;color:#F5C518;margin-bottom:6px;">${name || "(name not captured)"} — ${formatPence(session.amount_total ?? 0)}</div>
       ${missingMandate ? `
       <div style="margin:12px 0 16px;padding:14px 16px;background:#3A0D0D;border:1px solid #C0392B;border-radius:10px;color:#FFD9D4;font-size:13px;line-height:1.6;">
         <strong style="color:#ffffff;">⚠️ NO INSTALMENT MANDATE TAKEN</strong><br><br>
@@ -564,7 +571,7 @@ async function sendPaidReconciliation(session: StripeSession) {
           phone,
           amount,
           currency,
-          plan_type: planType,       // "PIF" | "deposit"
+          plan_type: planKindForSale(sale), // "PIF" | "deposit" | "monthly"
           gym_referral: gymReferral,
           promo_code: promoCode,
           stripe_session_id: session.id,
@@ -678,7 +685,6 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
     return;
   }
 
-  const amount = (session.amount_total ?? 0) / 100;
   const name = buyerName(session);
   const firstName = name.trim().split(/\s+/)[0] || "";
   // Buyer-facing, so the amount test that used to be here was the worst copy of
@@ -702,7 +708,7 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
     <div style="background:#0A2A44;padding:26px;border-radius:0 0 12px 12px;color:#C7D6E8;font-size:14px;line-height:1.65;">
       <p style="margin:0 0 14px;">Hi${firstName ? ` ${firstName}` : ""},</p>
       <p style="margin:0 0 14px;">
-        Your payment of <strong style="color:#ffffff;">£${amount.toLocaleString()}</strong> (${label}) has gone through —
+        Your payment of <strong style="color:#ffffff;">${formatPence(session.amount_total ?? 0)}</strong> (${label}) has gone through —
         thank you, and welcome to PT Launch Lab.
       </p>
       <p style="margin:0 0 20px;">
@@ -758,18 +764,25 @@ async function sendLearnerCompletionEmail(session: StripeSession) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Deposit instalment plan — £599 at checkout then 5 × £200/month.
+// Payment plans.
+//
+//   monthly (from October 2026) — 10 × £99.99, the first taken at checkout.
+//   legacy                      — £599 (or £99) at checkout then 5 × £200/month
+//                                 (5 × £300 on the October price). Still being
+//                                 paid by learners who enrolled before October.
 //
 // The plan has to stop itself. A Stripe subscription runs forever unless told
-// otherwise, and the failure mode here is charging a learner a 6th, 7th, 12th
-// £200 for a course they've already paid off in full — so the counting is
-// deliberately conservative: count only settled instalment invoices, cancel as
-// soon as the target is reached, and cancel on the way past it rather than
-// exactly on it if the count is ever ambiguous.
+// otherwise, and the failure mode here is charging a learner an 11th £99.99,
+// or a 6th £200, for a course they've already paid off in full — so the
+// counting is deliberately conservative: count only settled invoices on the
+// plan's own recurring price, stop as soon as the target is reached, and stop
+// on the way past it rather than exactly on it if the count is ever ambiguous.
 //
 // Counting invoices rather than computing an end date matters because Stripe's
 // smart retries push billing dates around on a failed payment, and month-end
-// enrolments (31 Jan → 28 Feb) break naive month arithmetic.
+// enrolments (31 Jan → 28 Feb) break naive month arithmetic. It is also why
+// cancel_at is NOT used: setting it mid-period makes Stripe prorate the final
+// instalment.
 //
 // Requires `invoice.paid` and `invoice.payment_failed` on the webhook endpoint.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -795,18 +808,9 @@ function invoiceSubscriptionId(invoice: StripeInvoice): string | null {
   return invoice.subscription || invoice.parent?.subscription_details?.subscription || null;
 }
 
-// What was collected at checkout before the monthly instalments start — £599 on
-// the standard deposit plan, £99 on the September weekend offer.
-//
-// Stamped into subscription metadata by buildSessionParams. Plans created before
-// that stamp existed are all £599, because the £99 price post-dates it — so the
-// fallback is correct rather than merely safe. Everything below reports running
-// totals to admin, and hardcoding 599 told a £99 buyer's record £999 collected
-// when it was £499.
-const LEGACY_ENTRY_AMOUNT = 599;
-function entryAmountFrom(metadata: Record<string, string> | undefined): number {
-  const stamped = Number(metadata?.entry_amount);
-  return Number.isFinite(stamped) && stamped > 0 ? stamped : LEGACY_ENTRY_AMOUNT;
+/** Which plan this subscription is, or null if it isn't one of ours. */
+function planKindOf(sub: StripeSubscription) {
+  return subscriptionPlanKind(sub.metadata, subscriptionPriceIds(sub), MONTHLY_999_PRICE_ID);
 }
 
 async function handleInstalmentPaid(invoice: StripeInvoice) {
@@ -814,8 +818,12 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
   if (!subId) return;
 
   const sub = await getSubscription(subId);
-  if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return; // not our plan
+  if (!sub) return;
+  const kind = planKindOf(sub);
+  if (kind === "monthly") return handleMonthlyPaymentPaid(invoice, sub, subId);
+  if (kind !== "legacy") return; // not our plan
 
+  // ── Legacy deposit plan — behaviour unchanged ─────────────────────────────
   const target = Number(sub.metadata?.instalments_target ?? "5");
   const name = sub.metadata?.buyer_name || invoice.customer_name || "";
   const email = sub.metadata?.buyer_email || invoice.customer_email || "";
@@ -835,21 +843,26 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
   await setSubscriptionMetadata(subId, { instalments_paid: String(paid) });
   console.log(`[stripe-webhook] instalment ${paid}/${target} collected — £${amount} ${email} (${subId})`);
 
-  // Move the partner's payment progress on, and release their commission once
-  // the second instalment has cleared. Reuses `paid` above rather than counting
-  // again — that number is recomputed from Stripe and safe against redelivery.
+  // Move the partner's payment progress on, and release their commission when
+  // their terms say so. Reuses `paid` above rather than counting again — that
+  // number is recomputed from Stripe and safe against redelivery.
   await applyInstalmentToPartnerSale({
     subscriptionId: subId,
-    settledInstalments: paid,
-    amountPaidPence: invoice.amount_paid ?? 0,
+    kind: "legacy",
+    settled: paid,
+    collectedPence: collectedPence("legacy", paid, sub.metadata),
   });
 
   if (paid < target) return;
 
   // Balance settled — stop the mandate before another month comes round.
   const cancelled = await cancelSubscription(subId);
-  const entry = entryAmountFrom(sub.metadata);
-  const total = entry + paid * 200;
+  // Each instalment is (contract − entry) ÷ target: £200 on every £599 and £99
+  // September plan, exactly as the old `paid * 200` said, and £300 on the
+  // October price, which `paid * 200` got wrong.
+  const entryPence = legacyEntryPence(sub.metadata);
+  const instalment = formatPence(legacyInstalmentPence(sub.metadata));
+  const total = formatPence(collectedPence("legacy", paid, sub.metadata));
   console.log(
     cancelled
       ? `[stripe-webhook] plan complete for ${email} — cancelled ${subId} after ${paid} instalments`
@@ -862,17 +875,90 @@ async function handleInstalmentPaid(invoice: StripeInvoice) {
         from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
         to: ADMIN_EMAIL,
         subject: cancelled
-          ? `✅ Course paid in full: ${name || email} — £${total.toLocaleString()}`
+          ? `✅ Course paid in full: ${name || email} — ${total}`
           : `🚨 ACTION NEEDED: cancel subscription for ${name || email} (${subId})`,
         html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
-          <p style="font-size:15px;">${name || email} has now paid <strong>£${total.toLocaleString()}</strong> in full
-          (£${entry.toLocaleString()} to start + ${paid} × £200).</p>
+          <p style="font-size:15px;">${name || email} has now paid <strong>${total}</strong> in full
+          (${formatPence(entryPence)} to start + ${paid} × ${instalment}).</p>
           <p style="font-size:14px;color:#4A6280;">Email: ${email}<br>Subscription: ${subId}</p>
           ${cancelled
             ? `<p style="font-size:14px;">The instalment plan has been cancelled automatically — no further payments will be taken.</p>`
             : `<p style="font-size:14px;color:#b00;"><strong>The automatic cancellation failed.</strong> Cancel
                <a href="https://dashboard.stripe.com/subscriptions/${subId}">${subId}</a> in Stripe now, or they will be
-               charged £200 again next month.</p>`}
+               charged ${instalment} again next month.</p>`}
+        </div>`,
+      });
+    } catch (err) {
+      console.error("[stripe-webhook] plan-complete email failed:", err);
+    }
+  }
+}
+
+// 10 × £99.99. The checkout payment is payment 1 (no trial), so the count of
+// paid invoices on the monthly price IS the number of payments made.
+async function handleMonthlyPaymentPaid(
+  invoice: StripeInvoice,
+  sub: StripeSubscription,
+  subId: string,
+) {
+  const target = monthlyTarget();
+  const name = sub.metadata?.buyer_name || invoice.customer_name || "";
+  const email = sub.metadata?.buyer_email || invoice.customer_email || "";
+
+  const paid = await countSettledMonthlyPayments(subId);
+  if (paid === null) {
+    console.error(`[stripe-webhook] could not count monthly payments for ${subId} — leaving plan running`);
+    return;
+  }
+
+  await setSubscriptionMetadata(subId, { payments_paid: String(paid) });
+  console.log(
+    `[stripe-webhook] monthly payment ${paid}/${target} collected — ${formatPence(invoice.amount_paid ?? 0)} ${email} (${subId})`,
+  );
+
+  await applyInstalmentToPartnerSale({
+    subscriptionId: subId,
+    kind: "monthly",
+    settled: paid,
+    collectedPence: collectedPence("monthly", paid),
+  });
+
+  if (!planIsComplete(paid, target)) return;
+
+  // A redelivered 10th invoice.paid arrives after the plan has already been
+  // ended. Nothing to do, and re-cancelling would fail and raise a false alarm.
+  if (sub.status === "canceled") {
+    console.log(`[stripe-webhook] monthly plan ${subId} already ended — redelivery ignored`);
+    return;
+  }
+
+  // Cancel now with prorate=false and invoice_now=false: no credit, no closing
+  // invoice, no 11th month. Never cancel_at — see endSubscriptionWithoutProration.
+  const ended = await endSubscriptionWithoutProration(subId);
+  const total = formatPence(collectedPence("monthly", paid));
+  console.log(
+    ended
+      ? `[stripe-webhook] monthly plan complete for ${email} — ended ${subId} after ${paid} payments`
+      : `[stripe-webhook] MONTHLY PLAN COMPLETE BUT CANCEL FAILED for ${email} (${subId}) — cancel it by hand`,
+  );
+
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await resend.emails.send({
+        from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
+        to: ADMIN_EMAIL,
+        subject: ended
+          ? `✅ Course paid in full: ${name || email} — ${total}`
+          : `🚨 ACTION NEEDED: cancel subscription for ${name || email} (${subId})`,
+        html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
+          <p style="font-size:15px;">${name || email} has now paid <strong>${total}</strong> in full
+          (${paid} × ${MONTHLY_PRICE_LABEL}).</p>
+          <p style="font-size:14px;color:#4A6280;">Email: ${email}<br>Subscription: ${subId}</p>
+          ${ended
+            ? `<p style="font-size:14px;">The monthly plan has been ended automatically, with no proration — no further payments will be taken.</p>`
+            : `<p style="font-size:14px;color:#b00;"><strong>The automatic cancellation failed.</strong> Cancel
+               <a href="https://dashboard.stripe.com/subscriptions/${subId}">${subId}</a> in Stripe now (cancel
+               immediately, no proration), or they will be charged ${MONTHLY_PRICE_LABEL} again next month.</p>`}
         </div>`,
       });
     } catch (err) {
@@ -918,14 +1004,22 @@ async function handleInstalmentFailed(invoice: StripeInvoice) {
   }
 
   const sub = await getSubscription(subId);
-  if (!sub || sub.metadata?.ptll_plan !== "deposit_instalments") return;
+  if (!sub) return;
+  const kind = planKindOf(sub);
+  if (!kind) return;
 
-  const target = Number(sub.metadata?.instalments_target ?? "5");
-  const paid = Number(sub.metadata?.instalments_paid ?? "0");
-  const entry = entryAmountFrom(sub.metadata);
+  // Per-plan numbers. Legacy keeps its old meaning exactly (instalments after
+  // the deposit, deposit added to the running total); monthly counts every
+  // payment, the checkout one included.
+  const monthly = kind === "monthly";
+  const target = monthly ? MONTHLY_PAYMENTS : Number(sub.metadata?.instalments_target ?? "5");
+  const paid = Number((monthly ? sub.metadata?.payments_paid : sub.metadata?.instalments_paid) ?? "0");
+  const collected = formatPence(collectedPence(kind, paid, sub.metadata));
+  const contract = formatPence(monthly ? MONTHLY_PLAN_TOTAL_PENCE : contractPence(kind, sub.metadata));
+  const noun = monthly ? "Monthly payment" : "Instalment";
   const name = sub.metadata?.buyer_name || invoice.customer_name || "";
   const email = sub.metadata?.buyer_email || invoice.customer_email || "";
-  const amount = (invoice.amount_due ?? 0) / 100;
+  const amount = formatPence(invoice.amount_due ?? 0);
   const attempt = invoice.attempt_count ?? 1;
   const nextAttempt = invoice.next_payment_attempt
     ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString("en-GB", {
@@ -933,7 +1027,7 @@ async function handleInstalmentFailed(invoice: StripeInvoice) {
       })
     : null;
 
-  console.warn(`[stripe-webhook] instalment FAILED — ${email} attempt ${attempt} (${subId})`);
+  console.warn(`[stripe-webhook] ${noun.toLowerCase()} FAILED — ${email} attempt ${attempt} (${subId})`);
 
   if (!process.env.RESEND_API_KEY) return;
   try {
@@ -941,15 +1035,15 @@ async function handleInstalmentFailed(invoice: StripeInvoice) {
       from: "PT Launch Lab Enrolments <enrolments@ptlaunchlab.co.uk>",
       to: ADMIN_EMAIL,
       subject: nextAttempt
-        ? `⚠️ Instalment failed: ${name || email} — £${amount} (retrying ${nextAttempt})`
-        : `🚨 Instalment failed — no retries left: ${name || email} — £${amount}`,
+        ? `⚠️ ${noun} failed: ${name || email} — ${amount} (retrying ${nextAttempt})`
+        : `🚨 ${noun} failed — no retries left: ${name || email} — ${amount}`,
       html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;">
-        <p style="font-size:15px;">Instalment ${paid + 1} of ${target} failed for <strong>${name || email}</strong>.</p>
+        <p style="font-size:15px;">${noun} ${paid + 1} of ${target} failed for <strong>${name || email}</strong>.</p>
         <table style="font-size:14px;color:#4A6280;">
-          <tr><td style="padding:2px 12px 2px 0;">Amount</td><td>£${amount}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Amount</td><td>${amount}</td></tr>
           <tr><td style="padding:2px 12px 2px 0;">Email</td><td><a href="mailto:${email}">${email}</a></td></tr>
           <tr><td style="padding:2px 12px 2px 0;">Attempt</td><td>${attempt}</td></tr>
-          <tr><td style="padding:2px 12px 2px 0;">Collected so far</td><td>£${(entry + paid * 200).toLocaleString()} of £${(entry + target * 200).toLocaleString()}</td></tr>
+          <tr><td style="padding:2px 12px 2px 0;">Collected so far</td><td>${collected} of ${contract}</td></tr>
         </table>
         ${nextAttempt
           ? `<p style="font-size:14px;">Stripe will retry on <strong>${nextAttempt}</strong> and has emailed them to update their card. No action needed yet.</p>`
@@ -1066,8 +1160,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Deposit instalment plan lifecycle — see handleInstalmentPaid for why the
-  // 5-payment cap is enforced by counting invoices rather than by a date.
+  // Payment plan lifecycle (legacy deposit plans AND the 10 × £99.99 monthly
+  // plan) — see handleInstalmentPaid for why each cap is enforced by counting
+  // invoices rather than by a date.
   if (event.type === "invoice.paid" || event.type === "invoice.payment_failed") {
     const invoice = event.data?.object as unknown as StripeInvoice;
     try {

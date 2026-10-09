@@ -10,6 +10,7 @@ import {
   updateAdSetBudget,
 } from '@/app/lib/ads/meta';
 import type { OptimisationAction } from '@/app/lib/ads/types';
+import { COURSE_PRICE_LABEL, MONTHLY_PLAN_LABEL } from '@/app/lib/pricing';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 
@@ -76,7 +77,7 @@ export async function POST() {
     const prompt = `You are a Meta Ads optimisation specialist for PT Launch Lab, a UK personal trainer education company.
 
 BUSINESS CONTEXT:
-- Product: NCFE Level 3 PT qualification with business mentorship — £1,399 full or payment plan
+- Product: NCFE Level 3 PT qualification with business mentorship — ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PLAN_LABEL} monthly. No discounts, no promo codes, rolling enrolment (never suggest offers or deadlines)
 - Target: UK adults 18-45 wanting to become personal trainers
 - Funnel: Ad → Quiz or Funnel page → Book call → Enrol
 - Acceptable CPL target: under £12

@@ -1,5 +1,6 @@
 'use client';
 import { trackEvent } from '@/app/lib/gtag';
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS } from '@/app/lib/pricing';
 
 export default function ConversionSection() {
   return (
@@ -21,25 +22,25 @@ export default function ConversionSection() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Deposit Plan */}
+          {/* Monthly plan */}
           <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col shadow-2xl shadow-black/30 relative border-2 border-gold/50">
             <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-gold to-transparent" />
             <div className="inline-block mb-5">
               <span className="bg-gold text-deep text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                Most Popular
+                Spread the Cost
               </span>
             </div>
-            <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-1">Start With a Deposit</h3>
-            <p className="text-gold font-bold text-lg mb-4">£599 today, then 5 × £200</p>
+            <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-1">Pay Monthly</h3>
+            <p className="text-gold font-bold text-lg mb-4">{MONTHLY_PLAN_LABEL}, no interest</p>
             <p className="text-soft/65 text-[15px] leading-relaxed mb-7">
-              Put down a deposit to secure your place and get immediate access to your course and tutor. Split the remaining cost over a payment plan that fits your budget. You don&apos;t need the full amount to start today.
+              Pay your first {MONTHLY_PRICE_LABEL} today and get immediate access to your course and tutor. The other {MONTHLY_PAYMENTS - 1} payments go out once a month. You don&apos;t need the full amount to start.
             </p>
             <ul className="space-y-3 mb-8 flex-1">
               {[
-                "Immediate course access on deposit",
+                "Immediate course access from your first payment",
                 "Personal tutor assigned within 24 hours",
                 "Start your first module today",
-                "Spread the remaining cost over 5 months",
+                `${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, no interest`,
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3 text-sm">
                   <span className="shrink-0 w-4 h-4 rounded-full bg-gold/15 flex items-center justify-center">
@@ -56,20 +57,20 @@ export default function ConversionSection() {
               onClick={() => trackEvent('enrol_click', { method: 'deposit' })}
               className="block w-full text-center py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-xl shadow-gold/20 mb-3"
             >
-              Reserve Your Place With a Deposit →
+              Start Paying Monthly →
             </a>
-            <p className="text-faint text-xs text-center">Total course fee: £1,599. Start immediately.</p>
+            <p className="text-faint text-xs text-center">First payment at checkout, then monthly. Start immediately.</p>
           </div>
 
           {/* Pay in Full */}
           <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col border border-white/[0.08] shadow-2xl shadow-black/20">
             <div className="inline-block mb-5">
               <span className="bg-blue text-white text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
-                Best Value
+                Pay Once
               </span>
             </div>
             <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-1">Pay in Full</h3>
-            <p className="text-gold font-bold text-lg mb-4">£1,599, everything included</p>
+            <p className="text-gold font-bold text-lg mb-4">{COURSE_PRICE_LABEL}, everything included</p>
             <p className="text-soft/65 text-[15px] leading-relaxed mb-7">
               One payment, and immediate access to your tutor, the NCFE qualification, the £500 business mentorship community, and the guaranteed gym introduction you get on qualifying. No instalments, no additional fees.
             </p>

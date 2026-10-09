@@ -10,6 +10,7 @@ import ProofStrip from "../components/ProofStrip";
 import FunnelPricingBlock from "../components/FunnelPricingBlock";
 import PromoBar from "../components/PromoBar";
 import { faqPageSchema } from "@/app/lib/faqSchema";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/career-blueprint";
 
@@ -75,7 +76,7 @@ const faqs = [
   { q: "Am I too old to start?", a: "No. Career-changers in their 30s, 40s and 50s often do better — clients trust maturity, and you bring real-world people skills the 19-year-olds don't have yet." },
   { q: "Will you actually help me get clients?", a: "Yes — that's the whole point. The Mentorship Hub walks you through pricing, marketing and client conversations as a system, and we make warm introductions into our partner gym network when you qualify." },
   { q: "Will employers recognise the qualification?", a: "Yes. It's NCFE, Ofqual regulated (Level 3 ref 603/4388/6) — the qualification gym managers hire against as standard across the UK." },
-  { q: "What are the payment options?", a: "Two simple options: pay in full (£1,599), or spread it with our deposit plan — £599 deposit then 5 × £200 monthly. No third-party finance. Once qualified, a single PT session covers roughly a month's payment." },
+  { q: "What are the payment options?", a: `Two simple options: pay ${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. The first payment is taken when you enrol. Once qualified, one PT session a week covers the monthly payment.` },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
@@ -266,7 +267,7 @@ export default function CareerBlueprintPage() {
           </div>
         </section>
 
-        {/* INVESTMENT FRAMING (payment, not finance) */}
+        {/* INVESTMENT FRAMING (two ways to pay, no third party) */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-4">The investment</p>
@@ -276,12 +277,12 @@ export default function CareerBlueprintPage() {
               <span className="text-gold">It&apos;s the cheapest bet on your own income.</span>
             </h2>
             <p className="text-soft/85 text-lg leading-relaxed mb-8">
-              On the deposit plan it&apos;s <span className="text-white font-semibold">£200 a month</span> — roughly a daily coffee habit, a mid-tier gym membership, or a couple of streaming subscriptions. Once you qualify, <span className="text-white font-semibold">a single PT session at ~£30 covers most of a week of it.</span>
+              On the monthly plan it&apos;s <span className="text-white font-semibold">{MONTHLY_PRICE_LABEL} a month</span> — roughly a daily coffee habit, a mid-tier gym membership, or a couple of streaming subscriptions. Once you qualify, <span className="text-white font-semibold">one PT session a week at ~£30 covers it.</span>
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {[
-                { big: "£1,599", label: "Pay in full", note: "one payment, nothing to manage" },
-                { big: "£599", label: "Deposit plan", note: "then 5 × £200 monthly" },
+                { big: COURSE_PRICE_LABEL, label: "Pay in full", note: "one payment, nothing to manage" },
+                { big: MONTHLY_PRICE_LABEL, label: "Monthly", note: `${MONTHLY_PAYMENTS} payments, no interest` },
                 { big: "£20–50k+", label: "PT earning range", note: "employed to self-employed" },
               ].map((s) => (
                 <div key={s.label} className="bg-card border border-white/[0.06] rounded-2xl p-6">
@@ -291,7 +292,7 @@ export default function CareerBlueprintPage() {
                 </div>
               ))}
             </div>
-            <p className="text-soft/60 text-sm">Two options only — pay in full or the deposit plan. No third-party finance.</p>
+            <p className="text-soft/60 text-sm">Two options only: pay in full, or {MONTHLY_PLAN_LABEL} monthly. No interest, no third party.</p>
           </div>
         </section>
 

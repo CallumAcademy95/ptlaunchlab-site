@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
-import { getPartnerSales, getPartnerPayouts, commissionState, formatPence } from "@/app/lib/partner-data";
+import {
+  getPartnerSales,
+  getPartnerPayouts,
+  commissionState,
+  commissionReleaseRule,
+  formatPence,
+} from "@/app/lib/partner-data";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import BankDetailsForm from "./BankDetailsForm";
 
@@ -17,14 +23,12 @@ export default async function PaymentsPage() {
 
   // Their actual signed terms, not a generic description. Ebor and a partner
   // who signs tomorrow are owed different things and should be told so.
-  const releaseRule =
-    partner.commission_terms === "instalment_2"
-      ? "If they pay in full, it's released 30 days after they enrol. If they're on an instalment plan, it's released once their second instalment clears, then paid 30 days after that."
-      : "It's released 30 days after they enrol, whichever way they choose to pay.";
+  const releaseRule = commissionReleaseRule(partner.commission_terms);
+  const terms = partner.commission_terms;
 
-  const payable = sales.filter((s) => commissionState(s).key === "payable");
-  const held = sales.filter((s) => commissionState(s).key === "held");
-  const paid = sales.filter((s) => commissionState(s).key === "paid");
+  const payable = sales.filter((s) => commissionState(s, terms).key === "payable");
+  const held = sales.filter((s) => commissionState(s, terms).key === "held");
+  const paid = sales.filter((s) => commissionState(s, terms).key === "paid");
 
   const sum = (rows: typeof sales) => rows.reduce((t, s) => t + s.commission_pence, 0);
   const outstanding = sum(payable);
@@ -92,7 +96,7 @@ export default async function PaymentsPage() {
                   <div key={s.id} className="px-5 py-3 flex items-center justify-between gap-4">
                     <div className="min-w-0">
                       <p className="text-white font-semibold truncate">{s.learner_name || "—"}</p>
-                      <p className="text-soft text-xs">{commissionState(s).label}</p>
+                      <p className="text-soft text-xs">{commissionState(s, terms).label}</p>
                     </div>
                     <span className="text-white font-semibold shrink-0">
                       {formatPence(s.commission_pence)}

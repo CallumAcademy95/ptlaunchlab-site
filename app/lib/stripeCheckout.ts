@@ -16,11 +16,10 @@
 // Creating the session here puts `success_url` in version control, where it
 // gets code-reviewed and deployed like everything else. It cannot drift again.
 //
-// FAIL-SAFE: every caller MUST fall back to the raw Payment Link URL if this
-// returns null. This sits on the money path — a Stripe outage, a missing
-// permission or a bad price ID must never leave a buyer unable to pay. The
-// fallback is exactly the old behaviour (buyer pays, lands on stripe.com,
-// admin chases via the /api/stripe-webhook reconciliation email).
+// FAIL-SAFE: if this returns null the enrol page falls back to the raw Payment
+// Link for the chosen plan (app/lib/paymentLinks.ts, read from env). If that
+// link is not configured the buyer is shown an error and a way to contact us —
+// never an older link, because every older link sells a retired price.
 //
 // REQUIRED STRIPE KEY PERMISSIONS
 //   STRIPE_SECRET_KEY needs "Checkout Sessions → write". Without it every
@@ -28,8 +27,15 @@
 //   key (rk_live_…GBxkR2) on 2026-07-26; verify with GET /api/checkout, which is
 //   a permission health check, or run `npm run test:e2e` (see e2e/README.md).
 
-import { INSTALMENTS_ENABLED, instalmentTarget } from "./instalments.ts";
 import { attributionMetadata, type Attribution } from "./attribution.ts";
+import {
+  COURSE_PRICE_PENCE,
+  MONTHLY_PRICE_PENCE,
+  MONTHLY_PAYMENTS,
+  MONTHLY_PLAN_TOTAL_PENCE,
+  type CoursePlanChoice,
+} from "./pricing.ts";
+import { countPaidInvoices, MONTHLY_PLAN_META, type InvoiceListEntry } from "./paymentPlans.ts";
 
 // The public origin baked into success_url / cancel_url.
 //
@@ -47,181 +53,81 @@ export function resolveSiteUrl(env: Record<string, string | undefined> = process
 
 export const SITE_URL = resolveSiteUrl();
 
-// ─── Deposit instalments ─────────────────────────────────────────────────────
-// The deposit plan is £599 up front then 5 × £200/month (£1,599 total). Those
-// £200s used to be collected by hand — someone had to remember to send a
-// one-off payment link every month, and nothing in Stripe recorded that the
-// £1,000 balance was even owed. Charging them on a subscription mandate taken
-// at checkout makes the balance self-collecting.
+// ─── The two prices (October 2026 change-over) ───────────────────────────────
+// £999.99 in full, or 10 × £99.99 a month with the first taken at checkout.
+// No promo codes, no discounts, no dated offers. Figures live in ./pricing.ts.
 //
-// The recurring price already existed in the account, unused by any flow.
-// Overridable by env so it can be pointed at a test price without a deploy.
+// Each price is env-overridable so e2e can point at TEST-mode copies (test mode
+// is a separate world with none of these ids in it) and so a price can be
+// swapped without a deploy. The literals are the LIVE prices.
+export const PIF_999_PRICE_ID =
+  process.env.STRIPE_PIF_999_PRICE_ID || "price_1UOg6999z9lThumnjHTU1rAt"; // £999.99 one-off GBP
+export const MONTHLY_999_PRICE_ID =
+  process.env.STRIPE_MONTHLY_999_PRICE_ID || "price_1UOg6n99z9lThumnrwXTZ4w7"; // £99.99/month GBP
+
+// ─── Legacy instalment prices — still being paid ─────────────────────────────
+// Learners who enrolled before October are on £599 (or £99) + 5 × £200, and the
+// October offer would have been £99 + 5 × £300. Those subscriptions keep billing
+// until their plan completes, so the webhook must keep recognising and counting
+// these prices exactly as before. Nothing NEW is ever sold on them.
 export const INSTALMENT_PRICE_ID =
   process.env.STRIPE_INSTALMENT_PRICE_ID || "price_1RxmdG99z9lThumnilf7YD2e"; // £200/month GBP
+export const OCTOBER_INSTALMENT_PRICE_ID =
+  process.env.STRIPE_OCTOBER_INSTALMENT_PRICE_ID || "price_1UM3D899z9lThumnlgeLDjSS"; // £300/month GBP
 
-// The flag and the instalment counts live in app/lib/instalments.ts so the
-// enrol page can read them without pulling this module's Stripe API helpers
-// into the browser bundle. Ships dark: with the flag unset the deposit stays a
-// one-off £599 charge exactly as before.
-
-// Days before the first £200 is taken. 30 days from the deposit, so each
-// learner's dates are their own rather than a shared billing date.
-const INSTALMENT_TRIAL_DAYS = 30;
+/** Recurring prices whose paid invoices are LEGACY instalments (deposit excluded). */
+export const LEGACY_INSTALMENT_PRICE_IDS: ReadonlySet<string> = new Set([
+  INSTALMENT_PRICE_ID,
+  OCTOBER_INSTALMENT_PRICE_ID,
+]);
+/** The recurring price whose paid invoices are monthly-plan payments (first included). */
+export const MONTHLY_PAYMENT_PRICE_IDS: ReadonlySet<string> = new Set([MONTHLY_999_PRICE_ID]);
 
 // The buyer lands here after paying and completes the enrolment record.
 // {CHECKOUT_SESSION_ID} is substituted by Stripe.
 export const ENROL_SUCCESS_URL = `${SITE_URL}/enrol/success?session_id={CHECKOUT_SESSION_ID}`;
 
-// ─── Payment Link → Price mapping ────────────────────────────────────────────
-// Keyed by the Payment Link URLs already hard-coded across the enrol pages so
-// callers keep choosing the destination exactly as they do today — this module
-// only changes HOW the buyer gets there, never WHICH product they buy.
-//
-// Price IDs were read off live checkout sessions created by each link, so the
-// product, price and any product-scoped coupons stay identical.
-// `allowPromotionCodes` likewise mirrors each link's current setting: only the
-// £1,599 PIF link accepts codes at Stripe checkout (that's how the partner gym
-// discounts are applied).
-export interface LinkConfig {
+export interface PlanConfig {
+  choice: CoursePlanChoice;
   price: string;
-  amount: number;                 // GBP charged at checkout. Telemetry only — Stripe charges off the price ID
+  /** Charged at checkout, in pence. Telemetry only — Stripe charges off the price id. */
+  checkoutPence: number;
+  /** What the learner owes in total, in pence. */
+  contractPence: number;
+  /** Session metadata.plan — what the webhook classifies on. Never an amount. */
+  metadataPlan: "PIF" | "monthly";
   label: string;
-  allowPromotionCodes: boolean;
-  /**
-   * Whether this price is an entry payment that takes the £200/month mandate.
-   *
-   * Explicit, NOT derived from `amount`. A price-range test on this exact
-   * decision has already shipped one production bug: `amount >= 1300` classified
-   * every discounted £1,099 partner pay-in-full as a deposit and mislabelled 8 of
-   * 9 sales in the tracker. Adding a third price to a range test is how that
-   * recurs, so each entry states what it is.
-   */
-  takesInstalments: boolean;
-  /**
-   * The monthly price this entry payment is followed by, and how many of
-   * them. Both optional: a link that omits them keeps INSTALMENT_PRICE_ID
-   * (£200) and instalmentTarget() (5), which is every plan that existed
-   * before October.
-   *
-   * They are per-link because October is £99 + 5 × £300 = £1,599 — the same
-   * total as paying up front — while September was £99 + 5 × £200 = £1,099,
-   * which was a £500 discount. One global instalment price cannot express
-   * both, and defaulting the new one silently to £200 would bill £1,099 for
-   * a £1,599 sale.
-   */
-  instalmentPriceId?: string;
-  instalmentCount?: number;
-  /**
-   * Full contract value in GBP — what the learner owes in total, which is NOT
-   * what checkout collects on an instalment plan.
-   *
-   * The webhook reports this to Meta as the Purchase value. Without it a £99
-   * entry teaches Meta the buyer is worth £99 rather than £1,099.
-   */
-  contractValue: number;
 }
 
-// Each price is env-overridable. Test mode is a separate world with none of
-// these ids in it, so without overrides a rehearsal can only ever exercise a
-// hand-written copy of this code rather than this code — which is exactly the
-// kind of gap that lets a bug reach production. Also lets a price be swapped
-// without a deploy.
-/** Black Friday's £999 pay-in-full link. */
-export const BLACK_FRIDAY_LINK = "https://buy.stripe.com/cNi28ldb27hi1Qe8UyfEk0t";
+const COURSE_NAME = "NCFE Level 3 Diploma in Gym Instructing and Personal Training";
 
-/** October's £99 entry link. Named so tests and callers cannot mistype it. */
-export const OCTOBER_LINK = "https://buy.stripe.com/5kQ14h9YQ0SUgL89YCfEk0s";
-
-export const PAYMENT_LINK_PRICES: Record<string, LinkConfig> = {
-  // £1,599 pay-in-full — the shared PIF link used by /enrol and every gym page
-  "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f": {
-    price: process.env.STRIPE_PIF_PRICE_ID || "price_1SffDN99z9lThumnkdXLn1LW",
-    amount: 1599,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
-    allowPromotionCodes: true,
-    takesInstalments: false,
-    contractValue: 1599,
+export const COURSE_PLANS: Record<CoursePlanChoice, PlanConfig> = {
+  pif: {
+    choice: "pif",
+    price: PIF_999_PRICE_ID,
+    checkoutPence: COURSE_PRICE_PENCE,
+    contractPence: COURSE_PRICE_PENCE,
+    metadataPlan: "PIF",
+    label: COURSE_NAME,
   },
-  // £599 deposit (+ 5×£200 on the instalment plan) — the shared deposit link
-  "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05": {
-    price: process.env.STRIPE_DEPOSIT_PRICE_ID || "price_1Rxmab99z9lThumnJ1f7EEXb",
-    amount: 599,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
-    allowPromotionCodes: false,
-    takesInstalments: true,
-    contractValue: 1599,
-  },
-  // £1,399 pay-in-full — funnel-promo only, never exposed in the client bundle
-  "https://buy.stripe.com/fZuaER6ME7hi0Ma0o2fEk06": {
-    price: process.env.STRIPE_FUNNEL_PIF_PRICE_ID || "price_1RxmYD99z9lThumnc9W37CX7",
-    amount: 1399,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
-    allowPromotionCodes: false,
-    takesInstalments: false,
-    contractValue: 1399,
-  },
-  // £99 entry (+ 5×£200) = £1,099 — the September weekend offer, email list only.
-  // Same Stripe product as the £599 deposit: same qualification, same shape of
-  // sale, different entry amount. Never linked from a partner gym page — a gym
-  // earns nothing on it, so exposing it there would take a sale off a partner.
-  "https://buy.stripe.com/4gMaER2wocBCdyWfiWfEk0r": {
-    price: process.env.STRIPE_SEPT99_PRICE_ID || "price_1U8JiI99z9lThumnwQlmTIJW",
-    amount: 99,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
-    allowPromotionCodes: false,
-    takesInstalments: true,
-    contractValue: 1099,
-  },
-  // £999 pay-in-full — Black Friday, the one genuine price cut of the year.
-  // No promotion codes: the price IS the offer, and stacking a partner code
-  // on top of it is not a discount anyone decided to give.
-  [BLACK_FRIDAY_LINK]: {
-    price: process.env.STRIPE_BF2026_PRICE_ID || "price_1UMAu399z9lThumnhP9JTLkm",
-    amount: 999,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training",
-    allowPromotionCodes: false,
-    takesInstalments: false,
-    contractValue: 999,
-  },
-  // £99 entry (+ 5×£300) = £1,599 — October. Same total as paying up front,
-  // so this is a payment shape rather than a discount, which is what keeps
-  // Black Friday the only genuine price cut of the year. Reuses September's
-  // £99 entry price; only what follows it differs.
-  [OCTOBER_LINK]: {
-    price: process.env.STRIPE_SEPT99_PRICE_ID || "price_1U8JiI99z9lThumnwQlmTIJW",
-    amount: 99,
-    label: "NCFE Level 3 Diploma in Gym Instructing and Personal Training — Deposit",
-    allowPromotionCodes: false,
-    takesInstalments: true,
-    instalmentPriceId:
-      process.env.STRIPE_OCTOBER_INSTALMENT_PRICE_ID || "price_1UM3D899z9lThumnlgeLDjSS",
-    instalmentCount: 5,
-    contractValue: 1599,
+  monthly: {
+    choice: "monthly",
+    price: MONTHLY_999_PRICE_ID,
+    checkoutPence: MONTHLY_PRICE_PENCE,
+    contractPence: MONTHLY_PLAN_TOTAL_PENCE,
+    metadataPlan: "monthly",
+    label: `${COURSE_NAME} — Monthly`,
   },
 };
 
-/** Which monthly price follows this entry payment. */
-export function instalmentPriceFor(config: LinkConfig): string {
-  return config.instalmentPriceId || INSTALMENT_PRICE_ID;
+/** Narrow an untrusted request value to a plan, or null. */
+export function planFromChoice(value: unknown): CoursePlanChoice | null {
+  return value === "pif" || value === "monthly" ? value : null;
 }
 
-/** How many of them. */
-export function instalmentCountFor(config: LinkConfig): number {
-  return config.instalmentCount ?? instalmentTarget();
-}
-
-// Strip query/hash so a link carrying ?client_reference_id=… still matches.
-export function normaliseLink(url: string): string {
-  try {
-    const u = new URL(url);
-    return `${u.origin}${u.pathname}`.replace(/\/$/, "");
-  } catch {
-    return url;
-  }
-}
-
-export function priceForLink(url: string): LinkConfig | null {
-  return PAYMENT_LINK_PRICES[normaliseLink(url)] ?? null;
+/** "999.99" — pence as a pounds string with exactly two decimals, for metadata. */
+function poundsString(pence: number): string {
+  return (pence / 100).toFixed(2);
 }
 
 // ─── Stripe form encoding ────────────────────────────────────────────────────
@@ -255,8 +161,8 @@ function encodeForm(obj: Record<string, FormValue>, prefix = ""): string[] {
 
 // ─── Session creation ────────────────────────────────────────────────────────
 export interface CheckoutSessionInput {
-  /** The Payment Link URL this buyer would have been sent to — decides the price. */
-  paymentLink: string;
+  /** Which of the two ways to pay. Decides the price; nothing else can. */
+  plan: CoursePlanChoice;
   /** Base64url attribution blob; /api/stripe-webhook decodes it for GA4 + Meta CAPI. */
   clientReferenceId?: string;
   email?: string;
@@ -264,10 +170,6 @@ export interface CheckoutSessionInput {
   gymReferral?: string;
   /** Stable partner join key. See PartnerConfig.gymSlug — display names aren't safe to join on. */
   gymSlug?: string;
-  promoCode?: string;
-  /** Stripe promotion code id, already resolved server-side. See buildSessionParams. */
-  promoCodeId?: string;
-  funnelPromo?: string;
   /** First/last-touch source, stamped into Stripe metadata as `attr_*`. */
   attribution?: Attribution;
   /** Where to send a buyer who backs out of Stripe. Must be a ptlaunchlab.co.uk path. */
@@ -318,10 +220,19 @@ export interface StripeSubscription {
   status?: string;
   metadata?: Record<string, string>;
   customer?: string;
+  cancel_at_period_end?: boolean;
+  items?: { data?: Array<{ price?: { id?: string } | null }> };
 }
 
 export function getSubscription(id: string) {
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "GET" });
+}
+
+/** The recurring price ids on a subscription, for plan classification. */
+export function subscriptionPriceIds(sub: StripeSubscription): string[] {
+  return (sub.items?.data ?? [])
+    .map((item) => item.price?.id)
+    .filter((id): id is string => typeof id === "string");
 }
 
 export interface StripeCheckoutSession {
@@ -353,28 +264,44 @@ export function setSubscriptionMetadata(id: string, metadata: Record<string, str
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "POST", body });
 }
 
-/** Ends the plan immediately — used once the final instalment clears. */
+/**
+ * Ends a LEGACY plan immediately — used once the final instalment clears.
+ * Unchanged since the deposit plans shipped; the legacy subscriptions still
+ * being paid depend on it behaving exactly as it always has.
+ */
 export function cancelSubscription(id: string) {
   return stripeRequest<StripeSubscription>(`subscriptions/${id}`, { method: "DELETE" });
 }
 
-type InvoiceLine = {
-  amount?: number;
-  price?: { id?: string } | null;
-  // Later API versions moved the price pointer under `pricing`.
-  pricing?: { price_details?: { price?: string } | null } | null;
-};
-type InvoiceListEntry = { status?: string; lines?: { data?: InvoiceLine[] } };
+/**
+ * Ends a MONTHLY plan after its 10th payment, with no proration and no
+ * closing invoice.
+ *
+ * ⚠️ Do not replace this with `cancel_at`. Setting cancel_at mid-period makes
+ * Stripe prorate the final instalment into a part-charge — a known trap on
+ * this account. Cancelling now, with prorate=false and
+ * invoice_now=false stated explicitly, ends the subscription the moment the
+ * 10th invoice is paid: no credit, no extra invoice, and no 11th month.
+ */
+export function endSubscriptionWithoutProration(id: string) {
+  return stripeRequest<StripeSubscription>(
+    `subscriptions/${id}?prorate=false&invoice_now=false`,
+    { method: "DELETE" },
+  );
+}
 
-function lineIsInstalment(line: InvoiceLine): boolean {
-  const priceId = line.price?.id || line.pricing?.price_details?.price;
-  // A £0 line is the recurring item sitting in its trial on the very first
-  // invoice — that invoice carries the deposit, not an instalment.
-  return priceId === INSTALMENT_PRICE_ID && (line.amount ?? 0) > 0;
+async function listSubscriptionInvoices(subscriptionId: string): Promise<InvoiceListEntry[] | null> {
+  const res = await stripeRequest<{ data?: InvoiceListEntry[] }>(
+    `invoices?subscription=${encodeURIComponent(subscriptionId)}&limit=100&expand[]=data.lines`,
+    { method: "GET" },
+  );
+  return res?.data ?? null;
 }
 
 /**
- * How many £200 instalments have actually settled on a plan.
+ * How many LEGACY instalments (£200, or £300 on the October price) have
+ * actually settled on a plan. The deposit is not counted: on the first invoice
+ * the recurring line is £0 because it is in its trial.
  *
  * Derived by asking Stripe rather than by incrementing a counter, because
  * webhook delivery is at-least-once: a duplicate `invoice.paid` would
@@ -387,75 +314,58 @@ function lineIsInstalment(line: InvoiceLine): boolean {
  * act rather than guess. Never cancel a plan on a number you aren't sure of.
  */
 export async function countSettledInstalments(subscriptionId: string): Promise<number | null> {
-  const res = await stripeRequest<{ data?: InvoiceListEntry[] }>(
-    `invoices?subscription=${encodeURIComponent(subscriptionId)}&limit=100&expand[]=data.lines`,
-    { method: "GET" },
-  );
-  if (!res?.data) return null;
-  return res.data.filter(
-    (inv) => inv.status === "paid" && (inv.lines?.data ?? []).some(lineIsInstalment),
-  ).length;
+  const invoices = await listSubscriptionInvoices(subscriptionId);
+  return invoices ? countPaidInvoices(invoices, LEGACY_INSTALMENT_PRICE_IDS) : null;
+}
+
+/**
+ * How many of the 10 × £99.99 payments have settled, the checkout payment
+ * included (the plan has no trial, so its first invoice is payment 1).
+ * Same idempotent, recomputed-from-Stripe approach as above; null if unknown.
+ */
+export async function countSettledMonthlyPayments(subscriptionId: string): Promise<number | null> {
+  const invoices = await listSubscriptionInvoices(subscriptionId);
+  return invoices ? countPaidInvoices(invoices, MONTHLY_PAYMENT_PRICE_IDS) : null;
 }
 
 /**
  * The Checkout Session parameters, as a plain object.
  *
- * Extracted from createCheckoutSession so the two money rules below can be
- * tested without creating real sessions. Everything here was previously inline
- * and is unchanged except where the discount rules are applied.
+ * Extracted from createCheckoutSession so the money rules can be tested without
+ * creating real sessions. There is no discount path at all: no `discounts`,
+ * and `allow_promotion_codes` is always false, so Stripe shows no code box.
  */
 export function buildSessionParams(
   input: CheckoutSessionInput,
-  config: LinkConfig,
-  opts: { withInstalments: boolean; target: number; cancelPath: string },
+  config: PlanConfig,
+  opts: { cancelPath: string },
 ): Record<string, unknown> {
-  const { withInstalments, cancelPath } = opts;
-  // The link's own count wins. opts.target is the fallback for links that do
-  // not state one, which is every plan that existed before October.
-  const target = config.instalmentCount ?? opts.target;
-
-  // A deposit is never discounted. The rule is Callum's, from 2026-07-26, and
-  // the webhook has stated it since — but the enrolment page contradicted it and
-  // promised £1,399 while Stripe billed £1,599. Enforcing it here means the UI
-  // is no longer the only thing standing between a deposit and a discount.
-  const discountable = !withInstalments && config.allowPromotionCodes;
-  const discountId = discountable ? input.promoCodeId : undefined;
+  const monthly = config.choice === "monthly";
   // Flat `attr_*` keys, additive to every existing metadata key.
   const attr = attributionMetadata(input.attribution ?? {});
   const hasAttr = Object.keys(attr).length > 0;
 
   return {
-    mode: withInstalments ? "subscription" : "payment",
-    line_items: withInstalments
-      ? [
-          { price: config.price, quantity: 1 },            // entry payment, charged now
-          { price: instalmentPriceFor(config), quantity: 1 }, // monthly, starts after the trial
-        ]
-      : [{ price: config.price, quantity: 1 }],
-    ...(withInstalments && {
+    mode: monthly ? "subscription" : "payment",
+    // One line either way. The monthly price is recurring with NO trial, so
+    // checkout takes the first £99.99 now and Stripe bills the rest monthly.
+    line_items: [{ price: config.price, quantity: 1 }],
+    ...(monthly && {
       subscription_data: {
-        trial_period_days: INSTALMENT_TRIAL_DAYS,
         // The webhook reads these off each invoice's subscription to know when
         // to stop. Counting invoices beats computing an end date: month-end
         // enrolments and Stripe's retry-shifted billing dates both break date
         // arithmetic, and overcharging a learner is the worst failure here.
         metadata: {
-          ptll_plan: "deposit_instalments",
-          instalments_target: String(target),
-          instalments_paid: "0",
-          // What was actually collected at checkout, and what the learner owes in
-          // total. Both are stamped because the two live plans share everything
-          // except these numbers (£599/£1,599 and £99/£1,099) — the instalment
-          // emails used to hardcode 599 and would report the wrong running total
-          // for every £99 buyer.
-          entry_amount: String(config.amount),
-          contract_value: String(config.contractValue),
+          ptll_plan: MONTHLY_PLAN_META,
+          payments_target: String(MONTHLY_PAYMENTS),
+          payments_paid: "0",
+          payment_amount_pence: String(MONTHLY_PRICE_PENCE),
+          contract_value_pence: String(MONTHLY_PLAN_TOTAL_PENCE),
           buyer_name: input.name?.trim().slice(0, 200),
           buyer_email: input.email?.trim().toLowerCase(),
           gym_referral: input.gymReferral,
           gym_slug: input.gymSlug,
-          promo_code: input.promoCode,
-          funnel_promo: input.funnelPromo,
           ...attr,
         },
       },
@@ -463,47 +373,38 @@ export function buildSessionParams(
     // One-off payments: put attribution on the PaymentIntent too so it survives
     // on the charge. Payment mode ONLY — Stripe rejects payment_intent_data on a
     // subscription-mode session.
-    ...(!withInstalments && hasAttr && { payment_intent_data: { metadata: attr } }),
-    // A proper hosted invoice + PDF for pay-in-full buyers, issued by Stripe so
-    // it always states what was actually charged — including a partner discount,
-    // which an invoice we generated ourselves would have to be told about.
-    //
-    // Payment mode only. Deposit plans are subscriptions, which already invoice
-    // per instalment, and Stripe rejects a session carrying both.
-    ...(!withInstalments && { invoice_creation: { enabled: true } }),
+    ...(!monthly && hasAttr && { payment_intent_data: { metadata: attr } }),
+    // A proper hosted invoice + PDF for pay-in-full buyers. Payment mode only:
+    // subscriptions already invoice every payment, and Stripe rejects a
+    // subscription session carrying invoice_creation.
+    ...(!monthly && { invoice_creation: { enabled: true } }),
     success_url: ENROL_SUCCESS_URL,
-    cancel_url: `${SITE_URL}${cancelPath}`,
+    cancel_url: `${SITE_URL}${opts.cancelPath}`,
     // Prefills the email on Stripe's page, same as the old ?prefilled_email=
     customer_email: input.email?.trim().toLowerCase(),
     client_reference_id: input.clientReferenceId,
-    ...(discountId && { discounts: [{ promotion_code: discountId }] }),
-    // Stripe rejects a session carrying both `discounts` and
-    // `allow_promotion_codes`, so applying a discount necessarily removes the
-    // second code box — which is the confusion this whole change exists to end.
-    allow_promotion_codes: discountId ? false : config.allowPromotionCodes,
+    // No codes, for anyone. Stated explicitly rather than omitted so Stripe's
+    // default can never put a code box back on the page.
+    allow_promotion_codes: false,
     // Metadata is the durable, structured home for this — the base64
     // client_reference_id blob is capped at 200 chars and drops fields when
     // full. The webhook already prefers metadata over the blob.
     metadata: {
-      // Classified by what the sale IS, not by what it costs. `amount >= 1300`
-      // called every discounted £1,099 partner pay-in-full a deposit and put 8 of
-      // 9 sales in the tracker under the wrong plan.
-      plan: config.takesInstalments ? "deposit" : "PIF",
-      // The contract value, so the webhook never has to infer it from an amount.
-      contract_value: String(config.contractValue),
+      // Classified by what the sale IS, never by what it costs.
+      plan: config.metadataPlan,
+      // The contract, so the webhook never infers it from an amount. Pounds
+      // (two decimals) for the existing readers, and pence as the exact value.
+      contract_value: poundsString(config.contractPence),
+      contract_value_pence: String(config.contractPence),
       buyer_name: input.name?.trim().slice(0, 200),
       gym_referral: input.gymReferral,
-      // The partner platform joins on this, NOT on gym_referral. Present from
-      // 2026-07-27 onward; anything older needs the legacy display-name match.
+      // The partner platform joins on this, NOT on gym_referral.
       gym_slug: input.gymSlug,
-      promo_code: input.promoCode,
-      funnel_promo: input.funnelPromo,
       // `source` is how the webhook tells OUR course sales apart from the
-      // Ultimate Shred gym memberships sharing this account. It used to key on
-      // mode !== 'subscription', which stops working the moment deposits become
-      // subscriptions.
+      // Ultimate Shred gym memberships sharing this account.
       source: "api-checkout-session",
-      instalments: withInstalments ? String(target) : undefined,
+      ptll_product: "course",
+      payments: monthly ? String(MONTHLY_PAYMENTS) : undefined,
       ...attr,
     },
   };
@@ -511,7 +412,8 @@ export function buildSessionParams(
 
 /**
  * Creates a Stripe Checkout Session with the return URL baked in.
- * Returns null on ANY failure — callers must fall back to `paymentLink`.
+ * Returns null on ANY failure — the caller falls back to the raw Payment Link
+ * for the plan, or shows an error if none is configured.
  */
 export async function createCheckoutSession(
   input: CheckoutSessionInput,
@@ -522,33 +424,20 @@ export async function createCheckoutSession(
     return null;
   }
 
-  const config = priceForLink(input.paymentLink);
+  const config = COURSE_PLANS[input.plan];
   if (!config) {
-    // An enrol page is pointing at a Payment Link we have no price for. The
-    // buyer still gets to Stripe via the fallback, but the return URL for that
-    // link must be set in the Dashboard until it's added to the map above.
-    console.error(
-      `[stripeCheckout] no price mapped for ${normaliseLink(input.paymentLink)} — falling back to Payment Link. Add it to PAYMENT_LINK_PRICES.`,
-    );
+    console.error(`[stripeCheckout] unknown plan ${String(input.plan)}`);
     return null;
   }
 
   const cancelPath = input.cancelPath && input.cancelPath.startsWith("/") ? input.cancelPath : "/enrol";
 
-  // Instalment buyers get the £200/month mandate taken alongside the entry
-  // payment so the balance collects itself. The recurring price sits behind a
-  // 30-day trial, so checkout charges the entry amount only and `amount_total`
-  // stays at it — which is what /api/stripe-webhook maps to the contract value.
-  // PIF buyers are unaffected: nothing recurring, still a plain one-off payment.
-  const withInstalments = config.takesInstalments && INSTALMENTS_ENABLED && !!INSTALMENT_PRICE_ID;
-  const target = instalmentTarget();
-
-  // buildSessionParams is typed Record<string, unknown> so tests/stripeDiscounts.test.mts
-  // can assert on it without importing encodeForm's internal FormValue type. The
-  // object it builds is the same shape as before extraction, which IS a FormValue.
+  // buildSessionParams is typed Record<string, unknown> so tests can assert on
+  // it without importing encodeForm's internal FormValue type. The object it
+  // builds IS a FormValue.
   try {
     const body = encodeForm(
-      buildSessionParams(input, config, { withInstalments, target, cancelPath }) as Record<string, FormValue>,
+      buildSessionParams(input, config, { cancelPath }) as Record<string, FormValue>,
     ).join("&");
 
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {

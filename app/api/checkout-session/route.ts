@@ -67,7 +67,6 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     gymSlug: session.metadata?.gym_slug || ref.gyms || null,
     gymReferral: session.metadata?.gym_referral || ref.gym || null,
-    promoCode: session.metadata?.promo_code || null,
     amountPaid: (session.amount_total ?? 0) / 100,
     planType: session.metadata?.plan || null,
     buyerName: session.metadata?.buyer_name || session.customer_details?.name || null,

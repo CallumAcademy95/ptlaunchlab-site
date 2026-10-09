@@ -1,5 +1,7 @@
 # Partner Playbook — content brief
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **What this is:** the list of everything the playbook needs, so the data dump maps straight onto entries we can build. Fill in the **INPUT NEEDED** blocks and we turn them into `partner-playbook/*.md`.
 
 **Where it lives:** `/partner-playbook/*.md` in this repo, rendered at `/partners/playbook`. Core entries are committed markdown — they're curated and we rewrite them constantly. Ad-hoc additions come through the admin upload (see §6).
@@ -15,7 +17,7 @@ The playbook has **two audiences**, and copy written for one is useless to the o
 | **Most of it** | The gym | Their own members | "You could do this for a living" |
 | **The rest** | The gym owner | Their own staff | "Here's how to mention it, here's what you earn" |
 
-This matters because our *ads* talk to gym owners about revenue — "add a revenue stream, zero cost". **None of that language belongs in the playbook.** A member doesn't care that the gym earns £500. They care that the thing they already do five times a week could pay their rent.
+This matters because our *ads* talk to gym owners about revenue — "add a revenue stream, zero cost". **None of that language belongs in the playbook.** A member doesn't care that the gym earns £250. They care that the thing they already do five times a week could pay their rent.
 
 Every entry below is tagged with which audience it's for.
 
@@ -36,7 +38,7 @@ The single most-requested item. A gym owner wants to open the playbook, copy a c
 | S5 | You're not too old | Members | Objection: age. Our biggest real audience is 30–45 career-changers | IG + FB |
 | S6 | 8 weeks, around your job | Members | Objection: time. Online, flexible, keep working | IG story + feed |
 | S7 | What it actually costs | Members | Price + payment plan, stated plainly. Removes the awkward question | IG story |
-| S8 | Intake closes [DATE] | Members | Deadline. Reusable every intake | IG story |
+| S8 | Applications are open | Members | Plain invitation, no deadline (rolling enrolment) | IG story |
 | S9 | Ask me anything about becoming a PT | Members | Story question-sticker. Generates the DMs that convert | IG story |
 | S10 | Meet [TRAINER] — they qualified with us | Members | Staff spotlight, doubles as proof | IG feed |
 
@@ -58,7 +60,7 @@ Gyms have a member list and almost never use it for this.
 | E2 | You know this place better than most | Lapsed members | Anytime | Lapsed members are a *better* audience than active ones — they liked the gym, lost the habit, and "career" beats "come back and train" |
 | E3 | You've been asking good questions | Engaged members | Anytime | To people who ask about programming and nutrition. Highest intent in the building |
 | E4 | Your PT wants to qualify | Freelance PTs / staff | Anytime | For unqualified or partly-qualified people already working the floor |
-| E5 | Intake closes [DATE] | Anyone who enquired | 5–7 days before | Deadline |
+| E5 | Second nudge | Anyone who enquired | 1–2 weeks after they went quiet | No deadline |
 | E6 | You asked about the academy | Enquirers | Within 24h | Follow-up after a DM or front-desk conversation |
 
 **INPUT NEEDED:**
@@ -96,14 +98,14 @@ Multi-step things a gym runs over days or weeks, not a single post.
 |---|---|---|---|
 | P1 | January intake | Members | The big one. Every gym is already talking about change in January |
 | P2 | QR poster blitz | Owner | Where to put them and why. Front desk, changing room mirror, water fountain, the wall people face on the leg press |
-| P3 | Staff incentive scheme | Owner → staff | **£50 per enrolment to the staff member, £450 to the gym.** How to announce it and track it |
+| P3 | Staff incentive scheme | Owner → staff | **Optional, the gym's choice: £25 per enrolment to the staff member, £225 to the gym.** How to announce it and track it |
 | P4 | Member referral | Members | A member who recommends a friend |
 | P5 | Screen advert rotation | Owner | What to run on the gym TV and how often to change it |
 | P6 | Open evening | Owner | An hour in the gym, someone from PTLL on the call or in person |
 | P7 | Class instructor → PT | Members | Class instructors are the warmest audience in any gym and almost always overlooked |
 
 **INPUT NEEDED:**
-- P3: confirm £50/£450 is what you want published.
+- P3: £25/£225 is published as the gym's choice.
 - P6: are you willing to do these, and in person or on a call? Changes what we promise.
 - Which of these you've already seen work at Ebor, MOF or Superflex.
 
@@ -148,6 +150,6 @@ In rough order of value:
 2. **O1's numbers** — enrolments per year against membership size. Nobody else can write this.
 3. **Your own front-desk language** for C1–C6.
 4. **Price, plan and course length** in the exact words you want public.
-5. Confirmation on **£50/£450** and whether you'll do **open evenings**.
+5. Confirmation on **£25/£225** and whether you'll do **open evenings**.
 
 Dump it however it comes out — bullet points, voice-note transcript, screenshots of old posts. Structure is my problem.

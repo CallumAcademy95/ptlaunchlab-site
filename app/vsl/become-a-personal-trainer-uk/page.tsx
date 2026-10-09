@@ -11,6 +11,7 @@ import ProofStrip from "../../components/ProofStrip";
 import FunnelPricingBlock from "../../components/FunnelPricingBlock";
 import HeroLeadForm from "../../components/HeroLeadForm";
 import PromoBar from "../../components/PromoBar";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, COURSE_PRICE_PENCE } from "@/app/lib/pricing";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/vsl/become-a-personal-trainer-uk";
 // Static dates. Previously computed with new Date() at build time, which told
@@ -78,14 +79,14 @@ const comparisonRows = [
   { other: "Run by lecturers, not practitioners",                us: "Run by gym owners who've hired 500+ PTs" },
   { other: "No business training",                               us: "£500 Mentorship Hub bundled free" },
   { other: "Help-desk ticket if you get stuck",                  us: "Your tutor's a message away, with answers in hours rather than days" },
-  { other: "Surprise upsell fees post-enrolment",                us: "£1,599 total. Nothing sold as a paid upgrade later" },
+  { other: "Surprise upsell fees post-enrolment",                us: `${COURSE_PRICE_LABEL} total. Nothing sold as a paid upgrade later` },
 ];
 
 const faqs = [
-  { q: "How do you become a personal trainer in the UK?", a: "Two qualifications: NCFE Level 2 Gym Instructor (legal prerequisite) followed by NCFE Level 3 Personal Trainer. Both Ofqual regulated, both bundled in our £1,599 course. Once you've passed Level 3 you register with CIMSPA, get public liability insurance (~£60/year), and you can legally take paying 1-to-1 clients in any UK commercial gym. No degree required. No minimum age above 16." },
-  { q: "Do I need Level 2 if I just want to do Level 3?", a: "Yes. Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our £1,599 fee includes both. One fee, one tutor, one finish line." },
+  { q: "How do you become a personal trainer in the UK?", a: `Two qualifications: NCFE Level 2 Gym Instructor (legal prerequisite) followed by NCFE Level 3 Personal Trainer. Both Ofqual regulated, both bundled in our ${COURSE_PRICE_LABEL} course. Once you've passed Level 3 you register with CIMSPA, get public liability insurance (~£60/year), and you can legally take paying 1-to-1 clients in any UK commercial gym. No degree required. No minimum age above 16.` },
+  { q: "Do I need Level 2 if I just want to do Level 3?", a: `Yes. Level 2 is the legal prerequisite for Level 3 Personal Trainer. Some providers quote a 'Level 3 only' price to look cheap, then bolt Level 2 on as a £500 extra. Our ${COURSE_PRICE_LABEL} fee includes both. One fee, one tutor, one finish line.` },
   { q: "Will gyms actually hire me with this qualification?", a: "NCFE Level 3 is regulated by Ofqual under reference 603/4388/6 and sits on the public register, which is what a hiring manager is checking for. Our team has personally hired 500+ PTs, so we know what they look for. When you qualify we approach at least one gym on your behalf: either with a gym in our partner network, or with a gym local to you that we approach on your behalf." },
-  { q: "Can I afford it?", a: "You can pay in full, or spread it with our deposit plan: £599 deposit then 5 × £200 monthly. Once qualified, a single PT session at £30 covers a month's payment." },
+  { q: "Can I afford it?", a: `You can pay ${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. Once qualified, one PT session a week at £30 covers the monthly payment.` },
   { q: "Can I really do this online from home?", a: "Yes. 100% online. Theory online, practicals via video assessment (you film yourself coaching at any gym, tutor reviews remotely). NCFE, Focus Awards, and Active IQ all accept video assessment. What matters is the qualification itself, not the room you were sitting in when you earned it." },
   { q: "When can I start?", a: "Immediately. Full access opens the moment you enrol. Your tutor is introduced within 24 hours. There's no cohort start date, and many learners are halfway through their first unit by the end of day one." },
 ];
@@ -105,7 +106,7 @@ const courseSchema = {
   description: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and a guaranteed gym introduction on graduation.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
-  offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
+  offers: { "@type": "Offer", price: (COURSE_PRICE_PENCE / 100).toFixed(2), priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
   hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT8W" },
 };
 
@@ -267,7 +268,7 @@ export default function BecomeAPersonalTrainerUkPage() {
               <span className="text-gold">Talk to a real person.</span>
             </h2>
             <p className="text-soft/75 text-base mb-8 max-w-xl mx-auto">
-              If you already know PT is for you, drop your details. We&apos;ll WhatsApp you a quick intro, lock in £200 off, and you can book your call straight after.
+              If you already know PT is for you, drop your details. We&apos;ll WhatsApp you a quick intro, and you can book your call straight after.
             </p>
             <HeroLeadForm avatar="starter" />
           </div>
@@ -473,10 +474,10 @@ export default function BecomeAPersonalTrainerUkPage() {
             <h2 className="font-display font-extrabold text-4xl md:text-5xl text-white text-center leading-none tracking-tight mb-6">
               One fee. Everything in.
               <br />
-              <span className="text-gold">£200 off for serious enquiries.</span>
+              <span className="text-gold">Pay in full or monthly.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm introduction to our gym network. Most learners use the deposit plan: £599 then 5 × £200.
+              {COURSE_PRICE_LABEL} covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm introduction to our gym network. Or pay {MONTHLY_PLAN_LABEL} a month, with no interest.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>

@@ -22,11 +22,6 @@ export const hitioOrpingtonAcademy: GymConfig = {
   heroSubline: "Train. Qualify. Earn.",
   location: "Orpington, South East London",
 
-  promoCode: "HITIOPT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
-
   // Positioning leans on what is actually distinctive here — a family-run
   // martial arts and fitness gym with a real coaching culture already in the
   // building. Equipment lists are what every other gym page says.
@@ -35,9 +30,6 @@ export const hitioOrpingtonAcademy: GymConfig = {
   whyThisGymHeading: "Learn Inside HITIO Gym Orpington",
   gymIntro:
     "You qualify on a floor that already runs coached sessions every day, from fitness boxing and kickboxing to strength and conditioning.",
-
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
 
   stats: [
     { value: "5am",     label: "Open From, Seven Days" },
@@ -55,6 +47,6 @@ export const hitioOrpingtonAcademy: GymConfig = {
 
   metaTitle: "HITIO PT Academy Orpington | Become a Qualified Personal Trainer",
   metaDescription:
-    "Train, qualify and earn at HITIO Gym Orpington. Get £200 off your Level 2 & 3 PT qualification as a HITIO member. Mentorship included.",
+    "Train, qualify and earn at HITIO Gym Orpington. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/hitio-orpington-academy",
 };

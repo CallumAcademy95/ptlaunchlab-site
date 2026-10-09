@@ -12,14 +12,8 @@ export const mofGym: GymConfig = {
     "Inside Bristol's\nBest Independent Gym",
   ],
   heroSubline: "Train. Qualify. Earn.",
-  promoCode: "MOFPTDISCOUNT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
   positioningSubline: "Built inside Bristol's best independent gym, by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside Ministry of Fitness",
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05",
   stats: [
     { value: "#1",  label: "Best independent gym in Bristol" },
     { value: "2010", label: "Est. — 15+ years transforming Bristol" },
@@ -34,6 +28,6 @@ export const mofGym: GymConfig = {
   ],
   metaTitle: "Ministry of Fitness PT Academy | Become a Qualified Personal Trainer in Bristol",
   metaDescription:
-    "Train, qualify, and earn at Bristol's biggest independent gym. Get £200 off your Level 2 & 3 PT qualification exclusively through Ministry of Fitness. Mentorship included.",
+    "Train, qualify, and earn at Bristol's biggest independent gym. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/mof-gym",
 };

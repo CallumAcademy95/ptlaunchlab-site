@@ -3,14 +3,13 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | Ministry of Fitness PT Academy",
-  description: "Claim your £200 MOF member discount and start your Level 2 & 3 PT qualification today.",
+  description: "Start your Level 2 & 3 PT qualification today — pay in full or monthly.",
   robots: { index: false },
 };
 
 const MOF_PARTNER = {
   gymSlug: "mof",
   gymReferral: "Ministry of Fitness",
-  fullPrice: 1399,
 };
 
 export default function MofGymEnrolPage() {
@@ -30,11 +29,8 @@ export default function MofGymEnrolPage() {
             />
             <div>
               <p className="text-white font-black text-sm uppercase leading-none">Ministry of Fitness PT Academy</p>
-              <p className="text-white/40 text-[10px] mt-0.5">Powered by PT Launch Lab</p>
+              <p className="text-white/40 text-[10px] mt-0.5">Enrolment</p>
             </div>
-          </div>
-          <div className="bg-[#00cc33] text-black text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-            MOFPTDISCOUNT
           </div>
         </div>
       </div>

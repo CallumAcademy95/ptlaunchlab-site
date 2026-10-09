@@ -48,7 +48,7 @@ export default function PrivacyPage() {
     <LegalPage
       label="Legal"
       title="Privacy Policy"
-      lastUpdated="March 2026"
+      lastUpdated="October 2026"
       intro="PT Launch Lab is committed to protecting your personal data. This policy explains what data we collect, why we collect it, and your rights under UK data protection law."
       sections={[
         {
@@ -76,7 +76,7 @@ export default function PrivacyPage() {
                 "Current employment status",
                 "How you heard about us",
                 "Electronic signature and agreement timestamp",
-                "Payment choice (full or deposit)",
+                "Payment choice (in full or monthly)",
               ])}
               <p className="font-semibold text-white mt-3">Website and enquiries</p>
               {ul([

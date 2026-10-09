@@ -1,11 +1,13 @@
 # PT Launch Lab — Ad Manager Brief
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **Site:** https://ptlaunchlab.co.uk
 **Brand:** PT Launch Lab (NCFE Level 2 + Level 3 Personal Trainer course, UK, online)
-**Headline price:** £1,599 PIF or £599 deposit + 5 × £200 (with funnel promo: £1,399 / £599 + 4 × £200)
+**Headline price:** £999.99 in full, or 10 × £99.99 monthly (no interest). No funnel promo.
 **Geo:** UK-wide; Yorkshire emphasis on homepage hero (geo-personalised)
 **Primary KPI:** Lead → WhatsApp warm-up → free 15-min call → enrolment
-**Primary lever:** Drive cold traffic to one of 3 avatar pages OR to /quiz, capture lead, enter 48h £200-off funnel + WhatsApp + MailerLite warm-up.
+**Primary lever:** Drive cold traffic to one of 3 avatar pages OR to /quiz, capture lead, enter WhatsApp + MailerLite warm-up.
 
 ---
 
@@ -224,7 +226,7 @@ Cold ad
 
 ---
 
-## 9. Promo Mechanic — 48h £200 Off
+## 9. Promo Mechanic — 48h £200 Off (RETIRED October 2026: no discounts)
 
 - Triggered automatically on Lead submit from quiz, prospectus, or hero form
 - HMAC-signed cookie `ptll_promo` set for 48h

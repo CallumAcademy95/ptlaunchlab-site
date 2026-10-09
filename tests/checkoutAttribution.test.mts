@@ -10,14 +10,14 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildSessionParams, PAYMENT_LINK_PRICES } from "../app/lib/stripeCheckout.ts";
+import { buildSessionParams, COURSE_PLANS } from "../app/lib/stripeCheckout.ts";
 
-const PIF = PAYMENT_LINK_PRICES["https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f"];
-const DEPOSIT = PAYMENT_LINK_PRICES["https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05"];
+const PIF = COURSE_PLANS.pif;
+const MONTHLY = COURSE_PLANS.monthly;
 
 const attribution = { fts: "facebook", ftm: "paid", lts: "google" };
-const base = { paymentLink: "x", email: "a@b.com", name: "A B", attribution };
-const opts = { withInstalments: false, target: 5, cancelPath: "/enrol" };
+const base = { plan: "pif" as const, email: "a@b.com", name: "A B", attribution };
+const opts = { cancelPath: "/enrol" };
 
 type Meta = Record<string, string | undefined>;
 
@@ -30,13 +30,13 @@ test("a PIF session carries attr_* in session and payment_intent metadata", () =
   assert.equal((p.metadata as Meta).source, "api-checkout-session");
 });
 
-test("a deposit session carries attr_* in session and subscription metadata, never payment_intent_data", () => {
-  const p = buildSessionParams(base, DEPOSIT, { ...opts, withInstalments: true });
+test("a monthly session carries attr_* in session and subscription metadata, never payment_intent_data", () => {
+  const p = buildSessionParams({ ...base, plan: "monthly" }, MONTHLY, opts);
   assert.equal(p.mode, "subscription");
   assert.equal(p.payment_intent_data, undefined);
   const sub = (p.subscription_data as { metadata: Meta }).metadata;
   assert.equal(sub.attr_fts, "facebook");
-  assert.equal(sub.ptll_plan, "deposit_instalments", "existing keys untouched");
+  assert.equal(sub.ptll_plan, "monthly_10", "existing keys untouched");
   assert.equal((p.metadata as Meta).attr_lts, "google");
 });
 

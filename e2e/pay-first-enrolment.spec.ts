@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import {
   BASE_URL,
-  PAYMENT_LINKS,
+  PLANS,
   PRODUCTION_ORIGIN,
   expectedTestPrices,
   payWithTestCard,
@@ -50,7 +50,7 @@ test.describe("pay-first enrolment: the return redirect", () => {
     // Twice: the first primes the module, the second the TLS pool to Stripe.
     for (let i = 0; i < 2; i++) {
       await warm("/api/checkout", {
-        paymentLink: PAYMENT_LINKS.pif,
+        plan: "pif",
         email: "warmup@ptlaunchlab-test.invalid",
         name: "Warm Up",
       });
@@ -60,13 +60,13 @@ test.describe("pay-first enrolment: the return redirect", () => {
   // ── The contract, asserted directly on real Stripe sessions ───────────────
   // This is the cheapest and most important check. It does not need a browser
   // or a payment: it asks the real /api/checkout for a real Stripe session for
-  // every Payment Link the site can send a buyer to, and inspects where Stripe
-  // has been told to return them.
-  for (const [name, paymentLink] of Object.entries(PAYMENT_LINKS)) {
+  // each of the two plans the site sells, and inspects where Stripe has been
+  // told to return them.
+  for (const name of PLANS) {
     test(`${name}: the Checkout Session returns the buyer to ${SUCCESS_PATH}`, async ({ request }) => {
       const res = await request.post("/api/checkout", {
         data: {
-          paymentLink,
+          plan: name,
           email: `e2e-${name}@ptlaunchlab-test.invalid`,
           name: "E2E Redirect Contract",
           cancelPath: "/enrol",
@@ -80,7 +80,7 @@ test.describe("pay-first enrolment: the return redirect", () => {
       // a Dashboard setting nobody reviews. Treat it as a hard failure.
       expect(
         body.url,
-        `/api/checkout returned no session for the ${name} link (reason: ${body.reason ?? "none"}).\n` +
+        `/api/checkout returned no session for the ${name} plan (reason: ${body.reason ?? "none"}).\n` +
           "Buyers are being sent to the raw Stripe Payment Link instead, which means the\n" +
           "post-payment redirect is once again controlled by the Stripe Dashboard rather\n" +
           "than by this repo. Most likely causes: STRIPE_SECRET_KEY lost its\n" +
@@ -104,6 +104,11 @@ test.describe("pay-first enrolment: the return redirect", () => {
       expect(session.success_url).toContain("{CHECKOUT_SESSION_ID}");
       expect(session.metadata.source).toBe("api-checkout-session");
 
+      // The plan's shape: pay-in-full is a one-off payment; monthly is a
+      // subscription whose first £99.99 is taken now (the webhook stops it at 10).
+      expect(session.mode).toBe(name === "monthly" ? "subscription" : "payment");
+      expect(session.metadata.plan).toBe(name === "monthly" ? "monthly" : "PIF");
+
       // Guards against a stale reused dev server silently passing this suite:
       // if the server was booted with different prices than this run provisioned,
       // it is not the code under test and its success_url proves nothing.
@@ -111,7 +116,7 @@ test.describe("pay-first enrolment: the return redirect", () => {
       expect(
         session.line_items?.data[0]?.price.id,
         `The server under test charged price ${session.line_items?.data[0]?.price.id} for the\n` +
-          `${name} link, but this run provisioned ${expectedPrice}. The dev server on\n` +
+          `${name} plan, but this run provisioned ${expectedPrice}. The dev server on\n` +
           "this port was almost certainly started with a different environment — restart it\n" +
           "(or run with CI=1) so the suite is testing what you think it is.",
       ).toBe(expectedPrice);
@@ -174,7 +179,10 @@ test.describe("pay-first enrolment: the return redirect", () => {
     await page
       .waitForURL(/checkout\.stripe\.com|buy\.stripe\.com/, { timeout: 60_000 })
       .catch(() => {
-        throw new Error(`Clicking Pay never reached Stripe at all. Ended up at: ${page.url()}`);
+        throw new Error(
+          `Clicking Pay never reached Stripe at all. Ended up at: ${page.url()} ` +
+            "(with no fallback link configured, a failed /api/checkout shows the \"Checkout unavailable\" error instead)",
+        );
       });
 
     if (page.url().includes("buy.stripe.com")) {
@@ -210,7 +218,7 @@ test.describe("pay-first enrolment: the return redirect", () => {
     // The payment must actually have settled, not just redirected.
     const { body: session } = await readTestSession(sessionId);
     expect(session.payment_status).toBe("paid");
-    expect(session.amount_total).toBe(159900);
+    expect(session.amount_total).toBe(99999);
 
     // ── 4. The buyer is told the payment landed ──
     await expect(page.getByRole("heading", { name: /Your place is confirmed/ })).toBeVisible({ timeout: 30_000 });
@@ -223,7 +231,7 @@ test.describe("pay-first enrolment: the return redirect", () => {
     const cta = page.getByRole("link", { name: /Create my account/ });
     await expect(
       cta,
-      "The hand-off button is missing. A buyer who has just paid £1,599 has no route " +
+      "The hand-off button is missing. A buyer who has just paid £999.99 has no route " +
         "through to Praxel from this page. Check PTLL_INVITE_SECRET is set and that " +
         "/enrol/success can read the Stripe session.",
     ).toBeVisible();
@@ -253,6 +261,6 @@ test.describe("pay-first enrolment: the return redirect", () => {
     expect(payload.email).toBe(learner.email.toLowerCase());
     // Shape, never amount — a discounted partner pay-in-full is still a PIF.
     expect(payload.plan).toBe("PIF");
-    expect(payload.amount).toBe(1599);
+    expect(payload.amount).toBe(999.99);
   });
 });

@@ -6,7 +6,7 @@
 //    e.g. app/ultimate-shred-academy
 // 2. Fill in the config object below with the gym's details
 // 3. Duplicate app/_gym-template/enrol/page.tsx → app/[gym-slug]/enrol/page.tsx
-//    and fill in the PartnerConfig (promo code + Stripe links)
+//    and fill in the PartnerConfig (gymSlug + display name — no prices or codes)
 // 4. Deploy — that's it.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -35,19 +35,9 @@ const config: GymConfig = {
   ],
   heroSubline: "Train. Qualify. Earn.",
 
-  // ── Discount
-  promoCode: "GYMPROMOCODE",
-  discountAmount: 200,
-  fullPrice: 1399,                           // standard is 1599 minus discount
-  depositPrice: 599,
-
   // ── Positioning section — write gym-specific copy (no generic claims)
   positioningSubline: "Built inside [GYM NAME], by people who actually hire PTs.",
   whyThisGymHeading: "Learn Inside [GYM NAME]",
-
-  // ── Stripe (create payment links in Stripe dashboard first)
-  stripeFullLink:    "REPLACE_WITH_STRIPE_FULL_LINK",
-  stripeDepositLink: "REPLACE_WITH_STRIPE_DEPOSIT_LINK",
 
   // ── Why this gym (4 stat boxes)
   stats: [
@@ -68,7 +58,7 @@ const config: GymConfig = {
   // ── SEO
   metaTitle: "GYM NAME PT Academy | Become a Qualified Personal Trainer",
   metaDescription:
-    "Train, qualify, and earn at GYM NAME. Get £200 off your Level 2 & 3 PT qualification exclusively through GYM NAME. Mentorship included.",
+    "Train, qualify, and earn at GYM NAME. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/gym-slug-here",
 };
 

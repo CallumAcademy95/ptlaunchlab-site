@@ -12,7 +12,7 @@ import { trackEvent } from "@/app/lib/gtag";
 //   1. User picks employment path, region, experience, hours/week
 //   2. Live preliminary headline number renders below the inputs
 //   3. Email gate sits between the headline and the detailed breakdown
-//   4. After submit → cookie set, full breakdown reveals + £200 FunnelPricingBlock
+//   4. After submit → full breakdown reveals + FunnelPricingBlock (the two ways to pay)
 //
 // Rate model is derived from the /personal-trainer-salary-uk pillar:
 //   Tier 1 (employed chain)    £18-28k yr1 → £24-32k yr2-3 → £30-42k yr4+
@@ -308,7 +308,7 @@ export default function SalaryCalculatorClient() {
                   See your year 1 → year 4+ projection.
                 </h3>
                 <p className="text-soft/70 text-sm mb-6 leading-relaxed">
-                  Enter your email to unlock the full breakdown, including how to climb from your current tier to the £80k+ band — plus a <strong className="text-gold">£200 discount on the NCFE Level 3 PT course</strong> for the next 48 hours.
+                  Enter your email to unlock the full breakdown, including how to climb from your current tier to the £80k+ band.
                 </p>
 
                 <form onSubmit={handleUnlock} className="space-y-3">
@@ -430,7 +430,7 @@ export default function SalaryCalculatorClient() {
                 </Link>
               </div>
 
-              {/* PROMO — the whole reason this exists */}
+              {/* PRICING — the two ways to pay */}
               <FunnelPricingBlock />
             </>
           )}

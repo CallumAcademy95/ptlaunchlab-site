@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -193,7 +194,7 @@ export default function RecognisedPage() {
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">You can study around a job.</strong> PT Launch Lab learners typically qualify in 8–16 weeks while still working full-time.</li>
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">Assessor feedback is permanent.</strong> You get written feedback on every video, which becomes a learning record you keep forever.</li>
                 </ul>
-                <p>What you don&apos;t get from a video-assessed course is immediate physical gym-floor practice with peers. Good online courses solve this with optional in-person workshops, partner gym shadow days, and an active mentorship community. PT Launch Lab includes the <strong className="text-white">£500 Skool mentorship community</strong> in its £1,599 all-in price specifically for this — daily peer practice, weekly live coaching from founders Callum, Ryan and Miles, and warm-intro interviews with partner gyms.</p>
+                <p>What you don&apos;t get from a video-assessed course is immediate physical gym-floor practice with peers. Good online courses solve this with optional in-person workshops, partner gym shadow days, and an active mentorship community. PT Launch Lab includes the <strong className="text-white">£500 Skool mentorship community</strong> in its {COURSE_PRICE_LABEL} all-in price specifically for this — daily peer practice, weekly live coaching from founders Callum, Ryan and Miles, and warm-intro interviews with partner gyms.</p>
               </div>
             </section>
 
@@ -223,7 +224,7 @@ export default function RecognisedPage() {
         <section className="bg-surface py-16 md:py-20 px-6 border-t border-blue/15">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-4">Ready to qualify the right way?</h2>
-            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">£1,599 all-in</strong> — fully Ofqual-regulated, CIMSPA-recognised, and accepted by every major UK gym chain.</p>
+            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">{COURSE_PRICE_LABEL} all-in</strong> — fully Ofqual-regulated, CIMSPA-recognised, and accepted by every major UK gym chain.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
               <Link href="/quiz" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Take the 60-Second Quiz →</Link>
               <Link href="/book-call" className="px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all">Book a Free 15-Min Call</Link>

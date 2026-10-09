@@ -20,23 +20,10 @@ export interface PartnerConfig {
   // it gets reworded, gains trailing spaces, and changes when a gym rebrands.
   gymSlug: string;               // e.g. "6fit"
   gymReferral: string;           // e.g. "6fit Gyms" — display only (Sheet, emails)
-  stripeFullLink?: string;       // default full-price Stripe link
-  stripeDepositLink?: string;    // default deposit Stripe link
-  // No promo config here on purpose. Prices and discounts come from Stripe at
-  // request time, keyed off gymSlug — see app/lib/partnerPromo.ts. Hardcoding
-  // them here is what let the page advertise £1,399 while Stripe charged
-  // £1,599, and what kept HITIO's launch codes off the site entirely.
-  /**
-   * DISPLAY ONLY. The pay-in-full price this partner already advertises
-   * elsewhere on their own page (app/lib/gyms/<slug>.ts's `fullPrice`, £1,399
-   * for every gym with an active standing code). EnrolmentFlow uses it only
-   * to decide what "was" price it may cross out when a code is applied — it
-   * never affects what Stripe actually charges, which is driven entirely by
-   * the applied promo code's own Stripe amount_off against the underlying
-   * £1,599 base price. Omit it and the general £1,599 rate is used, which is
-   * only correct for a partner who has never advertised a lower one.
-   */
-  fullPrice?: number;
+  // No prices, payment links or promo config here on purpose. Every partner
+  // sells the same two plans at the same prices (app/lib/pricing.ts), chosen
+  // server-side by /api/checkout. Partner attribution is gymSlug in checkout
+  // metadata — no codes.
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -51,18 +38,9 @@ export interface PartnerConfig {
 export interface EnrolmentContext {
   fullName: string;
   email: string;
-  /**
-   * The SHAPE of the sale, which is all any consumer downstream cares about.
-   * The September £99 entry records as "deposit" because that is what it is —
-   * an entry payment with instalments to follow. Its identity lives in `offer`
-   * and in the Stripe metadata, not here.
-   */
-  plan: "full" | "deposit";
-  /** Set only for a September-weekend enrolment. */
-  offer?: "sept99" | "oct99" | "bf2026";
+  /** "full" = £999.99 paid in full; "monthly" = 10 × £99.99. */
+  plan: "full" | "monthly";
   amount: number;
-  promoCode?: string;
-  discountApplied?: number;
   gymReferral?: string;
   gymSlug?: string;
   source: string;

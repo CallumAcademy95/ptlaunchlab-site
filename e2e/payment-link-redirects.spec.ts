@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { ALL_MAPPED_LINK_URLS, PAYMENT_LINKS, PRODUCTION_ORIGIN, envValue, stripeGet } from "./helpers";
+import { RETIRED_LINK_URLS, PRODUCTION_ORIGIN, configuredFallbackLinks, envValue, stripeGet } from "./helpers";
 
 // ════════════════════════════════════════════════════════════════════════════
 // THE SAFETY NET, CHECKED AGAINST LIVE STRIPE (read-only)
@@ -62,7 +62,13 @@ test.describe("live Stripe Payment Links still redirect to the enrolment form", 
     const expected = `${PRODUCTION_ORIGIN}/enrol/success?session_id={CHECKOUT_SESSION_ID}`;
     const problems: string[] = [];
 
-    for (const [name, url] of Object.entries(PAYMENT_LINKS)) {
+    // Only the CURRENT fallback links (NEXT_PUBLIC_STRIPE_LINK_*_999). When one
+    // is unset the enrol page shows a contact error instead of any link, so
+    // there is nothing to check for it — and nothing a buyer can be sent to.
+    const configured = Object.entries(configuredFallbackLinks()).filter(
+      (entry): entry is [string, string] => typeof entry[1] === "string",
+    );
+    for (const [name, url] of configured) {
       const link = byUrl.get(url);
       if (!link) {
         problems.push(`  ${name} (${url})\n      NOT FOUND in the live account — is it still the right link?`);
@@ -96,21 +102,18 @@ test.describe("live Stripe Payment Links still redirect to the enrolment form", 
     ).toBe("");
   });
 
-  // The map in stripeCheckout.ts is what decides whether a buyer gets a
-  // code-controlled session at all. A link on an enrol page that is missing
-  // from the map silently gets the old Dashboard-controlled behaviour.
-  test("no active Payment Link that takes course money is missing from PAYMENT_LINK_PRICES", async () => {
+  // Every active link must be either one of the two configured fallback links
+  // or a known legacy/retired one. Anything else is a link the code knows
+  // nothing about.
+  test("no active Payment Link that takes course money is unknown to the code", async () => {
     if (process.env[SKIP_FLAG] === "1") test.skip(true, `${SKIP_FLAG}=1`);
     const key = envValue("STRIPE_SECRET_KEY");
     test.skip(!key, "STRIPE_SECRET_KEY unavailable");
 
     const { body } = await stripeGet<{ data?: PaymentLink[] }>(key!, "payment_links?limit=100");
-    // Read from the app's own map, NOT from the named PAYMENT_LINKS fixture.
-    // That fixture is hand-written and drifted the first time a fourth link was
-    // added: the £99 September link was correctly in PAYMENT_LINK_PRICES and
-    // this check failed anyway, reporting a live link as unknown to code that
-    // knew about it perfectly well.
-    const unmapped = (body.data ?? []).filter((l) => l.active && !ALL_MAPPED_LINK_URLS.has(l.url));
+    // Read from the same env the app reads, not a hand-written fixture.
+    const known = new Set(Object.values(configuredFallbackLinks()).filter(Boolean) as string[]);
+    const unmapped = (body.data ?? []).filter((l) => l.active && !known.has(l.url));
 
     // Legacy links knowingly kept active. None is referenced by any enrol page.
     const KNOWN_LEGACY = new Set([
@@ -125,17 +128,23 @@ test.describe("live Stripe Payment Links still redirect to the enrolment form", 
       // which derives from subscription invoices — so a balance collected this
       // way has to be reconciled by hand.
       "https://buy.stripe.com/aFafZb0og456dyWdaOfEk0l",
+      // Every link retired at the October 2026 change-over (£1,599 PIF, £599
+      // deposit, £1,399 funnel, £99 September, £999 Black Friday, £99 October).
+      // Nothing in the app links to them any more. They sell retired prices and
+      // should be DEACTIVATED in the Stripe Dashboard — listed here only so this
+      // check stays about links the code has never heard of.
+      ...RETIRED_LINK_URLS,
     ]);
     const unexpected = unmapped.filter((l) => !KNOWN_LEGACY.has(l.url));
 
     expect(
       unexpected.map((l) => `  ${l.id} ${l.url}`).join("\n"),
-      "New active Stripe Payment Link(s) exist that app/lib/stripeCheckout.ts knows nothing\n" +
+      "New active Stripe Payment Link(s) exist that the app (NEXT_PUBLIC_STRIPE_LINK_*_999) knows nothing\n" +
         "about:\n\n" +
         unexpected.map((l) => `  ${l.id} ${l.url}`).join("\n") +
         "\n\nIf any enrol page sends buyers to one of these, those buyers get the old\n" +
         "Dashboard-controlled redirect — the failure mode this whole suite exists to prevent.\n" +
-        "Either add it to PAYMENT_LINK_PRICES (with its price ID) or, if it is a legacy link\n" +
+        "Either configure it as NEXT_PUBLIC_STRIPE_LINK_PIF_999 / _MONTHLY_999 or, if it is a legacy link\n" +
         "no page links to, add it to KNOWN_LEGACY in this test with a note explaining why.\n",
     ).toBe("");
   });

@@ -25,11 +25,6 @@ export const atpFelixstoweAcademy: GymConfig = {
   heroSubline: "Train. Qualify. Earn.",
   location: "Felixstowe, Suffolk",
 
-  promoCode: "ATPPT",
-  discountAmount: 200,
-  fullPrice: 1399,
-  depositPrice: 599,
-
   // What is distinctive here is the coaching: every session is coach-led, in
   // groups of twelve at most, by Level 3 trainers. That is the job a PT
   // learner is training for, happening in the room every day.
@@ -38,9 +33,6 @@ export const atpFelixstoweAcademy: GymConfig = {
   whyThisGymHeading: "Learn Inside ATP Fitness Felixstowe",
   gymIntro:
     "You qualify in a gym where small-group coaching is the whole point, not an add-on.",
-
-  stripeFullLink:    "https://buy.stripe.com/9B69AN7QI3127ayeeSfEk0f",  // shared payment links
-  stripeDepositLink: "https://buy.stripe.com/8x2bIVef6bxy2Ui1s6fEk05", // gym tracked via enrolment form
 
   stats: [
     { value: "12",     label: "Max Per Coached Class" },
@@ -58,6 +50,6 @@ export const atpFelixstoweAcademy: GymConfig = {
 
   metaTitle: "ATP PT Academy Felixstowe | Become a Qualified Personal Trainer",
   metaDescription:
-    "Train, qualify and earn at ATP Fitness Felixstowe. Get £200 off your Level 2 & 3 PT qualification as an ATP member. Mentorship included.",
+    "Train, qualify and earn at ATP Fitness Felixstowe. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
   canonicalPath: "/atp-felixstowe-academy",
 };
