@@ -1,3 +1,5 @@
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
+
 const AwardIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
     <circle cx="12" cy="8" r="5"/>
@@ -76,7 +78,7 @@ const features = [
   {
     Icon: CardIcon,
     title: "Flexible Payment Options",
-    body: "Pay in full for £1,599, or spread the cost with our deposit plan: £599 upfront, then 5 × £200. We'd rather you got started than let the money be the thing that stops you.",
+    body: `Pay ${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. We'd rather you got started than let the money be the thing that stops you.`,
     badge: null,
   },
 ];

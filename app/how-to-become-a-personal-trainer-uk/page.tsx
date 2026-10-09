@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COURSE_PRICE_LABEL, COURSE_PRICE_PENCE, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
@@ -112,7 +113,7 @@ const howToSchema = {
   estimatedCost: {
     "@type": "MonetaryAmount",
     currency: "GBP",
-    value: "1599",
+    value: (COURSE_PRICE_PENCE / 100).toFixed(2),
   },
   supply: [
     { "@type": "HowToSupply", name: "Ofqual-regulated Level 2 + 3 PT qualification" },
@@ -443,7 +444,7 @@ export default function HowToBecomePtUkPage() {
               </div>
             </div>
             <p className="text-soft/80 text-base leading-relaxed mt-8">
-              Most learners land in the <span className="text-white font-semibold">£1,500 to £1,800 bracket</span> if they take the employed-first route (no loss-of-income runway needed) and pick a mid-range Ofqual-regulated course. Spread over 6-12 months via finance, that&apos;s £150-£300 a month — less than most gym memberships plus a coffee a day. See the full breakdown on our <Link href="/courses" className="text-gold hover:underline font-semibold">courses page</Link>.
+              Most learners land in the <span className="text-white font-semibold">£1,500 to £1,800 bracket</span> if they take the employed-first route (no loss-of-income runway needed) and pick a mid-range Ofqual-regulated course. Spread over 10 months, that&apos;s £150–£180 a month. Our own course is {COURSE_PRICE_LABEL}, or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL} with no interest. See the full breakdown on our <Link href="/courses" className="text-gold hover:underline font-semibold">courses page</Link>.
             </p>
           </div>
         </section>

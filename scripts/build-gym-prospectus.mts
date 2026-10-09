@@ -33,6 +33,14 @@ import {
   KEY_TERMS_FOR_ACKNOWLEDGEMENT,
   PARTNERSHIP_AGREEMENT_VERSION,
 } from "../app/lib/partnershipAgreement";
+import { PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "../app/lib/pricing";
+
+// The per-learner fee in the marketing pages comes from app/lib/pricing.ts (v4.0
+// terms: £250 inc. VAT). Page 4 still renders the signed agreement verbatim, so
+// do not publish a regenerated prospectus until partnershipAgreement.ts carries
+// the same fee — otherwise pages 1-3 and page 4 disagree.
+const FEE = formatPence(PARTNER_FEE_PENCE);
+const perYear = (perMonth: number) => formatPence(PARTNER_FEE_PENCE * perMonth * 12);
 
 const OUT_HTML = path.resolve("public/gym-partner-prospectus.html");
 const OUT_PDF = path.resolve("public/gym-partner-prospectus.pdf");
@@ -100,11 +108,11 @@ const html = `<!DOCTYPE html>
 
 ${page(`
   <div class="eyebrow">Gym partnership</div>
-  <h1>Your members are<br>your next trainers.</h1>
+  <h1>A new revenue stream,<br>at zero cost.</h1>
   <div class="rule"></div>
-  <p>A white-label PT academy for your gym. Your members qualify under your brand,
-  come out as trainers who already know your floor, and you are paid £500 for each
-  one who enrols.</p>
+  <p>A white-label PT academy for your gym. You are paid ${FEE} (inc. VAT) for each
+  member who enrols, and you grow your own pipeline of trainers who already know
+  your floor.</p>
   <p style="margin-top:10mm;font-size:10.5pt;">PT Launch Lab Ltd · Pontefract<br>
   ptlaunchlab.co.uk/gym-partnership</p>
   <div class="foot"><span>Partnership terms v${PARTNERSHIP_AGREEMENT_VERSION}</span><span>1</span></div>
@@ -129,38 +137,42 @@ ${page(`
       Level 3, Ofqual regulated, CIMSPA recognised. Most learners qualify in 8 to 16
       weeks around a job. You teach nothing.</p></div>
     <div class="box"><h3>3. You are paid</h3>
-      <p>£500 for every member who enrols through your academy.</p></div>
-    <div class="box"><h3>4. They stay on your floor</h3>
-      <p>A trainer who qualified in your gym, with your members, is far likelier to
-      rent space from you than someone who answered an advert.</p></div>
+      <p>${FEE} (inc. VAT) for every member who enrols through your academy. Paid 30
+      days after a pay-in-full enrolment, or when their ${PARTNER_FEE_RELEASE_PAYMENT}th
+      monthly payment clears. Nothing is clawed back once paid.</p></div>
+    <div class="box"><h3>4. First introductions</h3>
+      <p>Learners who qualify through your academy are introduced to you first. A
+      trainer who qualified in your gym may well choose to rent space from you.</p></div>
   </div>
   <div class="kicker"><p><strong>What it costs you:</strong> nothing. No fee, no minimum,
-  no tie-in, and either side can end it on 30 days' written notice.</p></div>
+  no tie-in, and either side can end it on 30 days' written notice. Each month you get a
+  marketing kit (screen video, posters, social posts) and a ready-to-run Meta ad pack.</p></div>
   <div class="foot"><span>PT Launch Lab · Gym partnership</span><span>2</span></div>
 `)}
 
 ${page(`
   <h2>What it is worth</h2>
-  <p>£500 per learner, so the arithmetic is easy. Put your own number in:</p>
+  <p>${FEE} per learner, inclusive of VAT, so the arithmetic is easy. Put your own number in:</p>
   <table style="width:100%;border-collapse:collapse;margin:5mm 0 6mm;">
     <tr style="background:${NAVY};color:#fff;">
       <th style="text-align:left;padding:3mm 4mm;font-family:'Barlow Condensed',sans-serif;font-size:10pt;letter-spacing:.12em;text-transform:uppercase;font-weight:600;">Members enrolling</th>
       <th style="text-align:right;padding:3mm 4mm;font-family:'Barlow Condensed',sans-serif;font-size:10pt;letter-spacing:.12em;text-transform:uppercase;font-weight:600;">Over a year</th>
     </tr>
     <tr><td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;">One a month</td>
-        <td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;text-align:right;" class="cond"><span style="font-size:15pt;font-weight:700;color:${NAVY};">£6,000</span></td></tr>
+        <td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;text-align:right;" class="cond"><span style="font-size:15pt;font-weight:700;color:${NAVY};">${perYear(1)}</span></td></tr>
     <tr><td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;">Three a month</td>
-        <td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;text-align:right;" class="cond"><span style="font-size:15pt;font-weight:700;color:${NAVY};">£18,000</span></td></tr>
+        <td style="padding:3mm 4mm;border-bottom:1px solid #E4E9F2;text-align:right;" class="cond"><span style="font-size:15pt;font-weight:700;color:${NAVY};">${perYear(3)}</span></td></tr>
     <tr style="background:#FFFBEC;"><td style="padding:3mm 4mm;border-bottom:2px solid ${GOLD};"><strong>Five a month</strong></td>
-        <td style="padding:3mm 4mm;border-bottom:2px solid ${GOLD};text-align:right;" class="cond"><span style="font-size:19pt;font-weight:700;color:${NAVY};">£30,000</span></td></tr>
+        <td style="padding:3mm 4mm;border-bottom:2px solid ${GOLD};text-align:right;" class="cond"><span style="font-size:19pt;font-weight:700;color:${NAVY};">${perYear(5)}</span></td></tr>
   </table>
   <p style="font-size:9.5pt;color:#6E7A8E;margin-top:-2mm;">Illustration of the fee at different
   volumes, not a forecast of what your gym will do. What you actually enrol depends on your
   membership and how often you mention it.</p>
 
-  <p style="margin-top:5mm;">And the fee is the smaller half. Every member you help qualify is a
-  trainer who already knows your gym and is likely to build their business on your floor rather
-  than someone else's, paying rent and bringing their own clients through your door.</p>
+  <p style="margin-top:5mm;">The fee is not the only upside. A member who qualifies through your
+  academy already knows your gym, and you get the first introduction. If they choose to build their
+  business on your floor, that could mean rent and their own clients through your door. No partner
+  learner has qualified yet, so treat that as potential, not a track record.</p>
 
   <div class="kicker"><p><strong>Where the programme is now:</strong> ${PROOF.partnerGyms} gyms are
   running an academy with us, and the strongest has had ${PROOF.bestGymEnrolments} of its members

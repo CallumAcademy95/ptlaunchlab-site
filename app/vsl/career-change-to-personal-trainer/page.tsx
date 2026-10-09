@@ -11,6 +11,7 @@ import ProofStrip from "../../components/ProofStrip";
 import FunnelPricingBlock from "../../components/FunnelPricingBlock";
 import HeroLeadForm from "../../components/HeroLeadForm";
 import PromoBar from "../../components/PromoBar";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, COURSE_PRICE_PENCE } from "@/app/lib/pricing";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/vsl/career-change-to-personal-trainer";
 // Static dates. Previously computed with new Date() at build time, which told
@@ -65,7 +66,7 @@ const objections = [
 
 const steps = [
   { n: 1, title: "Book a free 15-min call", body: "Tell us your situation honestly. Current role, hours, financial pressure, when you want to be out. We'll tell you if the maths actually works, and if it doesn't." },
-  { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: "£599 deposit then 5 × £200 monthly, or pay in full. Payments roughly match a single PT session per week once you qualify." },
+  { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: `${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, no interest, or pay in full. One PT session a week covers the monthly payment once you qualify.` },
   { n: 3, title: "Study evenings and weekends, and keep earning", body: "Tutor introduced within 24 hours. Average 8–10 hours per week alongside full-time work. Level 2 done in ~4 weeks, Level 3 in another ~6–8." },
   { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by name. Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
   { n: 5, title: "Transition employed-first, with a warm gym introduction", body: "We've personally hired 500+ PTs through our network. A warm introduction into a salaried PT role rather than a cold CV drop. Overlap salaries while you build your client base." },
@@ -78,7 +79,7 @@ const comparisonRows = [
   { other: "Just a certificate, and clients to figure out alone", us: "£500 Mentorship Hub bundled free" },
   { other: "Lecturer telling you the theory",              us: "Gym owners who've personally hired 500+ PTs" },
   { other: "Cold CV drops once you qualify",               us: "Warm intros to salaried roles in our network" },
-  { other: "Surprise upsell fees post-enrolment",          us: "£1,599 total. Nothing sold as a paid upgrade later" },
+  { other: "Surprise upsell fees post-enrolment",          us: `${COURSE_PRICE_LABEL} total. Nothing sold as a paid upgrade later` },
 ];
 
 const faqs = [
@@ -105,7 +106,7 @@ const courseSchema = {
   description: "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm introductions into employed PT roles.",
   provider: { "@type": "Organization", name: "PT Launch Lab", sameAs: "https://ptlaunchlab.co.uk" },
   educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
-  offers: { "@type": "Offer", price: "1599", priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
+  offers: { "@type": "Offer", price: (COURSE_PRICE_PENCE / 100).toFixed(2), priceCurrency: "GBP", availability: "https://schema.org/InStock", url: "https://ptlaunchlab.co.uk/enrol" },
   hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT12W" },
 };
 
@@ -267,7 +268,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">Map your transition with the team.</span>
             </h2>
             <p className="text-soft/75 text-base mb-8 max-w-xl mx-auto">
-              If you already know PT is the move, drop your details. We&apos;ll WhatsApp you a quick intro, lock in £200 off, and you can book a 15-min transition call straight after.
+              If you already know PT is the move, drop your details. We&apos;ll WhatsApp you a quick intro, and you can book a 15-min transition call straight after.
             </p>
             <HeroLeadForm avatar="switcher" />
           </div>
@@ -312,7 +313,7 @@ export default function CareerChangeToPersonalTrainerPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
               {[
                 { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
-                { tag: "Cost", title: "Spread across your transition", body: "£599 deposit + 5 × £200 monthly, or pay in full. Roughly matches a single PT session per week once you qualify." },
+                { tag: "Cost", title: "Spread across your transition", body: `${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, no interest, or pay in full. One PT session a week covers it once you qualify.` },
                 { tag: "Support", title: "Real tutor, not a help-desk ticket", body: "Personal tutor introduced within 24 hours. Reviews every unit you submit and either passes it or sends it back with feedback, so the assessments stop being scary." },
                 { tag: "Exit", title: "Employed-first, then self-employed", body: "A warm introduction into our partner gym network. Overlap salaries while you build your client base. No leap-of-faith required." },
               ].map((row) => (
@@ -467,7 +468,7 @@ export default function CareerChangeToPersonalTrainerPage() {
               <span className="text-gold">across your exit.</span>
             </h2>
             <p className="text-soft/75 text-center text-base mb-10 max-w-xl mx-auto">
-              £1,599 covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm gym intros. Most career-changers use the deposit plan so payments roughly match one PT session per week post-qualification.
+              {COURSE_PRICE_LABEL} covers Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm gym intros. Or pay {MONTHLY_PLAN_LABEL} a month, with no interest. Once you qualify, one PT session a week covers the monthly payment.
             </p>
             <FunnelPricingBlock variant="dark" />
           </div>
@@ -530,7 +531,7 @@ export default function CareerChangeToPersonalTrainerPage() {
                   Enrol today and start studying tonight. Your tutor is introduced within 24 hours, and the payment plans are designed never to sit on top of your salary.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {["Immediate course access", "Tutor introduced within 24 hours", "Pay £599 + 5 × £200 monthly", "Cancel within 7 days, no questions"].map((line) => (
+                  {["Immediate course access", "Tutor introduced within 24 hours", `Pay ${MONTHLY_PLAN_LABEL} monthly, no interest`, "Cancel within 7 days, no questions"].map((line) => (
                     <li key={line} className="flex items-center gap-3 text-sm">
                       <span className="text-gold font-bold">✓</span>
                       <span className="text-white">{line}</span>

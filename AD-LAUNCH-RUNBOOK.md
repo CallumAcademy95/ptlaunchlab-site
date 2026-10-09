@@ -1,5 +1,7 @@
 # PT Launch Lab — June 2026 Meta Ads Launch Runbook
 
+> **Price change-over (October 2026).** The course is £999.99 in full, or 10 monthly payments of £99.99 (no interest, first payment at checkout, £999.90 in total). No promo codes, discounts, struck-through prices, countdowns or intakes: enrolment is rolling. Gym partner fee: £250 inc. VAT per learner, paid 30 days after a pay-in-full enrolment or when the learner's 5th monthly payment clears. Older figures below (£1,599, £1,399, £599 deposit, 5 × £200, £200 off, £500 per learner) are historical.
+
 **Status:** Ready for ad manager to build in Meta Ads Manager.
 **v1 launch format: STATIC IMAGE ads only** (no videos in week 1 — video assets queued for Phase 2 once first-week data is in).
 **Total daily budget:** £20/day (£16 cold + £4 retargeting) = £600/month.
@@ -518,7 +520,7 @@ The only exception: CTR under 1% after 72 hours = the creative is broken, kill a
 - ✅ Quiz with `?avatar=` pre-tagging
 - ✅ Meta Pixel (afterInteractive strategy, SPA PageView fires on route change)
 - ✅ Meta CAPI for Lead, Schedule, Purchase, InitiateCheckout — all paired with browser fbq via event_id dedup
-- ✅ 48h Priority Intake Incentive promo cookie (£200 off, fires on quiz/prospectus/hero-form submit)
+- ~~48h Priority Intake Incentive promo cookie (£200 off)~~ retired October 2026: no discounts
 - ✅ MailerLite 4-email quiz + prospectus nurture sequences
 - ✅ WhatsApp warm-up sequence (auto-triggered)
 - ✅ GA4 funnel reports + server-side Purchase via Stripe webhook

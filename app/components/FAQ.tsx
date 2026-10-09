@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 
 const faqs = [
   {
@@ -24,7 +25,7 @@ const faqs = [
   },
   {
     q: "Why should I choose PT Launch Lab over a cheaper course?",
-    a: "If price is the only factor, cheaper courses exist. What £1,599 buys here is the NCFE Level 3 qualification, a personal tutor assigned to you within 24 hours, and the £500 business mentorship. Everything is in the one fee and nothing is sold as a paid upgrade afterwards. Whether that is worth more than a cheaper course depends on how much support you want once the content is done.",
+    a: `If price is the only factor, cheaper courses exist. What ${COURSE_PRICE_LABEL} buys here is the NCFE Level 3 qualification, a personal tutor assigned to you within 24 hours, and the £500 business mentorship. Everything is in the one fee and nothing is sold as a paid upgrade afterwards. Whether that is worth more than a cheaper course depends on how much support you want once the content is done.`,
   },
   {
     q: "What does the business mentorship actually do for me?",

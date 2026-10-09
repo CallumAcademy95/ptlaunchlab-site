@@ -12,34 +12,32 @@ You do not have to run all twelve. Four run properly will beat twelve run badly.
 
 ## The year
 
-| Month | Campaign | What it puts in front of members | Price |
-|---|---|---|---|
-| **January** | New year, new career | Someone like them has done this | **£1,099** |
-| February | You're already here | 8 to 16 weeks, online, around their shifts | — |
-| March | Meet your future trainer | Your own coaches, and how they got there | — |
-| **April** | Six months from now | Where they could be by the summer | **£1,099** |
-| May | Coach spotting | A personal tutor from day one | — |
-| June | Ask us anything | Ofqual regulated, CIMSPA recognised | — |
-| July | Discovery evening | What a week of study actually looks like | — |
-| August | Train together | The £500 mentorship community, included | — |
-| **September** | Autumn intake | The intake before the new year rush | **£1,099** |
-| October | Two qualifications, one course | Level 2 and Level 3, one price | — |
-| **November** | Black Friday | The lowest price of the year | **£999** |
-| December | Decide before January | A January place held on a deposit | — |
+| Month | Campaign | What it puts in front of members |
+|---|---|---|
+| **January** | New year, new career | Someone like them has done this |
+| February | You're already here | 8 to 16 weeks, online, around their shifts |
+| March | Meet your future trainer | Your own coaches, and how they got there |
+| **April** | Six months from now | Where they could be by the summer |
+| May | Coach spotting | A personal tutor from day one |
+| June | Ask us anything | Ofqual regulated, CIMSPA recognised |
+| July | Discovery evening | What a week of study actually looks like |
+| August | Train together | The £500 mentorship community, included |
+| **September** | Start this autumn | Qualified before the new year rush |
+| October | Two qualifications, one course | Level 2 and Level 3, one price |
+| November | Pay monthly | 10 monthly payments, no interest |
+| December | Decide before January | Start any day, no need to wait for the new year |
 
-Normal price at {{gymName}} is £1,399.
+The price at {{gymName}} is £999.99 in full, or 10 monthly payments of £99.99 with no interest. It is the same every month.
 
-## Why eight months carry no discount
+## Why no month carries a discount
 
-A year that asks every single month stops being believed, and members learn to wait for the next sale instead of enrolling.
+There are no discounts, codes or sale weeks, in any month. A year that keeps moving the price stops being believed, and members learn to wait for the next sale instead of enrolling.
 
-So four months move on price and eight tell members something the course already includes. The eight cost you nothing and they are the ones that fill January, because someone who learns in October that it is two qualifications is the person who enrols in January when the price moves.
-
-June deliberately carries no offer at all.
+So every month tells members something the course already includes. Enrolment is rolling, so there are no intakes or closing dates either. Someone who learns in October that it is two qualifications can start the same day.
 
 ## What you have now
 
-October and November are in your drive already. Each one has two graphics on your branding, a caption, a member email, a story poll, a WhatsApp line and a script for when someone replies.
+October is in your drive already, with graphics on your branding, a caption, a member email, a story poll, a WhatsApp line and a script for when someone replies.
 
 The rest arrive before the month they belong to. You will not have to ask.
 
@@ -51,9 +49,9 @@ The poll is what makes it work. Anyone who taps either answer has told you they 
 
 ## What to judge it on
 
-Conversations, not enrolments, in every month that carries no price.
+Conversations first, every month.
 
-A reveal month that produces thirty conversations and no enrolments has done its job. Those thirty people are who January sells to.
+A month that produces thirty conversations and no enrolments has done its job. Those thirty people are who the next few months sell to.
 
 ## March needs a word from you
 

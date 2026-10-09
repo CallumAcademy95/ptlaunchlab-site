@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import LegalPage from "../components/LegalPage";
 import { CONTACT_EMAIL, PHONE_NATIONAL } from "@/app/lib/contactDetails";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, formatPence } from "@/app/lib/pricing";
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://ptlaunchlab.co.uk/terms" },
@@ -25,7 +26,7 @@ export default function TermsPage() {
     <LegalPage
       label="Legal"
       title="Terms & Conditions"
-      lastUpdated="March 2026"
+      lastUpdated="October 2026"
       intro="Please read these terms carefully before enrolling. By completing your enrolment and making payment, you agree to be bound by these terms."
       sections={[
         {
@@ -58,14 +59,14 @@ export default function TermsPage() {
           title: "Pricing & Payment",
           content: (
             <>
-              {p("The standard payment options are:")}
+              {p("There are two ways to pay:")}
               {ul([
-                "Full Payment: £1,599 — single payment, immediate access",
-                "Deposit Plan: £599 deposit followed by 5 monthly payments of £200 (total £1,599)",
+                `Pay in full: ${COURSE_PRICE_LABEL}, a single payment, immediate access`,
+                `Monthly: ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} (${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total), taken by card. The first payment is taken at checkout and gives immediate access. No interest is charged.`,
               ])}
-              {p("We also run promotional and partner-referral prices from time to time, including reduced pay-in-full prices and payment plans with a lower starting payment. These are offered for a limited period or through a specific partner gym. Where one applies to you, the price and the payment schedule are shown in full before you pay, and the amount shown at checkout is the amount you will be charged.")}
+              {p("These are the only prices. We do not offer discounts, promotional prices or discount codes, and the price is the same whether you enrol directly or through a partner gym. The amount shown at checkout is the amount you will be charged.")}
               {p("All prices are inclusive of VAT where applicable. Payments are processed securely via Stripe. PT Launch Lab does not store your card details.")}
-              {p("If you choose a payment plan, the monthly payments are due on the same date each month following your initial payment. Failure to maintain payments may result in suspension of course access until payments are brought up to date.")}
+              {p("If you choose to pay monthly, the remaining payments are taken from your card on the same date each month following your first payment. Failure to maintain payments may result in suspension of course access until payments are brought up to date.")}
             </>
           ),
         },
@@ -76,7 +77,7 @@ export default function TermsPage() {
               {p("Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, you have the right to cancel your enrolment within 14 calendar days of your payment without giving a reason (the \"cooling off period\").")}
               {p("To exercise your right to cancel, contact us at info@ptlaunchlab.co.uk within 14 days of payment. We will acknowledge your cancellation and process a full refund within 14 days of receiving your cancellation request.")}
               {p("After the 14-day cooling off period has expired, cancellations are not eligible for a refund except in exceptional circumstances at our discretion. Your statutory rights under UK consumer law are not affected.")}
-              {p("If you choose a payment plan and cancel after 14 days, the payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged. Where the course fee has not been paid in full, your certificate will not be claimed from NCFE.")}
+              {p("If you pay monthly and cancel after 14 days, the payments already made are non-refundable. You will not be liable for any remaining monthly payments that have not yet been charged. Where the course fee has not been paid in full, your certificate will not be claimed from NCFE.")}
             </>
           ),
         },
@@ -119,7 +120,7 @@ export default function TermsPage() {
               {p("PT Launch Lab is the business mentorship and education provider for this programme. The NCFE-accredited delivery centre is Ultimate Shred Academy (NCFE Centre Number: 9002788). Ultimate Shred Academy and PT Launch Lab share the same directors and operate under the same organisation. Learner registrations with NCFE are processed through Ultimate Shred Academy as the approved centre.")}
               {p("Qualification registration is subject to the learner providing a valid National Insurance number and meeting the entry requirements.")}
               {p("Certificates are issued by NCFE upon successful completion of all required assessments and coursework. PT Launch Lab does not guarantee the outcome of any assessment.")}
-              {p("If you are paying by instalments, your certificate will be claimed from NCFE once the course fee has been paid in full. You may work through the course at whatever pace suits you, and finishing your assessments early does not bring the remaining payments forward — but certification is claimed after the final payment has cleared, not before.")}
+              {p("If you are paying monthly, your certificate will be claimed from NCFE once the course fee has been paid in full. You may work through the course at whatever pace suits you, and finishing your assessments early does not bring the remaining payments forward — but certification is claimed after the final payment has cleared, not before.")}
             </>
           ),
         },

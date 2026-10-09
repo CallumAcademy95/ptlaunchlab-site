@@ -4,18 +4,24 @@ import Footer from "@/app/components/Footer";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
 import CalendlyCallLink from "./CalendlyCallLink";
+import { PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "@/app/lib/pricing";
+
+// £250, inclusive of VAT. Released 30 days after a pay-in-full enrolment, or
+// when the learner's 5th monthly payment clears. Never clawed back once paid.
+const PARTNER_FEE_LABEL = formatPence(PARTNER_FEE_PENCE);
+const RELEASE_ORDINAL = `${PARTNER_FEE_RELEASE_PAYMENT}th`;
 
 export const metadata: Metadata = {
-  title: "Gym Partnership Programme | PT Launch Lab — A New Annual Revenue Stream",
+  title: "Gym Partnership Programme | PT Launch Lab — A New Revenue Stream at Zero Cost",
   description:
-    "Turn your gym into its own white-label PT academy. £500 per learner upfront plus annual PT rental and membership income — a recurring revenue stream that compounds year-on-year, with zero admin.",
+    `A new revenue stream for your gym at zero cost, and a home-grown pipeline of trainers. Run your own white-label PT academy and earn ${PARTNER_FEE_LABEL} (inc. VAT) per learner. We do the teaching and admin.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/gym-partnership",
   },
   openGraph: {
     title: "Gym Partnership Programme | PT Launch Lab",
     description:
-      "Add a new annual revenue stream to your gym. £500 per learner upfront plus PT rental and retention income. We handle education, compliance & mentorship — you keep the revenue.",
+      `A new revenue stream for your gym at zero cost. ${PARTNER_FEE_LABEL} (inc. VAT) per learner who enrols through your academy, and trainers grown from your own members. We handle education, compliance & mentorship.`,
     url: "https://ptlaunchlab.co.uk/gym-partnership",
   },
 };
@@ -25,7 +31,7 @@ const partnershipSchema = {
   "@type": "Service",
   name: "PT Launch Lab Gym Partnership Programme",
   description:
-    "A white-label personal trainer academy programme for commercial gyms. Partner gyms earn £500 per learner, receive a branded PT academy, and build a consistent pipeline of qualified personal trainers.",
+    `A white-label personal trainer academy programme for commercial gyms. Partner gyms earn ${PARTNER_FEE_LABEL} (inc. VAT) per learner, receive a branded PT academy, and grow their own pipeline of trainers.`,
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -37,7 +43,7 @@ const partnershipSchema = {
   },
   offers: {
     "@type": "Offer",
-    description: "£500 referral fee per learner enrolled through your gym",
+    description: `${PARTNER_FEE_LABEL} (inc. VAT) partner fee per learner enrolled through your gym`,
     price: "0",
     priceCurrency: "GBP",
     eligibleCustomerType: "https://schema.org/Business",
@@ -48,7 +54,7 @@ const STEPS = [
   { n: "01", title: "Join the Partnership", body: "Apply below — we review your gym and confirm your area." },
   { n: "02", title: "We Build Your Academy", body: "Your white-label PT academy is set up with your branding, logo and link." },
   { n: "03", title: "Promote It In Your Gym", body: "Display your QR code and link on-site and across your socials." },
-  { n: "04", title: "Earn Front & Back End", body: "£500 per enrolment upfront. PT rent and membership long-term." },
+  { n: "04", title: "Earn Per Learner", body: `${PARTNER_FEE_LABEL} (inc. VAT) per learner. Paid 30 days after a pay-in-full enrolment, or when their ${RELEASE_ORDINAL} monthly payment clears.` },
 ];
 
 function CheckIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -120,14 +126,14 @@ export default function GymPartnershipPage() {
               </div>
 
               <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl text-white leading-none tracking-tight mb-6">
-                Add a New Annual<br />
+                Add a New<br />
                 <span className="text-gold">Revenue Stream</span><br />
                 <span className="text-white">to Your Gym.</span>
               </h1>
 
               <p className="text-xl text-soft/70 leading-relaxed mb-10 max-w-xl">
                 We build, run, and manage a fully white-label PT academy inside your gym.
-                <strong className="text-white"> £500 per learner upfront</strong>, plus PT rental and membership income that builds year on year.
+                <strong className="text-white"> {PARTNER_FEE_LABEL} per learner (inc. VAT)</strong>, and a home-grown pipeline of trainers who already know your gym.
                 Zero teaching. Zero admin. Zero cost to you.
               </p>
 
@@ -154,7 +160,7 @@ export default function GymPartnershipPage() {
           <div className="relative z-10 bg-deep/80 backdrop-blur-sm border-t border-white/[0.06]">
             <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
-                { value: "£500", label: "Per learner" },
+                { value: PARTNER_FEE_LABEL, label: "Per learner, inc. VAT" },
                 { value: "0", label: "Admin for you" },
                 { value: "1", label: "Partner per area" },
                 { value: "100%", label: "White-label branded" },
@@ -205,8 +211,9 @@ export default function GymPartnershipPage() {
                   {[
                     "Your own white-label branded academy",
                     "We handle all education, compliance & mentorship",
-                    "Qualified PTs ready to work in your gym",
-                    "£500 per learner paid to your gym",
+                    "A home-grown pipeline of trainers",
+                    `${PARTNER_FEE_LABEL} per learner (inc. VAT) paid to your gym`,
+                    "Monthly marketing kit and a ready-to-run Meta ad pack",
                     "Zero teaching, zero admin, zero cost",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm">
@@ -225,16 +232,16 @@ export default function GymPartnershipPage() {
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14">
               <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">Revenue</p>
-              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight">Two ways you earn</h2>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight">What your gym gets</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-card rounded-2xl p-10 border-2 border-gold/40 shadow-xl shadow-gold/5">
                 <p className="text-gold text-xs font-bold tracking-widest uppercase mb-4">Front End</p>
-                <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">£500</p>
-                <p className="text-white font-semibold text-lg mb-6">per learner who enrols through your gym</p>
+                <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">{PARTNER_FEE_LABEL}</p>
+                <p className="text-white font-semibold text-lg mb-6">per learner who enrols through your gym, inc. VAT</p>
                 <ul className="space-y-2 text-sm">
-                  {["Paid directly to your gym", "No teaching required", "No extra work required"].map((i) => (
+                  {["Paid 30 days after a pay-in-full enrolment", `Or when the learner's ${RELEASE_ORDINAL} monthly payment clears`, "Nothing clawed back once paid", "No teaching or extra work required"].map((i) => (
                     <li key={i} className="flex items-center gap-2 text-soft/60">
                       <CheckIcon />{i}
                     </li>
@@ -243,11 +250,11 @@ export default function GymPartnershipPage() {
               </div>
 
               <div className="bg-card rounded-2xl p-10 border-2 border-blue/30 shadow-xl shadow-blue/5">
-                <p className="text-blue text-xs font-bold tracking-widest uppercase mb-4">Back End</p>
-                <p className="font-display font-extrabold text-white text-3xl leading-snug mb-2">They qualify.<br />They stay.</p>
-                <p className="text-soft/60 text-sm mb-6">Every learner becomes a qualified PT who already knows your gym — and needs somewhere to work.</p>
+                <p className="text-blue text-xs font-bold tracking-widest uppercase mb-4">The Pipeline</p>
+                <p className="font-display font-extrabold text-white text-3xl leading-snug mb-2">Grow your<br />own trainers.</p>
+                <p className="text-soft/60 text-sm mb-6">Learners who qualify through your academy already know your gym. You get the first introduction. If they then work from your floor, that could mean:</p>
                 <ul className="space-y-2 text-sm">
-                  {["PT floor rent", "PT membership fees", "Long-term trainer retention", "More coaching revenue in-club"].map((i) => (
+                  {["PT floor rent", "PT membership fees", "Trainers who already know your members", "More coaching revenue in-club"].map((i) => (
                     <li key={i} className="flex items-center gap-2 text-soft/60">
                       <svg viewBox="0 0 14 14" fill="none" className="w-3.5 h-3.5 text-blue shrink-0 mt-0.5">
                         <path d="M2 7l3.5 3.5L12 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -412,7 +419,7 @@ export default function GymPartnershipPage() {
               <br />
               They have a <span className="text-gold">pipeline problem.</span>
             </p>
-            <p className="text-soft/60 text-lg">Fix the pipeline once. Never recruit again.</p>
+            <p className="text-soft/60 text-lg">Grow your own trainers instead of waiting for the right one to apply.</p>
           </div>
         </section>
 
@@ -450,7 +457,7 @@ export default function GymPartnershipPage() {
                 Apply to Become a Partner Gym
               </h2>
               <p className="text-soft/60 text-sm">
-                Earn £500 per learner · Your own PT academy · Zero admin
+                Earn {PARTNER_FEE_LABEL} per learner · Your own PT academy · Zero admin
               </p>
             </div>
 

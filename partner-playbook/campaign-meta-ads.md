@@ -27,9 +27,7 @@ Some of the people on that floor are qualified to coach. Most of them started ex
 
 {{gymName}} now runs its own Personal Training academy — a nationally recognised Level 3 qualification, studied around your own training, in the gym you already know.
 
-No commute to a college. No stopping work. The next intake is open.{{#promoCode}}
-
-Use code {{promoCode}} when you enrol.{{/promoCode}}
+No commute to a college. No stopping work. Start any day, and pay monthly if that suits you.
 ```
 
 Headline:
@@ -63,9 +61,7 @@ You don't have to leave {{town}} to qualify as a Personal Trainer.
 
 You already know the gym. You already know the coaches. Study where you train.
 
-Places on the next intake are open now.{{#promoCode}}
-
-Use code {{promoCode}} when you enrol.{{/promoCode}}
+You can start any day, and pay monthly if that suits you.
 ```
 
 Headline:
