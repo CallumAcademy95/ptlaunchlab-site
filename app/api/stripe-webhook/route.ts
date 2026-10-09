@@ -472,7 +472,7 @@ async function sendPaidReconciliation(session: StripeSession) {
   // collection, and there is now no mechanism to collect the balance. Silence
   // here would mean discovering it a month later, or never.
   //
-  // `planType` decides this, so it must never be derived from the amount: a
+  // The plan kind decides this, so it must never be derived from the amount: a
   // £1,099 partner pay-in-full read as a deposit fires this alarm at a learner
   // who owes nothing, and a false alarm is how a real one gets ignored.
   //
