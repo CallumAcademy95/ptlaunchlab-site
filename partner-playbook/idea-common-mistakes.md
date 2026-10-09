@@ -12,7 +12,7 @@ They won't, because it hasn't occurred to them that it's for people like them. S
 **Talking about the qualification first.**
 Nobody wants a qualification. They want a different Monday morning. The qualification is how they get there, not the reason they'd go. Lead with the career, mention the course second.
 
-**Only mentioning it when an intake opens.**
+**Only mentioning it now and then.**
 The people who enrol in March first heard about it in November. Familiarity is what makes someone act, and you can't create it in the week you need it. Stay visible when you're not selling.
 
 **Overcomplicating it.**

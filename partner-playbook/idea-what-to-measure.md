@@ -28,4 +28,4 @@ Judging this on enrolments alone will make you stop too early. Enrolments are th
 
 The point is noticing which step leaked. Plenty of views and no conversations is a staff problem. Plenty of conversations and no enquiries is a message problem. Those need opposite fixes, and you can't tell them apart from the enrolment number alone.
 
-**A realistic shape:** one learner every couple of months is a good, steady partnership. That's £3,000 a year for conversations you were half having anyway, and life-changing for the handful of members it reaches.
+**A realistic shape:** one learner every couple of months is a good, steady partnership. That's £1,500 a year (inc. VAT) for conversations you were half having anyway, and life-changing for the handful of members it reaches.

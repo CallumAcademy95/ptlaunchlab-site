@@ -30,15 +30,15 @@ Hi [Name], no pressure at all, just checking whether you had any questions
 about the academy. Easier to ask than to keep wondering.
 ```
 
-**Intake closing**
+**Asked about the cost**
 ```
-Hi [Name], applications for this intake close [DATE]. Didn't want you to
-miss it if you were still thinking about it.
+Hi [Name], you asked about the cost. It's £999.99, or 10 monthly
+payments of £99.99 with no interest. You can start any day: [ACADEMY LINK]
 ```
 
 **To your own staff, WhatsApp group**
 ```
-Reminder team: £50 to whoever has the conversation that leads to an
+Reminder team: £25 to whoever has the conversation that leads to an
 enrolment. If someone in here would make a good PT, tell them. That's it.
 ```
 

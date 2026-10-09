@@ -14,7 +14,7 @@ Your job is to **create awareness, encourage conversations, and connect interest
 
 It isn't size, footfall or marketing budget. None of these gyms spend anything extra. They do five things:
 
-1. They mention the academy **consistently**, not only when an intake opens
+1. They mention the academy **consistently**, not only when a campaign is running
 2. Every member of staff knows how to spot potential
 3. They celebrate learners publicly
 4. It's easy to enquire: visible QR codes, someone who knows the answer

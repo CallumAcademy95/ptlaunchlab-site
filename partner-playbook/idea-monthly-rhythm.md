@@ -15,7 +15,7 @@ You don't need to market the academy every day. You need a few focused things, r
 | 1 | Awareness | One post, a couple of stories |
 | 2 | Conversations | Staff challenge: three each |
 | 3 | Proof | A member or coach story |
-| 4 | Ask | Intake reminder + email |
+| 4 | Ask | Direct invitation + email |
 
 Then start again. Simple beats clever here, because clever doesn't survive a busy month.
 
