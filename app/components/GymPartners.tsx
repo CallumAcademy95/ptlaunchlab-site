@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { PARTNER_FEE_PENCE, formatPence } from "@/app/lib/pricing";
 
 // `dark` is unused by the rendering below (kept for a future light/dark logo
 // swap that was never wired up) — do not rely on it to affect layout.
@@ -114,7 +115,7 @@ export default function GymPartners() {
         <div className="border-t border-white/[0.06] pt-12">
           <p className="text-white font-bold text-xl md:text-2xl mb-2">Own a gym?</p>
           <p className="text-soft/60 text-sm mb-6 max-w-md mx-auto">
-            Earn £500 per learner and build your own white-label PT academy — without doing any teaching, admin, or courses.
+            A new revenue stream at zero cost: run your own white-label PT academy and grow your own trainers. {formatPence(PARTNER_FEE_PENCE)} per learner (inc. VAT), with no teaching or admin.
           </p>
           <a
             href="/gym-partnership"
