@@ -99,7 +99,9 @@ test("ATP £1,599 in full, no code: £1,599, no discount", () => {
 test("ATPPT → coupon buPzSnaF, £1,399; ATP500 → coupon vgLNHktz, £1,099", () => {
   const a = params(resolveCheckout({ plan: "pif_1599", gymSlug: "atp-felixstowe", memberCode: "atppt" }, 0, {}));
   assert.deepEqual(a.discounts, [{ coupon: "buPzSnaF" }]);
-  assert.equal(a.allow_promotion_codes, false);
+  // Stripe rejects discounts + allow_promotion_codes together (found against
+  // the live API) — a discounted session must not carry the flag at all.
+  assert.equal("allow_promotion_codes" in a, false);
   assert.equal((a.metadata as Meta).rung, "pif_1399");
   assert.equal((a.metadata as Meta).promo_code, "ATPPT");
   assert.equal((a.metadata as Meta).contract_value_pence, "139900");
@@ -146,6 +148,7 @@ test("member saving: pay-in-full only, only with its coupon, stamped for commiss
   const r = ok(resolveCheckout({ plan: "pif", gymSlug: "ebor" }, 5_000, env));
   const p = buildSessionParams({ ...ebor, plan: "pif" }, r.config, { ...opts, rung: r.rung, discount: r.discount });
   assert.deepEqual(p.discounts, [{ coupon: "coupon_fifty" }]);
+  assert.equal("allow_promotion_codes" in p, false);
   assert.equal((p.metadata as Meta).member_saving_pence, "5000");
   assert.equal((p.metadata as Meta).contract_value_pence, "94999");
   assert.equal((p.metadata as Meta).rung, "pif");

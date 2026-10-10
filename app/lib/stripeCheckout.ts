@@ -568,8 +568,12 @@ export function buildSessionParams(
     // A discount decided server-side (ATP's member code, or a gym's member
     // saving) goes on as a coupon. There is never a Stripe code box — stated
     // explicitly rather than omitted so Stripe's default can never put one back.
-    ...(discount && { discounts: [{ coupon: discount.coupon }] }),
-    allow_promotion_codes: false,
+    // Stripe rejects a session carrying both `discounts` and
+    // `allow_promotion_codes` (even false), so a discounted session omits the
+    // flag; a session with `discounts` never shows a code box anyway.
+    ...(discount
+      ? { discounts: [{ coupon: discount.coupon }] }
+      : { allow_promotion_codes: false }),
     // Metadata is the durable, structured home for this — the base64
     // client_reference_id blob is capped at 200 chars and drops fields when
     // full. The webhook already prefers metadata over the blob.
