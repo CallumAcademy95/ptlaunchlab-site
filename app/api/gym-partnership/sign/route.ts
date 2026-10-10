@@ -4,6 +4,8 @@ import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { describeOutcome, switchSignedPartner, type SwitchOutcome } from "@/app/lib/partnerTermsSwitch";
 import {
   PARTNERSHIP_AGREEMENT_VERSION,
   PARTNERSHIP_AGREEMENT_SUMMARY,
@@ -48,6 +50,23 @@ export async function POST(req: NextRequest) {
     });
     const pdfBase64 = pdfBuffer.toString("base64");
     const pdfAttachment = [{ filename: pdfFilename, content: pdfBuffer }];
+
+    // ── Existing partner? Move its record onto the terms it just signed ─────
+    // Only when the signer ticked the key-terms acknowledgement. The outcome is
+    // reported in the admin email either way, so a human always sees it.
+    let termsSwitch: SwitchOutcome = { kind: "no-match" };
+    if (acknowledgedKeyTerms === true) {
+      try {
+        termsSwitch = await switchSignedPartner(getSupabaseAdmin() as never, String(repEmail), PARTNERSHIP_AGREEMENT_VERSION);
+      } catch (err) {
+        termsSwitch = { kind: "error", message: err instanceof Error ? err.message : String(err) };
+      }
+      console.log("[gym-partnership/sign] terms switch:", termsSwitch.kind);
+    }
+    const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const termsSwitchLine = acknowledgedKeyTerms === true
+      ? describeOutcome(termsSwitch, String(repEmail))
+      : "Key terms were not acknowledged, so the partner record was not changed.";
 
     const signedDate = new Date(signedAt).toLocaleDateString("en-GB", {
       day: "numeric", month: "long", year: "numeric",
@@ -97,6 +116,9 @@ export async function POST(req: NextRequest) {
         ${dataRow("Date Signed", signedDate)}
         ${dataRow("Agreement Version", `v${PARTNERSHIP_AGREEMENT_VERSION} — ${PARTNERSHIP_AGREEMENT_SUMMARY}`)}
         ${dataRow("Key Terms Acknowledged", acknowledgedKeyTerms === true ? "Yes — ticked before signing" : "NO — check how this was submitted")}
+
+        ${sectionHead("Partner Record")}
+        ${dataRow("Terms switch", esc(termsSwitchLine))}
       </table>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #1A3A5C;">
