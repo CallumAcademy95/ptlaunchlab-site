@@ -15,6 +15,7 @@
 // commissionReleasedByPayment), so nothing already owed moves.
 
 import { PARTNER_FEE_PENCE } from "./pricing.ts";
+import { PARTNERSHIP_AGREEMENT_VERSION } from "./partnershipAgreement.ts";
 
 /**
  * Gyms whose fee is held above the standard rate by a separate written deal.
@@ -22,11 +23,30 @@ import { PARTNER_FEE_PENCE } from "./pricing.ts";
  * hand once the deal is used up.
  *
  *   atp-felixstowe — £500 for its first five learners (agreed at onboarding,
- *                    7 Oct 2026). Two used by 10 Oct.
+ *                    7 Oct 2026). Two used by 10 Oct. From 10 Oct 2026 ATP's
+ *                    commission is set per rung of its own ladder
+ *                    (app/lib/partnerCommission.ts ATP_LADDER), not by this fee.
  */
 export const FEE_HELD_BY_DEAL: ReadonlySet<string> = new Set(["atp-felixstowe"]);
 
-export const SIGNED_TERMS = "payment_5";
+/**
+ * The commission terms a gym moves onto when it signs agreement `version`.
+ *
+ *   4.0        → 'payment_5' (£250, PIF 30 days, monthly at payment 5)
+ *   4.1 and up → 'ladder'    (same timing; amount by plan + quarterly volume)
+ *
+ * Follows the version actually signed, so a gym signing an older text is never
+ * moved onto terms it did not sign.
+ */
+export function signedTermsFor(version: string): string {
+  const [maj, min] = String(version).trim().split(".").map((n) => Number(n));
+  if (!Number.isFinite(maj)) return "payment_5";
+  if (maj > 4 || (maj === 4 && Number.isFinite(min) && min >= 1)) return "ladder";
+  return "payment_5";
+}
+
+/** The terms the CURRENT agreement switches a signer onto. */
+export const SIGNED_TERMS = signedTermsFor(PARTNERSHIP_AGREEMENT_VERSION);
 
 export interface PartnerForSwitch {
   id: string;
@@ -48,7 +68,7 @@ export function termsUpdateFor(partner: PartnerForSwitch, version: string, signe
   const update: TermsUpdate = {
     agreement_version: version,
     agreement_signed_at: signedAtIso,
-    commission_terms: SIGNED_TERMS,
+    commission_terms: signedTermsFor(version),
   };
   if (!FEE_HELD_BY_DEAL.has(partner.slug)) update.fee_per_learner_pence = PARTNER_FEE_PENCE;
   return update;
