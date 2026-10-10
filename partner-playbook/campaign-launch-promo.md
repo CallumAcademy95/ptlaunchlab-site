@@ -58,6 +58,6 @@ Your launch graphics are in your Resources. Put them:
 
 ## What good looks like
 
-One enrolment in the launch month is a good outcome: £250 to the gym and a member whose career changed. Two is a strong one.
+One enrolment in the launch month is a good outcome: £400 to the gym if they pay in full (£250 if monthly) and a member whose career changed. Two is a strong one.
 
 Judge it on **conversations and enquiries**, not just enrolments. Somebody who asks during the launch and enrols in March still came from this campaign.
