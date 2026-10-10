@@ -2,6 +2,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const hitioOrpingtonAcademy: GymConfig = {
   gymName: "HITIO Gym Orpington",
+  gymSlug: "hitio-orpington",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "https://www.hitiogym.com/wp-content/uploads/2019/01/hitio_gym_logo1.png",
   logoAlt: "HITIO Gym Orpington",
   // Both dimensions are REQUIRED. The wordmark is 168×46; with either missing,

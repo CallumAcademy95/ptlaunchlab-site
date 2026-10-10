@@ -35,7 +35,19 @@ import {
   MONTHLY_PLAN_TOTAL_PENCE,
   type CoursePlanChoice,
 } from "./pricing.ts";
-import { countPaidInvoices, MONTHLY_PLAN_META, type InvoiceListEntry } from "./paymentPlans.ts";
+import {
+  countPaidInvoices,
+  MONTHLY_PLAN_META,
+  LEGACY_PLAN_META,
+  type InvoiceListEntry,
+} from "./paymentPlans.ts";
+import {
+  ATP_LADDER,
+  isAtp,
+  resolveMemberCode,
+  resolveMemberSaving,
+  type Rung,
+} from "./partnerCommission.ts";
 
 // The public origin baked into success_url / cancel_url.
 //
@@ -75,6 +87,16 @@ export const INSTALMENT_PRICE_ID =
 export const OCTOBER_INSTALMENT_PRICE_ID =
   process.env.STRIPE_OCTOBER_INSTALMENT_PRICE_ID || "price_1UM3D899z9lThumnlgeLDjSS"; // £300/month GBP
 
+// ─── ATP Fitness Felixstowe's ladder (a 60-day test from 10 Oct 2026) ────────
+// Sold on ATP's own enrol page ONLY. Both are existing LIVE prices: the old £599
+// deposit (followed by 5 × £200 on INSTALMENT_PRICE_ID — the legacy
+// deposit_instalments plan shape the webhook already counts and stops) and the
+// old £1,599 pay-in-full, which ATP's member codes discount.
+export const DEPOSIT_599_PRICE_ID =
+  process.env.STRIPE_DEPOSIT_PRICE_ID || "price_1Rxmab99z9lThumnJ1f7EEXb"; // £599 one-off GBP
+export const PIF_1599_PRICE_ID =
+  process.env.STRIPE_PIF_PRICE_ID || "price_1SffDN99z9lThumnkdXLn1LW"; // £1,599 one-off GBP
+
 /** Recurring prices whose paid invoices are LEGACY instalments (deposit excluded). */
 export const LEGACY_INSTALMENT_PRICE_IDS: ReadonlySet<string> = new Set([
   INSTALMENT_PRICE_ID,
@@ -87,15 +109,24 @@ export const MONTHLY_PAYMENT_PRICE_IDS: ReadonlySet<string> = new Set([MONTHLY_9
 // {CHECKOUT_SESSION_ID} is substituted by Stripe.
 export const ENROL_SUCCESS_URL = `${SITE_URL}/enrol/success?session_id={CHECKOUT_SESSION_ID}`;
 
+/** Every plan /api/checkout can sell. The ATP-only two are refused for any other gym. */
+export type CheckoutPlan = CoursePlanChoice | "six_month" | "pif_1599";
+
 export interface PlanConfig {
-  choice: CoursePlanChoice;
+  choice: CheckoutPlan;
   price: string;
   /** Charged at checkout, in pence. Telemetry only — Stripe charges off the price id. */
   checkoutPence: number;
   /** What the learner owes in total, in pence. */
   contractPence: number;
   /** Session metadata.plan — what the webhook classifies on. Never an amount. */
-  metadataPlan: "PIF" | "monthly";
+  metadataPlan: "PIF" | "monthly" | "deposit";
+  /**
+   * Deposit plans only: the recurring price taken alongside the deposit, and
+   * how many of it. A deposit is NEVER sold without this mandate.
+   */
+  instalmentPrice?: string;
+  instalments?: number;
   label: string;
 }
 
@@ -120,9 +151,119 @@ export const COURSE_PLANS: Record<CoursePlanChoice, PlanConfig> = {
   },
 };
 
+/** ATP's ladder rungs that are not one of the two standard plans. */
+export const ATP_PLANS: Record<"six_month" | "pif_1599", PlanConfig> = {
+  six_month: {
+    choice: "six_month",
+    price: DEPOSIT_599_PRICE_ID,
+    checkoutPence: ATP_LADDER.sixMonth.depositPence,
+    contractPence: ATP_LADDER.sixMonth.contractPence,
+    metadataPlan: "deposit",
+    label: `${COURSE_NAME} — 6-month plan`,
+    instalmentPrice: INSTALMENT_PRICE_ID,
+    instalments: ATP_LADDER.sixMonth.instalments,
+  },
+  pif_1599: {
+    choice: "pif_1599",
+    price: PIF_1599_PRICE_ID,
+    checkoutPence: ATP_LADDER.pif1599Pence,
+    contractPence: ATP_LADDER.pif1599Pence,
+    metadataPlan: "PIF",
+    label: COURSE_NAME,
+  },
+};
+
 /** Narrow an untrusted request value to a plan, or null. */
 export function planFromChoice(value: unknown): CoursePlanChoice | null {
   return value === "pif" || value === "monthly" ? value : null;
+}
+
+/** A discount decided SERVER-SIDE. Never read from the request. */
+export interface SessionDiscount {
+  coupon: string;
+  /** What the coupon takes off, in pence (for the contract value stamped in metadata). */
+  offPence: number;
+  /** ATP member code, when that is what produced it. */
+  code?: string;
+  /** Nine-gym member saving, when that is what produced it. */
+  memberSavingPence?: number;
+}
+
+export type ResolvedCheckout =
+  | { ok: true; plan: CheckoutPlan; config: PlanConfig; rung: Rung; discount: SessionDiscount | null }
+  | { ok: false; reason: "unknown-plan" | "invalid-code" };
+
+/**
+ * Decide what one request buys: the plan, the rung, and any discount.
+ *
+ * Pure, so every money rule is unit-tested:
+ *   - pif / monthly — any page. Pay-in-full carries the gym's member saving
+ *     when it set one and its coupon exists (`gymMemberSavingPence` is looked
+ *     up by the caller from the gym config for THIS gymSlug). Monthly never does.
+ *   - six_month / pif_1599 — ATP's page only; refused for any other gym.
+ *   - a member code — ATP's £1,599 pay-in-full only. Ignored everywhere else;
+ *     on that rung an unrecognised code is refused so the buyer can fix it,
+ *     never silently sold at a price they were not shown.
+ */
+export function resolveCheckout(
+  req: { plan: unknown; gymSlug?: string | null; memberCode?: unknown },
+  gymMemberSavingPence: number,
+  env: Record<string, string | undefined>,
+): ResolvedCheckout {
+  const std = planFromChoice(req.plan);
+  if (std) {
+    const config = COURSE_PLANS[std];
+    if (std === "pif") {
+      const saving = resolveMemberSaving(gymMemberSavingPence, env);
+      if (saving.coupon && saving.savingPence > 0) {
+        return {
+          ok: true, plan: std, config, rung: "pif",
+          discount: { coupon: saving.coupon, offPence: saving.savingPence, memberSavingPence: saving.savingPence },
+        };
+      }
+    }
+    return { ok: true, plan: std, config, rung: std, discount: null };
+  }
+
+  if ((req.plan === "six_month" || req.plan === "pif_1599") && isAtp(req.gymSlug)) {
+    const config = ATP_PLANS[req.plan];
+    if (req.plan === "six_month") return { ok: true, plan: "six_month", config, rung: "six_month", discount: null };
+    const code = resolveMemberCode(req.gymSlug, req.memberCode);
+    if (code.kind === "invalid") return { ok: false, reason: "invalid-code" };
+    if (code.kind === "valid") {
+      return {
+        ok: true, plan: "pif_1599", config, rung: code.rung,
+        discount: { coupon: code.coupon, offPence: code.offPence, code: code.code },
+      };
+    }
+    return { ok: true, plan: "pif_1599", config, rung: "pif_1599", discount: null };
+  }
+
+  return { ok: false, reason: "unknown-plan" };
+}
+
+/**
+ * A deposit must never be taken without its monthly mandate.
+ *
+ * The £599 is a deposit on a £1,599 course: charged as a bare one-off, nothing
+ * would ever collect the £1,000 balance. That is what the webhook's
+ * missing-mandate alarm exists to catch. Checked on the params actually sent
+ * to Stripe, so no change upstream can slip one through.
+ */
+export function depositHasMandate(params: Record<string, unknown>): boolean {
+  const meta = (params.metadata ?? {}) as Record<string, unknown>;
+  if (meta.plan !== "deposit") return true; // not a deposit — nothing to guard
+  if (params.mode !== "subscription") return false;
+  const lines = (params.line_items ?? []) as { price?: string }[];
+  const sub = (params.subscription_data ?? {}) as { trial_period_days?: number; metadata?: Record<string, unknown> };
+  return (
+    lines.length === 2 &&
+    !!lines[1]?.price &&
+    LEGACY_INSTALMENT_PRICE_IDS.has(String(lines[1].price)) &&
+    Number(sub.trial_period_days) > 0 &&
+    sub.metadata?.ptll_plan === LEGACY_PLAN_META &&
+    Number(sub.metadata?.instalments_target) > 0
+  );
 }
 
 /** "999.99" — pence as a pounds string with exactly two decimals, for metadata. */
@@ -161,8 +302,8 @@ function encodeForm(obj: Record<string, FormValue>, prefix = ""): string[] {
 
 // ─── Session creation ────────────────────────────────────────────────────────
 export interface CheckoutSessionInput {
-  /** Which of the two ways to pay. Decides the price; nothing else can. */
-  plan: CoursePlanChoice;
+  /** Which way to pay. Decides the price; nothing else can. */
+  plan: CheckoutPlan;
   /** Base64url attribution blob; /api/stripe-webhook decodes it for GA4 + Meta CAPI. */
   clientReferenceId?: string;
   email?: string;
@@ -332,24 +473,64 @@ export async function countSettledMonthlyPayments(subscriptionId: string): Promi
  * The Checkout Session parameters, as a plain object.
  *
  * Extracted from createCheckoutSession so the money rules can be tested without
- * creating real sessions. There is no discount path at all: no `discounts`,
- * and `allow_promotion_codes` is always false, so Stripe shows no code box.
+ * creating real sessions. `allow_promotion_codes` is always false, so Stripe
+ * never shows a code box. The ONLY discount path is `opts.discount`, which
+ * resolveCheckout() decides server-side (ATP member code / a gym's member
+ * saving) — nothing in `input` can produce one — and it only ever applies to
+ * a pay-in-full.
  */
 export function buildSessionParams(
   input: CheckoutSessionInput,
   config: PlanConfig,
-  opts: { cancelPath: string },
+  opts: { cancelPath: string; rung?: Rung; discount?: SessionDiscount | null },
 ): Record<string, unknown> {
-  const monthly = config.choice === "monthly";
+  const deposit = config.metadataPlan === "deposit";
+  const monthly = config.metadataPlan === "monthly";
+  // Either plan that is a subscription. Named so the payment-mode-only fields
+  // below read the way Stripe's rules do.
+  const recurring = monthly || deposit;
+  const rung: Rung = opts.rung ?? (config.choice as Rung);
+  // A discount only ever reduces a pay-in-full. A deposit plan or the monthly
+  // plan is never discounted, whatever a caller passes.
+  const discount = config.metadataPlan === "PIF" && opts.discount?.coupon ? opts.discount : null;
+  const contractPence = Math.max(0, config.contractPence - (discount?.offPence ?? 0));
   // Flat `attr_*` keys, additive to every existing metadata key.
   const attr = attributionMetadata(input.attribution ?? {});
   const hasAttr = Object.keys(attr).length > 0;
 
   return {
-    mode: monthly ? "subscription" : "payment",
-    // One line either way. The monthly price is recurring with NO trial, so
-    // checkout takes the first £99.99 now and Stripe bills the rest monthly.
-    line_items: [{ price: config.price, quantity: 1 }],
+    mode: recurring ? "subscription" : "payment",
+    // Pay in full / monthly: one line. The monthly price is recurring with NO
+    // trial, so checkout takes the first £99.99 now and Stripe bills the rest.
+    // Deposit (ATP's 6-month plan): the £599 charged now, plus the £200
+    // recurring line in a 30-day trial, so the first £200 lands a month later.
+    line_items: deposit
+      ? [
+          { price: config.price, quantity: 1 },
+          { price: config.instalmentPrice, quantity: 1 },
+        ]
+      : [{ price: config.price, quantity: 1 }],
+    ...(deposit && {
+      subscription_data: {
+        trial_period_days: ATP_LADDER.sixMonth.trialDays,
+        // Exactly the legacy deposit_instalments shape the webhook already
+        // counts and stops (handleInstalmentPaid), unchanged since deposits
+        // first shipped.
+        metadata: {
+          ptll_plan: LEGACY_PLAN_META,
+          instalments_target: String(config.instalments ?? 5),
+          instalments_paid: "0",
+          entry_amount: String(config.checkoutPence / 100),
+          contract_value: String(config.contractPence / 100),
+          buyer_name: input.name?.trim().slice(0, 200),
+          buyer_email: input.email?.trim().toLowerCase(),
+          gym_referral: input.gymReferral,
+          gym_slug: input.gymSlug,
+          rung,
+          ...attr,
+        },
+      },
+    }),
     ...(monthly && {
       subscription_data: {
         // The webhook reads these off each invoice's subscription to know when
@@ -366,6 +547,7 @@ export function buildSessionParams(
           buyer_email: input.email?.trim().toLowerCase(),
           gym_referral: input.gymReferral,
           gym_slug: input.gymSlug,
+          rung,
           ...attr,
         },
       },
@@ -373,18 +555,20 @@ export function buildSessionParams(
     // One-off payments: put attribution on the PaymentIntent too so it survives
     // on the charge. Payment mode ONLY — Stripe rejects payment_intent_data on a
     // subscription-mode session.
-    ...(!monthly && hasAttr && { payment_intent_data: { metadata: attr } }),
+    ...(!recurring && hasAttr && { payment_intent_data: { metadata: attr } }),
     // A proper hosted invoice + PDF for pay-in-full buyers. Payment mode only:
     // subscriptions already invoice every payment, and Stripe rejects a
     // subscription session carrying invoice_creation.
-    ...(!monthly && { invoice_creation: { enabled: true } }),
+    ...(!recurring && { invoice_creation: { enabled: true } }),
     success_url: ENROL_SUCCESS_URL,
     cancel_url: `${SITE_URL}${opts.cancelPath}`,
     // Prefills the email on Stripe's page, same as the old ?prefilled_email=
     customer_email: input.email?.trim().toLowerCase(),
     client_reference_id: input.clientReferenceId,
-    // No codes, for anyone. Stated explicitly rather than omitted so Stripe's
-    // default can never put a code box back on the page.
+    // A discount decided server-side (ATP's member code, or a gym's member
+    // saving) goes on as a coupon. There is never a Stripe code box — stated
+    // explicitly rather than omitted so Stripe's default can never put one back.
+    ...(discount && { discounts: [{ coupon: discount.coupon }] }),
     allow_promotion_codes: false,
     // Metadata is the durable, structured home for this — the base64
     // client_reference_id blob is capped at 200 chars and drops fields when
@@ -392,10 +576,16 @@ export function buildSessionParams(
     metadata: {
       // Classified by what the sale IS, never by what it costs.
       plan: config.metadataPlan,
+      // What was sold, for partner commission (app/lib/partnerCommission.ts).
+      rung,
       // The contract, so the webhook never infers it from an amount. Pounds
       // (two decimals) for the existing readers, and pence as the exact value.
-      contract_value: poundsString(config.contractPence),
-      contract_value_pence: String(config.contractPence),
+      // Net of any discount: it is what the learner owes.
+      contract_value: poundsString(contractPence),
+      contract_value_pence: String(contractPence),
+      // The ATP member code, or the gym's member saving, when one applied.
+      promo_code: discount?.code,
+      member_saving_pence: discount?.memberSavingPence ? String(discount.memberSavingPence) : undefined,
       buyer_name: input.name?.trim().slice(0, 200),
       gym_referral: input.gymReferral,
       // The partner platform joins on this, NOT on gym_referral.
@@ -405,6 +595,7 @@ export function buildSessionParams(
       source: "api-checkout-session",
       ptll_product: "course",
       payments: monthly ? String(MONTHLY_PAYMENTS) : undefined,
+      instalments: deposit ? String(config.instalments ?? 5) : undefined,
       ...attr,
     },
   };
@@ -417,6 +608,7 @@ export function buildSessionParams(
  */
 export async function createCheckoutSession(
   input: CheckoutSessionInput,
+  resolved?: { config: PlanConfig; rung: Rung; discount: SessionDiscount | null },
 ): Promise<CheckoutSessionResult | null> {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
@@ -424,7 +616,7 @@ export async function createCheckoutSession(
     return null;
   }
 
-  const config = COURSE_PLANS[input.plan];
+  const config = resolved?.config ?? (COURSE_PLANS as Record<string, PlanConfig>)[input.plan];
   if (!config) {
     console.error(`[stripeCheckout] unknown plan ${String(input.plan)}`);
     return null;
@@ -436,9 +628,19 @@ export async function createCheckoutSession(
   // it without importing encodeForm's internal FormValue type. The object it
   // builds IS a FormValue.
   try {
-    const body = encodeForm(
-      buildSessionParams(input, config, { cancelPath }) as Record<string, FormValue>,
-    ).join("&");
+    const params = buildSessionParams(input, config, {
+      cancelPath,
+      rung: resolved?.rung,
+      discount: resolved?.discount ?? null,
+    });
+    // Never send a deposit without its mandate. A deposit has no Payment Link
+    // to fall back to, so refusing here shows the buyer an error and a way to
+    // contact us — never a £599 one-off with nothing to collect the £1,000.
+    if (!depositHasMandate(params)) {
+      console.error(`[stripeCheckout] REFUSED: ${config.choice} deposit without its instalment mandate`);
+      return null;
+    }
+    const body = encodeForm(params as Record<string, FormValue>).join("&");
 
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
