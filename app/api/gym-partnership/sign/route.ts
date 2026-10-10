@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { formatPence, PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT } from "@/app/lib/pricing";
+import { formatPence, PARTNER_FEE_RELEASE_PAYMENT } from "@/app/lib/pricing";
+import { LADDER_MONTHLY_COMMISSION_PENCE, LADDER_PIF_COMMISSION_PENCE, VOLUME_BONUS_MONTHLY_PENCE, VOLUME_BONUS_PIF_PENCE, VOLUME_THRESHOLD } from "@/app/lib/partnerCommission";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
@@ -14,7 +15,10 @@ import {
 
 // v4.0 commercial terms (October 2026) for the confirmation email only. The
 // contract itself (app/lib/partnershipAgreement.ts) is maintained separately.
-const PARTNER_FEE_LABEL = formatPence(PARTNER_FEE_PENCE); // "£250"
+const PIF_FEE = formatPence(LADDER_PIF_COMMISSION_PENCE);         // £400
+const MONTHLY_FEE = formatPence(LADDER_MONTHLY_COMMISSION_PENCE); // £250
+const PIF_FEE_VOLUME = formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE);             // £500
+const MONTHLY_FEE_VOLUME = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE); // £300
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -168,7 +172,8 @@ export async function POST(req: NextRequest) {
       <div style="background:#061F36;border:1px solid #F5C518;border-radius:10px;padding:20px;margin-bottom:20px;">
         <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Commercial Terms</div>
         <ul style="color:#8CA3BF;font-size:14px;line-height:1.8;padding-left:20px;margin:0;">
-          <li><strong style="color:#ffffff;">${PARTNER_FEE_LABEL} for every learner who enrols through your gym</strong> — inclusive of VAT, nothing added on top</li>
+          <li><strong style="color:#ffffff;">${PIF_FEE} for every learner who pays in full, ${MONTHLY_FEE} on the monthly plan</strong> — inclusive of VAT, nothing added on top</li>
+          <li>In any quarter in which ${VOLUME_THRESHOLD} or more learners enrol through your gym, every learner that quarter earns ${PIF_FEE_VOLUME} (pay in full) or ${MONTHLY_FEE_VOLUME} (monthly)</li>
           <li>Paid 30 days after enrolment if the learner pays in full. If they pay monthly, it is paid once their ${PARTNER_FEE_RELEASE_PAYMENT}th monthly payment clears (their first payment counts as 1)</li>
           <li>Once a commission has been paid it is yours — there is no clawback</li>
           <li>You can see accrued, released and paid commission any time in your partner portal</li>
@@ -181,7 +186,7 @@ export async function POST(req: NextRequest) {
           <li>Send us your logo and brand assets — we build your white-label academy page, tracking link and QR code within 14 days (Clause 3.2)</li>
           <li>You will receive partner portal login details to track referrals, enrolments and commission</li>
           <li>Send us your bank details so commission can be paid when it is released</li>
-          <li>Promote your academy link and QR code in your gym and across your socials — every enrolment through it earns you ${PARTNER_FEE_LABEL}</li>
+          <li>Promote your academy link and QR code in your gym and across your socials — every enrolment through it earns you up to ${PIF_FEE_VOLUME}</li>
         </ul>
       </div>
 

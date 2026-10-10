@@ -4,11 +4,24 @@ import Footer from "@/app/components/Footer";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
 import CalendlyCallLink from "./CalendlyCallLink";
-import { PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "@/app/lib/pricing";
+import { PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "@/app/lib/pricing";
+import {
+  LADDER_MONTHLY_COMMISSION_PENCE,
+  LADDER_PIF_COMMISSION_PENCE,
+  VOLUME_BONUS_MONTHLY_PENCE,
+  VOLUME_BONUS_PIF_PENCE,
+  VOLUME_THRESHOLD,
+} from "@/app/lib/partnerCommission";
 
-// £250, inclusive of VAT. Released 30 days after a pay-in-full enrolment, or
-// when the learner's 5th monthly payment clears. Never clawed back once paid.
-const PARTNER_FEE_LABEL = formatPence(PARTNER_FEE_PENCE);
+// v4.1 commission schedule (app/lib/partnerCommission.ts), inclusive of VAT:
+// pay in full / monthly, rising at the quarterly volume threshold. Released 30
+// days after a pay-in-full enrolment, or when the learner's 5th monthly payment
+// clears. Never clawed back once paid.
+const PIF_FEE = formatPence(LADDER_PIF_COMMISSION_PENCE);
+const MONTHLY_FEE = formatPence(LADDER_MONTHLY_COMMISSION_PENCE);
+const PIF_FEE_VOLUME = formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE);
+const MONTHLY_FEE_VOLUME = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE);
+const PARTNER_FEE_LABEL = `up to ${PIF_FEE_VOLUME}`;
 const RELEASE_ORDINAL = `${PARTNER_FEE_RELEASE_PAYMENT}th`;
 
 export const metadata: Metadata = {
@@ -21,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Gym Partnership Programme | PT Launch Lab",
     description:
-      `A new revenue stream for your gym at zero cost. ${PARTNER_FEE_LABEL} (inc. VAT) per learner who enrols through your academy, and trainers grown from your own members. We handle education, compliance & mentorship.`,
+      `A new revenue stream for your gym at zero cost. Up to ${PIF_FEE_VOLUME} (inc. VAT) per learner who enrols through your academy, and trainers grown from your own members. We handle education, compliance & mentorship.`,
     url: "https://ptlaunchlab.co.uk/gym-partnership",
   },
 };
@@ -43,7 +56,7 @@ const partnershipSchema = {
   },
   offers: {
     "@type": "Offer",
-    description: `${PARTNER_FEE_LABEL} (inc. VAT) partner fee per learner enrolled through your gym`,
+    description: `Up to ${PIF_FEE_VOLUME} (inc. VAT) partner fee per learner enrolled through your gym`,
     price: "0",
     priceCurrency: "GBP",
     eligibleCustomerType: "https://schema.org/Business",
@@ -54,7 +67,7 @@ const STEPS = [
   { n: "01", title: "Join the Partnership", body: "Apply below — we review your gym and confirm your area." },
   { n: "02", title: "We Build Your Academy", body: "Your white-label PT academy is set up with your branding, logo and link." },
   { n: "03", title: "Promote It In Your Gym", body: "Display your QR code and link on-site and across your socials." },
-  { n: "04", title: "Earn Per Learner", body: `${PARTNER_FEE_LABEL} (inc. VAT) per learner. Paid 30 days after a pay-in-full enrolment, or when their ${RELEASE_ORDINAL} monthly payment clears.` },
+  { n: "04", title: "Earn Per Learner", body: `${PIF_FEE} per pay-in-full learner, ${MONTHLY_FEE} monthly, rising to ${PIF_FEE_VOLUME} and ${MONTHLY_FEE_VOLUME} in any quarter you send us ${VOLUME_THRESHOLD} or more (all inc. VAT). Paid 30 days after a pay-in-full enrolment, or when their ${RELEASE_ORDINAL} monthly payment clears.` },
 ];
 
 function CheckIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -160,7 +173,7 @@ export default function GymPartnershipPage() {
           <div className="relative z-10 bg-deep/80 backdrop-blur-sm border-t border-white/[0.06]">
             <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               {[
-                { value: PARTNER_FEE_LABEL, label: "Per learner, inc. VAT" },
+                { value: `Up to ${PIF_FEE_VOLUME}`, label: "Per learner, inc. VAT" },
                 { value: "0", label: "Admin for you" },
                 { value: "1", label: "Partner per area" },
                 { value: "100%", label: "White-label branded" },
@@ -212,7 +225,7 @@ export default function GymPartnershipPage() {
                     "Your own white-label branded academy",
                     "We handle all education, compliance & mentorship",
                     "A home-grown pipeline of trainers",
-                    `${PARTNER_FEE_LABEL} per learner (inc. VAT) paid to your gym`,
+                    `Up to ${PIF_FEE_VOLUME} per learner (inc. VAT) paid to your gym`,
                     "Monthly marketing kit and a ready-to-run Meta ad pack",
                     "Zero teaching, zero admin, zero cost",
                   ].map((item) => (
@@ -238,10 +251,10 @@ export default function GymPartnershipPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-card rounded-2xl p-10 border-2 border-gold/40 shadow-xl shadow-gold/5">
                 <p className="text-gold text-xs font-bold tracking-widest uppercase mb-4">Front End</p>
-                <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">{PARTNER_FEE_LABEL}</p>
-                <p className="text-white font-semibold text-lg mb-6">per learner who enrols through your gym, inc. VAT</p>
+                <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">{PIF_FEE}</p>
+                <p className="text-white font-semibold text-lg mb-6">per learner who pays in full, inc. VAT</p>
                 <ul className="space-y-2 text-sm">
-                  {["Paid 30 days after a pay-in-full enrolment", `Or when the learner's ${RELEASE_ORDINAL} monthly payment clears`, "Nothing clawed back once paid", "No teaching or extra work required"].map((i) => (
+                  {[`${MONTHLY_FEE} per learner on the monthly plan`, `${PIF_FEE_VOLUME} / ${MONTHLY_FEE_VOLUME} for every learner in a quarter with ${VOLUME_THRESHOLD}+ enrolments`, "Paid 30 days after a pay-in-full enrolment, or at the learner's " + RELEASE_ORDINAL + " monthly payment", "Nothing clawed back once paid"].map((i) => (
                     <li key={i} className="flex items-center gap-2 text-soft/60">
                       <CheckIcon />{i}
                     </li>
