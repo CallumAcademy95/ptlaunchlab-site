@@ -24,8 +24,7 @@ export default function ConversionSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Monthly plan */}
-          <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col shadow-2xl shadow-black/30 relative border-2 border-gold/50">
-            <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-gold to-transparent" />
+          <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col border border-white/[0.08] shadow-2xl shadow-black/20 md:order-2">
             <div className="inline-block mb-5">
               <span className="bg-gold text-deep text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
                 Spread the Cost
@@ -56,7 +55,7 @@ export default function ConversionSection() {
             <a
               href="/enrol"
               onClick={() => trackEvent('enrol_click', { method: 'deposit' })}
-              className="block w-full text-center py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-xl shadow-gold/20 mb-3"
+              className="block w-full text-center py-4 rounded-full border-2 border-gold/50 text-gold font-bold text-base hover:bg-gold hover:text-deep transition-all mb-3"
             >
               Start Paying Monthly →
             </a>
@@ -64,7 +63,8 @@ export default function ConversionSection() {
           </div>
 
           {/* Pay in Full */}
-          <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col border border-white/[0.08] shadow-2xl shadow-black/20">
+          <div className="bg-card rounded-2xl p-6 md:p-8 text-left flex flex-col shadow-2xl shadow-black/30 relative border-2 border-gold/50 order-first md:order-1">
+            <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-gold to-transparent" />
             <div className="inline-block mb-5">
               <span className="bg-blue text-white text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest">
                 Pay Once
@@ -95,7 +95,7 @@ export default function ConversionSection() {
             <a
               href="/enrol"
               onClick={() => trackEvent('enrol_click', { method: 'full' })}
-              className="block w-full text-center py-4 rounded-full border-2 border-gold/50 text-gold font-bold text-base hover:bg-gold hover:text-deep transition-all mb-3"
+              className="block w-full text-center py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-xl shadow-gold/20 mb-3"
             >
               Enrol in Full Today →
             </a>

@@ -14,10 +14,10 @@ export default function WasPrice({ note = false, className = "" }: { note?: bool
   if (!on) return null;
   return (
     <span className={`inline-flex flex-col leading-tight ${className}`}>
-      <span className="line-through opacity-50 text-[0.6em] font-semibold" aria-label={`was ${WAS_PRICE_LABEL}`}>
+      <span className="line-through opacity-60 text-[0.85em] font-semibold" aria-label={`was ${WAS_PRICE_LABEL}`}>
         {WAS_PRICE_LABEL}
       </span>
-      {note && <span className="text-[11px] font-normal opacity-70 not-italic">{PRICE_DROP_NOTE}</span>}
+      {note && <span className="text-xs font-normal opacity-80 not-italic">{PRICE_DROP_NOTE}</span>}
     </span>
   );
 }
