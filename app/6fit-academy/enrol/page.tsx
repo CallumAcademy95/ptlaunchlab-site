@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
+import { memberSavingForGym } from "@/app/lib/gyms";
 
 export const metadata: Metadata = {
   title: "Enrol | 6fit PT Academy",
@@ -37,7 +38,11 @@ export default function SixFitEnrolPage() {
       </div>
 
       {/* Enrolment flow — referral pre-set */}
-      <EnrolmentFlow partner={SIXFIT_PARTNER} standalone />
+      <EnrolmentFlow
+        partner={SIXFIT_PARTNER}
+        standalone
+        memberSavingPence={memberSavingForGym(SIXFIT_PARTNER.gymSlug).savingPence}
+      />
 
       {/* Minimal footer */}
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">

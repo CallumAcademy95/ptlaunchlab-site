@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
+import { memberSavingForGym } from "@/app/lib/gyms";
 
 export const metadata: Metadata = {
   title: "Enrol | Muscle Bound PT Academy",
@@ -37,7 +38,11 @@ export default function MuscleBoundEnrolPage() {
       </div>
 
       {/* Enrolment flow — referral pre-set */}
-      <EnrolmentFlow partner={MUSCLE_BOUND_PARTNER} standalone />
+      <EnrolmentFlow
+        partner={MUSCLE_BOUND_PARTNER}
+        standalone
+        memberSavingPence={memberSavingForGym(MUSCLE_BOUND_PARTNER.gymSlug).savingPence}
+      />
 
       {/* Minimal footer */}
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">

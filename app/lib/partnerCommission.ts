@@ -26,6 +26,9 @@
 // Money is in PENCE throughout.
 
 import { COURSE_PRICE_PENCE } from "./pricing.ts";
+import { ATP_GYM_SLUG, ATP_PIF_FULL_PENCE, ATP_SIX_MONTH } from "./atpPrices.ts";
+
+export { ATP_GYM_SLUG };
 
 // ─── Rungs ──────────────────────────────────────────────────────────────────
 // What was sold, stamped on the Checkout Session (metadata.rung) and on the
@@ -224,7 +227,6 @@ export function volumeProgressMessage(learners: number): string {
 
 // ─── ATP Fitness Felixstowe ─────────────────────────────────────────────────
 
-export const ATP_GYM_SLUG = "atp-felixstowe";
 
 /**
  * ATP's own ladder. Prices are the LIVE Stripe prices (env-overridable for
@@ -235,14 +237,8 @@ export const ATP_LADDER = {
   slug: ATP_GYM_SLUG,
   /** When the test began — the ATP500 "next three" are counted from here. */
   startsAt: "2026-10-10T00:00:00.000Z",
-  sixMonth: {
-    depositPence: 59_900,
-    instalmentPence: 20_000,
-    instalments: 5,
-    contractPence: 159_900,
-    trialDays: 30,
-  },
-  pif1599Pence: 159_900,
+  sixMonth: ATP_SIX_MONTH,
+  pif1599Pence: ATP_PIF_FULL_PENCE,
   codes: {
     ATPPT: { coupon: "buPzSnaF", offPence: 20_000, rung: "pif_1399" as Rung },
     ATP500: { coupon: "vgLNHktz", offPence: 50_000, rung: "pif_1099" as Rung },

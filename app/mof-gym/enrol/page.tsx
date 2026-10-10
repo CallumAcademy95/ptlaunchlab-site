@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
+import { memberSavingForGym } from "@/app/lib/gyms";
 
 export const metadata: Metadata = {
   title: "Enrol | Ministry of Fitness PT Academy",
@@ -35,7 +36,11 @@ export default function MofGymEnrolPage() {
         </div>
       </div>
 
-      <EnrolmentFlow partner={MOF_PARTNER} standalone />
+      <EnrolmentFlow
+        partner={MOF_PARTNER}
+        standalone
+        memberSavingPence={memberSavingForGym(MOF_PARTNER.gymSlug).savingPence}
+      />
 
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">
         <p className="text-[#4A6280] text-xs">
