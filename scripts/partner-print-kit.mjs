@@ -38,6 +38,14 @@ import {
   formatPence,
 } from "../app/lib/pricing.ts";
 import { accentFor, contrastRatio, logoTreatmentFor } from "./lib/ad-guards.mjs";
+import {
+  LADDER_MONTHLY_COMMISSION_PENCE,
+  LADDER_PIF_COMMISSION_PENCE,
+  MAX_MEMBER_SAVING_PENCE,
+  VOLUME_BONUS_MONTHLY_PENCE,
+  VOLUME_BONUS_PIF_PENCE,
+  VOLUME_THRESHOLD,
+} from "../app/lib/partnerCommission.ts";
 
 const BRANDS = JSON.parse(readFileSync(new URL("./gym-brands.json", import.meta.url), "utf8"));
 const ROOT = process.cwd();
@@ -45,7 +53,10 @@ const ORIGIN = "https://ptlaunchlab.co.uk";
 const OUT_ROOT = path.join(ROOT, "ad-assets", "partner-kit");
 const REG_LINE = "NCFE Accredited Centre No. 9002788 · Ofqual regulated";
 const MONTHLY_TOTAL = formatPence(MONTHLY_PLAN_TOTAL_PENCE);
-const FEE = formatPence(PARTNER_FEE_PENCE);
+const FEE_PIF = formatPence(LADDER_PIF_COMMISSION_PENCE);
+const FEE_MONTHLY = formatPence(LADDER_MONTHLY_COMMISSION_PENCE);
+const FEE_PIF_VOL = formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE);
+const FEE_MONTHLY_VOL = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE);
 const ORDINAL = { 2: "2nd", 3: "3rd", 4: "4th", 5: "5th", 6: "6th" };
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap');`;
@@ -362,7 +373,7 @@ function handbookHtml() {
   const NAVY = "#070D1B";
   const GOLD = "#F5C518";
   const nth = ORDINAL[PARTNER_FEE_RELEASE_PAYMENT] ?? `${PARTNER_FEE_RELEASE_PAYMENT}th`;
-  const foot = (n) => `<div class="foot"><span>PT Launch Lab · Gym partner handbook · v4.0 terms, October 2026</span><span>${n}</span></div>`;
+  const foot = (n) => `<div class="foot"><span>PT Launch Lab · Gym partner handbook · v4.1 terms, October 2026</span><span>${n}</span></div>`;
   return `<!doctype html><html><head><meta charset="utf-8"><style>
 ${FONTS}
 @page{size:A4;margin:0}
@@ -407,7 +418,7 @@ td:first-child{font-weight:600;color:${NAVY};width:44mm}
     <h1>Gym partner<br>handbook</h1>
     <p>How the partnership works, start to finish: what your members pay, what you earn and when, what your gym does, and what we do.</p>
   </div>
-  <div class="meta">v4.0 terms · October 2026 · Your signed partnership agreement is the binding document; this handbook summarises it.</div>
+  <div class="meta">v4.1 terms · October 2026 · Your signed partnership agreement is the binding document; this handbook summarises it.</div>
   <div class="bar"></div>
 </section>
 
@@ -416,10 +427,10 @@ td:first-child{font-weight:600;color:${NAVY};width:44mm}
   <p>Your gym runs its own PT Academy, <b>“[Your gym] PT Academy”</b>, with its own branded page, enrol link, QR code and marketing. Members who want to become personal trainers enrol through it. PT Launch Lab delivers everything behind it: the qualification, the tutors, the learning platform, the payments and the support.</p>
   <div class="box gold">
     <ul>
-      <li><b>${FEE} per learner</b>, including VAT, for every member who enrols through your academy.</li>
+      <li><b>${FEE_PIF} per learner who pays in full, ${FEE_MONTHLY} on the monthly plan</b>, including VAT, rising to ${FEE_PIF_VOL} / ${FEE_MONTHLY_VOL} in any quarter with ${VOLUME_THRESHOLD}+ learners.</li>
       <li><b>Zero cost and zero admin</b> to your gym. No fee, no subscription, no staff time required.</li>
       <li><b>One partner gym per area.</b> We don't run a second academy on your doorstep.</li>
-      <li><b>No codes, no discounts, no deadlines.</b> One price for everyone, and members can enrol any time.</li>
+      <li><b>No codes and no deadlines.</b> One price, the same as our own site, unless you choose to give your members a saving. Members can enrol any time.</li>
     </ul>
   </div>
   <h3>It's white-label</h3>
@@ -442,7 +453,7 @@ td:first-child{font-weight:600;color:${NAVY};width:44mm}
     <div class="alt"><div class="tag">Or monthly</div><div class="mid">or ${MONTHLY_PRICE_LABEL} a month<br>for ${MONTHLY_PAYMENTS} months</div><div class="sm">First payment at checkout, no interest, ${MONTHLY_TOTAL} in total.</div></div>
   </div>
   <ul style="margin-top:4mm">
-    <li>The same price on your academy page as everywhere else. There are no member codes or discounts to hand out or chase.</li>
+    <li>The same price on your academy page as everywhere else, unless you opt into a member price (below). There are no codes to hand out or chase.</li>
     <li>Rolling enrolment: no closing dates. A member can start the day they decide.</li>
     <li>14-day cooling-off: a learner who cancels within 14 days of paying gets a full refund.</li>
   </ul>
@@ -450,14 +461,15 @@ td:first-child{font-weight:600;color:${NAVY};width:44mm}
   <h2 style="margin-top:9mm">What you earn, and when</h2>
   <table>
     <tr><th>Item</th><th>The rule</th></tr>
-    <tr><td>Fee</td><td>${FEE} per learner, including VAT.</td></tr>
-    <tr><td>Pay-in-full learner</td><td>Paid 30 days after the learner enrols and pays in full.</td></tr>
-    <tr><td>Monthly learner</td><td>Paid when the learner's ${nth} monthly payment clears.</td></tr>
+    <tr><td>Pay-in-full learner</td><td>${FEE_PIF}, including VAT. Paid 30 days after the learner enrols and pays in full.</td></tr>
+    <tr><td>Monthly learner</td><td>${FEE_MONTHLY}, including VAT. Paid when the learner's ${nth} monthly payment clears.</td></tr>
+    <tr><td>Volume rate</td><td>In any quarter where ${VOLUME_THRESHOLD} or more learners enrol through your gym, every learner that quarter earns ${FEE_PIF_VOL} (pay in full) or ${FEE_MONTHLY_VOL} (monthly). The top-up is paid after the quarter ends.</td></tr>
+    <tr><td>Member price (optional)</td><td>You can give your members up to ${formatPence(MAX_MEMBER_SAVING_PENCE)} off the pay-in-full price, shown on your academy page. It comes out of your fee for that learner.</td></tr>
     <tr><td>Once paid</td><td>It's yours. No clawback once a fee has been paid.</td></tr>
     <tr><td>Tracking</td><td>Enrolments and fees show in your partner portal.</td></tr>
   </table>
   <div class="box">
-    <p><b>Illustration, not a forecast:</b> four members paying in full in a month would be 4 × ${FEE} = ${formatPence(PARTNER_FEE_PENCE * 4)}, paid 30 days later.</p>
+    <p><b>Illustration, not a forecast:</b> one member a month paying in full is 12 × ${FEE_PIF} = ${formatPence(LADDER_PIF_COMMISSION_PENCE * 12)} a year. Two a month puts every quarter on the volume rate: 24 × ${FEE_PIF_VOL} = ${formatPence((LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE) * 24)}.</p>
   </div>
   ${foot(3)}
 </section>
