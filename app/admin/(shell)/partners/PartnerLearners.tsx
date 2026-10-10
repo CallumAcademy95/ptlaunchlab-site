@@ -23,6 +23,8 @@ export interface SaleRow {
   promo_code: string | null;
   status: string;
   commission_pence: number | null;
+  /** Quarterly volume top-up (v4.1 ladder). Absent before the ladder migration. */
+  volume_bonus_pence?: number | null;
   commission_status: string | null;
   commission_release_at: string | null;
   enrolled_at: string | null;

@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { formatPence, PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT } from "@/app/lib/pricing";
+import { formatPence, PARTNER_FEE_RELEASE_PAYMENT } from "@/app/lib/pricing";
+import { LADDER_MONTHLY_COMMISSION_PENCE, LADDER_PIF_COMMISSION_PENCE, VOLUME_BONUS_MONTHLY_PENCE, VOLUME_BONUS_PIF_PENCE, VOLUME_THRESHOLD } from "@/app/lib/partnerCommission";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { describeOutcome, switchSignedPartner, type SwitchOutcome } from "@/app/lib/partnerTermsSwitch";
 import {
   PARTNERSHIP_AGREEMENT_VERSION,
   PARTNERSHIP_AGREEMENT_SUMMARY,
@@ -12,7 +15,10 @@ import {
 
 // v4.0 commercial terms (October 2026) for the confirmation email only. The
 // contract itself (app/lib/partnershipAgreement.ts) is maintained separately.
-const PARTNER_FEE_LABEL = formatPence(PARTNER_FEE_PENCE); // "£250"
+const PIF_FEE = formatPence(LADDER_PIF_COMMISSION_PENCE);         // £400
+const MONTHLY_FEE = formatPence(LADDER_MONTHLY_COMMISSION_PENCE); // £250
+const PIF_FEE_VOLUME = formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE);             // £500
+const MONTHLY_FEE_VOLUME = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE); // £300
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL  = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -48,6 +54,23 @@ export async function POST(req: NextRequest) {
     });
     const pdfBase64 = pdfBuffer.toString("base64");
     const pdfAttachment = [{ filename: pdfFilename, content: pdfBuffer }];
+
+    // ── Existing partner? Move its record onto the terms it just signed ─────
+    // Only when the signer ticked the key-terms acknowledgement. The outcome is
+    // reported in the admin email either way, so a human always sees it.
+    let termsSwitch: SwitchOutcome = { kind: "no-match" };
+    if (acknowledgedKeyTerms === true) {
+      try {
+        termsSwitch = await switchSignedPartner(getSupabaseAdmin() as never, String(repEmail), PARTNERSHIP_AGREEMENT_VERSION);
+      } catch (err) {
+        termsSwitch = { kind: "error", message: err instanceof Error ? err.message : String(err) };
+      }
+      console.log("[gym-partnership/sign] terms switch:", termsSwitch.kind);
+    }
+    const esc = (v: string) => v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const termsSwitchLine = acknowledgedKeyTerms === true
+      ? describeOutcome(termsSwitch, String(repEmail))
+      : "Key terms were not acknowledged, so the partner record was not changed.";
 
     const signedDate = new Date(signedAt).toLocaleDateString("en-GB", {
       day: "numeric", month: "long", year: "numeric",
@@ -97,6 +120,9 @@ export async function POST(req: NextRequest) {
         ${dataRow("Date Signed", signedDate)}
         ${dataRow("Agreement Version", `v${PARTNERSHIP_AGREEMENT_VERSION} — ${PARTNERSHIP_AGREEMENT_SUMMARY}`)}
         ${dataRow("Key Terms Acknowledged", acknowledgedKeyTerms === true ? "Yes — ticked before signing" : "NO — check how this was submitted")}
+
+        ${sectionHead("Partner Record")}
+        ${dataRow("Terms switch", esc(termsSwitchLine))}
       </table>
 
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid #1A3A5C;">
@@ -146,7 +172,8 @@ export async function POST(req: NextRequest) {
       <div style="background:#061F36;border:1px solid #F5C518;border-radius:10px;padding:20px;margin-bottom:20px;">
         <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Commercial Terms</div>
         <ul style="color:#8CA3BF;font-size:14px;line-height:1.8;padding-left:20px;margin:0;">
-          <li><strong style="color:#ffffff;">${PARTNER_FEE_LABEL} for every learner who enrols through your gym</strong> — inclusive of VAT, nothing added on top</li>
+          <li><strong style="color:#ffffff;">${PIF_FEE} for every learner who pays in full, ${MONTHLY_FEE} on the monthly plan</strong> — inclusive of VAT, nothing added on top</li>
+          <li>In any quarter in which ${VOLUME_THRESHOLD} or more learners enrol through your gym, every learner that quarter earns ${PIF_FEE_VOLUME} (pay in full) or ${MONTHLY_FEE_VOLUME} (monthly)</li>
           <li>Paid 30 days after enrolment if the learner pays in full. If they pay monthly, it is paid once their ${PARTNER_FEE_RELEASE_PAYMENT}th monthly payment clears (their first payment counts as 1)</li>
           <li>Once a commission has been paid it is yours — there is no clawback</li>
           <li>You can see accrued, released and paid commission any time in your partner portal</li>
@@ -159,7 +186,7 @@ export async function POST(req: NextRequest) {
           <li>Send us your logo and brand assets — we build your white-label academy page, tracking link and QR code within 14 days (Clause 3.2)</li>
           <li>You will receive partner portal login details to track referrals, enrolments and commission</li>
           <li>Send us your bank details so commission can be paid when it is released</li>
-          <li>Promote your academy link and QR code in your gym and across your socials — every enrolment through it earns you ${PARTNER_FEE_LABEL}</li>
+          <li>Promote your academy link and QR code in your gym and across your socials — every enrolment through it earns you up to ${PIF_FEE_VOLUME}</li>
         </ul>
       </div>
 

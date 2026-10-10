@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import {
   createCheckoutSession,
-  planFromChoice,
+  resolveCheckout,
   COURSE_PLANS,
   ENROL_SUCCESS_URL,
 } from "@/app/lib/stripeCheckout";
+import { getGymByPartnerSlug } from "@/app/lib/gyms";
 import { sanitizeAttribution } from "@/app/lib/attribution";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,14 +21,21 @@ import { sanitizeAttribution } from "@/app/lib/attribution";
 // had one set, so those buyers paid and were dumped on stripe.com, never
 // completing enrolment. See app/lib/stripeCheckout.ts for the full history.
 //
-// The client chooses one of the two plans; the price comes from the server-side
-// plan config and nothing in the request can change it. There are no promo
-// codes, so nothing here accepts one.
+// The client chooses a plan; the price comes from the server-side plan config
+// and nothing in the request can change it. resolveCheckout() decides any
+// discount server-side:
+//   - ATP Fitness Felixstowe's page also sells "six_month" (£599 + 5 × £200)
+//     and "pif_1599", which takes a member code (ATPPT / ATP500) checked against
+//     an ATP-only map. Any other gym: those plans are refused and codes ignored.
+//   - a gym that set a member saving gets it on its own pay-in-full, looked up
+//     from that gym's config by gymSlug, if its Stripe coupon is configured.
 //
-// Body: { plan: "pif" | "monthly", clientReferenceId?, email?, name?,
-//         gymReferral?, gymSlug?, cancelPath?, attribution? }
-// Returns: { url } on success, or { url: null } so the client falls back to the
-//          plan's raw Payment Link (or shows a contact message if none is set).
+// Body: { plan: "pif" | "monthly" | "six_month" | "pif_1599", memberCode?,
+//         clientReferenceId?, email?, name?, gymReferral?, gymSlug?,
+//         cancelPath?, attribution? }
+// Returns: { url } on success; { url: null, reason: "invalid-code" } for a code
+//          ATP's page does not recognise; or { url: null } so the client falls
+//          back to the plan's raw Payment Link (or shows a contact message).
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const runtime = "nodejs";
@@ -110,14 +118,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: null, reason: "bad-json" });
   }
 
-  const plan = planFromChoice(body.plan);
-  if (!plan) {
-    // Unknown/absent plan — the client falls back to its own error handling.
-    return NextResponse.json({ url: null, reason: "unknown-plan" });
-  }
-
   const str = (v: unknown, max = 300) =>
     typeof v === "string" && v.trim() ? v.trim().slice(0, max) : undefined;
+  const gymSlug = str(body.gymSlug, 60);
+
+  const resolved = resolveCheckout(
+    { plan: body.plan, gymSlug, memberCode: body.memberCode },
+    getGymByPartnerSlug(gymSlug)?.memberSavingPence ?? 0,
+    process.env,
+  );
+  if (!resolved.ok) {
+    // Unknown plan: the client falls back to its own error handling.
+    // Invalid code: the client says "that code isn't valid" and charges nothing.
+    return NextResponse.json({ url: null, reason: resolved.reason });
+  }
+  const plan = resolved.plan;
 
   const session = await createCheckoutSession({
     plan,
@@ -125,10 +140,10 @@ export async function POST(req: NextRequest) {
     email: str(body.email, 200),
     name: str(body.name, 200),
     gymReferral: str(body.gymReferral, 100),
-    gymSlug: str(body.gymSlug, 60),
+    gymSlug,
     cancelPath: str(body.cancelPath, 200),
     attribution: sanitizeAttribution(body.attribution),
-  });
+  }, resolved);
 
   if (!session) {
     return NextResponse.json({ url: null, reason: "stripe-unavailable" });

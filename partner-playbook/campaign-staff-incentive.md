@@ -6,7 +6,7 @@ when_to_use: Set it up before you brief the team, not after
 order: 90
 ---
 
-You earn £250 (inc. VAT) when a member enrols. Whether you share any of it with your team is your choice. If you do, **£25 to the person who had the conversation** is a fair split: you keep £225, it costs you nothing you didn't already gain, and it turns a good intention into something your team actually remembers on a Tuesday.
+You earn £400 (inc. VAT) when a member enrols and pays in full, or £250 on the monthly plan. Whether you share any of it with your team is your choice. If you do, **£25 to the person who had the conversation** is a fair split: you keep the rest, it costs you nothing you didn't already gain, and it turns a good intention into something your team actually remembers on a Tuesday.
 
 Pay it when your fee reaches you, not before. Your fee lands 30 days after a pay-in-full enrolment, or when the learner's 5th monthly payment clears.
 

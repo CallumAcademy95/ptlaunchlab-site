@@ -152,11 +152,19 @@ export function contractPence(kind: SubscriptionPlanKind, metadata?: Record<stri
 //   payment_5     — v4.0 terms (October 2026): pay-in-full 30 days after
 //                   enrolment; a payment plan once the learner's 5th payment
 //                   clears, the checkout payment counting as payment 1.
+//   ladder        — v4.1 terms (the sales ladder): release timing IDENTICAL to
+//                   payment_5. Only the amount differs, and that is decided at
+//                   sale time in ./partnerCommission.ts.
 //
 // The rule is evaluated against the partner's CURRENT terms when each invoice
 // lands.
 
-export type CommissionTerms = "on_enrolment" | "instalment_2" | "payment_5";
+export type CommissionTerms = "on_enrolment" | "instalment_2" | "payment_5" | "ladder";
+
+/** Terms whose release timing is the v4.0 rule (PIF 30 days; monthly at payment 5). */
+export function releasesAtPayment5(terms: string | null | undefined): boolean {
+  return terms === "payment_5" || terms === "ladder";
+}
 
 /**
  * How many of the learner's payments have cleared, counting the checkout
@@ -185,7 +193,11 @@ export function commissionReleasedByPayment(
   if (terms === "instalment_2") {
     return kind === "legacy" ? settled >= 2 : settled >= 3;
   }
-  if (terms === "payment_5") {
+  if (releasesAtPayment5(terms)) {
+    // v4.0 clause 5.4: a learner who enrolled before 12 October 2026 on a
+    // deposit plan keeps the 2nd-instalment rule, even after their gym moves to
+    // v4.0. Only the monthly plan waits for the 5th payment.
+    if (kind === "legacy") return settled >= 2;
     return learnerPaymentsCleared(kind, settled) >= PARTNER_FEE_RELEASE_PAYMENT;
   }
   // on_enrolment, or anything unrecognised: the sale was dated at enrolment and
@@ -195,12 +207,15 @@ export function commissionReleasedByPayment(
 
 /** Whether a payment-plan sale starts with its commission held (no release date). */
 export function commissionHeldAtSale(terms: string, isPaymentPlan: boolean): boolean {
-  return isPaymentPlan && (terms === "instalment_2" || terms === "payment_5");
+  return isPaymentPlan && (terms === "instalment_2" || releasesAtPayment5(terms));
 }
 
 /** Partner-facing wording for a held commission on a payment plan. */
-export function heldCommissionLabel(terms: string | null | undefined): string {
-  if (terms === "payment_5") return `Releases after ${ordinal(PARTNER_FEE_RELEASE_PAYMENT)} payment`;
+export function heldCommissionLabel(terms: string | null | undefined, rung?: string | null): string {
+  // A deposit plan (ATP's 6-month plan) keeps the 2nd-instalment rule under
+  // payment_5 and ladder alike — see commissionReleasedByPayment.
+  if (rung === "six_month") return "Releases after 2nd instalment";
+  if (releasesAtPayment5(terms)) return `Releases after ${ordinal(PARTNER_FEE_RELEASE_PAYMENT)} payment`;
   return "Releases after 2nd instalment";
 }
 
@@ -214,5 +229,6 @@ function ordinal(n: number): string {
 export function commissionTermsLabel(terms: string | null | undefined): string {
   if (terms === "on_enrolment") return "30d after enrolment (grandfathered)";
   if (terms === "payment_5") return "v4.0: PIF 30d · monthly at payment 5";
+  if (terms === "ladder") return "v4.1 ladder: PIF 30d · monthly at payment 5";
   return "Held to instalment 2";
 }

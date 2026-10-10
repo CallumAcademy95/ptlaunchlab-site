@@ -14,6 +14,8 @@
 // real partner, and must never render an embed card.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { resolveMemberSaving } from "../partnerCommission.ts";
+
 // Relative imports carry the .ts extension so tests/ can import this registry
 // under Node's own type stripping (see allowImportingTsExtensions in tsconfig).
 import type { GymConfig } from "@/app/lib/gymPartnerConfig";
@@ -50,4 +52,22 @@ export const GYM_SLUGS = Object.keys(GYMS);
 /** Config for a route slug, or undefined when the slug is not a partner. */
 export function getGym(slug: string): GymConfig | undefined {
   return GYMS[slug];
+}
+
+/** Config for a PARTNER slug (pp_partners.slug / checkout gym_slug), or undefined. */
+export function getGymByPartnerSlug(gymSlug: string | null | undefined): GymConfig | undefined {
+  if (!gymSlug) return undefined;
+  return Object.values(GYMS).find((g) => g.gymSlug === gymSlug);
+}
+
+/**
+ * The member saving this gym's pay-in-full actually carries right now, and the
+ * coupon that gives it. Zero (and no coupon) for an unknown gym, a gym that
+ * set none, or a saving whose coupon env var is missing.
+ */
+export function memberSavingForGym(
+  gymSlug: string | null | undefined,
+  env: Record<string, string | undefined> = process.env,
+): { savingPence: number; coupon: string | null } {
+  return resolveMemberSaving(getGymByPartnerSlug(gymSlug)?.memberSavingPence ?? 0, env);
 }

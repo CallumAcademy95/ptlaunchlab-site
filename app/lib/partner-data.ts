@@ -9,10 +9,11 @@
 import { getSupabaseAdmin } from "./supabase-admin";
 import { heldCommissionLabel } from "./paymentPlans";
 import { formatPence as formatPricePence } from "./pricing";
+import { countsForVolume, quarterOf, saleMoney } from "./partnerCommission";
 
 /** Columns a partner is allowed to see from pp_sales. Note: no learner_email. */
 export const PARTNER_SALE_COLUMNS =
-  "id, learner_name, plan_type, amount_paid_pence, amount_due_pence, promo_code, status, commission_pence, commission_status, commission_release_at, enrolled_at";
+  "id, learner_name, plan_type, amount_paid_pence, amount_due_pence, promo_code, status, commission_pence, commission_status, commission_release_at, enrolled_at, rung, volume_bonus_pence, volume_bonus_payout_id";
 
 export interface PartnerSummary {
   enrolmentsThisMonth: number;
@@ -49,7 +50,7 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
 
   const { data, error } = await getSupabaseAdmin()
     .from("pp_sales")
-    .select("commission_pence, commission_status, commission_release_at, enrolled_at")
+    .select("status, commission_pence, commission_status, commission_release_at, enrolled_at, volume_bonus_pence, volume_bonus_payout_id")
     .eq("partner_id", partnerId)
     .eq("status", "confirmed");
 
@@ -58,11 +59,14 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
     return EMPTY_SUMMARY;
   }
 
-  const rows = (data ?? []) as {
+  const rows = (data ?? []) as unknown as {
+    status: string;
     commission_pence: number;
     commission_status: "accruing" | "due" | "paid" | "voided";
     commission_release_at: string | null;
     enrolled_at: string;
+    volume_bonus_pence: number | null;
+    volume_bonus_payout_id: string | null;
   }[];
 
   const summary = { ...EMPTY_SUMMARY };
@@ -74,24 +78,18 @@ export async function getPartnerSummary(partnerId: string): Promise<PartnerSumma
     if (new Date(row.enrolled_at).getTime() >= monthStartMs) summary.enrolmentsThisMonth++;
 
     if (row.commission_status === "voided") continue;
-    summary.commissionAccruedPence += row.commission_pence;
-
-    if (row.commission_status === "paid") {
-      summary.commissionPaidPence += row.commission_pence;
-      continue;
-    }
 
     // Whether commission is payable is derived from the release date, not from
     // commission_status. Nothing flips 'accruing' → 'due' on a schedule, so a
     // stored status would sit stale until a payout run touched it and a partner
     // would see money as held for days after it became payable. The status
     // column stays authoritative for 'paid' and 'voided', which are real events.
-    const released =
-      row.commission_status === "due" ||
-      (row.commission_release_at !== null && new Date(row.commission_release_at).getTime() <= now);
-
-    if (released) summary.commissionDuePence += row.commission_pence;
-    else summary.commissionHeldPence += row.commission_pence;
+    // saleMoney() applies that, and counts any quarterly volume bonus with it.
+    const m = saleMoney(row, now);
+    summary.commissionAccruedPence += m.earned;
+    summary.commissionPaidPence += m.paid;
+    summary.commissionDuePence += m.payable;
+    summary.commissionHeldPence += m.held;
   }
 
   return summary;
@@ -109,6 +107,32 @@ export interface PartnerSale {
   commission_status: "accruing" | "due" | "paid" | "voided";
   commission_release_at: string | null;
   enrolled_at: string;
+  /** What was sold (v4.1 ladder). Null on older sales. */
+  rung?: string | null;
+  /** Quarterly volume top-up. */
+  volume_bonus_pence?: number | null;
+  volume_bonus_payout_id?: string | null;
+}
+
+/** Commission plus any volume bonus on one sale. */
+export function saleEarnedPence(sale: PartnerSale): number {
+  return (sale.commission_pence ?? 0) + (sale.volume_bonus_pence ?? 0);
+}
+
+/** How many learners count towards this calendar quarter's volume rate. */
+export async function getQuarterLearnerCount(partnerId: string, now = new Date()): Promise<number> {
+  const q = quarterOf(now);
+  const { data, error } = await getSupabaseAdmin()
+    .from("pp_sales")
+    .select("status, commission_status")
+    .eq("partner_id", partnerId)
+    .gte("enrolled_at", q.start.toISOString())
+    .lt("enrolled_at", q.end.toISOString());
+  if (error) {
+    console.error("[partner-data] quarter count failed:", error);
+    return 0;
+  }
+  return ((data ?? []) as { status: string; commission_status: string }[]).filter(countsForVolume).length;
 }
 
 /**
@@ -190,7 +214,7 @@ export function commissionState(sale: PartnerSale, terms?: string | null): Commi
   if (!sale.commission_release_at) {
     // What it is waiting for depends on the partner's terms: the 2nd instalment
     // (instalment_2) or the learner's 5th payment (payment_5, v4.0).
-    return { key: "held", label: heldCommissionLabel(terms) };
+    return { key: "held", label: heldCommissionLabel(terms, sale.rung) };
   }
 
   const release = new Date(sale.commission_release_at);
@@ -218,7 +242,7 @@ export function formatPence(pence: number): string {
  * disagree with each other.
  */
 export function commissionReleaseRule(terms: string | null | undefined): string {
-  if (terms === "payment_5") {
+  if (terms === "payment_5" || terms === "ladder") {
     return (
       "If the learner pays in full, your fee is released 30 days after they enrol. " +
       "If they pay monthly, it's released when their 5th monthly payment clears (their first payment counts as 1). " +

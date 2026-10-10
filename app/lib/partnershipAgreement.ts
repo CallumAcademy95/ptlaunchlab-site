@@ -32,19 +32,31 @@
  *                   for the gym employing or renting to its own trainers; notices,
  *                   assignment, force majeure, third-party rights, severability,
  *                   waiver and electronic-execution clauses added.
+ *   v4.0 2026-10-10 £999.99 / 10 × £99.99 course price. Fee £250 inc. VAT;
+ *                   released 30 days after pay-in-full or when the learner's 5th
+ *                   monthly payment is collected; no clawback once paid (fraud
+ *                   excepted); promotional codes removed from tracking; monthly
+ *                   marketing support, first introductions and 5-mile local
+ *                   exclusivity written in. v4.0 signers get commission_terms = 'payment_5'.
+ *   v4.1 2026-10-11 Commission schedule replaces the flat fee: £400 pay in full,
+ *                   £250 monthly; £500 / £300 for every learner in a quarter in
+ *                   which the gym refers 4 or more; optional member saving of up
+ *                   to £100 on pay in full, taken from the gym's fee; separately
+ *                   agreed written fees prevail. v4.1 signers get commission_terms
+ *                   = 'ladder'.
  *
  * Commission RELEASE MECHANICS are unchanged between v2.0 and v3.0, so v3.0
  * signers keep commission_terms = 'instalment_2'. No migration is needed.
  */
 
-export const PARTNERSHIP_AGREEMENT_VERSION = "3.0";
+export const PARTNERSHIP_AGREEMENT_VERSION = "4.1";
 
 /** Short label for the admin email / partner record. */
 export const PARTNERSHIP_AGREEMENT_SUMMARY =
-  "unified screen+PDF terms · £500 inc. VAT · instalment-2 hold + clawback · narrowed non-circumvention";
+  "£400 pay in full / £250 monthly inc. VAT; £500 / £300 at 4+ learners a quarter · paid 30 days after pay-in-full or at the 5th monthly payment · no clawback · 5-mile exclusivity";
 
 /** The referral fee, in pence. Mirrors pp_partners.fee_per_learner_pence. */
-export const DEFAULT_FEE_PER_LEARNER_PENCE = 50_000;
+export const DEFAULT_FEE_PER_LEARNER_PENCE = 40_000;
 
 // ─── Document model ───────────────────────────────────────────────────────────
 
@@ -83,21 +95,21 @@ const s = (text: string): Block => ({ kind: "sub", text });
 export const KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
   {
     clause: "Clause 5",
-    title: "£500 per learner, inclusive of VAT",
+    title: "Commission schedule, inclusive of VAT",
     detail:
-      "You are paid £500 for each learner who enrols through your gym. That figure is inclusive of VAT — nothing is added on top.",
+      "You are paid £400 for each learner who pays in full and £250 for each learner on the monthly plan. In any quarter in which 4 or more learners enrol through your gym, every learner that quarter earns £500 (pay in full) or £300 (monthly). If you choose to give your members a saving on the pay-in-full price, it comes out of your fee. All figures include VAT — nothing is added on top.",
   },
   {
     clause: "Clause 5.4",
     title: "When the money is released",
     detail:
-      "If the learner pays in full, commission is paid 30 days after enrolment. If they are on an instalment plan, it is held until their second instalment clears, then paid 30 days after that. You can see accrued and released commission in the partner portal at any time.",
+      "If the learner pays in full, commission is paid 30 days after enrolment. If they pay monthly, it is paid once their 5th monthly payment has been collected. If a learner is refunded or stops paying before that point, no commission is due on them. You can see accrued and released commission in the partner portal at any time.",
   },
   {
-    clause: "Clauses 5.8–5.9",
-    title: "Clawback on refunds and chargebacks",
+    clause: "Clauses 5.7–5.9",
+    title: "No clawback once paid",
     detail:
-      "If a learner is refunded, cancels, or their payment is reversed after you have been paid, the commission on that enrolment is repayable. We normally recover it by offsetting against your next commission.",
+      "Once commission has been paid to you it is yours. It is only repayable if the enrolment turns out to be fraudulent or invalid.",
   },
   {
     clause: "Clause 14",
@@ -159,7 +171,8 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
         s("A branded academy landing page"),
         s("A unique tracking URL"),
         s("QR codes"),
-        s("Gym-branded marketing materials"),
+        s("Gym-branded marketing materials, refreshed monthly (for example screen video, posters and social posts)"),
+        s("A ready-to-run Meta advertising pack for the Partner Gym’s area"),
         p(
           "3.2  Set-up — PT Launch Lab shall make the Partner Gym’s branded academy page, unique tracking URL and QR code available within 14 days of the later of (a) the date of this Agreement and (b) the date the Partner Gym supplies its logo and brand assets."
         ),
@@ -175,6 +188,12 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
         p(
           "3.6  No volume guarantee — PT Launch Lab does not guarantee that any particular number of learners will enrol through the Partner Gym, and gives no warranty as to the revenue the Partner Gym will earn under this Agreement."
         ),
+        p(
+          "3.7  First introductions — where a learner referred by the Partner Gym qualifies, PT Launch Lab shall offer the Partner Gym an introduction to that learner before introducing them to any other gym, provided the learner consents."
+        ),
+        p(
+          "3.8  Local exclusivity — while this Agreement is in force, PT Launch Lab shall not enter into a partner agreement of this kind with another gym whose premises are within 5 miles of the Partner Gym’s premises."
+        ),
       ],
     },
 
@@ -185,13 +204,12 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
         p("4.1  All learner referrals shall be tracked via:"),
         b("Unique tracking URLs"),
         b("QR codes"),
-        b("Partner-specific promotional codes"),
         b("Assigned digital attribution systems"),
         p("4.2  A referral shall be deemed valid where a learner:"),
-        b("Registers via the Partner Gym’s unique tracking mechanism or promotional code; and"),
+        b("Registers via the Partner Gym’s unique tracking mechanism; and"),
         b("Enrols within 90 days of that first registration"),
         p(
-          "4.3  Successfully enrolled learner — for the purposes of Clause 5, a learner is “successfully enrolled” where that learner has (a) been validly referred under Clause 4.2; (b) completed PT Launch Lab’s enrolment process; and (c) either paid the course fee in full or paid the required deposit and entered into a written instalment agreement with PT Launch Lab."
+          "4.3  Successfully enrolled learner — for the purposes of Clause 5, a learner is “successfully enrolled” where that learner has (a) been validly referred under Clause 4.2; (b) completed PT Launch Lab’s enrolment process; and (c) either paid the course fee in full, or paid the first monthly payment and entered into PT Launch Lab’s monthly payment plan (or, for a learner who enrolled before 12 October 2026, paid the required deposit and entered into a written instalment agreement)."
         ),
         p(
           "4.4  Attribution — where a learner cannot be attributed to a single partner, or could be attributed to more than one, PT Launch Lab shall determine attribution acting reasonably and in good faith, and shall record its determination in the partner portal."
@@ -207,7 +225,18 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
       title: "Payment Terms",
       blocks: [
         p(
-          "5.1  Fee — PT Launch Lab shall pay the Partner Gym £500 for each successfully enrolled learner (the “Fee”), as defined in Clause 4.3."
+          "5.1  Fee — PT Launch Lab shall pay the Partner Gym, for each successfully enrolled learner as defined in Clause 4.3, the fee set out in the Commission Schedule below (the “Fee”):"
+        ),
+        b("Learner who pays the course fee in full: £400"),
+        b("Learner on the monthly payment plan: £250"),
+        b(
+          "Volume rate — where 4 or more learners referred by the Partner Gym become successfully enrolled learners in the same calendar quarter, the Fee for every such learner in that quarter is £500 (paid in full) or £300 (monthly payment plan). The difference is paid with the first payment run after the quarter ends, once the underlying Fee has been released under Clause 5.4"
+        ),
+        b(
+          "Member saving — the Partner Gym may elect in writing to offer its members a reduction of up to £100 on the pay-in-full course fee, shown on its academy page. Where it does, the Fee for each learner who receives the reduction is reduced by the same amount. The reduction does not apply to the monthly payment plan"
+        ),
+        p(
+          "5.1A  Separately agreed fees — where PT Launch Lab and the Partner Gym have agreed in writing a different fee for particular learners or payment options, that written agreement prevails over the Commission Schedule for those learners."
         ),
         p(
           "5.2  VAT — the Fee is inclusive of VAT and of any other tax or duty. Where the Partner Gym is registered for VAT, the Fee shall be treated as VAT-inclusive and the Partner Gym shall be responsible for accounting to HM Revenue & Customs for any VAT due on it. No amount is payable by PT Launch Lab in addition to the Fee."
@@ -222,7 +251,10 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
           "Where the learner pays the course fee in full at the point of enrolment: 30 days after enrolment and payment confirmation; or"
         ),
         b(
-          "Where the learner enrols on a deposit and instalment plan: 30 days after the second scheduled instalment has been successfully collected"
+          "Where the learner enrols on the monthly payment plan: when the learner’s fifth monthly payment (counting the first payment taken at enrolment) has been successfully collected; or"
+        ),
+        b(
+          "Where the learner enrolled before 12 October 2026 on a deposit and instalment plan: 30 days after the second scheduled instalment has been successfully collected"
         ),
         p(
           "5.5  The Partner Gym may view its accrued and released commission at any time via the PT Launch Lab partner portal. Commission shown as accrued is not payable until released in accordance with Clause 5.4."
@@ -231,16 +263,16 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
         b("To the bank account details supplied in writing by the Partner Gym"),
         b("By bank transfer unless otherwise agreed"),
         b("With a remittance statement identifying the learners to which the payment relates"),
-        p("5.7  PT Launch Lab reserves the right to withhold payment where:"),
+        p("5.7  No commission is payable, and PT Launch Lab may withhold commission not yet released, where:"),
         b(
-          "A refund has been issued, or a cancellation, payment reversal or chargeback has occurred; or"
+          "Before the commission is released under Clause 5.4, the learner is refunded, cancels, stops paying, or a payment is reversed or charged back; or"
         ),
         b("Fraudulent or invalid enrolment is identified"),
         p(
-          "5.8  Clawback — where commission has already been paid in respect of a learner who is subsequently refunded, who cancels within any statutory cooling-off period, or whose payment is reversed or charged back, the Partner Gym shall repay the corresponding commission. Where the learner is refunded in part, the sum repayable shall be reduced in the same proportion as the refund bears to the total course fee."
+          "5.8  No clawback — commission that has been paid to the Partner Gym is not repayable if the learner is later refunded, cancels or stops paying, save where the enrolment is found to be fraudulent or invalid under Clause 5.7."
         ),
         p(
-          "5.9  PT Launch Lab may recover any sum due under Clause 5.8 by offsetting it against commission otherwise payable to the Partner Gym, and shall notify the Partner Gym in writing of any offset applied. Where no further commission is expected to become payable within 60 days, the Partner Gym shall repay the sum within 30 days of written demand."
+          "5.9  Where commission has been paid on a fraudulent or invalid enrolment, PT Launch Lab may recover it by offsetting it against commission otherwise payable to the Partner Gym, and shall notify the Partner Gym in writing of any offset applied. Where no further commission is expected to become payable within 60 days, the Partner Gym shall repay the sum within 30 days of written demand."
         ),
         p(
           "5.10  Late payment — where PT Launch Lab fails to pay released commission by its due date, the Partner Gym may charge interest and recover its costs in accordance with the Late Payment of Commercial Debts (Interest) Act 1998."
@@ -313,7 +345,7 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
           "8.5  Nothing in this Agreement shall exclude or limit either party’s liability for death or personal injury caused by negligence, for fraud or fraudulent misrepresentation, or for any other liability which cannot lawfully be excluded or limited."
         ),
         p(
-          "8.6  Clause 8.4 does not limit PT Launch Lab’s obligation to pay commission properly due under Clause 5, or the Partner Gym’s obligation to repay commission under Clause 5.8."
+          "8.6  Clause 8.4 does not limit PT Launch Lab’s obligation to pay commission properly due under Clause 5, or the Partner Gym’s obligation to repay commission under Clauses 5.8 and 5.9."
         ),
       ],
     },
@@ -392,7 +424,7 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
           "13.1  Upon termination: the licences granted under Clauses 6.2 and 6.3 shall immediately cease; each party shall return or destroy the other’s confidential information; and the Partner Gym shall cease use of all tracking URLs, QR codes and PT Launch Lab branding."
         ),
         p(
-          "13.2  Commission accrued before termination remains payable in accordance with Clause 5, including the release timing in Clause 5.4 and the clawback in Clauses 5.8 and 5.9, which continue to apply after termination."
+          "13.2  Commission accrued before termination remains payable in accordance with Clause 5, including the release timing in Clause 5.4 and Clauses 5.7 to 5.9, which continue to apply after termination."
         ),
         p(
           "13.3  Clauses 5.8, 5.9, 6, 8, 9, 10, 11, 14 and 17 to 24 survive termination."

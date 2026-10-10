@@ -189,3 +189,26 @@ test("the route-to-gym-slug map matches the real source in each enrol/page.tsx",
   }
 });
 
+
+// ─── v4.1 ladder: each config's gymSlug is the slug its enrol page sends ──────
+import { getGymByPartnerSlug, memberSavingForGym } from "../app/lib/gyms/index.ts";
+
+test("every registry gymSlug matches the gymSlug on that gym's /enrol page", () => {
+  for (const [route, cfg] of Object.entries(GYMS)) {
+    const enrol = new URL(`../app/${route}/enrol/page.tsx`, import.meta.url);
+    if (!existsSync(enrol)) continue; // the demo has no enrol page
+    const src = readFileSync(enrol, "utf8");
+    const m = /gymSlug:\s*"([^"]+)"/.exec(src);
+    assert.ok(m, `${route}: enrol page has no gymSlug`);
+    assert.equal(cfg.gymSlug, m![1], `${route}: config gymSlug must equal the enrol page's`);
+    assert.equal(getGymByPartnerSlug(cfg.gymSlug), cfg);
+  }
+});
+
+test("every member saving is 0 for now, and a missing coupon means no saving", () => {
+  for (const cfg of Object.values(GYMS)) {
+    assert.equal(cfg.memberSavingPence ?? 0, 0, cfg.gymSlug);
+    assert.deepEqual(memberSavingForGym(cfg.gymSlug, {}), { savingPence: 0, coupon: null });
+  }
+  assert.deepEqual(memberSavingForGym("nope", { STRIPE_MEMBER_SAVING_COUPON_5000: "c" }), { savingPence: 0, coupon: null });
+});

@@ -2,6 +2,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const gymNGoAcademy: GymConfig = {
   gymName: "Gym n Go",
+  gymSlug: "gym-n-go",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "/gym-logos/gym-n-go.png",
   logoAlt: "Gym n Go Forest Hill",
   logoWidth: 915,

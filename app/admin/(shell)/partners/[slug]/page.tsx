@@ -109,7 +109,7 @@ export default async function PartnerDetailPage({
       .from("pp_sales")
       .select(
         "learner_name, learner_email, plan_type, amount_paid_pence, commission_pence, " +
-          "commission_status, status, enrolled_at, created_at",
+          "volume_bonus_pence, commission_status, status, enrolled_at, created_at",
       )
       .eq("partner_id", p.id),
     admin
@@ -136,7 +136,7 @@ export default async function PartnerDetailPage({
 
   const earned = s
     .filter((x) => x.status !== "voided")
-    .reduce((t, x) => t + (x.commission_pence ?? 0), 0);
+    .reduce((t, x) => t + (x.commission_pence ?? 0) + (x.volume_bonus_pence ?? 0), 0);
   const paid = po.filter((x) => x.status === "paid").reduce((t, x) => t + x.total_pence, 0);
   const owed = Math.max(0, earned - paid);
 
