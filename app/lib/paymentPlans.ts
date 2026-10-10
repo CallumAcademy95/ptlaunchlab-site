@@ -186,6 +186,10 @@ export function commissionReleasedByPayment(
     return kind === "legacy" ? settled >= 2 : settled >= 3;
   }
   if (terms === "payment_5") {
+    // v4.0 clause 5.4: a learner who enrolled before 12 October 2026 on a
+    // deposit plan keeps the 2nd-instalment rule, even after their gym moves to
+    // v4.0. Only the monthly plan waits for the 5th payment.
+    if (kind === "legacy") return settled >= 2;
     return learnerPaymentsCleared(kind, settled) >= PARTNER_FEE_RELEASE_PAYMENT;
   }
   // on_enrolment, or anything unrecognised: the sale was dated at enrolment and

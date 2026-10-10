@@ -156,9 +156,12 @@ test("payment_5: monthly releases at the learner's 5th payment, checkout counted
   }
 });
 
-test("payment_5 on a legacy plan: deposit is payment 1, so the 4th instalment is payment 5", () => {
+test("payment_5 on a legacy plan keeps the 2nd-instalment rule (v4.0 clause 5.4)", () => {
+  // A gym moving to v4.0 must not delay commission on learners who enrolled
+  // before 12 October 2026 on a deposit plan.
   assert.equal(learnerPaymentsCleared("legacy", 4), 5);
-  assert.equal(commissionReleasedByPayment("payment_5", "legacy", 3), false);
+  assert.equal(commissionReleasedByPayment("payment_5", "legacy", 1), false);
+  assert.equal(commissionReleasedByPayment("payment_5", "legacy", 2), true);
   assert.equal(commissionReleasedByPayment("payment_5", "legacy", 4), true);
 });
 
