@@ -5,6 +5,10 @@
 export interface GymConfig {
   // ── Identity
   gymName: string;           // e.g. "6fit Gyms"
+  // Stable partner join key (pp_partners.slug) — the SAME value the gym's
+  // /enrol page sends as gymSlug. Not the route slug: route "ebor-fitness" is
+  // gymSlug "ebor". Used by the "ring me" form and the member saving lookup.
+  gymSlug: string;
   logoUrl: string;           // External logo URL or /public path
   logoAlt?: string;          // Alt text (defaults to gymName)
   // Set BOTH for a wide wordmark logo — it then renders at a fixed height with
@@ -25,10 +29,18 @@ export interface GymConfig {
   location?: string;         // e.g. "Bradford's best gym"
 
   // ── Pricing
-  // Deliberately absent. Every gym sells the same two plans at the same prices
-  // (app/lib/pricing.ts): £999.99 in full or 10 × £99.99 a month. No promo
-  // code, member discount, "was" price or per-gym Stripe link — partner
-  // attribution is gym_slug in checkout metadata from the gym's own enrol page.
+  // Every gym sells the same two plans at the same prices (app/lib/pricing.ts):
+  // £999.99 in full or 10 × £99.99 a month. No promo code, "was" price or
+  // per-gym Stripe link — partner attribution is gym_slug in checkout metadata
+  // from the gym's own enrol page.
+  //
+  // The ONE exception is an optional member saving the gym funds out of its own
+  // commission (v4.1 ladder): pay-in-full only, £25 steps up to £100, applied
+  // automatically on that gym's own pages — no code box. It only shows if the
+  // Stripe coupon for that exact amount is configured
+  // (STRIPE_MEMBER_SAVING_COUPON_<pence>); otherwise no saving is shown or
+  // given. See app/lib/partnerCommission.ts.
+  memberSavingPence?: number;
 
   // ── Positioning section — required, gym-specific copy
   positioningSubline: string;   // under "This Is The X PT Academy" heading

@@ -2,6 +2,7 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const atpFelixstoweAcademy: GymConfig = {
   gymName: "ATP Fitness Felixstowe",
+  gymSlug: "atp-felixstowe",       // commission join key — must match the enrol page; never change
   // Their source logo is a white mark on an opaque black square. This copy has
   // the black knocked out to transparency, so it sits on any dark section —
   // and, like HITIO's, disappears on a light one.

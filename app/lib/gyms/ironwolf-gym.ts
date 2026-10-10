@@ -3,6 +3,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 export const ironwolfGym: GymConfig = {
   // ── Identity
   gymName: "Iron Wolf Gym",
+  gymSlug: "ironwolf",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "/logos/iron-wolf-gym-white.png",
   logoAlt: "Iron Wolf Gym Goole",
 

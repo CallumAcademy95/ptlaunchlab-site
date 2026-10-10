@@ -89,14 +89,20 @@ else ok("no dangling payout references");
 
 // A payout's total must equal the commission it settles, or the partner's
 // "already paid" figure disagrees with their own payment history.
+// A payout settles commission (payout_id) and/or a volume bonus
+// (volume_bonus_payout_id, v4.1 ladder) — the bonus is often paid separately.
+const coveredBy = (poId: string) =>
+  sales.reduce(
+    (t, s) => t + (s.payout_id === poId ? s.commission_pence : 0) + (s.volume_bonus_payout_id === poId ? s.volume_bonus_pence ?? 0 : 0),
+    0,
+  );
 for (const po of payouts) {
-  const covered = sales.filter((s) => s.payout_id === po.id);
-  const sum = covered.reduce((t, s) => t + s.commission_pence, 0);
+  const sum = coveredBy(po.id);
   if (sum !== po.total_pence) {
     fail(`payout ${po.period_label}: total £${po.total_pence / 100} but covers £${sum / 100}`);
   }
 }
-if (!payouts.some((po) => sales.filter((s) => s.payout_id === po.id).reduce((t, s) => t + s.commission_pence, 0) !== po.total_pence)) {
+if (!payouts.some((po) => coveredBy(po.id) !== po.total_pence)) {
   ok("payout totals match the sales they cover");
 }
 

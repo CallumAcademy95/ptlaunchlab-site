@@ -2,6 +2,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const superflexAcademy: GymConfig = {
   gymName: "Superflex Gym",
+  gymSlug: "superflex",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "https://static.wixstatic.com/media/88602e_b5b0f48fcacd4ae7b459fdc0c0a0c0b8~mv2.png",
   logoAlt: "Superflex 2.0 Gym",
   primaryColor: "#1E9E1E",  // balanced grass green — white button text stays legible

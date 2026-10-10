@@ -1150,6 +1150,9 @@ export async function POST(req: NextRequest) {
           mode: session.mode ?? null,
           metadataPlan: session.metadata?.plan ?? null,
           promoCode: session.metadata?.promo_code ?? null,
+          // v4.1 ladder: what was sold, and any gym-funded member saving.
+          rung: session.metadata?.rung ?? null,
+          memberSavingPence: Number(session.metadata?.member_saving_pence) || 0,
         });
         if (!result.ok) {
           console.error(`[stripe-webhook] partner sale not recorded for ${session.id}: ${result.reason}`);

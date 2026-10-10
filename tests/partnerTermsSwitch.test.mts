@@ -81,3 +81,33 @@ test("a % or _ in the address cannot act as a wildcard", async () => {
   assert.equal((await switchSignedPartner(db as never, "a%@c.com", "4.0")).kind, "no-match");
   assert.equal(writes.length, 0);
 });
+
+// ─── v4.1: the sales ladder ─────────────────────────────────────────────────
+import { signedTermsFor, SIGNED_TERMS } from "../app/lib/partnerTermsSwitch.ts";
+import { PARTNERSHIP_AGREEMENT_VERSION } from "../app/lib/partnershipAgreement.ts";
+
+test("terms follow the version signed: 4.0 → payment_5, 4.1+ → ladder", () => {
+  assert.equal(signedTermsFor("4.0"), "payment_5");
+  assert.equal(signedTermsFor("4.1"), "ladder");
+  assert.equal(signedTermsFor("4.2"), "ladder");
+  assert.equal(signedTermsFor("5.0"), "ladder");
+  assert.equal(signedTermsFor("3.0"), "payment_5");
+  assert.equal(signedTermsFor("nonsense"), "payment_5");
+  assert.equal(SIGNED_TERMS, signedTermsFor(PARTNERSHIP_AGREEMENT_VERSION));
+});
+
+test("a gym signing v4.1 moves to the ladder", async () => {
+  const { db, writes } = fakeDb({ users: [{ partner_id: "p1", email: "owner@ebor.com" }], partners: [partner("p1", "ebor", { commission_terms: "payment_5", fee_per_learner_pence: 25000 })] });
+  const o = await switchSignedPartner(db as never, "owner@ebor.com", "4.1", new Date("2026-11-01T09:00:00Z"));
+  assert.equal(o.kind, "switched");
+  assert.deepEqual(writes, [{ id: "p1", values: { agreement_version: "4.1", agreement_signed_at: "2026-11-01T09:00:00.000Z", commission_terms: "ladder", fee_per_learner_pence: 25000 } }]);
+  assert.match(describeOutcome(o, "owner@ebor.com"), /ebor → v4\.1 terms \(ladder\)/);
+});
+
+test("ATP signing v4.1 moves to the ladder with its fee left alone", async () => {
+  const { db, writes } = fakeDb({ users: [{ partner_id: "p9", email: "g@atp.com" }], partners: [partner("p9", "atp-felixstowe")] });
+  const o = await switchSignedPartner(db as never, "g@atp.com", "4.1");
+  assert.equal(o.kind, "switched");
+  assert.equal(writes[0].values.commission_terms, "ladder");
+  assert.equal("fee_per_learner_pence" in writes[0].values, false);
+});

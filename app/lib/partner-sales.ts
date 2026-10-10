@@ -13,8 +13,10 @@ import { contractTotalPence, isDepositSale } from "./coursePlan";
 import {
   commissionHeldAtSale,
   commissionReleasedByPayment,
+  releasesAtPayment5,
   type SubscriptionPlanKind,
 } from "./paymentPlans";
+import { ATP_LADDER, commissionForSale, isAtp, isRung } from "./partnerCommission";
 
 // The deposit-vs-PIF rule lives in ./coursePlan (unit-tested, no dependencies)
 // so the portal, the Sheet tracker and every email answer it identically. It
@@ -44,8 +46,15 @@ export interface PartnerSaleInput {
   /** `metadata.plan` off the session — the deposit-vs-PIF signal a promo code cannot move. */
   metadataPlan?: string | null;
   promoCode?: string | null;
+  /** `metadata.rung` off the session — what was sold, for ladder commission. */
+  rung?: string | null;
+  /** `metadata.member_saving_pence` — a gym-funded saving on pay-in-full. */
+  memberSavingPence?: number | null;
   enrolledAt?: Date;
 }
+
+/** pp_sales columns added by 20261010_pp_partner_ladder.sql. */
+const LADDER_COLUMNS = ["rung", "member_saving_pence", "member_code"] as const;
 
 /** What `_gym-template` ships with. A live page carrying this is a mistake. */
 export const PLACEHOLDER_SLUG = "GYM-SLUG-HERE";
@@ -60,9 +69,9 @@ export const PLACEHOLDER_SLUG = "GYM-SLUG-HERE";
 async function resolvePartner(
   gymSlug?: string | null,
   gymDisplayName?: string | null
-): Promise<{ id: string; fee_per_learner_pence: number; commission_terms: string; payout_terms_days: number } | null> {
+): Promise<{ id: string; slug: string; fee_per_learner_pence: number; commission_terms: string; payout_terms_days: number } | null> {
   const admin = getSupabaseAdmin();
-  const columns = "id, fee_per_learner_pence, commission_terms, payout_terms_days";
+  const columns = "id, slug, fee_per_learner_pence, commission_terms, payout_terms_days";
 
   // A gym page copied from _gym-template without editing its config ships this
   // literal placeholder. Treat it as no attribution rather than letting it
@@ -145,8 +154,41 @@ export async function recordPartnerSale(
     const enrolledAt = input.enrolledAt ?? new Date();
 
     const isDeposit = isDepositSale(input);
+    const rung = isRung(input.rung) ? input.rung : null;
+    const memberSavingPence = Math.max(0, Math.round(Number(input.memberSavingPence) || 0));
 
-    const row = {
+    // ATP's £1,099 rung earns £500 for its next three sales from the start of
+    // the test, then £400. Count the ones already recorded (this one excluded:
+    // a redelivered webhook must not count itself).
+    let priorPif1099Count = 0;
+    if (isAtp(partner.slug) && rung === "pif_1099") {
+      const { count, error: countError } = await getSupabaseAdmin()
+        .from("pp_sales")
+        .select("id", { count: "exact", head: true })
+        .eq("partner_id", partner.id)
+        .eq("rung", "pif_1099")
+        .eq("status", "confirmed")
+        .gte("enrolled_at", ATP_LADDER.startsAt)
+        .neq("stripe_session_id", input.stripeSessionId);
+      if (countError) {
+        // Unknown count: pay the lower figure and say so, rather than guess high.
+        console.error("[partner-sales] ATP pif_1099 count failed — stamping the after-three rate:", countError);
+        priorPif1099Count = ATP_LADDER.pif1099FullRateCount;
+      } else {
+        priorPif1099Count = count ?? 0;
+      }
+    }
+
+    const commissionPence = commissionForSale({
+      partnerSlug: partner.slug,
+      terms: partner.commission_terms,
+      feePerLearnerPence: partner.fee_per_learner_pence,
+      rung,
+      memberSavingPence,
+      priorPif1099Count,
+    });
+
+    const row: Record<string, unknown> = {
       partner_id: partner.id,
       stripe_session_id: input.stripeSessionId,
       stripe_subscription_id: input.stripeSubscriptionId ?? null,
@@ -157,7 +199,7 @@ export async function recordPartnerSale(
       amount_due_pence: isDeposit ? contractTotalPence(input) : input.amountTotalPence,
       promo_code: input.promoCode || null,
       status: "confirmed",
-      commission_pence: partner.fee_per_learner_pence,
+      commission_pence: commissionPence,
       commission_status: "accruing",
       commission_release_at: commissionReleaseAt(
         partner.commission_terms,
@@ -166,13 +208,30 @@ export async function recordPartnerSale(
         partner.payout_terms_days
       ),
       enrolled_at: enrolledAt.toISOString(),
+      rung,
+      member_saving_pence: memberSavingPence,
+      member_code: rung === "pif_1399" || rung === "pif_1099" ? input.promoCode || null : null,
     };
 
     // ignoreDuplicates: a redelivered webhook must not reset amount_paid_pence
     // back to the deposit after instalments have already been credited.
-    const { error } = await getSupabaseAdmin()
+    let { error } = await getSupabaseAdmin()
       .from("pp_sales")
       .upsert(row, { onConflict: "stripe_session_id", ignoreDuplicates: true });
+
+    // Deployed before 20261010_pp_partner_ladder.sql ran: the ladder columns do
+    // not exist yet. Record the sale without them — commission_pence above is
+    // already right — rather than lose it, and say so loudly.
+    if (error && LADDER_COLUMNS.some((c) => String(error?.message ?? "").includes(c))) {
+      console.error(
+        `[partner-sales] LADDER MIGRATION NOT APPLIED — recorded ${input.stripeSessionId} without rung/member columns (rung ${rung ?? "-"}). Apply supabase/migrations/20261010_pp_partner_ladder.sql.`
+      );
+      const legacyRow = { ...row };
+      for (const c of LADDER_COLUMNS) delete legacyRow[c];
+      ({ error } = await getSupabaseAdmin()
+        .from("pp_sales")
+        .upsert(legacyRow, { onConflict: "stripe_session_id", ignoreDuplicates: true }));
+    }
 
     if (error) {
       console.error("[partner-sales] pp_sales upsert failed:", error);
@@ -237,11 +296,11 @@ export async function applyInstalmentToPartnerSale(args: {
 
       const terms = String(partner?.commission_terms ?? "instalment_2");
       if (commissionReleasedByPayment(terms, args.kind, args.settled)) {
-        // payment_5 releases on the 5th payment itself — no further wait: the
+        // payment_5 / ladder release on the trigger itself — no further wait: the
         // fee is payable from that point. instalment_2 keeps its old rule of
         // payout_terms_days after the trigger.
         const release = new Date();
-        if (terms !== "payment_5") {
+        if (!releasesAtPayment5(terms)) {
           release.setUTCDate(release.getUTCDate() + Number(partner?.payout_terms_days ?? 30));
         }
         update.commission_release_at = release.toISOString();

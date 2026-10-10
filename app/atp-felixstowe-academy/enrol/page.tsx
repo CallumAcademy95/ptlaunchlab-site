@@ -40,7 +40,7 @@ export default function AtpFelixstoweEnrolPage() {
       </div>
 
       {/* Enrolment flow — referral pre-set */}
-      <EnrolmentFlow partner={ATP_PARTNER} standalone />
+      <EnrolmentFlow partner={ATP_PARTNER} standalone ladder="atp" />
 
       {/* Minimal footer */}
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">

@@ -16,6 +16,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const demoAcademy: GymConfig = {
   gymName: "Northgate Strength",
+  gymSlug: "demo",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "/logos/ultimate-shred.png",
   logoAlt: "Northgate Strength",
 

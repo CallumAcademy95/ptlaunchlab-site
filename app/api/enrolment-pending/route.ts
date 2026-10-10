@@ -73,9 +73,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true }); // nothing useful to alert on
   }
 
-  const planLabel = plan === "full"
-    ? `Pay in Full — ${COURSE_PRICE_LABEL}`
-    : `Pay Monthly — ${MONTHLY_PLAN_LABEL}`;
+  // ATP Fitness Felixstowe's ladder (v4.1) sells two more shapes. Named from a
+  // fixed list, never from client text, so the alert cannot be made to say
+  // anything else.
+  const ATP_RUNG_LABELS: Record<string, string> = {
+    six_month: "6-Month Plan — £599 today + 5 × £200 (£1,599)",
+    pif_1599: "Pay in Full — £1,599 (member code checked at checkout)",
+  };
+  const rungLabel =
+    typeof body.rung === "string" && Object.hasOwn(ATP_RUNG_LABELS, body.rung) ? ATP_RUNG_LABELS[body.rung] : undefined;
+  const planLabel = rungLabel
+    ?? (plan === "full"
+      ? `Pay in Full — ${COURSE_PRICE_LABEL}`
+      : `Pay Monthly — ${MONTHLY_PLAN_LABEL}`);
 
   const startedAt = new Date().toLocaleString("en-GB", {
     day: "numeric", month: "long", year: "numeric",

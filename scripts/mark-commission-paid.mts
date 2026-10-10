@@ -16,6 +16,11 @@
  * one gym, which is usually what you want since each transfer is per partner.
  * Only unpaid, non-voided, confirmed sales are touched, so re-running is safe
  * and a second run reports nothing to do.
+ *
+ * v4.1 ladder: a quarterly volume bonus (pp_sales.volume_bonus_pence, written
+ * by scripts/partner-quarter-topup.mts) is settled on its own — it is often
+ * written onto a sale whose commission was already paid. Any unpaid bonus on a
+ * sale in scope is included in the payout and stamped volume_bonus_payout_id.
  */
 
 import { readFileSync } from "node:fs";
@@ -54,7 +59,12 @@ interface Sale {
   id: string; partner_id: string; learner_name: string | null;
   commission_pence: number; commission_status: string;
   commission_release_at: string | null; enrolled_at: string;
+  volume_bonus_pence: number; volume_bonus_payout_id: string | null;
 }
+/** What this run pays on a sale: unpaid commission plus any unpaid bonus. */
+const baseDue = (s: Sale) => (s.commission_status !== "paid" ? s.commission_pence : 0);
+const bonusDue = (s: Sale) => (s.volume_bonus_pence > 0 && !s.volume_bonus_payout_id ? s.volume_bonus_pence : 0);
+const dueOn = (s: Sale) => baseDue(s) + bonusDue(s);
 interface Partner { id: string; slug: string; gym_name: string }
 
 const partners = await api<Partner[]>("pp_partners?select=id,slug,gym_name");
@@ -63,12 +73,18 @@ const byId = new Map(partners.map((p) => [p.id, p]));
 const scoped = partners.filter((p) => !PARTNER_SLUG || p.slug === PARTNER_SLUG);
 if (PARTNER_SLUG && !scoped.length) throw new Error(`No partner with slug "${PARTNER_SLUG}"`);
 
-const sales = await api<Sale[]>(
-  `pp_sales?select=id,partner_id,learner_name,commission_pence,commission_status,commission_release_at,enrolled_at` +
-  `&enrolled_at=lt.${BEFORE}&commission_status=neq.paid&commission_status=neq.voided&status=eq.confirmed` +
-  `&partner_id=in.(${scoped.map((p) => p.id).join(",")})` +
-  `&order=enrolled_at`
+const COLS =
+  "id,partner_id,learner_name,commission_pence,commission_status,commission_release_at,enrolled_at," +
+  "volume_bonus_pence,volume_bonus_payout_id";
+const scope = `&enrolled_at=lt.${BEFORE}&commission_status=neq.voided&status=eq.confirmed` +
+  `&partner_id=in.(${scoped.map((p) => p.id).join(",")})`;
+const unpaid = await api<Sale[]>(`pp_sales?select=${COLS}${scope}&commission_status=neq.paid&order=enrolled_at`);
+// Paid sales still owed a volume bonus.
+const bonusOnly = await api<Sale[]>(
+  `pp_sales?select=${COLS}${scope}&commission_status=eq.paid&volume_bonus_pence=gt.0&volume_bonus_payout_id=is.null&order=enrolled_at`
 );
+// Every unpaid sale (its commission, plus any bonus) and every paid sale still owed a bonus.
+const sales = [...unpaid, ...bonusOnly];
 
 if (!sales.length) {
   console.log(`Nothing to mark — no unpaid commission on enrolments before ${BEFORE}.`);
@@ -96,7 +112,7 @@ console.log(`${APPLY ? "APPLYING" : "DRY RUN"} — marking commission paid on ${
 for (const [key, rows] of [...grouped.entries()].sort()) {
   const [partnerId, dateKey] = key.split("|");
   const partner = byId.get(partnerId);
-  const total = rows.reduce((t, s) => t + s.commission_pence, 0);
+  const total = rows.reduce((t, s) => t + dueOn(s), 0);
   const due = dateKey === "unreleased" ? null : dateKey;
 
   const label = args.label
@@ -107,10 +123,11 @@ for (const [key, rows] of [...grouped.entries()].sort()) {
 
   console.log(
     `  ${(partner?.gym_name ?? partnerId).padEnd(22)} ${label.padEnd(28)} ` +
-    `${rows.length} × £500 = £${(total / 100).toLocaleString()}`
+    `${rows.length} enrolment(s) = £${(total / 100).toLocaleString()}`
   );
   for (const s of rows) {
-    console.log(`      enrolled ${s.enrolled_at.slice(0, 10)}  ${s.learner_name ?? "—"}`);
+    const bonus = bonusDue(s) ? ` + £${bonusDue(s) / 100} volume bonus` : "";
+    console.log(`      enrolled ${s.enrolled_at.slice(0, 10)}  ${s.learner_name ?? "—"}  £${baseDue(s) / 100}${bonus}`);
   }
 
   if (!APPLY) continue;
@@ -130,10 +147,20 @@ for (const [key, rows] of [...grouped.entries()].sort()) {
     }),
   });
 
-  await api(`pp_sales?id=in.(${rows.map((s) => s.id).join(",")})`, {
-    method: "PATCH",
-    body: JSON.stringify({ commission_status: "paid", payout_id: payout.id }),
-  });
+  const baseRows = rows.filter((s) => s.commission_status !== "paid");
+  const bonusRows = rows.filter((s) => bonusDue(s) > 0);
+  if (baseRows.length) {
+    await api(`pp_sales?id=in.(${baseRows.map((s) => s.id).join(",")})`, {
+      method: "PATCH",
+      body: JSON.stringify({ commission_status: "paid", payout_id: payout.id }),
+    });
+  }
+  if (bonusRows.length) {
+    await api(`pp_sales?id=in.(${bonusRows.map((s) => s.id).join(",")})`, {
+      method: "PATCH",
+      body: JSON.stringify({ volume_bonus_payout_id: payout.id }),
+    });
+  }
   console.log(`      → payout ${payout.id} recorded`);
 }
 

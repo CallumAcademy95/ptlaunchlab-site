@@ -2,6 +2,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 export const sixFitAcademy: GymConfig = {
   gymName: "6fit Gyms",
+  gymSlug: "6fit",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "https://6fitgyms.co.uk/wp-content/uploads/2022/12/6fit_FF-02.png",
   primaryColor: "#ed0000",
   heroBg: "#000000",

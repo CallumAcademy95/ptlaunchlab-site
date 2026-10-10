@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
+import { memberSavingForGym } from "@/app/lib/gyms";
 import type { PartnerConfig } from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
@@ -36,7 +37,11 @@ export default function IronWolfEnrolPage() {
         </div>
       </div>
 
-      <EnrolmentFlow partner={PARTNER} standalone />
+      <EnrolmentFlow
+        partner={PARTNER}
+        standalone
+        memberSavingPence={memberSavingForGym(PARTNER.gymSlug).savingPence}
+      />
 
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">
         <p className="text-[#4A6280] text-xs">

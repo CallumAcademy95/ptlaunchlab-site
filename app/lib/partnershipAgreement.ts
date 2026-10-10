@@ -38,19 +38,25 @@
  *                   excepted); promotional codes removed from tracking; monthly
  *                   marketing support, first introductions and 5-mile local
  *                   exclusivity written in. v4.0 signers get commission_terms = 'payment_5'.
+ *   v4.1 2026-10-11 Commission schedule replaces the flat fee: £400 pay in full,
+ *                   £250 monthly; £500 / £300 for every learner in a quarter in
+ *                   which the gym refers 4 or more; optional member saving of up
+ *                   to £100 on pay in full, taken from the gym's fee; separately
+ *                   agreed written fees prevail. v4.1 signers get commission_terms
+ *                   = 'ladder'.
  *
  * Commission RELEASE MECHANICS are unchanged between v2.0 and v3.0, so v3.0
  * signers keep commission_terms = 'instalment_2'. No migration is needed.
  */
 
-export const PARTNERSHIP_AGREEMENT_VERSION = "4.0";
+export const PARTNERSHIP_AGREEMENT_VERSION = "4.1";
 
 /** Short label for the admin email / partner record. */
 export const PARTNERSHIP_AGREEMENT_SUMMARY =
-  "£250 inc. VAT · paid 30 days after pay-in-full or at the 5th monthly payment · no clawback once paid · 5-mile exclusivity";
+  "£400 pay in full / £250 monthly inc. VAT; £500 / £300 at 4+ learners a quarter · paid 30 days after pay-in-full or at the 5th monthly payment · no clawback · 5-mile exclusivity";
 
 /** The referral fee, in pence. Mirrors pp_partners.fee_per_learner_pence. */
-export const DEFAULT_FEE_PER_LEARNER_PENCE = 25_000;
+export const DEFAULT_FEE_PER_LEARNER_PENCE = 40_000;
 
 // ─── Document model ───────────────────────────────────────────────────────────
 
@@ -89,9 +95,9 @@ const s = (text: string): Block => ({ kind: "sub", text });
 export const KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
   {
     clause: "Clause 5",
-    title: "£250 per learner, inclusive of VAT",
+    title: "Commission schedule, inclusive of VAT",
     detail:
-      "You are paid £250 for each learner who enrols through your gym. That figure is inclusive of VAT — nothing is added on top.",
+      "You are paid £400 for each learner who pays in full and £250 for each learner on the monthly plan. In any quarter in which 4 or more learners enrol through your gym, every learner that quarter earns £500 (pay in full) or £300 (monthly). If you choose to give your members a saving on the pay-in-full price, it comes out of your fee. All figures include VAT — nothing is added on top.",
   },
   {
     clause: "Clause 5.4",
@@ -219,7 +225,18 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
       title: "Payment Terms",
       blocks: [
         p(
-          "5.1  Fee — PT Launch Lab shall pay the Partner Gym £250 for each successfully enrolled learner (the “Fee”), as defined in Clause 4.3."
+          "5.1  Fee — PT Launch Lab shall pay the Partner Gym, for each successfully enrolled learner as defined in Clause 4.3, the fee set out in the Commission Schedule below (the “Fee”):"
+        ),
+        b("Learner who pays the course fee in full: £400"),
+        b("Learner on the monthly payment plan: £250"),
+        b(
+          "Volume rate — where 4 or more learners referred by the Partner Gym become successfully enrolled learners in the same calendar quarter, the Fee for every such learner in that quarter is £500 (paid in full) or £300 (monthly payment plan). The difference is paid with the first payment run after the quarter ends, once the underlying Fee has been released under Clause 5.4"
+        ),
+        b(
+          "Member saving — the Partner Gym may elect in writing to offer its members a reduction of up to £100 on the pay-in-full course fee, shown on its academy page. Where it does, the Fee for each learner who receives the reduction is reduced by the same amount. The reduction does not apply to the monthly payment plan"
+        ),
+        p(
+          "5.1A  Separately agreed fees — where PT Launch Lab and the Partner Gym have agreed in writing a different fee for particular learners or payment options, that written agreement prevails over the Commission Schedule for those learners."
         ),
         p(
           "5.2  VAT — the Fee is inclusive of VAT and of any other tax or duty. Where the Partner Gym is registered for VAT, the Fee shall be treated as VAT-inclusive and the Partner Gym shall be responsible for accounting to HM Revenue & Customs for any VAT due on it. No amount is payable by PT Launch Lab in addition to the Fee."

@@ -17,6 +17,8 @@ import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 const config: GymConfig = {
   // ── Identity
   gymName: "GYM NAME HERE",
+  gymSlug: "GYM-SLUG-HERE",       // commission join key — must match the enrol page; never change
+  memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "https://example.com/logo.png",   // gym logo URL
 
   // ── Branding

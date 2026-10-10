@@ -6,7 +6,9 @@ import {
   commissionState,
   commissionReleaseRule,
   formatPence,
+  saleEarnedPence,
 } from "@/app/lib/partner-data";
+import { saleMoney } from "@/app/lib/partnerCommission";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import BankDetailsForm from "./BankDetailsForm";
 
@@ -26,12 +28,19 @@ export default async function PaymentsPage() {
   const releaseRule = commissionReleaseRule(partner.commission_terms);
   const terms = partner.commission_terms;
 
-  const payable = sales.filter((s) => commissionState(s, terms).key === "payable");
-  const held = sales.filter((s) => commissionState(s, terms).key === "held");
+  // saleMoney() splits each sale's commission AND any quarterly volume bonus
+  // into paid / payable / held — the same rule the payout run settles by. A
+  // bonus can be owed on a sale whose own commission was already paid.
+  const nowMs = Date.now();
+  const money = new Map(sales.map((s) => [s.id, saleMoney(s, nowMs)]));
+  const m = (s: (typeof sales)[number]) => money.get(s.id)!;
+  const payable = sales.filter((s) => m(s).payable > 0);
+  const held = sales.filter((s) => m(s).held > 0);
   const paid = sales.filter((s) => commissionState(s, terms).key === "paid");
 
-  const sum = (rows: typeof sales) => rows.reduce((t, s) => t + s.commission_pence, 0);
-  const outstanding = sum(payable);
+  const outstanding = payable.reduce((t, s) => t + m(s).payable, 0);
+  const heldTotal = held.reduce((t, s) => t + m(s).held, 0);
+  const paidTotal = sales.reduce((t, s) => t + m(s).paid, 0);
 
   // Soonest release first — this is the "when do I get the rest" question.
   const upcoming = [...held].sort(
@@ -74,14 +83,14 @@ export default async function PaymentsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-card border border-white/10 p-5">
               <p className="text-soft text-[10px] font-bold tracking-widest uppercase">Still accruing</p>
-              <p className="text-white font-bold text-2xl mt-1.5">{formatPence(sum(held))}</p>
+              <p className="text-white font-bold text-2xl mt-1.5">{formatPence(heldTotal)}</p>
               <p className="text-soft text-xs mt-1">
                 {held.length} enrolment{held.length === 1 ? "" : "s"} not yet released
               </p>
             </div>
             <div className="rounded-xl bg-card border border-white/10 p-5">
               <p className="text-soft text-[10px] font-bold tracking-widest uppercase">Already paid</p>
-              <p className="text-white font-bold text-2xl mt-1.5">{formatPence(sum(paid))}</p>
+              <p className="text-white font-bold text-2xl mt-1.5">{formatPence(paidTotal)}</p>
               <p className="text-soft text-xs mt-1">
                 {paid.length} enrolment{paid.length === 1 ? "" : "s"} settled
               </p>
@@ -99,7 +108,7 @@ export default async function PaymentsPage() {
                       <p className="text-soft text-xs">{commissionState(s, terms).label}</p>
                     </div>
                     <span className="text-white font-semibold shrink-0">
-                      {formatPence(s.commission_pence)}
+                      {formatPence(m(s).held || saleEarnedPence(s))}
                     </span>
                   </div>
                 ))}
@@ -150,8 +159,20 @@ export default async function PaymentsPage() {
               <li className="flex gap-3">
                 <span aria-hidden className="text-gold">1.</span>
                 <span>
-                  You earn <strong className="text-white">{formatPence(partner.fee_per_learner_pence)}</strong>{" "}
-                  for every member who enrols and pays through your academy link.
+                  {partner.commission_terms === "ladder" ? (
+                    <>
+                      You earn <strong className="text-white">£400</strong> for every member who pays in full
+                      (less any member saving you give) and <strong className="text-white">£250</strong> for every
+                      member on the monthly plan, through your academy link. With 4 or more learners in a calendar
+                      quarter, every learner that quarter moves to the volume rate (£500 / £300), paid with the
+                      payout run after the quarter ends.
+                    </>
+                  ) : (
+                    <>
+                      You earn <strong className="text-white">{formatPence(partner.fee_per_learner_pence)}</strong>{" "}
+                      for every member who enrols and pays through your academy link.
+                    </>
+                  )}
                 </span>
               </li>
               <li className="flex gap-3">
