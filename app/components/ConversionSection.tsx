@@ -1,5 +1,6 @@
 'use client';
-import { trackEvent } from '@/app/lib/gtag';
+
+import WasPrice from '@/app/components/WasPrice';import { trackEvent } from '@/app/lib/gtag';
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS } from '@/app/lib/pricing';
 
 export default function ConversionSection() {
@@ -70,7 +71,7 @@ export default function ConversionSection() {
               </span>
             </div>
             <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-1">Pay in Full</h3>
-            <p className="text-gold font-bold text-lg mb-4">{COURSE_PRICE_LABEL}, everything included</p>
+            <p className="text-gold font-bold text-lg mb-4">{COURSE_PRICE_LABEL}, everything included <WasPrice note className="ml-2 align-middle text-white" /></p>
             <p className="text-soft/65 text-[15px] leading-relaxed mb-7">
               One payment, and immediate access to your tutor, the NCFE qualification, the £500 business mentorship community, and the guaranteed gym introduction you get on qualifying. No instalments, no additional fees.
             </p>

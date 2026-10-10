@@ -1,5 +1,6 @@
 "use client";
 
+import WasPrice from "@/app/components/WasPrice";
 import { trackEvent } from "@/app/lib/gtag";
 import {
   COURSE_PRICE_LABEL,
@@ -108,7 +109,7 @@ export default function FunnelPricingBlock({
                 className="font-display font-extrabold text-3xl tabular-nums"
                 style={{ color: accent }}
               >
-                {COURSE_PRICE_LABEL}
+                {COURSE_PRICE_LABEL} <WasPrice className="ml-1 align-middle text-white" />
               </span>
             </div>
             <p className="text-faint text-[11px] mt-2">
@@ -138,7 +139,7 @@ export default function FunnelPricingBlock({
             className="font-display font-extrabold text-3xl block mb-1"
             style={{ color: accent }}
           >
-            {COURSE_PRICE_LABEL}
+            {COURSE_PRICE_LABEL} <WasPrice note className="ml-1 align-middle text-white" />
           </span>
           <p className="text-faint text-xs mb-4">One payment · nothing further to pay</p>
           <button
