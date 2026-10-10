@@ -7,6 +7,7 @@ import {
   formatPence,
   type PartnerSale,
 } from "@/app/lib/partner-data";
+import { saleMoney } from "@/app/lib/partnerCommission";
 
 const STATE_STYLES: Record<string, string> = {
   paid: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
@@ -61,13 +62,14 @@ export default async function SalesPage({
   // Totals follow the filter, so the numbers always describe what is on screen.
   // "Earned" is everything not voided, paid or otherwise — the split between
   // settled and outstanding lives on the Payments page.
+  // saleMoney() counts any quarterly volume bonus alongside the commission.
   let earned = 0, payable = 0, held = 0;
+  const nowMs = Date.now();
   for (const s of sales) {
-    const state = commissionState(s, partner.commission_terms);
-    if (state.key === "voided") continue;
-    earned += s.commission_pence;
-    if (state.key === "payable") payable += s.commission_pence;
-    else if (state.key === "held") held += s.commission_pence;
+    const m = saleMoney(s, nowMs);
+    earned += m.earned;
+    payable += m.payable;
+    held += m.held;
   }
 
   return (
@@ -166,6 +168,11 @@ export default async function SalesPage({
                       <td className="px-4 py-3"><Progress sale={s} /></td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="text-white font-semibold">{formatPence(s.commission_pence)}</span>
+                        {(s.volume_bonus_pence ?? 0) > 0 && (
+                          <span className="ml-1 text-gold text-xs font-semibold">
+                            + {formatPence(s.volume_bonus_pence ?? 0)} volume
+                          </span>
+                        )}
                         <span
                           className={`ml-2 inline-block px-2 py-0.5 rounded-full border text-[10px] font-semibold ${STATE_STYLES[state.key]}`}
                         >

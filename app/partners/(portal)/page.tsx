@@ -1,6 +1,23 @@
 import Link from "next/link";
 import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
-import { getPartnerSummary, formatPence, commissionReleaseRule } from "@/app/lib/partner-data";
+import {
+  getPartnerSummary,
+  getQuarterLearnerCount,
+  formatPence,
+  commissionReleaseRule,
+} from "@/app/lib/partner-data";
+import {
+  ATP_LADDER,
+  isAtp,
+  LADDER_MONTHLY_COMMISSION_PENCE,
+  LADDER_PIF_COMMISSION_PENCE,
+  LADDER_TERMS,
+  quarterOf,
+  VOLUME_BONUS_MONTHLY_PENCE,
+  VOLUME_BONUS_PIF_PENCE,
+  VOLUME_THRESHOLD,
+  volumeProgressMessage,
+} from "@/app/lib/partnerCommission";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import CopyButton from "./CopyButton";
 import Welcome from "./Welcome";
@@ -18,10 +35,19 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 export default async function MyAcademyPage() {
   const session = await requirePartner();
   const { partner } = session;
-  const [summary, bank] = await Promise.all([
+  const [summary, bank, quarterLearners] = await Promise.all([
     getPartnerSummary(partner.id),
     getMaskedBankDetails(partner.id),
+    getQuarterLearnerCount(partner.id),
   ]);
+  // v4.1: the nine gyms on 'ladder' terms see their quarter's progress towards
+  // the volume rate; ATP sees its own rungs (it is not on the volume rate).
+  const atp = isAtp(partner.slug);
+  const onLadder = partner.commission_terms === LADDER_TERMS && !atp;
+  const quarter = quarterOf(new Date());
+  const quarterEnds = new Date(quarter.end.getTime() - 1).toLocaleDateString("en-GB", {
+    day: "numeric", month: "long",
+  });
 
   // (The "launch offer" banner that used to sit here is retired: there are no
   // promo codes, discounts or dated offers any more — October 2026.)
@@ -113,6 +139,82 @@ export default async function MyAcademyPage() {
           </p>
         )}
       </section>
+
+      {/* ── Commission rates (v4.1 ladder) ─────────────────────────────── */}
+      {onLadder && (
+        <section>
+          <h2 className="text-white font-bold text-xl mb-1">This quarter</h2>
+          <p className="text-soft text-sm mb-4">Runs to {quarterEnds}.</p>
+          <div className="rounded-xl bg-card border border-white/10 p-5 space-y-4">
+            <p className="text-white font-semibold">{volumeProgressMessage(quarterLearners)}</p>
+            <div className="h-2 rounded-full bg-white/10 overflow-hidden" aria-hidden>
+              <div
+                className="h-full bg-gold"
+                style={{ width: `${Math.min(100, Math.round((quarterLearners / VOLUME_THRESHOLD) * 100))}%` }}
+              />
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-soft text-[10px] uppercase tracking-widest text-left">
+                  <th className="py-2 font-bold">Learner pays</th>
+                  <th className="py-2 font-bold">You earn</th>
+                  <th className="py-2 font-bold">Volume rate ({VOLUME_THRESHOLD}+ a quarter)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                <tr>
+                  <td className="py-2 text-white">In full</td>
+                  <td className="py-2 text-white">{formatPence(LADDER_PIF_COMMISSION_PENCE)}</td>
+                  <td className="py-2 text-gold font-semibold">
+                    {formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE)}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 text-white">Monthly</td>
+                  <td className="py-2 text-white">{formatPence(LADDER_MONTHLY_COMMISSION_PENCE)}</td>
+                  <td className="py-2 text-gold font-semibold">
+                    {formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <p className="text-soft text-xs leading-relaxed">
+              Reach {VOLUME_THRESHOLD} learners in a calendar quarter and every learner that quarter moves to
+              the volume rate, including the ones already enrolled. The top-up is paid with the payout run
+              after the quarter ends. If you give your members a saving on paying in full, it comes off the
+              in-full figure.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {atp && (
+        <section>
+          <h2 className="text-white font-bold text-xl mb-4">Your rates</h2>
+          <div className="rounded-xl bg-card border border-white/10 p-5">
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-white/10">
+                {[
+                  ["6-month plan, £1,599", ATP_LADDER.commission.six_month],
+                  ["In full, £1,599", ATP_LADDER.commission.pif_1599],
+                  ["In full with code ATPPT, £1,399", ATP_LADDER.commission.pif_1399],
+                  [`In full with code ATP500, £1,099 (next ${ATP_LADDER.pif1099FullRateCount}, then ${formatPence(ATP_LADDER.pif1099AfterPence)})`, ATP_LADDER.commission.pif_1099],
+                  ["In full, £999.99", ATP_LADDER.commission.pif],
+                  ["Monthly, 10 × £99.99", ATP_LADDER.commission.monthly],
+                ].map(([label, pence]) => (
+                  <tr key={String(label)}>
+                    <td className="py-2 text-white">{label}</td>
+                    <td className="py-2 text-gold font-semibold text-right">{formatPence(Number(pence))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-soft text-xs mt-3">
+              {quarterLearners} learner{quarterLearners === 1 ? "" : "s"} this quarter.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* ── Next action ────────────────────────────────────────────────── */}
       {/* One card, not a list. Missing bank details outrank everything else —

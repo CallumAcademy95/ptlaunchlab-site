@@ -24,6 +24,7 @@ import { demoPartnerIds } from "./demo";
 import { formatUkPhone, isUkMobile } from "./phone";
 import SetContactForm from "./SetContactForm";
 import { canBePaid } from "@/app/lib/security/payoutRules";
+import { saleMoney } from "@/app/lib/partnerCommission";
 import CreateUserForm from "./CreateUserForm";
 import MarkPaidForm from "./MarkPaidForm";
 import BankReveal from "./BankReveal";
@@ -94,19 +95,24 @@ export default async function AdminPartnersPage({
   // hasn't been paid. Derived from the release date rather than a status
   // column, same rule the partner-facing pages use.
   const nowIso = new Date().toISOString();
+  // Paid sales are read too: a quarterly volume bonus can land on a sale whose
+  // commission was already paid, and is owed on its own. saleMoney() is the
+  // same rule markCommissionPaid settles by, so the two cannot disagree.
   const { data: payableRows } = await getSupabaseAdmin()
     .from("pp_sales")
-    .select("partner_id, commission_pence")
+    .select("partner_id, status, commission_pence, commission_status, commission_release_at, volume_bonus_pence, volume_bonus_payout_id")
     .eq("status", "confirmed")
-    .neq("commission_status", "paid")
     .neq("commission_status", "voided")
     .not("commission_release_at", "is", null)
     .lte("commission_release_at", nowIso);
 
   const payable = new Map<string, { total: number; count: number }>();
-  for (const row of (payableRows ?? []) as { partner_id: string; commission_pence: number }[]) {
+  const nowMs = Date.parse(nowIso);
+  for (const row of (payableRows ?? []) as unknown as ({ partner_id: string } & Parameters<typeof saleMoney>[0])[]) {
+    const owed = saleMoney(row, nowMs).payable;
+    if (owed <= 0) continue;
     const entry = payable.get(row.partner_id) ?? { total: 0, count: 0 };
-    entry.total += row.commission_pence;
+    entry.total += owed;
     entry.count += 1;
     payable.set(row.partner_id, entry);
   }
@@ -120,7 +126,7 @@ export default async function AdminPartnersPage({
       .select(
         "id, partner_id, learner_name, learner_email, plan_type, amount_paid_pence, " +
         "promo_code, status, commission_pence, commission_status, commission_release_at, " +
-        "enrolled_at, created_at"
+        "volume_bonus_pence, enrolled_at, created_at"
       )
       .order("created_at", { ascending: false }),
     getSupabaseAdmin()
@@ -152,7 +158,8 @@ export default async function AdminPartnersPage({
   for (const s of sales) {
     if (s.status === "voided") continue;
     learnersFor.set(s.partner_id, (learnersFor.get(s.partner_id) ?? 0) + 1);
-    if (s.commission_pence) earnedFor.set(s.partner_id, (earnedFor.get(s.partner_id) ?? 0) + s.commission_pence);
+    const earnedOnSale = (s.commission_pence ?? 0) + (s.volume_bonus_pence ?? 0);
+    if (earnedOnSale) earnedFor.set(s.partner_id, (earnedFor.get(s.partner_id) ?? 0) + earnedOnSale);
   }
   const paidFor = new Map<string, number>();
   for (const p of payouts) {

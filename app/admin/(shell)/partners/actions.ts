@@ -10,6 +10,7 @@ import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resource
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 import { payoutRefusalReason } from "@/app/lib/security/payoutRules";
+import { saleMoney } from "@/app/lib/partnerCommission";
 
 // Gated by the existing admin auth cookie via isProtectedAdminPath in
 // middleware.ts — every /admin/* path already requires it, including the server
@@ -390,23 +391,34 @@ export async function markCommissionPaid(
   // Only commission that has actually released. Re-reading here rather than
   // trusting an id list from the form means a sale that released, or got
   // voided, between page render and submit is handled correctly.
-  const { data: sales, error } = await admin
+  //
+  // Already-paid sales are read too: a quarterly volume bonus is written after
+  // the quarter ends, often onto a sale whose own commission has been paid, and
+  // it is settled on its own (volume_bonus_payout_id). saleMoney() decides
+  // what is payable on each sale.
+  const now = Date.now();
+  const { data: rows, error } = await admin
     .from("pp_sales")
-    .select("id, commission_pence, commission_release_at")
+    .select(
+      "id, status, commission_pence, commission_status, commission_release_at, volume_bonus_pence, volume_bonus_payout_id"
+    )
     .eq("partner_id", partnerId)
     .eq("status", "confirmed")
-    .neq("commission_status", "paid")
     .neq("commission_status", "voided")
     .not("commission_release_at", "is", null)
-    .lte("commission_release_at", new Date().toISOString());
+    .lte("commission_release_at", new Date(now).toISOString());
 
   if (error) {
     console.error("[admin/partners] payable lookup failed:", error);
     return { error: "Could not read what's payable. Nothing was changed." };
   }
-  if (!sales?.length) return { error: "Nothing is payable for that partner right now." };
+  const money = (rows ?? []).map((s) => ({ id: s.id as string, m: saleMoney(s as never, now) }));
+  const baseIds = money.filter((x) => x.m.payableCommission > 0).map((x) => x.id);
+  const bonusIds = money.filter((x) => x.m.payableBonus > 0).map((x) => x.id);
+  const sales = money.filter((x) => x.m.payable > 0);
+  if (!sales.length) return { error: "Nothing is payable for that partner right now." };
 
-  const total = sales.reduce((t, s) => t + (s.commission_pence as number), 0);
+  const total = sales.reduce((t, x) => t + x.m.payable, 0);
 
   const { data: payout, error: payoutError } = await admin
     .from("pp_payouts")
@@ -426,12 +438,20 @@ export async function markCommissionPaid(
     return { error: "Could not record the payment. Nothing was changed." };
   }
 
-  const { error: linkError } = await admin
-    .from("pp_sales")
-    .update({ commission_status: "paid", payout_id: payout.id })
-    .in("id", sales.map((s) => s.id));
+  const { error: baseError } = baseIds.length
+    ? await admin.from("pp_sales").update({ commission_status: "paid", payout_id: payout.id }).in("id", baseIds)
+    : { error: null };
+  const { error: bonusError } = !baseError && bonusIds.length
+    ? await admin.from("pp_sales").update({ volume_bonus_payout_id: payout.id }).in("id", bonusIds)
+    : { error: null };
+  const linkError = baseError ?? bonusError;
 
   if (linkError) {
+    // Undo any half-link before removing the payout, so nothing points at it
+    // and nothing reads as paid that was not.
+    if (baseIds.length) {
+      await admin.from("pp_sales").update({ commission_status: "accruing", payout_id: null }).eq("payout_id", payout.id);
+    }
     // Leave no payout with nothing attached — it would inflate the partner's
     // "already paid" total against enrolments still showing as owed.
     await admin.from("pp_payouts").delete().eq("id", payout.id);
