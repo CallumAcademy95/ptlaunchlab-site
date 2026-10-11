@@ -268,11 +268,11 @@ test("ATP with no rung (raw link fallback) keeps its fee", () => {
 
 // ─── Member codes ───────────────────────────────────────────────────────────
 
-test("codes: ATPPT and ATP500 on ATP only", () => {
-  assert.deepEqual(resolveMemberCode("atp-felixstowe", "ATPPT"), { kind: "valid", code: "ATPPT", coupon: "buPzSnaF", offPence: 20_000, rung: "pif_1399" });
-  assert.deepEqual(resolveMemberCode("atp-felixstowe", " atp 500 "), { kind: "valid", code: "ATP500", coupon: "vgLNHktz", offPence: 50_000, rung: "pif_1099" });
-  assert.equal(ATP_LADDER.pif1599Pence - 20_000, 139_900);
-  assert.equal(ATP_LADDER.pif1599Pence - 50_000, 109_900);
+test("codes: ATPPT, ATP500 and ATP600 on ATP only", () => {
+  assert.deepEqual(resolveMemberCode("atp-felixstowe", "ATPPT"), { kind: "valid", code: "ATPPT" });
+  assert.deepEqual(resolveMemberCode("atp-felixstowe", " atp 500 "), { kind: "valid", code: "ATP500" });
+  assert.deepEqual(resolveMemberCode("atp-felixstowe", "atp600"), { kind: "valid", code: "ATP600" });
+  assert.equal(ATP_LADDER.pif1599Pence, 159_900);
 });
 
 test("codes: anything else is invalid on ATP; nothing at all on any other gym", () => {

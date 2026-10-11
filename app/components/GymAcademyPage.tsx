@@ -18,8 +18,8 @@ import GymCallbackForm from "@/app/components/GymCallbackForm";
 const TYPICAL_COST_LABEL = "£1,200–£2,800";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
-/** What paying in full saves against the 6-month plan: £1,599 − £999.99 = £599.01, shown as £599 (never rounded up). */
-const ATP_PIF_SAVING = `£${Math.floor((ATP_LADDER.sixMonth.contractPence - COURSE_PRICE_PENCE) / 100)}`;
+/** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
+const ATP_CODE_SAVING = `£${Math.floor((ATP_LADDER.sixMonth.contractPence - COURSE_PRICE_PENCE) / 100)}`;
 const ATP_DEPOSIT = formatPence(ATP_LADDER.sixMonth.depositPence); // £599
 const ATP_INSTALMENT = formatPence(ATP_LADDER.sixMonth.instalmentPence); // £200
 
@@ -89,8 +89,8 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
             {atp ? (
               <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
-                <span className="text-white font-black text-xl uppercase tracking-wide">{ATP_SIX_MONTH_TOTAL} on our 6-month plan</span>
-                <span className="text-white text-sm font-bold">or {COURSE_PRICE_LABEL} paid in full, save {ATP_PIF_SAVING}</span>
+                <span className="text-white font-black text-xl uppercase tracking-wide">{ATP_SIX_MONTH_TOTAL}</span>
+                <span className="text-white text-sm font-bold">Save {ATP_CODE_SAVING} with your ATP member code</span>
               </div>
             ) : (
               <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
@@ -282,7 +282,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-4">Your Investment</h2>
             {atp ? (
               <p className="text-gray-600 text-base mb-10">
-                Most PT qualifications cost {TYPICAL_COST_LABEL}. Spread it over 6 months, or pay in full and save {ATP_PIF_SAVING}.
+                Most PT qualifications cost {TYPICAL_COST_LABEL}. ATP members save {ATP_CODE_SAVING} with their member code.
               </p>
             ) : (
               <p className="text-gray-600 text-base mb-10">
@@ -290,33 +290,36 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 {COURSE_PRICE_LABEL}, everything included.
               </p>
             )}
-            {/* ATP Fitness Felixstowe: George's two-step pitch (11 Oct 2026).
-                The 6-month plan really is £1,599, so "save £599 against the
-                6-month plan" is a true comparison, not a reference price.
-                10 × £99.99 is not on this page; George sends
-                /atp-felixstowe-academy/enrol?plan=monthly when someone needs it. */}
+            {/* ATP Fitness Felixstowe (11 Oct 2026): its two £1,599 plans. An ATP
+                member code, entered at enrolment, sells our standard plan instead
+                (£999.99 in full / 10 × £99.99), so it saves £599.01 / £599.10 —
+                shown as £599, never rounded up. George hands out the codes. */}
             {atp ? (
+              <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
-                  <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>Spread the Cost</p>
-                  <p className="text-black font-black text-2xl mb-1">6-Month Plan</p>
-                  <p className="font-black text-4xl mb-1" style={{ color: c.primaryColor }}>{ATP_DEPOSIT} <span className="text-lg text-gray-400 font-bold">today</span></p>
-                  <p className="text-gray-400 text-sm mb-4">then {ATP_LADDER.sixMonth.instalments} monthly payments of {ATP_INSTALMENT}, {ATP_SIX_MONTH_TOTAL} in total</p>
+                  <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>One Payment</p>
+                  <p className="text-black font-black text-2xl mb-1">Pay in Full</p>
+                  <p className="font-black text-4xl mb-1" style={{ color: c.primaryColor }}>{ATP_SIX_MONTH_TOTAL}</p>
+                  <p className="text-gray-400 text-sm mb-4">Nothing further to pay</p>
                   <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-white text-sm text-center hover:opacity-90 transition-all" style={{ backgroundColor: c.primaryColor }}>
-                    Start the 6-Month Plan →
+                    Enrol Now →
                   </a>
                 </div>
                 <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">One Payment</p>
-                  <p className="text-black font-black text-2xl mb-1">Pay in Full</p>
-                  <p className="font-black text-4xl text-black mb-1">{COURSE_PRICE_LABEL}</p>
-                  <p className="font-black text-base mb-1" style={{ color: c.primaryColor }}>Save {ATP_PIF_SAVING} against the 6-month plan</p>
-                  <p className="text-gray-400 text-sm mb-4">Nothing further to pay</p>
+                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Spread the Cost</p>
+                  <p className="text-black font-black text-2xl mb-1">6-Month Plan</p>
+                  <p className="font-black text-4xl text-black mb-1">{ATP_DEPOSIT}<span className="text-lg text-gray-400 font-bold"> today</span></p>
+                  <p className="text-gray-400 text-sm mb-4">then {ATP_LADDER.sixMonth.instalments} monthly payments of {ATP_INSTALMENT}, {ATP_SIX_MONTH_TOTAL} in total</p>
                   <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                    Pay in Full →
+                    Start the 6-Month Plan →
                   </a>
                 </div>
               </div>
+              <p className="mt-6 text-black font-bold">
+                ATP member? Save {ATP_CODE_SAVING} with your member code. Ask the team at {c.gymName} for yours.
+              </p>
+              </>
             ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
@@ -356,7 +359,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             </h2>
             <p className="text-white/70 font-bold uppercase tracking-wide mb-8">
               {atp
-                ? `${ATP_SIX_MONTH_TOTAL} on our 6-month plan, or ${COURSE_PRICE_LABEL} paid in full`
+                ? `${ATP_SIX_MONTH_TOTAL} in full or over 6 months · ATP members save ${ATP_CODE_SAVING} with their code`
                 : `${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL} a month`}
             </p>
             <a href={enrolPath}

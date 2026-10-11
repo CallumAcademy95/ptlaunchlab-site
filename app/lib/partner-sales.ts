@@ -210,7 +210,9 @@ export async function recordPartnerSale(
       enrolled_at: enrolledAt.toISOString(),
       rung,
       member_saving_pence: memberSavingPence,
-      member_code: rung === "pif_1399" || rung === "pif_1099" ? input.promoCode || null : null,
+      // ATP's member code (older sales: pif_1399 / pif_1099; from 11 Oct a
+      // code sells the standard pif / monthly plan).
+      member_code: isAtp(partner.slug) ? input.promoCode || null : null,
     };
 
     // ignoreDuplicates: a redelivered webhook must not reset amount_paid_pence

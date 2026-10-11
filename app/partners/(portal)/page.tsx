@@ -204,9 +204,10 @@ export default async function MyAcademyPage() {
             <table className="w-full text-sm">
               <tbody className="divide-y divide-white/10">
                 {[
+                  ["In full, £1,599", ATP_LADDER.commission.pif_1599],
                   ["6-month plan, £1,599", ATP_LADDER.commission.six_month],
-                  ["In full, £999.99", ATP_LADDER.commission.pif],
-                  ["Monthly, 10 × £99.99 (your ?plan=monthly link)", ATP_LADDER.commission.monthly],
+                  ["In full with an ATP code, £999.99", ATP_LADDER.commission.pif],
+                  ["Monthly with an ATP code, 10 × £99.99", ATP_LADDER.commission.monthly],
                 ].map(([label, pence]) => (
                   <tr key={String(label)}>
                     <td className="py-2 text-white">{label}</td>
