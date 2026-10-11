@@ -7,6 +7,7 @@ declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
     fbq?: (...args: unknown[]) => void;
+    __ptllPvPending?: boolean;
   }
 }
 
@@ -147,6 +148,13 @@ export default function Tracking() {
     let timer: ReturnType<typeof setTimeout>;
     const firePageView = () => {
       if (typeof window.fbq === "function") {
+        if ((window.fbq as { __ptllNoop?: boolean }).__ptllNoop) {
+          // No advertising consent yet: the layout's loader fires one
+          // PageView for this page if consent arrives later.
+          window.__ptllPvPending = true;
+          return;
+        }
+        window.__ptllPvPending = false;
         window.fbq("track", "PageView");
         return;
       }

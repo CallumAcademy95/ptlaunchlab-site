@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: config.metaTitle,
   description: config.metaDescription,
   alternates: { canonical: `https://ptlaunchlab.co.uk${config.canonicalPath}` },
+  robots: { index: false, follow: true },
 };
 
 export default function AtpFelixstoweAcademyPage() {

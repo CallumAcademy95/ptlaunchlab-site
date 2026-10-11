@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   description:
     "Join the free monthly PT Launch Lab live panel. Real gym owners, coaches and PTs, unfiltered, with a live audience Q&A. Mailing-list only — register free to get the watch link.",
   alternates: { canonical: "https://ptlaunchlab.co.uk/live" },
+  robots: { index: false, follow: true },
   openGraph: {
     title: `${SERIES_NAME} — ${EVENT.title}`,
     description:

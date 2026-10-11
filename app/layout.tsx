@@ -219,19 +219,37 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "w0qwj7lviw");
         `}</Script>
-        {/* 5. Meta Pixel — loaded afterInteractive so `fbq` is queued before
-            any form can be submitted (forms on cached pages otherwise hit
-            the typeof-guard while window.fbq is undefined under lazyOnload).
-            PageView is fired by Tracking.tsx on every pathname change so
-            Next.js SPA navigations are counted too — do NOT add a PageView
-            call here. */}
+        {/* 5. Meta Pixel — loads ONLY after CookieYes advertisement consent
+            (PECR). Before consent, window.fbq is a no-op so callers never
+            throw. Tracking.tsx owns PageView (mount + route changes): while
+            fbq is the no-op it sets window.__ptllPvPending, and the loader
+            fires one PageView on load only if that flag is set, so the
+            first page is never counted twice. */}
         <Script id="meta-pixel" strategy="afterInteractive">{`
-          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-          document,'script','https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '1133525198707842');
+          (function(){
+            var noop=function(){}; noop.__ptllNoop=true;
+            if(!window.fbq) window.fbq=noop;
+            function ok(c){ if(!c||typeof c!=='object') return false;
+              if(c.categories&&c.categories.advertisement===true) return true;
+              return Array.isArray(c.accepted)&&c.accepted.indexOf('advertisement')>-1; }
+            window.__ptllLoadPixel=function(){
+              if(window.__ptllPixelLoaded) return; window.__ptllPixelLoaded=true;
+              if(window.fbq&&window.fbq.__ptllNoop) delete window.fbq;
+              !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+              n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+              document,'script','https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init','1133525198707842');
+              if(window.__ptllPvPending){ window.__ptllPvPending=false; fbq('track','PageView'); }
+            };
+            document.addEventListener('cookieyes_consent_update',function(e){
+              if(ok(e&&e.detail)) window.__ptllLoadPixel(); });
+            document.addEventListener('cookieyes_banner_load',function(){
+              try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadPixel(); }catch(_){}
+            });
+            try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadPixel(); }catch(_){}
+          })();
         `}</Script>
       </body>
     </html>
