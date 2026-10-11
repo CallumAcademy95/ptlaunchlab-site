@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import { submitLead, type SubmitLeadResult } from "@/app/lib/submitLead";
 import type { LeadIntent } from "@/app/lib/leads";
 
@@ -59,6 +59,8 @@ export default function LeadForm({
   const [error, setError] = useState("");
   const [fieldError, setFieldError] = useState("");
   const [done, setDone] = useState(false);
+  const mountedAt = useRef(Date.now());
+  const errId = `${uid}-error`;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -75,7 +77,8 @@ export default function LeadForm({
         intent,
         source,
         gymSlug,
-        extra,
+        // Informational only: we never drop a lead on a heuristic.
+        extra: Date.now() - mountedAt.current < 1500 ? { ...extra, fastSubmit: true } : extra,
         honeypot,
       });
       if (result.ok) {
@@ -104,6 +107,8 @@ export default function LeadForm({
   }
 
   const invalid = (f: string) => (fieldError === f ? true : undefined);
+  const described = error ? errId : undefined;
+  const phoneRequired = intent !== "checkout_start";
 
   return (
     <div className={WRAPPER[variant]}>
@@ -111,24 +116,24 @@ export default function LeadForm({
         <div>
           <label htmlFor={`${uid}-name`} className={LABEL}>Your name</label>
           <input id={`${uid}-name`} name="name" autoComplete="name" required className={FIELD} placeholder="Your name"
-            aria-invalid={invalid("name")} value={name} onChange={(e) => setName(e.target.value)} />
+            aria-invalid={invalid("name")} aria-describedby={described} value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div>
-          <label htmlFor={`${uid}-phone`} className={LABEL}>Phone number</label>
+          <label htmlFor={`${uid}-phone`} className={LABEL}>{phoneRequired ? "Phone number" : "Phone (optional)"}</label>
           <input id={`${uid}-phone`} name="phone" type="tel" inputMode="tel" autoComplete="tel" className={FIELD}
-            placeholder="Phone number" aria-invalid={invalid("phone")} value={phone} onChange={(e) => setPhone(e.target.value)} />
+            required={phoneRequired} aria-describedby={described} placeholder={phoneRequired ? "Phone number" : "Phone (optional)"} aria-invalid={invalid("phone")} value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
         <div>
           <label htmlFor={`${uid}-email`} className={LABEL}>Email address</label>
           <input id={`${uid}-email`} name="email" type="email" autoComplete="email" required className={FIELD}
-            placeholder="Email address" aria-invalid={invalid("email")} value={email} onChange={(e) => setEmail(e.target.value)} />
+            placeholder="Email address" aria-invalid={invalid("email")} aria-describedby={described} value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         {question && (
           <div>
             <label htmlFor={`${uid}-question`} className={LABEL}>{question.label}</label>
             {question.options ? (
               <select id={`${uid}-question`} name="question" className={FIELD} required={question.required}
-                aria-invalid={invalid("question")} value={answer} onChange={(e) => setAnswer(e.target.value)}>
+                aria-invalid={invalid("question")} aria-describedby={described} value={answer} onChange={(e) => setAnswer(e.target.value)}>
                 <option value="">Select one</option>
                 {question.options.map((o) => (
                   <option key={o} value={o}>{o}</option>
@@ -136,16 +141,16 @@ export default function LeadForm({
               </select>
             ) : (
               <textarea id={`${uid}-question`} name="question" rows={3} className={FIELD} required={question.required}
-                aria-invalid={invalid("question")} value={answer} onChange={(e) => setAnswer(e.target.value)} />
+                aria-invalid={invalid("question")} aria-describedby={described} value={answer} onChange={(e) => setAnswer(e.target.value)} />
             )}
           </div>
         )}
-        {/* Honeypot: hidden from people and assistive tech; bots fill it in. */}
-        <div aria-hidden="true" className="sr-only">
-          <input name="company" tabIndex={-1} autoComplete="off" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+        {/* Honeypot: off-screen, non-semantic name so autofill never fills it; bots do. */}
+        <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+          <input name="hp_field_7" tabIndex={-1} autoComplete="new-password" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
         </div>
-        {error && <p role="alert" className="text-red-600 text-sm">{error}</p>}
-        <button type="submit" disabled={busy} className={BUTTON}>
+        {error && <p id={errId} role="alert" className="text-red-600 text-sm">{error}</p>}
+        <button type="submit" disabled={busy} aria-busy={busy} className={BUTTON}>
           {busy ? "Sending…" : submitLabel}
         </button>
       </form>
