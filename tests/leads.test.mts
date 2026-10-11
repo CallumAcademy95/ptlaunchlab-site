@@ -99,3 +99,79 @@ test("one failing side effect doesn't stop the others", async () => {
   assert.ok(log.includes("push") && log.includes("capi") && log.includes("setter"));
   assert.ok(updates.some((u) => String(u.zapier_status).startsWith("failed")));
 });
+
+test("UK phone written forms: +44 (0), 0044 (0) and brackets are accepted", () => {
+  const cases: [string, string][] = [
+    ["+44 (0)7700 900123", "07700900123"],
+    ["0044 (0) 7700 900123", "07700900123"],
+    ["(01977) 285014", "01977285014"],
+  ];
+  for (const [phone, want] of cases) {
+    const r = validateLead({ ...GOOD, phone });
+    assert.equal(r.ok, true, phone);
+    if (r.ok) assert.equal(r.lead.phone, want, phone);
+  }
+});
+
+test("UK phone length: mobiles must be 11 digits, landlines 10 or 11", () => {
+  assert.equal(validateLead({ ...GOOD, phone: "0770090012" }).ok, false);
+  assert.deepEqual(validateLead({ ...GOOD, phone: "0770090012" }), { ok: false, field: "phone", message: "Enter a UK phone number." });
+  const landline = validateLead({ ...GOOD, phone: "01977285014" });
+  assert.equal(landline.ok, true);
+});
+
+test("insert throwing (not returning an error) returns 500 and pushes NOT SAVED", async () => {
+  const pushed: { title: string; body?: string }[] = [];
+  const { deps } = fakeDeps({
+    insert: async () => { throw new Error("db exploded"); },
+    push: async (p) => { pushed.push(p); return { sent: 1 }; },
+  });
+  const r = await processLead(GOOD, deps);
+  assert.equal(r.status, 500);
+  assert.equal(r.body.ok, false);
+  assert.equal(pushed.length, 1);
+  assert.match(pushed[0].title, /NOT SAVED/);
+});
+
+test("a spam lead whose insert fails pushes nothing", async () => {
+  let pushes = 0;
+  const { deps } = fakeDeps({
+    insert: async () => ({ error: "db down" }),
+    push: async () => { pushes++; return { sent: 1 }; },
+  });
+  const r = await processLead({ ...GOOD, honeypot: "bot" }, deps);
+  assert.equal(r.status, 500);
+  assert.equal(pushes, 0);
+});
+
+test("setter throwing records setter_status as failed", async () => {
+  const { deps, updates } = fakeDeps({ setter: async () => { throw new Error("setter down"); } });
+  const r = await processLead({ ...GOOD, intent: "contact" }, deps);
+  await r.after!();
+  assert.ok(updates.some((u) => String(u.setter_status).startsWith("failed")));
+});
+
+test("a TEST lead never reaches setter, zapier or capi, and their statuses are skipped", async () => {
+  const { deps, log, updates } = fakeDeps();
+  const r = await processLead({ ...GOOD, intent: "contact", name: "TEST Jane" }, deps);
+  await r.after!();
+  assert.ok(!log.includes("setter"), "setter called");
+  assert.ok(!log.includes("zapier"), "zapier called");
+  assert.ok(!log.includes("capi"), "capi called");
+  assert.ok(!log.includes("mailerlite"), "mailerlite called");
+  assert.ok(updates.some((u) => u.setter_status === "skipped"));
+  assert.ok(updates.some((u) => u.zapier_status === "skipped"));
+  assert.ok(updates.some((u) => u.mailerlite_status === "skipped"));
+  assert.ok(updates.some((u) => u.capi_status === "skipped"));
+});
+
+test("a spam lead never pushes or reaches setter, zapier or capi", async () => {
+  const { deps, log } = fakeDeps();
+  const r = await processLead({ ...GOOD, intent: "contact", honeypot: "bot" }, deps);
+  await r.after!();
+  assert.ok(log.includes("insert"));
+  assert.ok(!log.includes("push"), "push called");
+  assert.ok(!log.includes("setter"), "setter called");
+  assert.ok(!log.includes("zapier"), "zapier called");
+  assert.ok(!log.includes("capi"), "capi called");
+});

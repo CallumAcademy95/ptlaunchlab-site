@@ -31,11 +31,15 @@ const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object"
 
 /** UK number → digits with a leading 0 (07…, 01…, 02…, 03…), or null. */
 export function normaliseUkPhone(raw: string): string | null {
-  let d = raw.replace(/[^\d+]/g, "");
+  // Drop a "(0)" that follows the country code: "+44 (0)7700…", "0044 (0) 7700…".
+  const s = raw.trim().replace(/^(\+44|0044|44)\s*\(0\)\s*/, "$1");
+  let d = s.replace(/[^\d+]/g, "");
   if (d.startsWith("+44")) d = "0" + d.slice(3);
   else if (d.startsWith("0044")) d = "0" + d.slice(4);
   else if (d.startsWith("44") && d.length === 12) d = "0" + d.slice(2);
-  return /^0[1-37]\d{8,9}$/.test(d) ? d : null;
+  // Mobiles are exactly 11 digits; landlines (01, 02, 03…) are 10 or 11.
+  if (/^07/.test(d)) return /^07\d{9}$/.test(d) ? d : null;
+  return /^0[1-36]\d{8,9}$/.test(d) ? d : null;
 }
 
 export function validateLead(raw: unknown): { ok: true; lead: CleanLead } | { ok: false; field: string; message: string } {
@@ -142,14 +146,15 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
       return r.error ? `failed: ${r.error}` : r.sent > 0 ? "ok" : "failed: no device";
     });
     if (lead.isSpam) return;
+    // TEST leads are saved and pushed-skipped, and never reach external systems.
     await step("setter_status", async () => {
-      if (!SETTER_INTENTS.has(lead.intent)) return "skipped";
+      if (lead.isTest || !SETTER_INTENTS.has(lead.intent)) return "skipped";
       await deps.setter({ name: lead.name, email: lead.email, ...(lead.intent === "contact" && lead.question ? { message: lead.question } : {}), source: setterSourceFor(lead.intent) });
       return "ok";
     });
-    await step("zapier_status", () => deps.zapier(lead.intent, full));
-    await step("mailerlite_status", () => deps.mailerlite(lead.intent, full));
-    await step("capi_status", () => deps.capi(lead.intent, full, eventId));
+    await step("zapier_status", async () => (lead.isTest ? "skipped" : deps.zapier(lead.intent, full)));
+    await step("mailerlite_status", async () => (lead.isTest ? "skipped" : deps.mailerlite(lead.intent, full)));
+    await step("capi_status", async () => (lead.isTest ? "skipped" : deps.capi(lead.intent, full, eventId)));
   };
   return { status: 200, body: { ok: true, id, eventId }, after };
 }
