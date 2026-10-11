@@ -1,24 +1,26 @@
 /**
- * Quarterly volume top-up for the v4.1 partner sales ladder.
+ * Quarterly Partner Accelerator top-up for the partner sales ladder (v4.2).
  *
  *   npx tsx scripts/partner-quarter-topup.mts                       # dry run, last quarter
  *   npx tsx scripts/partner-quarter-topup.mts --quarter=2026-Q4     # dry run, that quarter
  *   npx tsx scripts/partner-quarter-topup.mts --quarter=2026-Q4 --apply
  *
- * A gym on 'ladder' terms with 4 or more learners enrolled in a calendar
- * quarter (confirmed, not voided) has EVERY ladder sale that quarter topped up:
- * +£100 on pay-in-full (to £500, less any member saving), +£50 on monthly (to
- * £300). The rule is app/lib/partnerCommission.ts quarterTopUp(); this script
+ * For a gym on 'ladder' terms, the 4th and each later learner enrolled in a
+ * calendar quarter (confirmed, not voided; ordered by enrolled_at, then id) is
+ * topped up: +£100 on pay-in-full (to £500, less any member saving), +£50 on
+ * monthly (to £300). Learners 1–3 are NOT topped up — the Partner Accelerator
+ * rate is not retrospective. The rule is app/lib/partnerCommission.ts quarterTopUp(); this script
  * only reads and writes.
  *
  * Writes pp_sales.volume_bonus_pence and nothing else. The bonus is paid with
  * the next payout run (admin "Mark paid", or scripts/mark-commission-paid.mts),
  * which settles it separately via volume_bonus_payout_id.
  *
- * Safe to re-run: a sale already holding the right bonus is left alone, and a
- * bonus that has been paid is never changed. --apply refuses a quarter that
+ * Safe to re-run: a sale already holding the right bonus is left alone, a
+ * bonus is only ever raised (never lowered), and a bonus that has been paid is
+ * never changed. --apply refuses a quarter that
  * has not ended yet. ATP Fitness Felixstowe and demo partners are excluded —
- * ATP's own rungs replace the volume rate.
+ * ATP's own rungs replace the Partner Accelerator rate.
  *
  * Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (read from .env.local if
  * present), and supabase/migrations/20261010_pp_partner_ladder.sql applied.
@@ -75,7 +77,7 @@ type Sale = QuarterSale & { partner_id: string; learner_name: string | null; vol
 const partners = (await api<Partner[]>("pp_partners?select=id,slug,gym_name,commission_terms,is_demo"))
   .filter((p) => p.commission_terms === LADDER_TERMS && !p.is_demo && !isAtp(p.slug));
 
-console.log(`${APPLY ? "APPLYING" : "DRY RUN"} — volume top-up for ${q.label} (${q.start.toISOString().slice(0, 10)} to ${new Date(q.end.getTime() - 1).toISOString().slice(0, 10)})`);
+console.log(`${APPLY ? "APPLYING" : "DRY RUN"} — Partner Accelerator top-up for ${q.label} (${q.start.toISOString().slice(0, 10)} to ${new Date(q.end.getTime() - 1).toISOString().slice(0, 10)})`);
 console.log(`${partners.length} partner(s) on '${LADDER_TERMS}' terms (ATP and demo excluded)\n`);
 
 let grand = 0;
@@ -92,7 +94,7 @@ for (const p of partners) {
 
   console.log(
     `  ${p.gym_name.padEnd(26)} ${String(r.learners).padStart(2)} learner(s)  ` +
-      (r.qualifies ? `QUALIFIES  bonus £${r.totalBonusPence / 100}` : `below ${VOLUME_THRESHOLD}  no top-up`),
+      (r.qualifies ? `ACCELERATOR (learner ${VOLUME_THRESHOLD}+)  top-up £${r.totalBonusPence / 100}` : `fewer than ${VOLUME_THRESHOLD}  no top-up`),
   );
   for (const c of changes) {
     const s = byId.get(c.id)!;
@@ -110,5 +112,5 @@ for (const p of partners) {
   }
 }
 
-console.log(`\nTotal volume bonus for ${q.label}: £${grand / 100}`);
+console.log(`\nTotal Partner Accelerator top-up for ${q.label}: £${grand / 100}`);
 console.log(APPLY ? `${written} sale(s) updated.` : "Nothing written. Re-run with --apply to commit.");

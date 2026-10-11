@@ -1,4 +1,4 @@
-// Partner commission on the sales ladder (agreement v4.1, October 2026).
+// Partner commission on the sales ladder (agreement v4.1/v4.2, October 2026).
 //
 // ONE place for every figure a gym earns on a sale, and every rule that picks
 // it. Pure: no Stripe, no Supabase, no env reads (env is passed in), and the
@@ -10,9 +10,10 @@
 //   The nine gyms ('ladder' commission terms, from signing v4.1)
 //     pay in full £999.99  → £400, less any member saving the gym chose to give
 //     monthly 10 × £99.99  → £250
-//     volume rate: 4+ learners enrolled in a calendar quarter tops EVERY ladder
-//     sale that quarter up by +£100 (pay in full) / +£50 (monthly). Paid with
-//     the payout run after the quarter ends.
+//     Partner Accelerator rate (v4.2): the 4th and each later counted learner
+//     in a calendar quarter is topped up by +£100 (pay in full → £500) / +£50
+//     (monthly → £300). Learners 1–3 stay at £400 / £250 — it is NOT
+//     retrospective. Paid with the payout run after the quarter ends.
 //
 //   ATP Fitness Felixstowe only (a 60-day test, from 10 October 2026)
 //     6-month plan £599 + 5 × £200 (£1,599)   → £500
@@ -21,7 +22,7 @@
 //     pay in full £1,099 (code ATP500)         → £500 for the next 3, then £400
 //     pay in full £999.99                      → £300
 //     monthly 10 × £99.99                      → £250
-//     Not on the volume rate — the rungs replace it.
+//     Not on the Partner Accelerator rate — the rungs replace it.
 //
 // Money is in PENCE throughout.
 
@@ -56,8 +57,16 @@ export const LADDER_TERMS = "ladder";
 export const LADDER_PIF_COMMISSION_PENCE = 40_000;      // £400
 export const LADDER_MONTHLY_COMMISSION_PENCE = 25_000;  // £250
 
-/** Learners in one calendar quarter that move every sale that quarter to the volume rate. */
+/**
+ * The counted learner, in a calendar quarter, from which the Partner
+ * Accelerator rate applies: the 4th, 5th, 6th… each earn the top-up.
+ * (Identifiers keep the old "volume" name; the partner-facing name is the
+ * "Partner Accelerator rate".)
+ */
 export const VOLUME_THRESHOLD = 4;
+export const ACCELERATOR_FROM_LEARNER = VOLUME_THRESHOLD;
+/** Partner-facing name of the top-up rate. */
+export const ACCELERATOR_RATE_NAME = "Partner Accelerator rate";
 export const VOLUME_BONUS_PIF_PENCE = 10_000;     // +£100 → £500
 export const VOLUME_BONUS_MONTHLY_PENCE = 5_000;  // +£50  → £300
 
@@ -108,11 +117,11 @@ export function ladderCommissionPence(rung: Rung, memberSavingPence = 0): number
   return LADDER_PIF_COMMISSION_PENCE - saving;
 }
 
-/** The volume top-up for one sale, by what it was. */
+/** The Partner Accelerator top-up for one sale, by what it was. */
 export function volumeBonusPence(rung: string | null | undefined, planType?: string | null): number {
   if (rung === "monthly") return VOLUME_BONUS_MONTHLY_PENCE;
   if (rung === "pif") return VOLUME_BONUS_PIF_PENCE;
-  if (rung) return 0; // an ATP rung, or anything else: not on the volume rate
+  if (rung) return 0; // an ATP rung, or anything else: not on the Accelerator rate
   // No rung stamped: fall back to the binary plan type.
   if (planType === "PIF") return VOLUME_BONUS_PIF_PENCE;
   if (planType === "deposit") return VOLUME_BONUS_MONTHLY_PENCE;
@@ -155,7 +164,7 @@ export function previousQuarter(now: Date): Quarter {
   return cur.q === 1 ? quarter(cur.year - 1, 4) : quarter(cur.year, cur.q - 1);
 }
 
-// ─── Volume rate ────────────────────────────────────────────────────────────
+// ─── Partner Accelerator rate ───────────────────────────────────────────────
 
 export interface QuarterSale {
   id: string;
@@ -165,64 +174,142 @@ export interface QuarterSale {
   rung: string | null;
   plan_type: string | null;
   volume_bonus_pence: number | null;
+  /** Set once the top-up has been paid; a paid top-up is never changed. */
+  volume_bonus_payout_id?: string | null;
 }
 
-/** A sale that counts towards the volume threshold: confirmed and not voided. */
+/** A sale that counts towards a quarter's learner count: confirmed and not voided. */
 export function countsForVolume(s: Pick<QuarterSale, "status" | "commission_status">): boolean {
   return s.status === "confirmed" && s.commission_status !== "voided";
 }
 
-/** A sale that is topped up when the threshold is met: a nine-gym ladder sale. */
+/** A sale that CAN be topped up when it is the 4th+ learner: a nine-gym ladder sale. */
 export function eligibleForVolumeBonus(s: Pick<QuarterSale, "rung">): boolean {
   return s.rung === "pif" || s.rung === "monthly";
+}
+
+/**
+ * A quarter's counted sales, in the order that decides who is the 4th learner:
+ * enrolled_at ascending, then id ascending for ties. Deterministic, so the
+ * same data always picks the same learners.
+ */
+export function orderedCountedSales<T extends Pick<QuarterSale, "id" | "enrolled_at" | "status" | "commission_status">>(
+  sales: readonly T[],
+  q: Quarter,
+): T[] {
+  return sales
+    .filter((s) => {
+      const t = Date.parse(s.enrolled_at);
+      return t >= q.start.getTime() && t < q.end.getTime();
+    })
+    .filter(countsForVolume)
+    .sort((a, b) => {
+      const d = Date.parse(a.enrolled_at) - Date.parse(b.enrolled_at);
+      if (d !== 0) return d;
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    });
+}
+
+/**
+ * The top-up each counted sale is ENTITLED to, by its position in the quarter.
+ *
+ * Position 1–3 → 0. Position 4+ → volumeBonusPence() if the sale is a ladder
+ * rung (pif / monthly), else 0. A counted sale that is not eligible (an older
+ * flat-fee sale with no rung, or an ATP rung) still takes its position — it IS
+ * a learner the gym sent — it just earns no top-up itself. So with a pre-ladder
+ * sale at position 4, the 5th learner is the first to be topped up.
+ */
+export function acceleratorEntitlements<T extends QuarterSale>(
+  sales: readonly T[],
+  q: Quarter,
+): { sale: T; position: number; entitledPence: number }[] {
+  return orderedCountedSales(sales, q).map((sale, i) => {
+    const position = i + 1;
+    const entitledPence =
+      position >= ACCELERATOR_FROM_LEARNER && eligibleForVolumeBonus(sale)
+        ? volumeBonusPence(sale.rung, sale.plan_type)
+        : 0;
+    return { sale, position, entitledPence };
+  });
 }
 
 export interface QuarterTopUp {
   quarter: string;
   learners: number;
+  /** True once the quarter has a 4th counted learner. */
   qualifies: boolean;
   /** Every sale whose bonus should change, with the value it should hold. */
   changes: { id: string; from: number; to: number }[];
+  /** Sum of the top-ups the quarter's learners are entitled to (4th onwards). */
   totalBonusPence: number;
 }
 
 /**
- * The volume top-up for one gym's sales in one quarter.
+ * The Partner Accelerator top-up for one gym's sales in one quarter (v4.2).
  *
- * Counts confirmed, non-voided sales enrolled inside the quarter; at
- * VOLUME_THRESHOLD or more, every eligible sale gets its bonus. Below it,
- * nothing is changed — a bonus already written is NEVER taken back here (no
- * clawback once paid; a refund is handled by voiding the sale).
+ * Counts confirmed, non-voided sales enrolled inside the quarter, orders them
+ * (orderedCountedSales) and tops up ONLY the 4th, 5th, 6th… — never learners
+ * 1–3. No cap. Not retrospective.
+ *
+ * Only ever RAISES a bonus: a bonus already written is never lowered or taken
+ * back here (no clawback; a refund is handled by voiding the sale), and a bonus
+ * that has been paid (volume_bonus_payout_id set) is never changed at all.
+ * Re-running on the same data changes nothing.
  */
 export function quarterTopUp(sales: readonly QuarterSale[], q: Quarter): QuarterTopUp {
-  const inQuarter = sales.filter((s) => {
-    const t = Date.parse(s.enrolled_at);
-    return t >= q.start.getTime() && t < q.end.getTime();
-  });
-  const counted = inQuarter.filter(countsForVolume);
-  const qualifies = counted.length >= VOLUME_THRESHOLD;
+  const rows = acceleratorEntitlements(sales, q);
   const changes: QuarterTopUp["changes"] = [];
   let totalBonusPence = 0;
-  if (qualifies) {
-    for (const s of counted) {
-      if (!eligibleForVolumeBonus(s)) continue;
-      const to = volumeBonusPence(s.rung, s.plan_type);
-      totalBonusPence += to;
-      const from = s.volume_bonus_pence ?? 0;
-      if (from !== to) changes.push({ id: s.id, from, to });
-    }
+  for (const { sale, entitledPence } of rows) {
+    totalBonusPence += entitledPence;
+    if (sale.volume_bonus_payout_id) continue;
+    const from = sale.volume_bonus_pence ?? 0;
+    if (entitledPence > from) changes.push({ id: sale.id, from, to: entitledPence });
   }
-  return { quarter: q.label, learners: counted.length, qualifies, changes, totalBonusPence };
+  return {
+    quarter: q.label,
+    learners: rows.length,
+    qualifies: rows.length >= ACCELERATOR_FROM_LEARNER,
+    changes,
+    totalBonusPence,
+  };
 }
 
-/** Partner-facing progress line for the current quarter. */
+export interface QuarterMoneySale extends QuarterSale {
+  commission_pence: number | null;
+}
+
+/**
+ * What a gym has earned on this quarter's counted sales: base commission plus
+ * the Partner Accelerator top-up. The top-up is only WRITTEN after the quarter
+ * ends, so mid-quarter this counts the top-up the 4th+ learners are already
+ * entitled to (or the written figure, if higher).
+ */
+export function quarterEarnedPence(sales: readonly QuarterMoneySale[], q: Quarter): number {
+  return acceleratorEntitlements(sales, q).reduce(
+    (sum, { sale, entitledPence }) =>
+      sum + (sale.commission_pence ?? 0) + Math.max(sale.volume_bonus_pence ?? 0, entitledPence),
+    0,
+  );
+}
+
+/** Partner-facing headline: "N enrolments this quarter · £X earned this quarter". */
+export function quarterHeadline(learners: number, earnedPence: number, format: (pence: number) => string): string {
+  return `${learners} enrolment${learners === 1 ? "" : "s"} this quarter · ${format(earnedPence)} earned this quarter`;
+}
+
+/** Partner-facing next step towards / on the Partner Accelerator rate. */
 export function volumeProgressMessage(learners: number): string {
-  if (learners >= VOLUME_THRESHOLD) {
-    return `${learners} learners this quarter — every learner this quarter is on the volume rate.`;
+  const pif = `£${(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE) / 100}`;
+  const monthly = `£${(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE) / 100}`;
+  const before = ACCELERATOR_FROM_LEARNER - 1; // 3
+  if (learners < before) {
+    return `${before - learners} more to go before your ${ACCELERATOR_FROM_LEARNER}th learner, which earns the ${ACCELERATOR_RATE_NAME}`;
   }
-  const more = VOLUME_THRESHOLD - learners;
-  const word = more === 1 ? "one more" : `${more} more`;
-  return `${learners} of ${VOLUME_THRESHOLD} learners this quarter — ${word} and every learner this quarter moves to the volume rate.`;
+  if (learners === before) {
+    return `Your next learner this quarter earns ${pif} (pay in full) / ${monthly} (monthly)`;
+  }
+  return `You're on the ${ACCELERATOR_RATE_NAME}: every further learner this quarter earns ${pif} / ${monthly}`;
 }
 
 // ─── ATP Fitness Felixstowe ─────────────────────────────────────────────────
@@ -334,7 +421,8 @@ export function commissionForSale(input: CommissionInput): number {
 // ─── Paying it out ──────────────────────────────────────────────────────────
 //
 // A sale carries two amounts: commission_pence (stamped at sale time) and
-// volume_bonus_pence (written after the quarter ends). The bonus can land on a
+// volume_bonus_pence (the Partner Accelerator top-up, written after the
+// quarter ends). The bonus can land on a
 // sale whose commission was already paid, so it is settled separately: it is
 // payable once the sale's commission has released and volume_bonus_payout_id
 // is still empty.
@@ -356,7 +444,7 @@ export interface SaleMoney {
   held: number;
   /** Base commission payable now. */
   payableCommission: number;
-  /** Volume bonus payable now. */
+  /** Partner Accelerator top-up payable now. */
   payableBonus: number;
 }
 

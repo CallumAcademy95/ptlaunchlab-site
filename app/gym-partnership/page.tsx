@@ -14,7 +14,7 @@ import {
 } from "@/app/lib/partnerCommission";
 
 // v4.1 commission schedule (app/lib/partnerCommission.ts), inclusive of VAT:
-// pay in full / monthly, rising at the quarterly volume threshold. Released 30
+// pay in full / monthly, rising to the Partner Accelerator rate from the 4th learner in a quarter. Released 30
 // days after a pay-in-full enrolment, or when the learner's 5th monthly payment
 // clears. Never clawed back once paid.
 const PIF_FEE = formatPence(LADDER_PIF_COMMISSION_PENCE);
@@ -67,7 +67,7 @@ const STEPS = [
   { n: "01", title: "Join the Partnership", body: "Apply below — we review your gym and confirm your area." },
   { n: "02", title: "We Build Your Academy", body: "Your white-label PT academy is set up with your branding, logo and link." },
   { n: "03", title: "Promote It In Your Gym", body: "Display your QR code and link on-site and across your socials." },
-  { n: "04", title: "Earn Per Learner", body: `${PIF_FEE} per pay-in-full learner, ${MONTHLY_FEE} monthly, rising to ${PIF_FEE_VOLUME} and ${MONTHLY_FEE_VOLUME} in any quarter you send us ${VOLUME_THRESHOLD} or more (all inc. VAT). Paid 30 days after a pay-in-full enrolment, or when their ${RELEASE_ORDINAL} monthly payment clears.` },
+  { n: "04", title: "Earn Per Learner", body: `${PIF_FEE} per pay-in-full learner, ${MONTHLY_FEE} monthly, then ${PIF_FEE_VOLUME} / ${MONTHLY_FEE_VOLUME} from your ${VOLUME_THRESHOLD}th learner in a quarter onwards — the Partner Accelerator rate (all inc. VAT). Paid 30 days after a pay-in-full enrolment, or when their ${RELEASE_ORDINAL} monthly payment clears.` },
 ];
 
 function CheckIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -254,7 +254,7 @@ export default function GymPartnershipPage() {
                 <p className="font-display font-extrabold text-gold text-7xl leading-none mb-2">{PIF_FEE}</p>
                 <p className="text-white font-semibold text-lg mb-6">per learner who pays in full, inc. VAT</p>
                 <ul className="space-y-2 text-sm">
-                  {[`${MONTHLY_FEE} per learner on the monthly plan`, `${PIF_FEE_VOLUME} / ${MONTHLY_FEE_VOLUME} for every learner in a quarter with ${VOLUME_THRESHOLD}+ enrolments`, "Paid 30 days after a pay-in-full enrolment, or at the learner's " + RELEASE_ORDINAL + " monthly payment", "Nothing clawed back once paid"].map((i) => (
+                  {[`${MONTHLY_FEE} per learner on the monthly plan`, `${PIF_FEE_VOLUME} / ${MONTHLY_FEE_VOLUME} from your ${VOLUME_THRESHOLD}th learner in a quarter onwards (the Partner Accelerator rate)`, "Paid 30 days after a pay-in-full enrolment, or at the learner's " + RELEASE_ORDINAL + " monthly payment", "Nothing clawed back once paid"].map((i) => (
                     <li key={i} className="flex items-center gap-2 text-soft/60">
                       <CheckIcon />{i}
                     </li>

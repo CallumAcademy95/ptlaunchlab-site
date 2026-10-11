@@ -9,7 +9,7 @@
 import { getSupabaseAdmin } from "./supabase-admin";
 import { heldCommissionLabel } from "./paymentPlans";
 import { formatPence as formatPricePence } from "./pricing";
-import { countsForVolume, quarterOf, saleMoney } from "./partnerCommission";
+import { countsForVolume, quarterEarnedPence, quarterOf, saleMoney, type QuarterMoneySale } from "./partnerCommission";
 
 /** Columns a partner is allowed to see from pp_sales. Note: no learner_email. */
 export const PARTNER_SALE_COLUMNS =
@@ -109,30 +109,41 @@ export interface PartnerSale {
   enrolled_at: string;
   /** What was sold (v4.1 ladder). Null on older sales. */
   rung?: string | null;
-  /** Quarterly volume top-up. */
+  /** Partner Accelerator top-up (4th+ learner in a quarter). */
   volume_bonus_pence?: number | null;
   volume_bonus_payout_id?: string | null;
 }
 
-/** Commission plus any volume bonus on one sale. */
+/** Commission plus any Partner Accelerator top-up on one sale. */
 export function saleEarnedPence(sale: PartnerSale): number {
   return (sale.commission_pence ?? 0) + (sale.volume_bonus_pence ?? 0);
 }
 
-/** How many learners count towards this calendar quarter's volume rate. */
-export async function getQuarterLearnerCount(partnerId: string, now = new Date()): Promise<number> {
+export interface QuarterProgress {
+  /** Confirmed, non-voided learners enrolled this calendar quarter. */
+  learners: number;
+  /** Commission + Partner Accelerator top-up earned on those learners (pence). */
+  earnedPence: number;
+}
+
+/**
+ * This calendar quarter's learner count (towards the Partner Accelerator rate)
+ * and what those learners have earned. Selects money and status columns only.
+ */
+export async function getQuarterProgress(partnerId: string, now = new Date()): Promise<QuarterProgress> {
   const q = quarterOf(now);
   const { data, error } = await getSupabaseAdmin()
     .from("pp_sales")
-    .select("status, commission_status")
+    .select("id, enrolled_at, status, commission_status, rung, plan_type, commission_pence, volume_bonus_pence, volume_bonus_payout_id")
     .eq("partner_id", partnerId)
     .gte("enrolled_at", q.start.toISOString())
     .lt("enrolled_at", q.end.toISOString());
   if (error) {
-    console.error("[partner-data] quarter count failed:", error);
-    return 0;
+    console.error("[partner-data] quarter progress failed:", error);
+    return { learners: 0, earnedPence: 0 };
   }
-  return ((data ?? []) as { status: string; commission_status: string }[]).filter(countsForVolume).length;
+  const rows = (data ?? []) as QuarterMoneySale[];
+  return { learners: rows.filter(countsForVolume).length, earnedPence: quarterEarnedPence(rows, q) };
 }
 
 /**

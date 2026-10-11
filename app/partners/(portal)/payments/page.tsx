@@ -28,7 +28,7 @@ export default async function PaymentsPage() {
   const releaseRule = commissionReleaseRule(partner.commission_terms);
   const terms = partner.commission_terms;
 
-  // saleMoney() splits each sale's commission AND any quarterly volume bonus
+  // saleMoney() splits each sale's commission AND any Partner Accelerator top-up
   // into paid / payable / held — the same rule the payout run settles by. A
   // bonus can be owed on a sale whose own commission was already paid.
   const nowMs = Date.now();
@@ -163,9 +163,9 @@ export default async function PaymentsPage() {
                     <>
                       You earn <strong className="text-white">£400</strong> for every member who pays in full
                       (less any member saving you give) and <strong className="text-white">£250</strong> for every
-                      member on the monthly plan, through your academy link. With 4 or more learners in a calendar
-                      quarter, every learner that quarter moves to the volume rate (£500 / £300), paid with the
-                      payout run after the quarter ends.
+                      member on the monthly plan, through your academy link. From your 4th learner in a calendar
+                      quarter onwards, each further learner that quarter earns £500 / £300 (the Partner Accelerator
+                      rate); the top-up is paid with the payout run after the quarter ends.
                     </>
                   ) : (
                     <>
