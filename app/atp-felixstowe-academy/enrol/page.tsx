@@ -16,10 +16,7 @@ const ATP_PARTNER = {
   gymReferral: "ATP Fitness Felixstowe",
 };
 
-// 10 × £99.99 is not offered on ATP's page. George sends
-// /atp-felixstowe-academy/enrol?plan=monthly to anyone who needs it.
-export default async function AtpFelixstoweEnrolPage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
-  const { plan } = await searchParams;
+export default function AtpFelixstoweEnrolPage() {
   return (
     <div className="min-h-screen bg-[#061F36]">
       {/* Branded top bar — replaces Nav. Black, because the ATP mark is white
@@ -43,7 +40,7 @@ export default async function AtpFelixstoweEnrolPage({ searchParams }: { searchP
       </div>
 
       {/* Enrolment flow — referral pre-set */}
-      <EnrolmentFlow partner={ATP_PARTNER} standalone ladder="atp" showMonthly={plan === "monthly"} />
+      <EnrolmentFlow partner={ATP_PARTNER} standalone ladder="atp" />
 
       {/* Minimal footer */}
       <div className="bg-[#061F36] border-t border-[#1A3A5C] py-6 px-6 text-center">

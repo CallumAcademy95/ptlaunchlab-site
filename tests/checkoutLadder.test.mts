@@ -36,7 +36,7 @@ function ok(r: ResolvedCheckout) {
 }
 function params(r: ResolvedCheckout, input = ATP) {
   const o = ok(r);
-  return buildSessionParams({ ...input, plan: o.plan }, o.config, { ...opts, rung: o.rung, discount: o.discount });
+  return buildSessionParams({ ...input, plan: o.plan }, o.config, { ...opts, rung: o.rung, discount: o.discount, memberCode: o.memberCode });
 }
 
 test("the ATP prices are the live £599 / £200 / £1,599 prices", () => {
@@ -96,20 +96,32 @@ test("ATP £1,599 in full, no code: £1,599, no discount", () => {
   assert.equal(m.contract_value, "1599.00");
 });
 
-test("ATPPT → coupon buPzSnaF, £1,399; ATP500 → coupon vgLNHktz, £1,099", () => {
-  const a = params(resolveCheckout({ plan: "pif_1599", gymSlug: "atp-felixstowe", memberCode: "atppt" }, 0, {}));
-  assert.deepEqual(a.discounts, [{ coupon: "buPzSnaF" }]);
-  // Stripe rejects discounts + allow_promotion_codes together (found against
-  // the live API) — a discounted session must not carry the flag at all.
-  assert.equal("allow_promotion_codes" in a, false);
-  assert.equal((a.metadata as Meta).rung, "pif_1399");
-  assert.equal((a.metadata as Meta).promo_code, "ATPPT");
-  assert.equal((a.metadata as Meta).contract_value_pence, "139900");
+test("an ATP code on £1,599 in full sells the standard £999.99 pay-in-full, no coupon", () => {
+  for (const code of ["atppt", "ATP500", " atp 600 "]) {
+    const r = ok(resolveCheckout({ plan: "pif_1599", gymSlug: "atp-felixstowe", memberCode: code }, 0, {}));
+    assert.equal(r.plan, "pif");
+    assert.equal(r.rung, "pif");
+    assert.equal(r.discount, null);
+    const p = params(r);
+    assert.equal("discounts" in p, false);
+    assert.equal((p.metadata as Meta).rung, "pif");
+    assert.equal((p.metadata as Meta).promo_code, code.replace(/\s+/g, "").toUpperCase());
+    assert.equal((p.metadata as Meta).contract_value_pence, "99999");
+  }
+});
 
-  const b = params(resolveCheckout({ plan: "pif_1599", gymSlug: "atp-felixstowe", memberCode: "ATP500" }, 0, {}));
-  assert.deepEqual(b.discounts, [{ coupon: "vgLNHktz" }]);
-  assert.equal((b.metadata as Meta).rung, "pif_1099");
-  assert.equal((b.metadata as Meta).contract_value_pence, "109900");
+test("an ATP code on the 6-month plan sells the standard 10 × £99.99, no deposit", () => {
+  const r = ok(resolveCheckout({ plan: "six_month", gymSlug: "atp-felixstowe", memberCode: "ATP600" }, 0, {}));
+  assert.equal(r.plan, "monthly");
+  assert.equal(r.rung, "monthly");
+  const p = params(r);
+  assert.equal((p.metadata as Meta).plan, "monthly");
+  assert.equal((p.metadata as Meta).promo_code, "ATP600");
+  assert.equal((p.metadata as Meta).contract_value_pence, "99990");
+});
+
+test("an unknown code on ATP's 6-month plan is refused, not sold", () => {
+  assert.deepEqual(resolveCheckout({ plan: "six_month", gymSlug: "atp-felixstowe", memberCode: "NOPE" }, 0, {}), { ok: false, reason: "invalid-code" });
 });
 
 test("an unknown code on ATP's £1,599 is refused, not sold", () => {

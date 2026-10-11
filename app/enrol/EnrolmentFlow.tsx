@@ -17,12 +17,12 @@ import {
   type CoursePlanChoice,
 } from "@/app/lib/pricing";
 // Display-safe ATP figures only — the member codes never reach this bundle.
-import { ATP_SIX_MONTH } from "@/app/lib/atpPrices";
-/** ATP: what paying in full saves against its 6-month plan (£599.01 → "£599", never rounded up). */
-const ATP_PIF_SAVING = `£${Math.floor((ATP_SIX_MONTH.contractPence - COURSE_PRICE_PENCE) / 100)}`;
+import { ATP_SIX_MONTH, ATP_PIF_FULL_PENCE } from "@/app/lib/atpPrices";
+/** What an ATP code saves: £1,599 → £999.99 in full (£599.01), or → £999.90 monthly (£599.10). Shown as "£599", never rounded up. */
+const ATP_CODE_SAVING = "£599";
 
 /** What /api/checkout sells. The last two exist on ATP's enrol page only. */
-type EnrolPlan = CoursePlanChoice | "six_month";
+type EnrolPlan = CoursePlanChoice | "six_month" | "pif_1599";
 import { fallbackPaymentLink } from "@/app/lib/paymentLinks";
 import {
   type PartnerConfig,
@@ -145,16 +145,13 @@ function appendStripeAttribution(url: string, email: string, ref: string): strin
 // No dated offers. Figures come from app/lib/pricing.ts. Two exceptions, both
 // decided server-side by /api/checkout (v4.1 partner ladder):
 //   - a gym's own member saving on pay-in-full (memberSavingPence, display only);
-//   - ATP Fitness Felixstowe's page (ladder="atp") adds its 6-month plan as a
-//     third option. Its £1,599 pay-in-full / member-code rung is no longer
-//     offered here (11 Oct 2026): every code price was above £999.99, so a
-//     "member code" left a member paying more. /api/checkout still accepts it.
+//   - ATP Fitness Felixstowe's page (ladder="atp") shows its two £1,599 plans
+//     instead, with a member code box; a valid code sells the standard plan.
 export default function EnrolmentFlow({
   partner,
   standalone,
   memberSavingPence = 0,
   ladder,
-  showMonthly: showMonthlyProp = false,
 }: {
   partner?: PartnerConfig;
   standalone?: boolean;
@@ -165,19 +162,18 @@ export default function EnrolmentFlow({
    */
   memberSavingPence?: number;
   /**
-   * "atp" on ATP Fitness Felixstowe's enrol page only: adds its 6-month plan
-   * under the two standard options.
+   * "atp" on ATP Fitness Felixstowe's enrol page only: shows its four rungs and
+   * the member code box. Codes are checked server-side; none are in this bundle.
    */
   ladder?: "atp";
-  /** ATP only: show 10 × £99.99 too (its enrol page's ?plan=monthly link). */
-  showMonthly?: boolean;
 }) {
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [memberCode, setMemberCode] = useState("");
+  const [codeError, setCodeError] = useState("");
   const atpLadder = ladder === "atp";
-  const showMonthly = !atpLadder || showMonthlyProp;
   // Never on ATP's page (its rungs replace it), never negative, never over £100.
   const saving = atpLadder ? 0 : Math.max(0, Math.min(10_000, Math.round(memberSavingPence) || 0));
   const pifTodayPence = COURSE_PRICE_PENCE - saving;
@@ -215,14 +211,19 @@ export default function EnrolmentFlow({
     }
     setErrors({});
     setPayError("");
+    setCodeError("");
     setSubmitting(true);
 
     // What is charged TODAY, in pence and pounds. The monthly plan's checkout
     // payment is its first £99.99; ATP's 6-month plan takes its £599 today.
+    // On ATP's page a member code (checked server-side) sells the standard
+    // plan instead: £1,599 in full → £999.99, the 6-month plan → 10 × £99.99.
+    const coded = atpLadder && memberCode.trim() !== "";
     const todayPence =
       plan === "pif" ? pifTodayPence
       : plan === "monthly" ? MONTHLY_PRICE_PENCE
-      : ATP_SIX_MONTH.depositPence;
+      : plan === "six_month" ? (coded ? MONTHLY_PRICE_PENCE : ATP_SIX_MONTH.depositPence)
+      : (coded ? COURSE_PRICE_PENCE : ATP_PIF_FULL_PENCE);
     const amount = todayPence / 100;
     const recordedPlan: EnrolmentContext["plan"] =
       plan === "monthly" || plan === "six_month" ? "monthly" : "full";
@@ -291,8 +292,8 @@ export default function EnrolmentFlow({
         name: fullName.trim(),
         email: email.trim().toLowerCase(),
         plan: recordedPlan,
-        // ATP's 6-month plan, so the admin alert names the right price.
-        ...(plan === "six_month" && { rung: plan }),
+        // ATP's two extra rungs, so the admin alert names the right price.
+        ...((plan === "six_month" || plan === "pif_1599") && { rung: plan }),
         ...(partner?.gymReferral && { gymReferral: partner.gymReferral }),
         [sec.SEC_KEY]: sec.payload(),
       }),
@@ -324,12 +325,19 @@ export default function EnrolmentFlow({
           name: fullName.trim(),
           gymReferral: partner?.gymReferral,
           gymSlug: partner?.gymSlug,
+          ...((plan === "pif_1599" || plan === "six_month") && memberCode.trim() && { memberCode: memberCode.trim() }),
           cancelPath: typeof window !== "undefined" ? window.location.pathname : "/enrol",
         }),
       });
       clearTimeout(timeout);
-      const data = (await res.json()) as { url?: string | null };
+      const data = (await res.json()) as { url?: string | null; reason?: string };
       if (data?.url) checkoutUrl = data.url;
+      if (data?.reason === "invalid-code") {
+        // Nothing charged. Let them fix the code or clear it.
+        setSubmitting(false);
+        setCodeError("That code isn't valid. Check it and try again, or clear the box to pay without one.");
+        return;
+      }
     } catch { /* fall through to the Payment Link */ }
 
     if (checkoutUrl) {
@@ -418,37 +426,61 @@ export default function EnrolmentFlow({
               </div>
             )}
 
-            {/* The ways to pay. Everyone: £999.99 in full or 10 × £99.99.
-                ATP's page: its 6-month plan and pay in full; monthly only via
-                ?plan=monthly (the link George sends). */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* ATP Fitness Felixstowe only: its 6-month plan, first (George's
-                  pitch leads with it), then pay in full "save £599 against it". */}
-              {atpLadder && (
-              <button onClick={() => pay("six_month")} disabled={submitting} data-plan="six_month"
-                className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">6-month plan</p>
-                <p className="text-white font-bold text-2xl mb-1">{formatPence(ATP_SIX_MONTH.contractPence)} over 6 months</p>
-                <p className="text-gold text-4xl font-bold mb-1">{formatPence(ATP_SIX_MONTH.depositPence)}<span className="text-lg text-soft font-semibold"> today</span></p>
-                <p className="text-soft text-xs mb-6">
-                  then {ATP_SIX_MONTH.instalments} × {formatPence(ATP_SIX_MONTH.instalmentPence)} monthly, starting in{" "}
-                  {ATP_SIX_MONTH.trialDays} days
-                </p>
-                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
-                  {submitting ? "Taking you to checkout…" : `Pay ${formatPence(ATP_SIX_MONTH.depositPence)} today →`}
+            {/* ATP Fitness Felixstowe only (11 Oct 2026): its two £1,599 plans.
+                An ATP member code, checked by /api/checkout and never here,
+                sells the standard plan instead: £999.99 in full, or 10 × £99.99
+                for the 6-month plan. */}
+            {atpLadder && (
+              <div className="space-y-4" data-ladder="atp">
+                <div className="bg-deep border-2 border-gold/40 rounded-2xl p-6">
+                  <label htmlFor="member-code" className="text-white font-bold text-sm block mb-1">ATP member code</label>
+                  <p className="text-soft text-xs mb-3">
+                    Have a code from ATP? Enter it, then choose how to pay. It saves you {ATP_CODE_SAVING}: {COURSE_PRICE_LABEL} in
+                    full, or {MONTHLY_PAYMENTS} × {MONTHLY_PRICE_LABEL} instead of the 6-month plan.
+                  </p>
+                  <input id="member-code" name="memberCode" type="text" autoComplete="off" value={memberCode}
+                    onChange={(e) => { setMemberCode(e.target.value); setCodeError(""); }}
+                    placeholder="Enter your code" className={`${input} uppercase`} />
+                  {codeError && <p role="alert" className="text-red-400 text-xs mt-2">{codeError}</p>}
                 </div>
-              </button>
-              )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button onClick={() => pay("pif_1599")} disabled={submitting} data-plan="pif_1599"
+                    className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                    <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">One payment</p>
+                    <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
+                    <p className="text-gold text-4xl font-bold mb-1">{formatPence(ATP_PIF_FULL_PENCE)}</p>
+                    <p className="text-white text-sm font-bold mb-6">With an ATP code: {COURSE_PRICE_LABEL}</p>
+                    <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                      {submitting ? "Taking you to checkout…" : memberCode.trim() ? "Apply code and pay →" : `Pay ${formatPence(ATP_PIF_FULL_PENCE)} →`}
+                    </div>
+                  </button>
+                  <button onClick={() => pay("six_month")} disabled={submitting} data-plan="six_month"
+                    className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                    <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
+                    <p className="text-white font-bold text-2xl mb-1">6-Month Plan</p>
+                    <p className="text-white text-4xl font-bold mb-1">{formatPence(ATP_SIX_MONTH.depositPence)}<span className="text-lg text-soft font-semibold"> today</span></p>
+                    <p className="text-soft text-xs mb-1">
+                      then {ATP_SIX_MONTH.instalments} × {formatPence(ATP_SIX_MONTH.instalmentPence)} monthly, starting in{" "}
+                      {ATP_SIX_MONTH.trialDays} days ({formatPence(ATP_SIX_MONTH.contractPence)} in total)
+                    </p>
+                    <p className="text-white text-sm font-bold mb-6">With an ATP code: {MONTHLY_PAYMENTS} × {MONTHLY_PRICE_LABEL} a month</p>
+                    <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
+                      {submitting ? "Taking you to checkout…" : memberCode.trim() ? "Apply code and continue →" : `Pay ${formatPence(ATP_SIX_MONTH.depositPence)} today →`}
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
 
+            {/* The two ways to pay (not on ATP's page: its codes lead here) */}
+            {!atpLadder && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Pay in full */}
               <button onClick={() => pay("pif")} disabled={submitting} data-plan="pif"
-                className={`bg-deep border-2 ${atpLadder ? "border-white/10 hover:border-gold/40" : "border-gold/50 hover:border-gold hover:bg-gold/5"} rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed`}>
+                className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">One payment</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                 <p className="text-gold text-4xl font-bold mb-3">{COURSE_PRICE_LABEL}</p>
-                {atpLadder && (
-                  <p className="text-white text-base font-bold -mt-2 mb-3">Save {ATP_PIF_SAVING} against the 6-month plan</p>
-                )}
                 {saving > 0 && (
                   <p className="text-white text-base font-bold -mt-2 mb-3">Member price {formatPence(pifTodayPence)}</p>
                 )}
@@ -461,11 +493,9 @@ export default function EnrolmentFlow({
                 </div>
               </button>
 
-
               {/* Pay monthly */}
-              {showMonthly && (
               <button onClick={() => pay("monthly")} disabled={submitting} data-plan="monthly"
-                className={`${atpLadder ? "sm:col-span-2 " : ""}bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed`}>
+                className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay Monthly</p>
                 <p className="text-white text-3xl font-bold mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-soft font-semibold"> /month</span></p>
@@ -480,8 +510,8 @@ export default function EnrolmentFlow({
                   {submitting ? "Taking you to checkout…" : `Pay ${MONTHLY_PRICE_LABEL} today →`}
                 </div>
               </button>
-              )}
             </div>
+            )}
 
             {/* The certificate condition and the monthly mandate are material
                 terms of what someone is buying, so they belong on the screen
@@ -506,7 +536,6 @@ export default function EnrolmentFlow({
                     </span>
                   </li>
                 )}
-                {showMonthly && (<>
                 <li className="flex gap-2.5">
                   <span className="text-gold shrink-0">·</span>
                   <span>
@@ -524,7 +553,6 @@ export default function EnrolmentFlow({
                     them forward.
                   </span>
                 </li>
-                </>)}
                 <li className="flex gap-2.5">
                   <span className="text-gold shrink-0">·</span>
                   <span>

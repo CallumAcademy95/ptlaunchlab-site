@@ -190,7 +190,7 @@ export interface SessionDiscount {
 }
 
 export type ResolvedCheckout =
-  | { ok: true; plan: CheckoutPlan; config: PlanConfig; rung: Rung; discount: SessionDiscount | null }
+  | { ok: true; plan: CheckoutPlan; config: PlanConfig; rung: Rung; discount: SessionDiscount | null; memberCode?: string }
   | { ok: false; reason: "unknown-plan" | "invalid-code" };
 
 /**
@@ -201,9 +201,11 @@ export type ResolvedCheckout =
  *     when it set one and its coupon exists (`gymMemberSavingPence` is looked
  *     up by the caller from the gym config for THIS gymSlug). Monthly never does.
  *   - six_month / pif_1599 — ATP's page only; refused for any other gym.
- *   - a member code — ATP's £1,599 pay-in-full only. Ignored everywhere else;
- *     on that rung an unrecognised code is refused so the buyer can fix it,
- *     never silently sold at a price they were not shown.
+ *   - an ATP member code — on ATP's two £1,599 plans only, it sells the
+ *     standard plan instead: pif_1599 → pif (£999.99), six_month → monthly
+ *     (10 × £99.99). Ignored everywhere else; on those plans an unrecognised
+ *     code is refused so the buyer can fix it, never silently sold at a price
+ *     they were not shown.
  */
 export function resolveCheckout(
   req: { plan: unknown; gymSlug?: string | null; memberCode?: unknown },
@@ -226,17 +228,13 @@ export function resolveCheckout(
   }
 
   if ((req.plan === "six_month" || req.plan === "pif_1599") && isAtp(req.gymSlug)) {
-    const config = ATP_PLANS[req.plan];
-    if (req.plan === "six_month") return { ok: true, plan: "six_month", config, rung: "six_month", discount: null };
     const code = resolveMemberCode(req.gymSlug, req.memberCode);
     if (code.kind === "invalid") return { ok: false, reason: "invalid-code" };
     if (code.kind === "valid") {
-      return {
-        ok: true, plan: "pif_1599", config, rung: code.rung,
-        discount: { coupon: code.coupon, offPence: code.offPence, code: code.code },
-      };
+      const std: CoursePlanChoice = req.plan === "pif_1599" ? "pif" : "monthly";
+      return { ok: true, plan: std, config: COURSE_PLANS[std], rung: std, discount: null, memberCode: code.code };
     }
-    return { ok: true, plan: "pif_1599", config, rung: "pif_1599", discount: null };
+    return { ok: true, plan: req.plan, config: ATP_PLANS[req.plan], rung: req.plan, discount: null };
   }
 
   return { ok: false, reason: "unknown-plan" };
@@ -482,7 +480,7 @@ export async function countSettledMonthlyPayments(subscriptionId: string): Promi
 export function buildSessionParams(
   input: CheckoutSessionInput,
   config: PlanConfig,
-  opts: { cancelPath: string; rung?: Rung; discount?: SessionDiscount | null },
+  opts: { cancelPath: string; rung?: Rung; discount?: SessionDiscount | null; memberCode?: string },
 ): Record<string, unknown> {
   const deposit = config.metadataPlan === "deposit";
   const monthly = config.metadataPlan === "monthly";
@@ -588,7 +586,7 @@ export function buildSessionParams(
       contract_value: poundsString(contractPence),
       contract_value_pence: String(contractPence),
       // The ATP member code, or the gym's member saving, when one applied.
-      promo_code: discount?.code,
+      promo_code: discount?.code ?? opts.memberCode,
       member_saving_pence: discount?.memberSavingPence ? String(discount.memberSavingPence) : undefined,
       buyer_name: input.name?.trim().slice(0, 200),
       gym_referral: input.gymReferral,
@@ -612,7 +610,7 @@ export function buildSessionParams(
  */
 export async function createCheckoutSession(
   input: CheckoutSessionInput,
-  resolved?: { config: PlanConfig; rung: Rung; discount: SessionDiscount | null },
+  resolved?: { config: PlanConfig; rung: Rung; discount: SessionDiscount | null; memberCode?: string },
 ): Promise<CheckoutSessionResult | null> {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
@@ -636,6 +634,7 @@ export async function createCheckoutSession(
       cancelPath,
       rung: resolved?.rung,
       discount: resolved?.discount ?? null,
+      memberCode: resolved?.memberCode,
     });
     // Never send a deposit without its mandate. A deposit has no Payment Link
     // to fall back to, so refusing here shows the buyer an error and a way to

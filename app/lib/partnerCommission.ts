@@ -326,10 +326,14 @@ export const ATP_LADDER = {
   startsAt: "2026-10-10T00:00:00.000Z",
   sixMonth: ATP_SIX_MONTH,
   pif1599Pence: ATP_PIF_FULL_PENCE,
-  codes: {
-    ATPPT: { coupon: "buPzSnaF", offPence: 20_000, rung: "pif_1399" as Rung },
-    ATP500: { coupon: "vgLNHktz", offPence: 50_000, rung: "pif_1099" as Rung },
-  } as Record<string, { coupon: string; offPence: number; rung: Rung }>,
+  /**
+   * ATP member codes (11 Oct 2026). ATP's page shows the £1,599 prices; a code
+   * switches the buyer to our standard prices: £1,599 in full → £999.99 in
+   * full, the 6-month plan → 10 × £99.99. No coupon: the code only chooses
+   * which standard plan is sold. (Until 11 Oct ATPPT / ATP500 took £200 / £500
+   * off the £1,599 — rungs pif_1399 / pif_1099 on older sales.)
+   */
+  codes: ["ATPPT", "ATP500", "ATP600"] as readonly string[],
   commission: {
     six_month: 50_000,
     pif_1599: 50_000,
@@ -356,19 +360,18 @@ export function normaliseCode(raw: unknown): string {
 
 export type CodeResult =
   | { kind: "none" }
-  | { kind: "valid"; code: string; coupon: string; offPence: number; rung: Rung }
+  | { kind: "valid"; code: string }
   | { kind: "invalid" };
 
 /**
- * Check a member code. ATP's £1,599 pay-in-full only: any other gym, or no gym,
+ * Check a member code. ATP's £1,599 plans only: any other gym, or no gym,
  * gets "none" whatever was typed — a code cannot be smuggled onto another page.
  */
 export function resolveMemberCode(gymSlug: string | null | undefined, raw: unknown): CodeResult {
   if (!isAtp(gymSlug)) return { kind: "none" };
   const code = normaliseCode(raw);
   if (!code) return { kind: "none" };
-  const hit = Object.prototype.hasOwnProperty.call(ATP_LADDER.codes, code) ? ATP_LADDER.codes[code] : undefined;
-  return hit ? { kind: "valid", code, coupon: hit.coupon, offPence: hit.offPence, rung: hit.rung } : { kind: "invalid" };
+  return ATP_LADDER.codes.includes(code) ? { kind: "valid", code } : { kind: "invalid" };
 }
 
 /**
