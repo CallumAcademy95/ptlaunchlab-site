@@ -44,16 +44,22 @@
  *                   to £100 on pay in full, taken from the gym's fee; separately
  *                   agreed written fees prevail. v4.1 signers get commission_terms
  *                   = 'ladder'.
+ *   v4.2 2026-10-11 Volume rate renamed the Partner Accelerator rate and made
+ *                   non-retrospective: £500 / £300 applies to the 4th and each
+ *                   later learner referred by the gym who becomes a successfully
+ *                   enrolled learner in the same calendar quarter; learners 1–3
+ *                   stay at £400 / £250. v4.2 signers get commission_terms =
+ *                   'ladder' (as v4.1).
  *
  * Commission RELEASE MECHANICS are unchanged between v2.0 and v3.0, so v3.0
  * signers keep commission_terms = 'instalment_2'. No migration is needed.
  */
 
-export const PARTNERSHIP_AGREEMENT_VERSION = "4.1";
+export const PARTNERSHIP_AGREEMENT_VERSION = "4.2";
 
 /** Short label for the admin email / partner record. */
 export const PARTNERSHIP_AGREEMENT_SUMMARY =
-  "£400 pay in full / £250 monthly inc. VAT; £500 / £300 at 4+ learners a quarter · paid 30 days after pay-in-full or at the 5th monthly payment · no clawback · 5-mile exclusivity";
+  "£400 pay in full / £250 monthly inc. VAT; £500 / £300 from the 4th learner in a quarter onwards (Partner Accelerator rate) · paid 30 days after pay-in-full or at the 5th monthly payment · no clawback · 5-mile exclusivity";
 
 /** The referral fee, in pence. Mirrors pp_partners.fee_per_learner_pence. */
 export const DEFAULT_FEE_PER_LEARNER_PENCE = 40_000;
@@ -97,7 +103,7 @@ export const KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
     clause: "Clause 5",
     title: "Commission schedule, inclusive of VAT",
     detail:
-      "You are paid £400 for each learner who pays in full and £250 for each learner on the monthly plan. In any quarter in which 4 or more learners enrol through your gym, every learner that quarter earns £500 (pay in full) or £300 (monthly). If you choose to give your members a saving on the pay-in-full price, it comes out of your fee. All figures include VAT — nothing is added on top.",
+      "You are paid £400 for each learner who pays in full and £250 for each learner on the monthly plan. From the 4th learner who enrols through your gym in a calendar quarter, that learner and each later one that quarter earns £500 (pay in full) or £300 (monthly) — the Partner Accelerator rate. Your first 3 learners in the quarter stay at £400 / £250. If you choose to give your members a saving on the pay-in-full price, it comes out of your fee. All figures include VAT — nothing is added on top.",
   },
   {
     clause: "Clause 5.4",
@@ -230,7 +236,7 @@ export function buildAgreementClauses(party: AgreementParties): Clause[] {
         b("Learner who pays the course fee in full: £400"),
         b("Learner on the monthly payment plan: £250"),
         b(
-          "Volume rate — where 4 or more learners referred by the Partner Gym become successfully enrolled learners in the same calendar quarter, the Fee for every such learner in that quarter is £500 (paid in full) or £300 (monthly payment plan). The difference is paid with the first payment run after the quarter ends, once the underlying Fee has been released under Clause 5.4"
+          "Partner Accelerator rate — the Fee is £500 (paid in full) or £300 (monthly payment plan) for the 4th and each later learner referred by the Partner Gym who becomes a successfully enrolled learner in the same calendar quarter. The first 3 such learners in a calendar quarter are paid at the rates above. The difference is paid with the first payment run after the quarter ends, once the underlying Fee has been released under Clause 5.4"
         ),
         b(
           "Member saving — the Partner Gym may elect in writing to offer its members a reduction of up to £100 on the pay-in-full course fee, shown on its academy page. Where it does, the Fee for each learner who receives the reduction is reduced by the same amount. The reduction does not apply to the monthly payment plan"

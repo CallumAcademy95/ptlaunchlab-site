@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
 import {
   getPartnerSummary,
-  getQuarterLearnerCount,
+  getQuarterProgress,
   formatPence,
   commissionReleaseRule,
 } from "@/app/lib/partner-data";
@@ -16,6 +16,8 @@ import {
   VOLUME_BONUS_MONTHLY_PENCE,
   VOLUME_BONUS_PIF_PENCE,
   VOLUME_THRESHOLD,
+  ACCELERATOR_RATE_NAME,
+  quarterHeadline,
   volumeProgressMessage,
 } from "@/app/lib/partnerCommission";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
@@ -35,13 +37,15 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 export default async function MyAcademyPage() {
   const session = await requirePartner();
   const { partner } = session;
-  const [summary, bank, quarterLearners] = await Promise.all([
+  const [summary, bank, quarterProgress] = await Promise.all([
     getPartnerSummary(partner.id),
     getMaskedBankDetails(partner.id),
-    getQuarterLearnerCount(partner.id),
+    getQuarterProgress(partner.id),
   ]);
-  // v4.1: the nine gyms on 'ladder' terms see their quarter's progress towards
-  // the volume rate; ATP sees its own rungs (it is not on the volume rate).
+  const quarterLearners = quarterProgress.learners;
+  // The nine gyms on 'ladder' terms see this quarter's enrolments, what they
+  // have earned, and the next step towards / on the Partner Accelerator rate
+  // (v4.2: 4th learner onwards). ATP sees its own rungs (it is not on it).
   const atp = isAtp(partner.slug);
   const onLadder = partner.commission_terms === LADDER_TERMS && !atp;
   const quarter = quarterOf(new Date());
@@ -140,13 +144,18 @@ export default async function MyAcademyPage() {
         )}
       </section>
 
-      {/* ── Commission rates (v4.1 ladder) ─────────────────────────────── */}
+      {/* ── This quarter (ladder: Partner Accelerator rate) ─────────────── */}
       {onLadder && (
         <section>
           <h2 className="text-white font-bold text-xl mb-1">This quarter</h2>
           <p className="text-soft text-sm mb-4">Runs to {quarterEnds}.</p>
           <div className="rounded-xl bg-card border border-white/10 p-5 space-y-4">
-            <p className="text-white font-semibold">{volumeProgressMessage(quarterLearners)}</p>
+            <p className="text-white font-semibold">
+              {quarterHeadline(quarterLearners, quarterProgress.earnedPence, formatPence)}
+            </p>
+            <p className="text-soft text-sm">{volumeProgressMessage(quarterLearners)}</p>
+            {/* TODO: enquiries / leads this quarter go here once ring-me enquiries
+                are stored in the DB (they are not yet). */}
             <div className="h-2 rounded-full bg-white/10 overflow-hidden" aria-hidden>
               <div
                 className="h-full bg-gold"
@@ -158,7 +167,7 @@ export default async function MyAcademyPage() {
                 <tr className="text-soft text-[10px] uppercase tracking-widest text-left">
                   <th className="py-2 font-bold">Learner pays</th>
                   <th className="py-2 font-bold">You earn</th>
-                  <th className="py-2 font-bold">Volume rate ({VOLUME_THRESHOLD}+ a quarter)</th>
+                  <th className="py-2 font-bold">{ACCELERATOR_RATE_NAME} ({VOLUME_THRESHOLD}th learner on)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -179,9 +188,9 @@ export default async function MyAcademyPage() {
               </tbody>
             </table>
             <p className="text-soft text-xs leading-relaxed">
-              Reach {VOLUME_THRESHOLD} learners in a calendar quarter and every learner that quarter moves to
-              the volume rate, including the ones already enrolled. The top-up is paid with the payout run
-              after the quarter ends. If you give your members a saving on paying in full, it comes off the
+              Your first {VOLUME_THRESHOLD - 1} learners in a calendar quarter earn the standard rate. Your{" "}
+              {VOLUME_THRESHOLD}th learner and every one after it that quarter earn the {ACCELERATOR_RATE_NAME}.
+              The top-up is paid with the payout run after the quarter ends. If you give your members a saving on paying in full, it comes off the
               in-full figure.
             </p>
           </div>
