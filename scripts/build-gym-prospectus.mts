@@ -33,14 +33,33 @@ import {
   KEY_TERMS_FOR_ACKNOWLEDGEMENT,
   PARTNERSHIP_AGREEMENT_VERSION,
 } from "../app/lib/partnershipAgreement";
-import { PARTNER_FEE_PENCE, PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "../app/lib/pricing";
+import { PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "../app/lib/pricing";
+import {
+  LADDER_MONTHLY_COMMISSION_PENCE,
+  LADDER_PIF_COMMISSION_PENCE,
+  VOLUME_BONUS_MONTHLY_PENCE,
+  VOLUME_BONUS_PIF_PENCE,
+  VOLUME_THRESHOLD,
+} from "../app/lib/partnerCommission";
 
 // The per-learner fee in the marketing pages comes from app/lib/pricing.ts (v4.0
 // terms: £250 inc. VAT). Page 4 still renders the signed agreement verbatim, so
 // do not publish a regenerated prospectus until partnershipAgreement.ts carries
 // the same fee — otherwise pages 1-3 and page 4 disagree.
-const FEE = formatPence(PARTNER_FEE_PENCE);
-const perYear = (perMonth: number) => formatPence(PARTNER_FEE_PENCE * perMonth * 12);
+// v4.2 commission schedule: base £400 pay in full / £250 monthly; Partner
+// Accelerator £500 / £300 from the 4th learner in a calendar quarter (not
+// back-dated, no cap). Illustrations assume every learner pays in full.
+const PIF = formatPence(LADDER_PIF_COMMISSION_PENCE);
+const MON = formatPence(LADDER_MONTHLY_COMMISSION_PENCE);
+const PIF_ACC = formatPence(LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE);
+const MON_ACC = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_BONUS_MONTHLY_PENCE);
+const FEE = `${PIF} per learner who pays in full (${MON} monthly), rising to ${PIF_ACC} / ${MON_ACC} from your ${VOLUME_THRESHOLD}th learner in a quarter`;
+const perYear = (perMonth: number) => {
+  const perQuarter = perMonth * 3;
+  const base = Math.min(perQuarter, VOLUME_THRESHOLD - 1);
+  const accel = Math.max(0, perQuarter - (VOLUME_THRESHOLD - 1));
+  return formatPence(4 * (base * LADDER_PIF_COMMISSION_PENCE + accel * (LADDER_PIF_COMMISSION_PENCE + VOLUME_BONUS_PIF_PENCE)));
+};
 
 const OUT_HTML = path.resolve("public/gym-partner-prospectus.html");
 const OUT_PDF = path.resolve("public/gym-partner-prospectus.pdf");
@@ -48,7 +67,7 @@ const CHROME = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
 
 // Verified 2026-08-29 by scripts/audit-partner-platform.mts. Update both together.
 const PROOF = {
-  partnerGyms: 9,
+  partnerGyms: 10,
   bestGymEnrolments: 3,
   bestGymSince: "May",
   gymsWithNone: 4,
@@ -110,8 +129,8 @@ ${page(`
   <div class="eyebrow">Gym partnership</div>
   <h1>A new revenue stream,<br>at zero cost.</h1>
   <div class="rule"></div>
-  <p>A white-label PT academy for your gym. You are paid ${FEE} (inc. VAT) for each
-  member who enrols, and you grow your own pipeline of trainers who already know
+  <p>A white-label PT academy for your gym. You are paid ${PIF} (inc. VAT) for each
+  member who enrols and pays in full, more from your ${VOLUME_THRESHOLD}th each quarter, and you grow your own pipeline of trainers who already know
   your floor.</p>
   <p style="margin-top:10mm;font-size:10.5pt;">PT Launch Lab Ltd · Pontefract<br>
   ptlaunchlab.co.uk/gym-partnership</p>
@@ -137,7 +156,7 @@ ${page(`
       Level 3, Ofqual regulated, CIMSPA recognised. Most learners qualify in 8 to 16
       weeks around a job. You teach nothing.</p></div>
     <div class="box"><h3>3. You are paid</h3>
-      <p>${FEE} (inc. VAT) for every member who enrols through your academy. Paid 30
+      <p>${FEE}, all inc. VAT (the Partner Accelerator rate, no cap). Paid 30
       days after a pay-in-full enrolment, or when their ${PARTNER_FEE_RELEASE_PAYMENT}th
       monthly payment clears. Nothing is clawed back once paid.</p></div>
     <div class="box"><h3>4. First introductions</h3>
@@ -152,7 +171,7 @@ ${page(`
 
 ${page(`
   <h2>What it is worth</h2>
-  <p>${FEE} per learner, inclusive of VAT, so the arithmetic is easy. Put your own number in:</p>
+  <p>${PIF} per pay-in-full learner, and ${PIF_ACC} from your ${VOLUME_THRESHOLD}th each quarter, inclusive of VAT. If every learner paid in full:</p>
   <table style="width:100%;border-collapse:collapse;margin:5mm 0 6mm;">
     <tr style="background:${NAVY};color:#fff;">
       <th style="text-align:left;padding:3mm 4mm;font-family:'Barlow Condensed',sans-serif;font-size:10pt;letter-spacing:.12em;text-transform:uppercase;font-weight:600;">Members enrolling</th>
@@ -190,12 +209,12 @@ ${page(`
       <h3>${esc(t.title)}</h3><p>${esc(t.detail)}</p></div>`
   ).join("\n")}
   <h2 style="margin-top:5mm;">On territory</h2>
-  <p>We aim to work with one gym per area, and we will tell you honestly whether anyone
-  near you is already set up. That is how we intend to run it, not a right granted by the
-  agreement, and we would rather say so than have you find out later.</p>
+  <p>One gym per area is written into the agreement: while you are a partner we will not
+  sign another partner gym within 5 miles of your premises (clause 3.8). We will tell you
+  honestly whether anyone near you is already set up before you sign.</p>
 
   <div class="kicker"><p><strong>Next step:</strong> a fifteen minute call. If your gym
-  is not a fit we will say so. callum@ptlaunchlab.co.uk · ptlaunchlab.co.uk/gym-partnership</p></div>
+  is not a fit we will say so. info@ptlaunchlab.co.uk · ptlaunchlab.co.uk/gym-partnership</p></div>
   <div class="foot"><span>PT Launch Lab Ltd · Pontefract · Partnership terms v${PARTNERSHIP_AGREEMENT_VERSION}</span><span>4</span></div>
 `)}
 
