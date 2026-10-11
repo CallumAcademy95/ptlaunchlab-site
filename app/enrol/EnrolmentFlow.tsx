@@ -18,6 +18,8 @@ import {
 } from "@/app/lib/pricing";
 // Display-safe ATP figures only — the member codes never reach this bundle.
 import { ATP_SIX_MONTH } from "@/app/lib/atpPrices";
+/** ATP: what paying in full saves against its 6-month plan (£599.01 → "£599", never rounded up). */
+const ATP_PIF_SAVING = `£${Math.floor((ATP_SIX_MONTH.contractPence - COURSE_PRICE_PENCE) / 100)}`;
 
 /** What /api/checkout sells. The last two exist on ATP's enrol page only. */
 type EnrolPlan = CoursePlanChoice | "six_month";
@@ -152,6 +154,7 @@ export default function EnrolmentFlow({
   standalone,
   memberSavingPence = 0,
   ladder,
+  showMonthly: showMonthlyProp = false,
 }: {
   partner?: PartnerConfig;
   standalone?: boolean;
@@ -166,12 +169,15 @@ export default function EnrolmentFlow({
    * under the two standard options.
    */
   ladder?: "atp";
+  /** ATP only: show 10 × £99.99 too (its enrol page's ?plan=monthly link). */
+  showMonthly?: boolean;
 }) {
   const [fullName, setFullName]   = useState("");
   const [email, setEmail]         = useState("");
   const [errors, setErrors]       = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const atpLadder = ladder === "atp";
+  const showMonthly = !atpLadder || showMonthlyProp;
   // Never on ATP's page (its rungs replace it), never negative, never over £100.
   const saving = atpLadder ? 0 : Math.max(0, Math.min(10_000, Math.round(memberSavingPence) || 0));
   const pifTodayPence = COURSE_PRICE_PENCE - saving;
@@ -412,14 +418,37 @@ export default function EnrolmentFlow({
               </div>
             )}
 
-            {/* The two ways to pay */}
+            {/* The ways to pay. Everyone: £999.99 in full or 10 × £99.99.
+                ATP's page: its 6-month plan and pay in full; monthly only via
+                ?plan=monthly (the link George sends). */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* ATP Fitness Felixstowe only: its 6-month plan, first (George's
+                  pitch leads with it), then pay in full "save £599 against it". */}
+              {atpLadder && (
+              <button onClick={() => pay("six_month")} disabled={submitting} data-plan="six_month"
+                className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">6-month plan</p>
+                <p className="text-white font-bold text-2xl mb-1">{formatPence(ATP_SIX_MONTH.contractPence)} over 6 months</p>
+                <p className="text-gold text-4xl font-bold mb-1">{formatPence(ATP_SIX_MONTH.depositPence)}<span className="text-lg text-soft font-semibold"> today</span></p>
+                <p className="text-soft text-xs mb-6">
+                  then {ATP_SIX_MONTH.instalments} × {formatPence(ATP_SIX_MONTH.instalmentPence)} monthly, starting in{" "}
+                  {ATP_SIX_MONTH.trialDays} days
+                </p>
+                <div className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm text-center group-hover:brightness-110 transition-all">
+                  {submitting ? "Taking you to checkout…" : `Pay ${formatPence(ATP_SIX_MONTH.depositPence)} today →`}
+                </div>
+              </button>
+              )}
+
               {/* Pay in full */}
               <button onClick={() => pay("pif")} disabled={submitting} data-plan="pif"
-                className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                className={`bg-deep border-2 ${atpLadder ? "border-white/10 hover:border-gold/40" : "border-gold/50 hover:border-gold hover:bg-gold/5"} rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed`}>
                 <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">One payment</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay in Full</p>
                 <p className="text-gold text-4xl font-bold mb-3">{COURSE_PRICE_LABEL}</p>
+                {atpLadder && (
+                  <p className="text-white text-base font-bold -mt-2 mb-3">Save {ATP_PIF_SAVING} against the 6-month plan</p>
+                )}
                 {saving > 0 && (
                   <p className="text-white text-base font-bold -mt-2 mb-3">Member price {formatPence(pifTodayPence)}</p>
                 )}
@@ -432,9 +461,11 @@ export default function EnrolmentFlow({
                 </div>
               </button>
 
+
               {/* Pay monthly */}
+              {showMonthly && (
               <button onClick={() => pay("monthly")} disabled={submitting} data-plan="monthly"
-                className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
+                className={`${atpLadder ? "sm:col-span-2 " : ""}bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed`}>
                 <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
                 <p className="text-white font-bold text-2xl mb-1">Pay Monthly</p>
                 <p className="text-white text-3xl font-bold mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-soft font-semibold"> /month</span></p>
@@ -449,27 +480,8 @@ export default function EnrolmentFlow({
                   {submitting ? "Taking you to checkout…" : `Pay ${MONTHLY_PRICE_LABEL} today →`}
                 </div>
               </button>
+              )}
             </div>
-
-            {/* ATP Fitness Felixstowe only: its 6-month plan as a third way to
-                pay, under the two above because it costs more. */}
-            {atpLadder && (
-              <div data-ladder="atp">
-                <button onClick={() => pay("six_month")} disabled={submitting} data-plan="six_month"
-              className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
-              <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">6-month plan</p>
-              <p className="text-white font-bold text-2xl mb-1">{formatPence(ATP_SIX_MONTH.contractPence)} over 6 months</p>
-              <p className="text-gold text-4xl font-bold mb-1">{formatPence(ATP_SIX_MONTH.depositPence)}<span className="text-lg text-soft font-semibold"> today</span></p>
-              <p className="text-soft text-xs mb-6">
-                then {ATP_SIX_MONTH.instalments} × {formatPence(ATP_SIX_MONTH.instalmentPence)} monthly, starting in{" "}
-                {ATP_SIX_MONTH.trialDays} days
-              </p>
-              <div className="w-full py-3.5 rounded-full border border-gold text-gold font-bold text-sm text-center group-hover:bg-gold/10 transition-all">
-                {submitting ? "Taking you to checkout…" : `Pay ${formatPence(ATP_SIX_MONTH.depositPence)} today →`}
-              </div>
-            </button>
-              </div>
-            )}
 
             {/* The certificate condition and the monthly mandate are material
                 terms of what someone is buying, so they belong on the screen
@@ -494,6 +506,7 @@ export default function EnrolmentFlow({
                     </span>
                   </li>
                 )}
+                {showMonthly && (<>
                 <li className="flex gap-2.5">
                   <span className="text-gold shrink-0">·</span>
                   <span>
@@ -511,6 +524,7 @@ export default function EnrolmentFlow({
                     them forward.
                   </span>
                 </li>
+                </>)}
                 <li className="flex gap-2.5">
                   <span className="text-gold shrink-0">·</span>
                   <span>
