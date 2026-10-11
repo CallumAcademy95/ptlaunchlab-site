@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import HeroSlideshow from "../components/HeroSlideshow";
-import { useFormSecurity } from "@/app/lib/security/client";
+import LeadForm from "@/app/components/LeadForm";
 import { faqPageSchema } from "@/app/lib/faqSchema";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 
@@ -89,10 +89,6 @@ export default function FunnelPage() {
   const isDragging = useRef(false);
 
   const [prospectusOpen, setProspectusOpen] = useState(false);
-  const [prospectusForm, setProspectusForm] = useState({ name: "", phone: "", email: "" });
-  const [prospectusSubmitting, setProspectusSubmitting] = useState(false);
-  const [prospectusError, setProspectusError] = useState("");
-  const sec = useFormSecurity();
 
   useEffect(() => {
     function update() {
@@ -110,27 +106,11 @@ export default function FunnelPage() {
     return () => { document.body.style.overflow = ""; };
   }, [prospectusOpen]);
 
-  async function handleProspectusSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setProspectusError("");
-    setProspectusSubmitting(true);
-    try {
-      const res = await fetch("/api/prospectus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...prospectusForm, [sec.SEC_KEY]: sec.payload() }),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Something went wrong.");
-      setProspectusOpen(false);
-      setProspectusForm({ name: "", phone: "", email: "" });
-      try { sessionStorage.removeItem("ptll_prospectus_opened"); } catch {}
-      window.location.href = "/prospectus/thank-you";
-    } catch (err: unknown) {
-      setProspectusError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
-    } finally {
-      setProspectusSubmitting(false);
-    }
+  // Lead already saved (and Pixel Lead fired) by LeadForm/submitLead; open the prospectus.
+  function handleProspectusSuccess() {
+    setProspectusOpen(false);
+    try { sessionStorage.removeItem("ptll_prospectus_opened"); } catch {}
+    window.location.href = "/prospectus/thank-you";
   }
 
   const maxReviewIndex = reviews.length - visibleCount;
@@ -153,26 +133,15 @@ export default function FunnelPage() {
               <h2 className="text-2xl font-bold text-white mt-2 mb-1">PT Launch Lab Course Prospectus</h2>
               <p className="text-[#8CA3BF] text-sm leading-relaxed">Enter your details and we&apos;ll open the prospectus — full course overview, modules, pricing, and payment options.</p>
             </div>
-            <form onSubmit={handleProspectusSubmit} className="space-y-4">
-              <sec.Honeypot />
-              <div>
-                <label className="block text-white text-sm font-medium mb-1.5">Full name</label>
-                <input type="text" required placeholder="e.g. Jordan Smith" value={prospectusForm.name} onChange={(e) => setProspectusForm((f) => ({ ...f, name: e.target.value }))} className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors" />
-              </div>
-              <div>
-                <label className="block text-white text-sm font-medium mb-1.5">Phone number</label>
-                <input type="tel" required placeholder="e.g. 07700 900123" value={prospectusForm.phone} onChange={(e) => setProspectusForm((f) => ({ ...f, phone: e.target.value }))} className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors" />
-              </div>
-              <div>
-                <label className="block text-white text-sm font-medium mb-1.5">Email address</label>
-                <input type="email" required placeholder="e.g. jordan@email.com" value={prospectusForm.email} onChange={(e) => setProspectusForm((f) => ({ ...f, email: e.target.value }))} className="w-full bg-[#072B4A] border border-[#3B82F6]/30 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] text-sm focus:outline-none focus:border-[#F5C518]/60 transition-colors" />
-              </div>
-              {prospectusError && <p className="text-red-400 text-sm">{prospectusError}</p>}
-              <button type="submit" disabled={prospectusSubmitting} className="w-full py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2">
-                {prospectusSubmitting ? "Opening..." : "View & Download Prospectus →"}
-              </button>
-              <p className="text-[#4A6280] text-xs text-center">No spam. We&apos;ll only use this to follow up if you&apos;d like.</p>
-            </form>
+            <LeadForm
+              intent="prospectus"
+              source="funnel_prospectus_modal"
+              tone="dark"
+              submitLabel="View & Download Prospectus →"
+              successMessage="Thanks, opening the prospectus…"
+              onSuccess={handleProspectusSuccess}
+              footnote="No spam. We'll only use this to follow up if you'd like."
+            />
           </div>
         </div>
       )}

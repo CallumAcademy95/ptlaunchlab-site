@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { trackEvent } from "@/app/lib/gtag";
-import { useFormSecurity } from "@/app/lib/security/client";
+import LeadForm from "./LeadForm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HeroLeadForm
 //
 // Inline 3-field lead capture for avatar-targeted Meta ads landing pages.
-// Submits to /api/prospectus — same endpoint as the prospectus modal — so it
-// re-uses the existing Zapier → MailerLite → WhatsApp warm-up wiring.
+// Saves through /api/lead (intent prospectus), the same door as the prospectus
+// modal, so the existing Zapier / email-server warm-up wiring is unchanged.
 //
 // On success the form swaps to an inline thank-you state with a high-intent
 // "Book Your Call" CTA. The lead is in the warm-up sequence regardless of
@@ -30,65 +30,27 @@ const COPY: Record<Avatar, { eyebrow: string; submit: string; busy: string; than
     submit: "Start My PT Career →",
     busy: "One sec…",
     thankHeadline: "You're in.",
-    thankBody: "We'll text you on WhatsApp shortly. While you're here — book your free 15-min call so we can map the route in person.",
+    thankBody: "We'll be in touch shortly. While you're here — book your free 15-min call so we can map the route in person.",
   },
   switcher: {
     eyebrow: "See if it works for your situation — no pressure",
     submit: "See How It Works →",
     busy: "One sec…",
     thankHeadline: "You're in.",
-    thankBody: "We'll WhatsApp you with a quick intro shortly. Book a 15-min call below and we'll walk through your exact transition plan.",
+    thankBody: "We'll be in touch shortly. Book a 15-min call below and we'll walk through your exact transition plan.",
   },
   returner: {
     eyebrow: "Honest answers, no pressure",
     submit: "I'm Ready to Hear More →",
     busy: "One sec…",
     thankHeadline: "Got it — thank you.",
-    thankBody: "We'll WhatsApp you a kind hello shortly. If you'd like to talk it through, book a no-pressure 15-min chat below.",
+    thankBody: "We'll be in touch shortly. If you'd like to talk it through, book a no-pressure 15-min chat below.",
   },
 };
 
 export default function HeroLeadForm({ avatar }: { avatar: Avatar }) {
   const copy = COPY[avatar];
-  const sec = useFormSecurity();
-  const [form, setForm] = useState({ name: "", phone: "", email: "" });
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setBusy(true);
-    // Shared event_id so server CAPI Lead and browser fbq Lead dedup on Meta
-    const eventId =
-      typeof window !== "undefined" && window.crypto?.randomUUID
-        ? window.crypto.randomUUID()
-        : `hero-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    try {
-      const res = await fetch("/api/prospectus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, event_id: eventId, avatar, [sec.SEC_KEY]: sec.payload() }),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || "Something went wrong.");
-      trackEvent("lead_capture_submitted", { avatar, source: "hero-form" });
-      if (typeof window !== "undefined" && (window as { fbq?: (...args: unknown[]) => void }).fbq) {
-        (window as { fbq: (...args: unknown[]) => void }).fbq(
-          "track",
-          "Lead",
-          { content_name: "prospectus_download", content_category: avatar },
-          { eventID: eventId },
-        );
-      }
-      setSubmitted(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
 
   if (submitted) {
     return (
@@ -108,49 +70,20 @@ export default function HeroLeadForm({ avatar }: { avatar: Avatar }) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-card border border-white/[0.08] rounded-2xl p-6 md:p-7 max-w-2xl mx-auto shadow-xl"
-    >
+    <div className="bg-card border border-white/[0.08] rounded-2xl p-6 md:p-7 max-w-2xl mx-auto shadow-xl">
       <p className="text-gold text-[11px] font-bold tracking-widest uppercase text-center mb-4">{copy.eyebrow}</p>
-      <sec.Honeypot />
-      <div className="space-y-3 mb-3">
-        <input
-          type="text"
-          required
-          placeholder="Full name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="w-full bg-base border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder-soft/50 focus:outline-none focus:border-gold/60 transition-colors text-base"
-        />
-        <input
-          type="tel"
-          required
-          placeholder="Mobile (we'll WhatsApp you)"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          className="w-full bg-base border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder-soft/50 focus:outline-none focus:border-gold/60 transition-colors text-base"
-        />
-        <input
-          type="email"
-          required
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          className="w-full bg-base border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder-soft/50 focus:outline-none focus:border-gold/60 transition-colors text-base"
-        />
-      </div>
-      {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-gold/30"
-      >
-        {busy ? copy.busy : copy.submit}
-      </button>
-      <p className="text-soft/55 text-[11px] text-center mt-3">
-        We&apos;ll WhatsApp you with a quick intro · No spam · Unsubscribe any time
-      </p>
-    </form>
+      <LeadForm
+        intent="prospectus"
+        source={`vsl_hero_${avatar}`}
+        tone="dark"
+        extra={{ avatar }}
+        submitLabel={copy.submit}
+        onSuccess={() => {
+          trackEvent("lead_capture_submitted", { avatar, source: "hero-form" });
+          setSubmitted(true);
+        }}
+        footnote="We'll be in touch with a quick intro · No spam · Unsubscribe any time"
+      />
+    </div>
   );
 }

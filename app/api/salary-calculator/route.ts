@@ -1,3 +1,4 @@
+// Superseded by /api/lead (11 Oct 2026); kept so cached pages still post. Remove after 2026-11-11.
 import { NextRequest, NextResponse } from 'next/server';
 
 // ─────────────────────────────────────────────────────────────────────────────

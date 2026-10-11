@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { trackEvent } from "@/app/lib/gtag";
+import LeadForm from "@/app/components/LeadForm";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PT Salary Calculator — public lead-magnet anchor for /personal-trainer-salary-uk
@@ -108,55 +109,18 @@ export default function SalaryCalculatorClient() {
     hoursPerWeek: 35,
   });
   const [unlocked, setUnlocked] = useState(false);
-  const [emailForm, setEmailForm] = useState({ name: "", email: "", phone: "" });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
   const results = useMemo(() => project(inputs), [inputs]);
   const monthly = Math.round(results.current / 12);
   const weekly = Math.round(results.current / 52);
 
-  const handleUnlock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (!emailForm.name.trim() || !emailForm.email.includes("@")) {
-      setError("Please enter your name and a valid email.");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/salary-calculator", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: emailForm.name.trim(),
-          email: emailForm.email.trim().toLowerCase(),
-          phone: emailForm.phone.trim(),
-          inputs,
-          results: {
-            year1: results.year1,
-            "year2_3": results["year2-3"],
-            year4plus: results.year4plus,
-          },
-        }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setError(data.error || "Something went wrong. Please try again.");
-        setSubmitting(false);
-        return;
-      }
-      trackEvent("salary_calculator_unlocked", {
-        employment: inputs.employment,
-        region: inputs.region,
-        experience: inputs.experience,
-      });
-      setUnlocked(true);
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
+  // Lead saved + Pixel Lead fired by LeadForm/submitLead; unlock the report.
+  const handleUnlocked = () => {
+    trackEvent("salary_calculator_unlocked", {
+      employment: inputs.employment,
+      region: inputs.region,
+      experience: inputs.experience,
+    });
+    setUnlocked(true);
   };
 
   return (
@@ -311,47 +275,18 @@ export default function SalaryCalculatorClient() {
                   Enter your email to unlock the full breakdown, including how to climb from your current tier to the £80k+ band.
                 </p>
 
-                <form onSubmit={handleUnlock} className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      value={emailForm.name}
-                      onChange={(e) => setEmailForm((p) => ({ ...p, name: e.target.value }))}
-                      placeholder="Full name"
-                      required
-                      autoComplete="name"
-                      className="px-4 py-3 rounded-xl bg-deep border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-sm"
-                    />
-                    <input
-                      type="email"
-                      value={emailForm.email}
-                      onChange={(e) => setEmailForm((p) => ({ ...p, email: e.target.value }))}
-                      placeholder="Email address"
-                      required
-                      autoComplete="email"
-                      className="px-4 py-3 rounded-xl bg-deep border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-sm"
-                    />
-                  </div>
-                  <input
-                    type="tel"
-                    value={emailForm.phone}
-                    onChange={(e) => setEmailForm((p) => ({ ...p, phone: e.target.value }))}
-                    placeholder="Mobile (optional)"
-                    autoComplete="tel"
-                    className="w-full px-4 py-3 rounded-xl bg-deep border border-white/[0.08] text-white placeholder-faint focus:outline-none focus:border-gold transition-colors text-sm"
-                  />
-                  {error && <p className="text-red-400 text-sm">{error}</p>}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-gold/20 disabled:opacity-60"
-                  >
-                    {submitting ? "Unlocking…" : "Unlock my full report →"}
-                  </button>
-                  <p className="text-faint text-xs text-center">
-                    Free. No spam. Unsubscribe anytime.
-                  </p>
-                </form>
+                <LeadForm
+                  intent="salary"
+                  source="salary_calculator"
+                  tone="dark"
+                  extra={{
+                    inputs,
+                    results: { year1: results.year1, year2_3: results["year2-3"], year4plus: results.year4plus },
+                  }}
+                  submitLabel="Unlock my full report →"
+                  onSuccess={handleUnlocked}
+                  footnote="Free. No spam. Unsubscribe anytime."
+                />
               </div>
             </div>
           ) : (

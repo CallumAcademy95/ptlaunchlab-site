@@ -5,6 +5,8 @@ import { validateQuiz } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 import { notifySetter } from '@/app/lib/setter-intake';
+import { QUIZ_RESULT_LABELS } from '@/app/lib/quizResultLabels';
+import { quizSubmissionPlan } from '@/app/lib/quizSubmissionPlan';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
@@ -14,12 +16,7 @@ import { notifySetter } from '@/app/lib/setter-intake';
 const rateLimiter = createRateLimiter(5, 60_000); // 5 submissions per minute per IP
 const ENDPOINT = '/api/quiz-submission';
 
-const resultLabels: Record<string, string> = {
-  onFloor:          'On-Floor PT Path',
-  online:           'Online Coach Path',
-  hybrid:           'Hybrid Coach Path',
-  alreadyQualified: 'Already Qualified — Needs Direction',
-};
+const resultLabels = QUIZ_RESULT_LABELS;
 
 export async function POST(request: NextRequest) {
   const ip = getIP(request);
@@ -49,9 +46,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const { name, phone, email, result: quizResult, avatar, answers } = result.data;
+    // The quiz client saves through /api/lead first, which already sends
+    // Zapier, the email-server nurture, the setter and the CAPI Lead.
+    // See app/lib/quizSubmissionPlan.ts.
+    const plan = quizSubmissionPlan(raw);
     const webhookUrl = process.env.QUIZ_ZAPIER_WEBHOOK_URL;
 
-    if (webhookUrl) {
+    if (!plan.zapier) {
+      // Sent by /api/lead.
+    } else if (webhookUrl) {
       const payload = {
         name,
         email,
@@ -87,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Add to nurture sequence starting day 7 (after Miles' warmup emails finish)
     const emailServerUrl = process.env.EMAIL_SERVER_URL;
-    if (emailServerUrl) {
+    if (plan.emailServer && emailServerUrl) {
       fetch(`${emailServerUrl}/leads/new`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +101,9 @@ export async function POST(request: NextRequest) {
     // Open a real conversation instead of a one-way drip: the setter sends one
     // warm, reply-inviting email and takes over the reply. (Replaces the old
     // warmup sequence; the day-7 nurture above stays as a fallback for non-repliers.)
-    await notifySetter({ name, email, source: 'quiz' });
+    // Skipped when /api/lead saved the lead: it already called the setter for
+    // intent "quiz" with this same payload. Exactly one setter call either way.
+    if (plan.setter) await notifySetter({ name, email, source: 'quiz' });
 
     logSec({ level: 'security', endpoint: ENDPOINT, outcome: 'accepted', signals: [], ip, email_domain: email.split('@')[1] });
 
@@ -112,7 +117,7 @@ export async function POST(request: NextRequest) {
     const eventId = rawEventId || deterministicEventId('quiz_lead', email, quizResult);
     const [firstName, ...rest] = (name || '').split(/\s+/);
     const lastName = rest.join(' ');
-    after(() => sendCapiEvent({
+    if (plan.capi) after(() => sendCapiEvent({
       eventName: 'Lead',
       eventId,
       eventSourceUrl: request.headers.get('referer') || 'https://ptlaunchlab.co.uk/quiz',

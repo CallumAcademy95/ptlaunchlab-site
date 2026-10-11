@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { WHATSAPP_LINK } from "@/app/lib/contactDetails";
 
 type Message =
   | { role: "user"; content: string }
@@ -14,7 +15,7 @@ const OPENER: Message = {
 const ACTION_CONFIG: Record<string, { label: string; href: string; icon: string }> = {
   quiz:     { label: "Take the Quiz",   href: "/quiz",                      icon: "✦" },
   call:     { label: "Talk to the Team", href: "/book-call",                icon: "📞" },
-  whatsapp: { label: "WhatsApp us",     href: "https://wa.me/447418609039", icon: "💬" },
+  whatsapp: { label: "WhatsApp us",     href: WHATSAPP_LINK, icon: "💬" },
 };
 
 function parseRaw(raw: string): { blocks: string[]; actions: string[] } {

@@ -59,6 +59,7 @@ test("isProtectedAdminPath gates the push API and admin pages, not login", () =>
     assert.equal(isProtectedAdminPath(p), true, p);
   }
   assert.equal(isProtectedAdminPath("/admin/leads"), true);
+  assert.equal(isProtectedAdminPath("/admin/site-leads/abc"), true);
   assert.equal(isProtectedAdminPath("/admin"), true);
   assert.equal(isProtectedAdminPath("/admin/login"), false);
   assert.equal(isProtectedAdminPath("/api/whatsapp-send"), true);

@@ -1,29 +1,10 @@
 "use client";
-import { useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-import { useFormSecurity } from "@/app/lib/security/client";
+import LeadForm from "../components/LeadForm";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const sec = useFormSecurity();
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, [sec.SEC_KEY]: sec.payload() }),
-    });
-    setSubmitted(true);
-  }
-
   return (
     <>
       <Nav />
@@ -91,73 +72,15 @@ export default function ContactPage() {
 
             {/* Right — form */}
             <div className="bg-[#0D3559] border border-[#3B82F6]/25 rounded-2xl p-8">
-              {submitted ? (
-                <div className="text-center py-12">
-                  <p className="text-4xl mb-4">✅</p>
-                  <h3 className="text-white font-bold text-2xl mb-3">Message sent.</h3>
-                  <p className="text-[#8CA3BF]">We&apos;ll get back to you as soon as possible — usually within a few hours.</p>
-                </div>
-              ) : (
-                <>
-                  <h2 className="text-white font-bold text-2xl mb-6">Send us a message</h2>
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    <sec.Honeypot />
-                    <div>
-                      <label className="text-[#8CA3BF] text-sm mb-2 block">Name</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="Your name"
-                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[#8CA3BF] text-sm mb-2 block">Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="your@email.com"
-                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[#8CA3BF] text-sm mb-2 block">Phone</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        placeholder="07700 000000"
-                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[#8CA3BF] text-sm mb-2 block">Message</label>
-                      <textarea
-                        name="message"
-                        value={form.message}
-                        onChange={handleChange}
-                        required
-                        rows={5}
-                        placeholder="What would you like to know?"
-                        className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 transition-colors resize-none"
-                      />
-                    </div>
-                    <p className="text-[#4A6280] text-xs">Either email or phone number is required.</p>
-                    <button
-                      type="submit"
-                      className="w-full px-6 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all"
-                    >
-                      Send Message →
-                    </button>
-                  </form>
-                </>
-              )}
+              <h2 className="text-white font-bold text-2xl mb-6">Send us a message</h2>
+              <LeadForm
+                intent="contact"
+                source="contact_page"
+                tone="dark"
+                question={{ label: "Message (optional)" }}
+                submitLabel="Send Message →"
+                successMessage={(first) => `Message sent, ${first}. We'll get back to you as soon as possible, usually within a few hours.`}
+              />
             </div>
           </div>
         </section>

@@ -8,6 +8,10 @@ import { computeCareerPlanV2, BAND_SCORE, CONSENT_TEXT } from "@/app/lib/careerP
 import { notifyPlannerIntake } from "@/app/lib/setter-intake";
 import { mlAddSubscriber } from "@/app/lib/mailerlite";
 import { Resend } from "resend";
+import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { sendOwnerPush, type OwnerPushDb } from "@/app/lib/owner-push";
+import { newLeadPush, pushStatus, type LeadRow } from "@/app/lib/leads";
+import { insertDirect, plannerLead, plannerPushNeeded } from "@/app/lib/directLeads";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/career-planner (v2)
@@ -50,11 +54,32 @@ export async function POST(request: NextRequest) {
     const plan = computeCareerPlanV2(d.answers);
     const a = d.answers;
 
-    // 1. Respond first. Everything else is background and non-fatal.
+    const eventId = d.eventId || deterministicEventId("career_planner_lead", d.email);
+
+    // 1. Save the lead to `leads` (same row shape as /api/lead). A failure pushes
+    //    "NOT SAVED" and carries on: the after() chain below is the backstop.
+    const lead = plannerLead({
+      name: d.name, email: d.email, phone: d.phone, band: plan.band, consentAt: d.consentAt,
+      answers: a, utm: d.utm, referrer: request.headers.get("referer"),
+    });
+    let db: ReturnType<typeof getSupabaseAdmin> | null = null;
+    try { db = getSupabaseAdmin(); } catch (err) { console.error("[career-planner] supabase not configured:", err); }
+    const push = (p: Parameters<typeof sendOwnerPush>[1]) =>
+      db ? sendOwnerPush(db as unknown as OwnerPushDb, p) : Promise.resolve({ sent: 0, removed: 0, failed: 0, error: "no database" });
+    const saved = await insertDirect(lead, eventId, {
+      insert: async (row: LeadRow) => {
+        if (!db) return { error: "supabase not configured" };
+        const { data, error } = await db.from("leads").insert(row).select("id").single();
+        return error || !data ? { error: error?.message ?? "no row" } : { id: data.id as string };
+      },
+      push,
+    }, 5_000);
+    const leadId = "id" in saved ? saved.id : null;
+
+    // 2. Respond. Everything else is background and non-fatal.
     const response = NextResponse.json({ success: true, lead: true, plan });
     logSec({ level: "security", endpoint: ENDPOINT, outcome: "accepted", signals: [], ip, email_domain: d.email.split("@")[1] });
 
-    const eventId = d.eventId || deterministicEventId("career_planner_lead", d.email);
     const userData = {
       email: d.email,
       phone: d.phone,
@@ -68,8 +93,9 @@ export async function POST(request: NextRequest) {
 
     after(async () => {
       // Leads Central first: it is the only route to the WhatsApp first touch (never throws).
+      let intakeOk = false;
       try {
-        await notifyPlannerIntake({
+        intakeOk = await notifyPlannerIntake({
           name: d.name,
           firstName: d.firstName,
           email: d.email,
@@ -84,6 +110,16 @@ export async function POST(request: NextRequest) {
         });
       } catch (err) {
         console.error("[career-planner] Leads Central intake failed:", d.email, err);
+      }
+
+      // Owner "New lead" push for the saved row. Prime leads are already pushed
+      // by the PT app's planner intake, so only when that intake failed.
+      if (leadId && db) {
+        let status = "skipped";
+        if (plannerPushNeeded(lead, plan.band, intakeOk)) {
+          try { status = pushStatus(await push(newLeadPush(lead, leadId))); } catch (err) { status = `failed: ${String(err)}`.slice(0, 300); }
+        }
+        try { await db.from("leads").update({ push_status: status }).eq("id", leadId); } catch (err) { console.error("[career-planner] push_status write failed", err); }
       }
 
       // Everything else is independent; each step logs its own failure.

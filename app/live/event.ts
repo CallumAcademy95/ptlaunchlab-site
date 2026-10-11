@@ -5,7 +5,7 @@
 // start/end, hosts, panellists, talkingPoints). Everything else — the human
 // date label, the session label, the Google Calendar link, the Event schema on
 // /live, and the date shown on /ask — derives from this. The stream link itself
-// lives server-side in LIVE_STREAM_URL and is returned by /api/live-register.
+// lives server-side in LIVE_STREAM_URL and is returned by /api/lead (live intent only).
 //
 // Speaker photos: drop images in /public/live/speakers/ and set `photo` to the
 // path (e.g. "/live/speakers/callum.webp"). If `photo` is omitted the page
