@@ -5,6 +5,7 @@ import { validateQuiz } from '@/app/lib/security/validate';
 import { logSec } from '@/app/lib/security/log';
 import { sendCapiEvent, extractRequestUserData, deterministicEventId } from '@/app/lib/metaCapi';
 import { notifySetter } from '@/app/lib/setter-intake';
+import { QUIZ_RESULT_LABELS } from '@/app/lib/quizResultLabels';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/quiz-submission
@@ -14,12 +15,7 @@ import { notifySetter } from '@/app/lib/setter-intake';
 const rateLimiter = createRateLimiter(5, 60_000); // 5 submissions per minute per IP
 const ENDPOINT = '/api/quiz-submission';
 
-const resultLabels: Record<string, string> = {
-  onFloor:          'On-Floor PT Path',
-  online:           'Online Coach Path',
-  hybrid:           'Hybrid Coach Path',
-  alreadyQualified: 'Already Qualified — Needs Direction',
-};
+const resultLabels = QUIZ_RESULT_LABELS;
 
 export async function POST(request: NextRequest) {
   const ip = getIP(request);

@@ -1,6 +1,7 @@
 // Real side effects for POST /api/lead: Zapier, MailerLite / email-server, Meta CAPI.
 // Each branch reproduces what the matching legacy form route sends today.
 // Heavy `@/` modules are imported lazily so node --test can load this file.
+import { QUIZ_RESULT_LABELS } from "./quizResultLabels.ts";
 import type { CleanLead, LeadIntent, StepStatus } from "./leads.ts";
 
 type Lead = CleanLead & { id: string };
@@ -9,8 +10,23 @@ export type SideEffectOpts = {
   fetchImpl?: typeof fetch;
   env?: Env;
   /** Test seam: replaces the real sendCapiEvent call. */
-  capiSend?: (input: Record<string, unknown>) => Promise<unknown>;
+  capiSend?: (input: Record<string, unknown>) => Promise<unknown | null>;
+  /** Test seam: server-side gym lookup (defaults to getGymByPartnerSlug). */
+  gymLookup?: (slug: string) => { gymName: string; canonicalPath: string } | undefined;
+  /** Test seam: defaults to GYM_CALLBACK_CONSENT_TEXT. */
+  consentText?: string;
 };
+
+export const quizLabel = (result: string): string => QUIZ_RESULT_LABELS[result] ?? result;
+
+/** Gym-callback gate for the route: a bogus gym slug is rejected before anything is saved. */
+export function validateGymCallback(gymSlug: unknown, lookup: (slug: string) => unknown): { ok: false; field: "gymSlug"; message: string } | null {
+  const slug = typeof gymSlug === "string" ? gymSlug.trim().slice(0, 60) : "";
+  if (!slug || slug === "GYM-SLUG-HERE" || !lookup(slug)) return { ok: false, field: "gymSlug", message: "Unknown gym." };
+  return null;
+}
+
+type Ctx = { gymName?: string; consentText?: string };
 
 const s = (v: unknown, max = 500): string => (typeof v === "string" ? v.slice(0, max) : v == null ? "" : String(v).slice(0, max));
 
@@ -34,7 +50,7 @@ export function zapierHookFor(intent: LeadIntent, env: Env): string | undefined 
 
 type Payload = { kind: "json" | "form"; data: Record<string, unknown> };
 
-export function zapierPayload(lead: Lead): Payload | null {
+export function zapierPayload(lead: Lead, ctx: Ctx = {}): Payload | null {
   const now = new Date().toISOString();
   const x = lead.extra;
   switch (lead.intent) {
@@ -48,17 +64,20 @@ export function zapierPayload(lead: Lead): Payload | null {
       const answers = Array.isArray(x.answers)
         ? x.answers.map((a) => (a && typeof a === "object" ? s((a as Record<string, unknown>).label) : s(a))).join(" | ")
         : s(x.answers);
-      return { kind: "json", data: { name: lead.name, email: lead.email, phone: lead.phone, quiz_result: result, avatar, answers, source: avatar ? `quiz-funnel:${avatar}` : "quiz-funnel", submitted_at: now } };
+      return { kind: "json", data: { name: lead.name, email: lead.email, phone: lead.phone, quiz_result: quizLabel(result), avatar, answers, source: avatar ? `quiz-funnel:${avatar}` : "quiz-funnel", submitted_at: now } };
     }
     case "live": // app/api/live-register/route.ts:79-85
       return { kind: "json", data: { name: lead.name, email: lead.email, phone: lead.phone ?? "", source: "live-webinar", submitted_at: now } };
-    case "salary": // app/api/salary-calculator/route.ts:26-41
+    case "salary": { // app/api/salary-calculator/route.ts:26-41; extra = { inputs, results } as the form sends today
+      const inputs = (x.inputs && typeof x.inputs === "object" ? x.inputs : {}) as Record<string, unknown>;
+      const results = (x.results && typeof x.results === "object" ? x.results : {}) as Record<string, unknown>;
       return { kind: "json", data: {
         name: lead.name, email: lead.email, phone: lead.phone ?? "", source: "salary_calculator",
-        employment: x.employment ?? "", region: x.region ?? "", experience: x.experience ?? "", hours_per_week: x.hoursPerWeek ?? "",
-        projected_year1: x.projected_year1 ?? "", projected_year2_3: x.projected_year2_3 ?? "", projected_year4plus: x.projected_year4plus ?? "",
+        employment: inputs.employment ?? "", region: inputs.region ?? "", experience: inputs.experience ?? "", hours_per_week: inputs.hoursPerWeek ?? "",
+        projected_year1: results.year1 ?? "", projected_year2_3: results.year2_3 ?? "", projected_year4plus: results.year4plus ?? "",
         submitted_at: now,
       } };
+    }
     case "gym_partnership": // app/api/gym-partnership/route.ts:51-60
       return { kind: "json", data: { gym_name: x.gymName ?? "", name: lead.name, email: lead.email, phone: lead.phone, location: x.location ?? "", gym_size: x.gymSize ?? "", referred_by: x.referredBy ?? "", submitted_at: now } };
     case "call": { // app/book-call/components/PhoneCallbackForm.tsx:66-86 (form-encoded)
@@ -76,8 +95,8 @@ export function zapierPayload(lead: Lead): Payload | null {
       const u = lead.utm;
       return { kind: "form", data: {
         call_type: "gym_callback", name: lead.name, mobile: lead.phone, email: lead.email,
-        topics: `Ring-me request from the ${s(x.gymName)} PT Academy page`,
-        gym_slug: lead.gymSlug ?? "", gym_name: s(x.gymName), consent: s(x.consentText), consent_at: s(x.consentAt) || now,
+        topics: `Ring-me request from the ${ctx.gymName ?? ""} PT Academy page`,
+        gym_slug: lead.gymSlug ?? "", gym_name: ctx.gymName ?? "", consent: ctx.consentText ?? "", consent_at: now,
         page_url: s(x.page_url, 300) || (lead.pagePath ? "https://ptlaunchlab.co.uk" + lead.pagePath : ""), submitted_at: now,
         first_touch_source: s(u.first_source, 200) || "(direct)", first_touch_medium: s(u.first_medium, 200) || "(none)",
         first_touch_campaign: s(u.first_campaign, 200) || "(none)", last_touch_source: s(u.last_source, 200) || s(u.first_source, 200) || "(direct)",
@@ -93,14 +112,29 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
   const env: Env = opts.env ?? (process.env as Env);
   const doFetch: typeof fetch = opts.fetchImpl ?? fetch;
 
+  async function gymFor(slug: string | null) {
+    if (opts.gymLookup) return opts.gymLookup(slug ?? "");
+    const { getGymByPartnerSlug } = await import("@/app/lib/gyms");
+    return getGymByPartnerSlug(slug ?? "");
+  }
+  async function consent(): Promise<string> {
+    if (opts.consentText !== undefined) return opts.consentText;
+    const { GYM_CALLBACK_CONSENT_TEXT } = await import("@/app/lib/gymCallback");
+    return GYM_CALLBACK_CONSENT_TEXT;
+  }
+  /** Retry once on a thrown error or a "failed" status, as the quiz/live/partnership routes do today. */
+  async function retryOnce(fn: () => Promise<StepStatus>): Promise<StepStatus> {
+    const attempt = async (): Promise<StepStatus> => { try { return await fn(); } catch (e) { return `failed: ${e instanceof Error ? e.message : String(e)}`.slice(0, 300); } };
+    const first = await attempt();
+    return first.startsWith("failed") ? attempt() : first;
+  }
+
   async function gymCallbackEmail(lead: Lead): Promise<StepStatus> {
     // app/api/gym-callback/route.ts:130-155
     if (!env.RESEND_API_KEY) return "skipped";
     const { Resend } = await import("resend");
-    const { GYM_CALLBACK_CONSENT_TEXT } = await import("@/app/lib/gymCallback");
-    const { getGymByPartnerSlug } = await import("@/app/lib/gyms");
-    const gym = getGymByPartnerSlug(lead.gymSlug ?? "");
-    const gymName = gym?.gymName ?? s(lead.extra.gymName);
+    const gym = await gymFor(lead.gymSlug);
+    const gymName = gym?.gymName ?? "";
     const canonicalPath = gym?.canonicalPath ?? "";
     const phone = lead.phone ?? "";
     const submittedAt = new Date().toISOString();
@@ -118,7 +152,7 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
           (agreement clause 4.2) the sale belongs to ${esc(gymName)}. Send them that gym's enrol link
           (https://ptlaunchlab.co.uk${esc(canonicalPath)}/enrol) so it is attributed automatically.</p>
           <p style="font-size:13px;color:#4A6280;">White-label: introduce yourself as the ${esc(gymName)} academy team.</p>
-          <p style="font-size:12px;color:#8CA3BF;">Consent: "${esc(GYM_CALLBACK_CONSENT_TEXT)}" at ${submittedAt}</p>
+          <p style="font-size:12px;color:#8CA3BF;">Consent: "${esc(await consent())}" at ${submittedAt}</p>
         </div>`,
     });
     return error ? `failed: email ${JSON.stringify(error).slice(0, 200)}` : "ok";
@@ -126,7 +160,9 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
 
   async function zapier(intent: LeadIntent, lead: Lead): Promise<StepStatus> {
     const hook = zapierHookFor(intent, env);
-    const payload = zapierPayload(lead);
+    let ctx: Ctx = {};
+    if (intent === "gym_callback") ctx = { gymName: (await gymFor(lead.gymSlug))?.gymName ?? "", consentText: await consent() };
+    const payload = zapierPayload(lead, ctx);
     let result: StepStatus = "skipped";
     // live: today MailerLite is primary and Zapier only the fallback when no token is set.
     const liveViaMailerLite = intent === "live" && !!env.MAILERLITE_TOKEN;
@@ -134,8 +170,8 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
       const init: RequestInit = payload.kind === "form"
         ? { method: "POST", body: new URLSearchParams(Object.entries(payload.data).map(([k, v]) => [k, String(v ?? "")])) }
         : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload.data) };
-      const res = await doFetch(hook, init);
-      result = res.ok ? "ok" : `failed: ${res.status}`;
+      const post = async (): Promise<StepStatus> => { const res = await doFetch(hook, init); return res.ok ? "ok" : `failed: ${res.status}`; };
+      result = intent === "quiz" || intent === "live" || intent === "gym_partnership" ? await retryOnce(post) : await post();
     }
     if (intent === "gym_callback") {
       const mail = await gymCallbackEmail(lead).catch((e) => `failed: email ${e instanceof Error ? e.message : String(e)}`);
@@ -146,35 +182,61 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
   }
 
   async function mailerlite(intent: LeadIntent, lead: Lead): Promise<StepStatus> {
-    if (intent === "live") { // app/api/live-register/route.ts:70-77
+    if (intent === "live") { // app/api/live-register/route.ts:70-77 (retries once)
       if (!env.MAILERLITE_TOKEN) return "skipped";
       const { mlAddSubscriber } = await import("@/app/lib/mailerlite");
-      await mlAddSubscriber({ email: lead.email, name: lead.name, phone: lead.phone || undefined, groupId: env.LIVE_MAILERLITE_GROUP_ID || "191617669489756012" });
-      return "ok";
+      return retryOnce(async () => {
+        await mlAddSubscriber({ email: lead.email, name: lead.name, phone: lead.phone || undefined, groupId: env.LIVE_MAILERLITE_GROUP_ID || "191617669489756012" });
+        return "ok";
+      });
     }
-    if (intent === "prospectus" || intent === "quiz") { // email-server nurture: prospectus route.ts:60-67, quiz-submission route.ts:90-97
+    if (intent === "prospectus" || intent === "quiz" || intent === "salary") {
+      // email-server nurture: prospectus route.ts:60-67, quiz-submission route.ts:90-97, salary-calculator route.ts:66-72
       if (!env.EMAIL_SERVER_URL) return "skipped";
-      const body = intent === "prospectus"
-        ? { name: lead.name, email: lead.email, phone: lead.phone, source: "prospectus" }
-        : { name: lead.name, email: lead.email, phone: lead.phone, source: "quiz", quizResult: s(lead.extra.quiz_result ?? lead.extra.result) || null, avatar: s(lead.extra.avatar) || null };
+      const base = { name: lead.name, email: lead.email, phone: lead.phone };
+      const body = intent === "prospectus" ? { ...base, source: "prospectus" }
+        : intent === "salary" ? { ...base, source: "salary_calculator" }
+        : { ...base, source: "quiz", quizResult: quizLabel(s(lead.extra.quiz_result ?? lead.extra.result)) || null, avatar: s(lead.extra.avatar) || null };
       const res = await doFetch(`${env.EMAIL_SERVER_URL}/leads/new`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       return res.ok ? "ok" : `failed: ${res.status}`;
     }
     return "skipped";
   }
 
+  /** Per-intent customData, copied from the legacy routes (camelCase; toMetaCustomData maps the keys). */
+  function capiCustomData(intent: LeadIntent, lead: Lead): Record<string, unknown> {
+    const x = lead.extra;
+    const avatar = s(x.avatar, 24) || undefined;
+    switch (intent) {
+      case "quiz": // quiz-submission/route.ts:127-132
+        return { currency: "GBP", value: 0, contentName: s(x.quiz_result ?? x.result), contentCategory: avatar };
+      case "live": // live-register/route.ts:133-138
+        return { currency: "GBP", value: 0, contentName: "live_webinar_registration", contentCategory: "live-sessions" };
+      case "prospectus": // prospectus/route.ts:106-111
+        return { currency: "GBP", value: 0, contentName: "prospectus_download", contentCategory: avatar };
+      case "gym_partnership": // gym-partnership/route.ts:111-117
+        return { currency: "GBP", value: 0, contentName: "gym_partnership", contentCategory: "b2b_partner" };
+      default:
+        return { contentName: intent };
+    }
+  }
+
   async function capi(intent: LeadIntent, lead: Lead, eventId: string): Promise<StepStatus> {
     if (intent === "checkout_start") return "skipped";
-    const { extractRequestUserData, sendCapiEvent } = await import("@/app/lib/metaCapi");
-    const send = opts.capiSend ?? ((i: Record<string, unknown>) => sendCapiEvent(i as never));
-    await send({
+    // With the capiSend test seam there is no metaCapi import (the @/ alias is unavailable under node --test).
+    const mc = opts.capiSend ? null : await import("@/app/lib/metaCapi");
+    const send = opts.capiSend ?? ((i: Record<string, unknown>) => mc!.sendCapiEvent(i as never));
+    const requestUserData = mc ? mc.extractRequestUserData(req as never) : {};
+    const [firstName, ...rest] = lead.name.split(/\s+/);
+    const out = await send({
       eventName: "Lead",
       eventId,
-      eventSourceUrl: "https://ptlaunchlab.co.uk" + (lead.pagePath ?? "/"),
+      eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk" + (lead.pagePath ?? "/"),
       actionSource: "website",
-      userData: { email: lead.email, phone: lead.phone ?? undefined, firstName: lead.name.split(" ")[0], ...extractRequestUserData(req as never) },
-      customData: { content_name: lead.intent },
+      userData: { email: lead.email, phone: lead.phone ?? undefined, firstName, lastName: rest.join(" "), country: "gb", ...requestUserData },
+      customData: capiCustomData(intent, lead),
     });
+    if (out === null) return env.META_CAPI_ACCESS_TOKEN ? "failed: capi" : "skipped";
     return "ok";
   }
 

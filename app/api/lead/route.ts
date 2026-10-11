@@ -5,7 +5,9 @@ import { processLead, type LeadDeps } from "@/app/lib/leads";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { sendOwnerPush } from "@/app/lib/owner-push";
 import { notifySetter } from "@/app/lib/setter-intake";
-import { makeSideEffects } from "@/app/lib/leadSideEffects";
+import type { OwnerPushDb } from "@/app/lib/owner-push";
+import { getGymByPartnerSlug } from "@/app/lib/gyms";
+import { makeSideEffects, validateGymCallback } from "@/app/lib/leadSideEffects";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -17,6 +19,12 @@ export async function POST(req: NextRequest) {
   let body: unknown;
   try { body = await req.json(); } catch { return NextResponse.json({ ok: false, message: "Bad request." }, { status: 400 }); }
 
+  const b = body as Record<string, unknown> | null;
+  if (b && b.intent === "gym_callback") {
+    const bad = validateGymCallback(b.gymSlug, (slug) => getGymByPartnerSlug(slug));
+    if (bad) return NextResponse.json(bad, { status: 400 });
+  }
+
   const db = getSupabaseAdmin();
   const fx = makeSideEffects(req);
   const deps: LeadDeps = {
@@ -25,7 +33,7 @@ export async function POST(req: NextRequest) {
       return error || !data ? { error: error?.message ?? "no row" } : { id: data.id as string };
     },
     update: async (id, patch) => { await db.from("leads").update(patch).eq("id", id); },
-    push: (p) => sendOwnerPush(db as never, p),
+    push: (p) => sendOwnerPush(db as unknown as OwnerPushDb, p),
     setter: (l) => notifySetter(l),
     zapier: fx.zapier, mailerlite: fx.mailerlite, capi: fx.capi,
     newEventId: () => `lead_${randomUUID()}`,
