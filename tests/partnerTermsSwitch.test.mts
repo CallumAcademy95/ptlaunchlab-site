@@ -25,15 +25,18 @@ function fakeDb(tables: { users: Row[]; partners: Row[] }) {
   return { db, writes };
 }
 
+// After the 11 Oct 2026 notice period ends (10 Nov), signing moves the terms.
+const AFTER = Date.UTC(2026, 10, 12, 9);
+
 const partner = (id: string, slug: string, extra: Row = {}) => ({
   id, slug, fee_per_learner_pence: 50000, commission_terms: "on_enrolment", agreement_version: null, is_demo: false, contact_email: null, ...extra,
 });
 
 test("an existing gym signing with its portal email is switched to £250 + payment_5 + v4.0", async () => {
   const { db, writes } = fakeDb({ users: [{ partner_id: "p1", email: "Owner@Ebor.com" }], partners: [partner("p1", "ebor")] });
-  const o = await switchSignedPartner(db as never, "owner@ebor.com", "4.0", new Date("2026-10-12T09:00:00Z"));
+  const o = await switchSignedPartner(db as never, "owner@ebor.com", "4.0", new Date("2026-11-12T09:00:00Z"));
   assert.equal(o.kind, "switched");
-  assert.deepEqual(writes, [{ id: "p1", values: { agreement_version: "4.0", agreement_signed_at: "2026-10-12T09:00:00.000Z", commission_terms: "payment_5", fee_per_learner_pence: 25000 } }]);
+  assert.deepEqual(writes, [{ id: "p1", values: { agreement_version: "4.0", agreement_signed_at: "2026-11-12T09:00:00.000Z", commission_terms: "payment_5", fee_per_learner_pence: 25000 } }]);
   assert.match(describeOutcome(o, "owner@ebor.com"), /ebor → v4\.0.*£500 → £250/);
 });
 
@@ -46,9 +49,9 @@ test("matching on the contact email works too", async () => {
 
 test("ATP moves to the new terms but keeps its £500 deal fee", async () => {
   const p = partner("p3", "atp-felixstowe", { commission_terms: "instalment_2" });
-  assert.equal(termsUpdateFor(p, "4.0", "x").fee_per_learner_pence, undefined);
+  assert.equal(termsUpdateFor(p, "4.0", "x", AFTER).fee_per_learner_pence, undefined);
   const { db, writes } = fakeDb({ users: [{ partner_id: "p3", email: "g@atp.com" }], partners: [p] });
-  const o = await switchSignedPartner(db as never, "g@atp.com", "4.0");
+  const o = await switchSignedPartner(db as never, "g@atp.com", "4.0", new Date(AFTER));
   assert.equal(o.kind, "switched");
   assert.equal("fee_per_learner_pence" in writes[0].values, false);
   assert.match(describeOutcome(o, "g@atp.com"), /fee left at £500/);
@@ -98,16 +101,37 @@ test("terms follow the version signed: 4.0 → payment_5, 4.1+ → ladder", () =
 
 test("a gym signing v4.1 moves to the ladder", async () => {
   const { db, writes } = fakeDb({ users: [{ partner_id: "p1", email: "owner@ebor.com" }], partners: [partner("p1", "ebor", { commission_terms: "payment_5", fee_per_learner_pence: 25000 })] });
-  const o = await switchSignedPartner(db as never, "owner@ebor.com", "4.1", new Date("2026-11-01T09:00:00Z"));
+  const o = await switchSignedPartner(db as never, "owner@ebor.com", "4.1", new Date("2026-11-12T09:00:00Z"));
   assert.equal(o.kind, "switched");
-  assert.deepEqual(writes, [{ id: "p1", values: { agreement_version: "4.1", agreement_signed_at: "2026-11-01T09:00:00.000Z", commission_terms: "ladder", fee_per_learner_pence: 25000 } }]);
+  assert.deepEqual(writes, [{ id: "p1", values: { agreement_version: "4.1", agreement_signed_at: "2026-11-12T09:00:00.000Z", commission_terms: "ladder", fee_per_learner_pence: 25000 } }]);
   assert.match(describeOutcome(o, "owner@ebor.com"), /ebor → v4\.1 terms \(ladder\)/);
 });
 
 test("ATP signing v4.1 moves to the ladder with its fee left alone", async () => {
   const { db, writes } = fakeDb({ users: [{ partner_id: "p9", email: "g@atp.com" }], partners: [partner("p9", "atp-felixstowe")] });
-  const o = await switchSignedPartner(db as never, "g@atp.com", "4.1");
+  const o = await switchSignedPartner(db as never, "g@atp.com", "4.1", new Date(AFTER));
   assert.equal(o.kind, "switched");
   assert.equal(writes[0].values.commission_terms, "ladder");
   assert.equal("fee_per_learner_pence" in writes[0].values, false);
+});
+
+// ─── the 11 Oct 2026 notice period ──────────────────────────────────────────
+import { NOTICE_TERMS_FROM_MS } from "../app/lib/partnerTermsSwitch.ts";
+
+test("the notice period ends at the start of 10 November 2026", () => {
+  assert.equal(new Date(NOTICE_TERMS_FROM_MS).toISOString(), "2026-11-10T00:00:00.000Z");
+});
+
+test("a gym signing inside the notice period has only its signature recorded", async () => {
+  const { db, writes } = fakeDb({ users: [{ partner_id: "p2", email: "m@hitiogym.com" }], partners: [partner("p2", "hitio-orpington")] });
+  const o = await switchSignedPartner(db as never, "m@hitiogym.com", "4.2", new Date("2026-10-20T09:00:00Z"));
+  assert.equal(o.kind, "switched");
+  assert.deepEqual(writes, [{ id: "p2", values: { agreement_version: "4.2", agreement_signed_at: "2026-10-20T09:00:00.000Z" } }]);
+  assert.match(describeOutcome(o, "m@hitiogym.com"), /Signature recorded for hitio-orpington.*10 November 2026/);
+});
+
+test("the last second of the notice period still defers; 10 November switches", () => {
+  const p = partner("p1", "ebor");
+  assert.equal(termsUpdateFor(p, "4.2", "x", NOTICE_TERMS_FROM_MS - 1000).commission_terms, undefined);
+  assert.equal(termsUpdateFor(p, "4.2", "x", NOTICE_TERMS_FROM_MS).commission_terms, "ladder");
 });
