@@ -7,6 +7,7 @@ const SCRIPT_HOSTS = [
   "www.googletagmanager.com",   // Google Analytics 4
   "connect.facebook.net",       // Meta Pixel
   "www.clarity.ms",             // Microsoft Clarity
+  "scripts.clarity.ms",          // Clarity's versioned script
   "assets.calendly.com",        // Calendly booking widget
   "va.vercel-scripts.com",      // Vercel Analytics
 ].join(" ");
@@ -14,7 +15,9 @@ const SCRIPT_HOSTS = [
 // Domains the browser can fetch/XHR to
 const CONNECT_HOSTS = [
   "www.google-analytics.com",   // GA4 beacons
+  "*.google-analytics.com",       // GA4 regional beacons (region1.…)
   "analytics.google.com",
+  "*.analytics.google.com",
   "stats.g.doubleclick.net",
   "www.facebook.com",           // Meta Pixel events
   "*.clarity.ms",               // Clarity telemetry
