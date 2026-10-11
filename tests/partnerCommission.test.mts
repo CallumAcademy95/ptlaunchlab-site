@@ -241,7 +241,7 @@ test("ATP rungs, whatever ATP's terms", () => {
     assert.equal(atp("six_month", 0, terms), 50_000);
     assert.equal(atp("pif_1599", 0, terms), 50_000);
     assert.equal(atp("pif_1399", 0, terms), 50_000);
-    assert.equal(atp("pif", 0, terms), 30_000);
+    assert.equal(atp("pif", 0, terms), 50_000);
     assert.equal(atp("monthly", 0, terms), 25_000);
   }
 });

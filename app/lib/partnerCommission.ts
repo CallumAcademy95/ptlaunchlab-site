@@ -335,7 +335,9 @@ export const ATP_LADDER = {
     pif_1599: 50_000,
     pif_1399: 50_000,
     pif_1099: 50_000,
-    pif: 30_000,
+    // £999.99 in full, sold on ATP's page as "save £600 against the 6-month
+    // plan": £500, as George proposed (11 Oct 2026).
+    pif: 50_000,
     monthly: 25_000,
   } as Record<Rung, number>,
   /** pif_1099 earns £500 for this many sales from startsAt, then this lower figure. */
