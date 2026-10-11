@@ -2,7 +2,7 @@
 //
 // WHAT THIS PROTECTS
 //
-// Every figure a gym earns on the v4.1 sales ladder, and ATP's own 60-day
+// Every figure a gym earns on the v4.1/v4.2 sales ladder, and ATP's own 60-day
 // ladder. A wrong number here is money paid to, or withheld from, a partner.
 
 import { test } from "node:test";
@@ -17,6 +17,9 @@ import {
   parseQuarter,
   previousQuarter,
   volumeProgressMessage,
+  quarterHeadline,
+  quarterEarnedPence,
+  type QuarterMoneySale,
   resolveMemberSaving,
   memberPricePence,
   resolveMemberCode,
@@ -60,38 +63,81 @@ test("legacy terms are unchanged: the partner's flat fee, whatever the rung", ()
   assert.equal(commissionForSale({ partnerSlug: "x", terms: "on_enrolment", feePerLearnerPence: 50_000, rung: "pif" }), 50_000);
 });
 
-// ─── Volume rate ────────────────────────────────────────────────────────────
+// ─── Partner Accelerator rate (v4.2: 4th learner onwards, not retrospective) ─
 
 const sale = (id: string, at: string, rung: string | null, extra: Partial<QuarterSale> = {}): QuarterSale => ({
   id, enrolled_at: at, status: "confirmed", commission_status: "accruing", rung, plan_type: rung === "monthly" ? "deposit" : "PIF", volume_bonus_pence: 0, ...extra,
 });
 const Q4 = quarter(2026, 4);
 
-test("volume: 3 learners — no top-up", () => {
+test("accelerator: 3 learners — no top-up", () => {
   const r = quarterTopUp([sale("a", "2026-10-02", "pif"), sale("b", "2026-11-02", "monthly"), sale("c", "2026-12-31T23:59:59Z", "pif")], Q4);
   assert.equal(r.learners, 3);
   assert.equal(r.qualifies, false);
   assert.deepEqual(r.changes, []);
+  assert.equal(r.totalBonusPence, 0);
 });
 
-test("volume: 4 learners — every sale that quarter tops up (+£100 PIF → £500, +£50 monthly → £300)", () => {
+test("accelerator: 4 learners — ONLY the 4th is topped up (learners 1–3 stay at £400 / £250)", () => {
   const r = quarterTopUp(
-    [sale("a", "2026-10-02", "pif"), sale("b", "2026-11-02", "monthly"), sale("c", "2026-12-01", "pif"), sale("d", "2026-12-20", "monthly")],
+    [sale("a", "2026-10-02", "pif"), sale("b", "2026-11-02", "monthly"), sale("c", "2026-12-01", "pif"), sale("d", "2026-12-20", "pif")],
     Q4,
   );
   assert.equal(r.qualifies, true);
-  assert.deepEqual(r.changes, [
-    { id: "a", from: 0, to: 10_000 },
-    { id: "b", from: 0, to: 5_000 },
-    { id: "c", from: 0, to: 10_000 },
-    { id: "d", from: 0, to: 5_000 },
-  ]);
-  assert.equal(r.totalBonusPence, 30_000);
+  assert.deepEqual(r.changes, [{ id: "d", from: 0, to: 10_000 }]);
+  assert.equal(r.totalBonusPence, 10_000);
   assert.equal(ladderCommissionPence("pif") + volumeBonusPence("pif"), 50_000);
   assert.equal(ladderCommissionPence("monthly") + volumeBonusPence("monthly"), 30_000);
 });
 
-test("volume: refunded / voided / out-of-quarter sales do not count", () => {
+test("accelerator: 6 learners — the 4th, 5th and 6th are topped up, no cap", () => {
+  const r = quarterTopUp([1, 2, 3, 4, 5, 6].map((i) => sale(`s${i}`, `2026-10-0${i}`, i === 5 ? "monthly" : "pif")), Q4);
+  assert.equal(r.learners, 6);
+  assert.deepEqual(r.changes, [
+    { id: "s4", from: 0, to: 10_000 },
+    { id: "s5", from: 0, to: 5_000 },
+    { id: "s6", from: 0, to: 10_000 },
+  ]);
+  assert.equal(r.totalBonusPence, 25_000);
+});
+
+test("accelerator: order is enrolled_at, then id for ties — whatever order the rows arrive in", () => {
+  const rows = [
+    sale("z", "2026-10-05T10:00:00Z", "pif"),
+    sale("b", "2026-10-05T10:00:00Z", "monthly"),
+    sale("a", "2026-10-01", "pif"),
+    sale("c", "2026-10-02", "pif"),
+  ];
+  // a (1), c (2), b (3, tie broken by id), z (4)
+  assert.deepEqual(quarterTopUp(rows, Q4).changes, [{ id: "z", from: 0, to: 10_000 }]);
+  assert.deepEqual(quarterTopUp([...rows].reverse(), Q4).changes, [{ id: "z", from: 0, to: 10_000 }]);
+});
+
+test("accelerator: a monthly learner as the 4th gets +£50 (→ £300)", () => {
+  const r = quarterTopUp(
+    [sale("a", "2026-10-02", "pif"), sale("b", "2026-10-03", "pif"), sale("c", "2026-10-04", "pif"), sale("d", "2026-10-05", "monthly")],
+    Q4,
+  );
+  assert.deepEqual(r.changes, [{ id: "d", from: 0, to: 5_000 }]);
+});
+
+test("accelerator: a non-ladder sale at position 4 takes the position but earns no top-up; the 5th does", () => {
+  const r = quarterTopUp(
+    [
+      sale("a", "2026-10-02", "pif"),
+      sale("b", "2026-10-03", "pif"),
+      sale("c", "2026-10-04", "pif"),
+      sale("pre", "2026-10-05", null), // stamped before the gym moved to the ladder
+      sale("e", "2026-10-06", "monthly"),
+    ],
+    Q4,
+  );
+  assert.equal(r.learners, 5);
+  assert.deepEqual(r.changes, [{ id: "e", from: 0, to: 5_000 }]);
+  assert.equal(r.totalBonusPence, 5_000);
+});
+
+test("accelerator: refunded / voided / out-of-quarter sales do not count or take a position", () => {
   const r = quarterTopUp(
     [
       sale("a", "2026-10-02", "pif"),
@@ -106,20 +152,50 @@ test("volume: refunded / voided / out-of-quarter sales do not count", () => {
   );
   assert.equal(r.learners, 3);
   assert.equal(r.qualifies, false);
+  assert.deepEqual(r.changes, []);
 });
 
-test("volume: a sale stamped before the gym moved to the ladder counts but is not topped up", () => {
-  const r = quarterTopUp(
-    [sale("pre", "2026-10-02", null), sale("a", "2026-10-20", "pif"), sale("b", "2026-10-21", "pif"), sale("c", "2026-10-22", "monthly")],
-    Q4,
+test("accelerator: re-running is idempotent", () => {
+  const rows = [1, 2, 3, 4, 5].map((i) => sale(String(i), `2026-10-0${i}`, "pif"));
+  const first = quarterTopUp(rows, Q4);
+  assert.deepEqual(first.changes.map((c) => c.id), ["4", "5"]);
+  const applied = rows.map((s) => {
+    const c = first.changes.find((x) => x.id === s.id);
+    return c ? { ...s, volume_bonus_pence: c.to } : s;
+  });
+  assert.deepEqual(quarterTopUp(applied, Q4).changes, []);
+});
+
+test("accelerator: a bonus already written is never lowered, and a paid bonus is never changed", () => {
+  // Legacy rows from the old every-learner rule: learners 1–3 hold a bonus they
+  // would not get now. Never taken back here.
+  const legacy = [1, 2, 3, 4].map((i) => sale(String(i), `2026-10-0${i}`, "pif", { volume_bonus_pence: 10_000 }));
+  assert.deepEqual(quarterTopUp(legacy, Q4).changes, []);
+  // A paid bonus is left alone even if it is below the entitlement.
+  const paid = [1, 2, 3].map((i) => sale(String(i), `2026-10-0${i}`, "pif"));
+  paid.push(sale("4", "2026-10-04", "pif", { volume_bonus_pence: 0, volume_bonus_payout_id: "po_1" }));
+  assert.deepEqual(quarterTopUp(paid, Q4).changes, []);
+});
+
+test("quarterEarnedPence: base commission + the 4th+ learners' top-up, counted sales only", () => {
+  const m = (id: string, at: string, rung: string, commission: number, extra: Partial<QuarterMoneySale> = {}): QuarterMoneySale => ({
+    ...sale(id, at, rung), commission_pence: commission, ...extra,
+  });
+  assert.equal(quarterEarnedPence([], Q4), 0);
+  assert.equal(
+    quarterEarnedPence(
+      [
+        m("a", "2026-10-02", "pif", 40_000),
+        m("b", "2026-10-03", "monthly", 25_000),
+        m("c", "2026-10-04", "pif", 40_000),
+        m("d", "2026-10-05", "pif", 40_000), // 4th → +£100
+        m("x", "2026-10-06", "pif", 40_000, { status: "refunded" }),
+        m("old", "2026-09-01", "pif", 40_000),
+      ],
+      Q4,
+    ),
+    40_000 + 25_000 + 40_000 + 50_000,
   );
-  assert.equal(r.learners, 4);
-  assert.deepEqual(r.changes.map((c) => c.id), ["a", "b", "c"]);
-});
-
-test("volume: re-running is idempotent — a bonus already written is not changed again", () => {
-  const s = [1, 2, 3, 4].map((i) => sale(String(i), `2026-10-0${i}`, "pif", { volume_bonus_pence: 10_000 }));
-  assert.deepEqual(quarterTopUp(s, Q4).changes, []);
 });
 
 test("quarters are calendar quarters in UTC", () => {
@@ -130,13 +206,16 @@ test("quarters are calendar quarters in UTC", () => {
   assert.equal(previousQuarter(new Date("2027-02-01T00:00:00Z")).label, "2026-Q4");
 });
 
-test("portal progress wording", () => {
-  assert.equal(
-    volumeProgressMessage(3),
-    "3 of 4 learners this quarter — one more and every learner this quarter moves to the volume rate.",
-  );
-  assert.match(volumeProgressMessage(0), /^0 of 4 .* 4 more and/);
-  assert.match(volumeProgressMessage(5), /every learner this quarter is on the volume rate/);
+test("portal headline and next-step wording", () => {
+  const fmt = (p: number) => `£${(p / 100).toLocaleString("en-GB")}`;
+  assert.equal(quarterHeadline(3, 105_000, fmt), "3 enrolments this quarter · £1,050 earned this quarter");
+  assert.equal(quarterHeadline(1, 40_000, fmt), "1 enrolment this quarter · £400 earned this quarter");
+  assert.equal(volumeProgressMessage(0), "3 more to go before your 4th learner, which earns the Partner Accelerator rate");
+  assert.equal(volumeProgressMessage(2), "1 more to go before your 4th learner, which earns the Partner Accelerator rate");
+  assert.equal(volumeProgressMessage(3), "Your next learner this quarter earns £500 (pay in full) / £300 (monthly)");
+  assert.equal(volumeProgressMessage(4), "You're on the Partner Accelerator rate: every further learner this quarter earns £500 / £300");
+  assert.equal(volumeProgressMessage(9), volumeProgressMessage(4));
+  for (const n of [0, 3, 4, 7]) assert.doesNotMatch(volumeProgressMessage(n), /every learner that quarter|volume rate/i);
 });
 
 // ─── Member saving ──────────────────────────────────────────────────────────
@@ -175,7 +254,7 @@ test("ATP500 (£1,099): £500 for the next three, then £400", () => {
   assert.equal(atpCommissionPence("pif_1099", 10), 40_000);
 });
 
-test("ATP is not on the volume rate", () => {
+test("ATP is not on the Partner Accelerator rate", () => {
   assert.equal(volumeBonusPence("six_month"), 0);
   assert.equal(volumeBonusPence("pif_1099"), 0);
   const r = quarterTopUp([1, 2, 3, 4, 5].map((i) => sale(String(i), `2026-10-1${i}`, "pif_1399")), Q4);

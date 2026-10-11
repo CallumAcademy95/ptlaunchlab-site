@@ -126,7 +126,7 @@ for (const [key, rows] of [...grouped.entries()].sort()) {
     `${rows.length} enrolment(s) = £${(total / 100).toLocaleString()}`
   );
   for (const s of rows) {
-    const bonus = bonusDue(s) ? ` + £${bonusDue(s) / 100} volume bonus` : "";
+    const bonus = bonusDue(s) ? ` + £${bonusDue(s) / 100} Partner Accelerator top-up` : "";
     console.log(`      enrolled ${s.enrolled_at.slice(0, 10)}  ${s.learner_name ?? "—"}  £${baseDue(s) / 100}${bonus}`);
   }
 

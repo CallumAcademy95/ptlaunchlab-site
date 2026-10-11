@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
         <div style="color:#F5C518;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">Your Commercial Terms</div>
         <ul style="color:#8CA3BF;font-size:14px;line-height:1.8;padding-left:20px;margin:0;">
           <li><strong style="color:#ffffff;">${PIF_FEE} for every learner who pays in full, ${MONTHLY_FEE} on the monthly plan</strong> — inclusive of VAT, nothing added on top</li>
-          <li>In any quarter in which ${VOLUME_THRESHOLD} or more learners enrol through your gym, every learner that quarter earns ${PIF_FEE_VOLUME} (pay in full) or ${MONTHLY_FEE_VOLUME} (monthly)</li>
+          <li>${PIF_FEE_VOLUME} (pay in full) / ${MONTHLY_FEE_VOLUME} (monthly) from your ${VOLUME_THRESHOLD}th learner in a calendar quarter onwards — the Partner Accelerator rate. Your first ${VOLUME_THRESHOLD - 1} learners in the quarter stay at ${PIF_FEE} / ${MONTHLY_FEE}</li>
           <li>Paid 30 days after enrolment if the learner pays in full. If they pay monthly, it is paid once their ${PARTNER_FEE_RELEASE_PAYMENT}th monthly payment clears (their first payment counts as 1)</li>
           <li>Once a commission has been paid it is yours — there is no clawback</li>
           <li>You can see accrued, released and paid commission any time in your partner portal</li>

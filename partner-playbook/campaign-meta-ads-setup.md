@@ -71,8 +71,8 @@ campaign, one ad set, both creatives in it. Increase it if you want to — it is
 account and your money.
 
 Each learner who enrols through your academy earns you **£400 if they pay in full, £250
-if they pay monthly**, inclusive of VAT, rising to £500 / £300 in any quarter you send us 4
-or more. Paid 30 days after a pay-in-full enrolment or when their 5th monthly payment
+if they pay monthly**, inclusive of VAT, then £500 / £300 from your 4th learner in a quarter
+onwards (the Partner Accelerator rate). Paid 30 days after a pay-in-full enrolment or when their 5th monthly payment
 clears. That is what makes this worth testing without needing volume.
 
 What we are not going to tell you is that £150 produces a learner. It might not. Nobody

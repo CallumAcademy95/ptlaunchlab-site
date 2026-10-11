@@ -62,7 +62,7 @@ export default async function SalesPage({
   // Totals follow the filter, so the numbers always describe what is on screen.
   // "Earned" is everything not voided, paid or otherwise — the split between
   // settled and outstanding lives on the Payments page.
-  // saleMoney() counts any quarterly volume bonus alongside the commission.
+  // saleMoney() counts any Partner Accelerator top-up alongside the commission.
   let earned = 0, payable = 0, held = 0;
   const nowMs = Date.now();
   for (const s of sales) {
@@ -170,7 +170,7 @@ export default async function SalesPage({
                         <span className="text-white font-semibold">{formatPence(s.commission_pence)}</span>
                         {(s.volume_bonus_pence ?? 0) > 0 && (
                           <span className="ml-1 text-gold text-xs font-semibold">
-                            + {formatPence(s.volume_bonus_pence ?? 0)} volume
+                            + {formatPence(s.volume_bonus_pence ?? 0)} accelerator
                           </span>
                         )}
                         <span
