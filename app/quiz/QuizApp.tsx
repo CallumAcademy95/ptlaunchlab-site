@@ -169,6 +169,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
       phone: phone.trim(),
       email: email.trim().toLowerCase(),
       extra: { quiz_result: calcResult, answers: answerLabels, ...(avatar ? { avatar } : {}) },
+      _sec: sec.payload(),
     });
     if (!saved.ok) {
       // Not saved: no result until it is. A phone problem goes back to that step.

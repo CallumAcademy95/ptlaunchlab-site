@@ -41,7 +41,7 @@ test("a valid lead is saved before any side effect, then the rest run in after()
   const { deps, log, updates } = fakeDeps();
   const r = await processLead({ ...GOOD, intent: "contact" }, deps);
   assert.equal(r.status, 200);
-  assert.deepEqual(r.body, { ok: true, id: "lead-1", eventId: "ev-1" });
+  assert.deepEqual(r.body, { ok: true, id: "lead-1", eventId: "ev-1", track: true });
   assert.deepEqual(log, ["insert"], "nothing but the insert before the response");
   await r.after!();
   assert.equal(log[0], "insert");
@@ -174,4 +174,135 @@ test("a spam lead never pushes or reaches setter, zapier or capi", async () => {
   assert.ok(!log.includes("setter"), "setter called");
   assert.ok(!log.includes("zapier"), "zapier called");
   assert.ok(!log.includes("capi"), "capi called");
+});
+
+// ---- final review fixes ----
+import { capJson, JSON_FIELD_MAX, pushTone, pushStatus } from "../app/lib/leads.ts";
+import { spamReasonFor, type SpamValidators } from "../app/lib/leadSpam.ts";
+import { checkHoneypot } from "../app/lib/security/honeypot.ts";
+import { validateName, validateBusinessName } from "../app/lib/security/name.ts";
+
+// email.ts needs a JSON import attribute node --test can't supply; this stand-in
+// mirrors its role and disposable rules for the cases used here. The real
+// function is wired in app/api/lead/route.ts.
+const ROLE = new Set(["admin", "info", "support", "test", "noreply"]);
+const fakeEmail: SpamValidators["validateEmail"] = (e, opts = {}) => {
+  const [local, domain] = String(e).toLowerCase().split("@");
+  if (domain === "mailinator.com") return { ok: false, reason: "disposable" };
+  if (!opts.allowRole && ROLE.has(local)) return { ok: false, reason: "role" };
+  return { ok: true };
+};
+const V: SpamValidators = {
+  checkHoneypot: (s) => checkHoneypot(s),
+  gymPartnershipSec: (raw) => {
+    const hp = (raw as { _sec?: { hp?: unknown } })?._sec?.hp;
+    return typeof hp === "string" && hp ? { ok: false, reason: "honeypot" } : { ok: true };
+  },
+  validateName: (n) => validateName(n),
+  validateBusinessName,
+  validateEmail: fakeEmail,
+};
+const SEC = { hp: "", t: 5000, n: "abcd1234efgh" };
+
+test("spam gates: each intent runs exactly its legacy checks", () => {
+  const base = { ...GOOD, intent: "contact", _sec: SEC };
+  assert.equal(spamReasonFor(base, V), null);
+  assert.equal(spamReasonFor({ ...base, _sec: undefined }, V), "sec:missing");
+  assert.equal(spamReasonFor({ ...base, _sec: { ...SEC, n: "" } }, V), "sec:no-js");
+  assert.equal(spamReasonFor({ ...base, _sec: { ...SEC, t: 200 } }, V), "sec:too-fast");
+  assert.equal(spamReasonFor({ ...base, _sec: { ...SEC, hp: "x" } }, V), "sec:honeypot");
+  assert.equal(spamReasonFor({ ...base, name: "Win cash t.me/abc" }, V), "name:url");
+  assert.equal(spamReasonFor({ ...base, name: "http://spam" }, V), "name:url");
+  assert.equal(spamReasonFor({ ...base, email: "x@mailinator.com" }, V), "email:disposable");
+  assert.equal(spamReasonFor({ ...base, email: "info@gym.co.uk" }, V), "email:role");
+  for (const intent of ["prospectus", "quiz", "live", "gym_callback"]) {
+    assert.equal(spamReasonFor({ ...base, intent }, V), null, intent);
+    assert.equal(spamReasonFor({ ...base, intent, _sec: undefined }, V), "sec:missing", intent);
+  }
+  // Legacy call / salary / WhatsApp had no gates: still none.
+  for (const intent of ["call", "salary", "whatsapp", "checkout_start"]) {
+    assert.equal(spamReasonFor({ ...base, intent, _sec: undefined, email: "x@mailinator.com" }, V), null, intent);
+  }
+});
+
+test("spam gates: gym_partnership is honeypot-only and allows role emails, like /api/gym-partnership", () => {
+  const p = { ...GOOD, intent: "gym_partnership", email: "info@ironwolf.co.uk", extra: { gymName: "F45" } };
+  assert.equal(spamReasonFor(p, V), null, "no _sec, fast or no-js is fine; info@ is fine; F45 is a real gym");
+  assert.equal(spamReasonFor({ ...p, _sec: { hp: "x" } }, V), "sec:honeypot");
+  assert.equal(spamReasonFor({ ...p, extra: { gymName: "www.spam.com" } }, V), "gym:url");
+  assert.equal(spamReasonFor({ ...p, email: "a@mailinator.com" }, V), "email:disposable");
+});
+
+test("a spam-gate hit saves the lead with is_spam and spamReason, sends nothing external, track:false", async () => {
+  const rows: Record<string, unknown>[] = [];
+  const { deps, log } = fakeDeps({
+    insert: async (row) => { rows.push(row as unknown as Record<string, unknown>); log.push("insert"); return { id: "lead-1" }; },
+    spamCheck: (raw) => spamReasonFor(raw, V),
+  });
+  const r = await processLead({ ...GOOD, intent: "contact", question: "hi", email: "x@mailinator.com", _sec: SEC }, deps);
+  assert.equal(r.status, 200);
+  assert.equal((r.body as { track?: boolean }).track, false);
+  await r.after!();
+  assert.equal(rows[0].is_spam, true);
+  assert.equal((rows[0].extra as Record<string, unknown>).spamReason, "email:disposable");
+  assert.deepEqual(log, ["insert"], "no push, setter, zapier, mailerlite or capi");
+});
+
+test("a clean lead passes the spam gate and runs everything; a TEST lead returns track:false", async () => {
+  const { deps, log } = fakeDeps({ spamCheck: (raw) => spamReasonFor(raw, V) });
+  const r = await processLead({ ...GOOD, intent: "contact", question: "hi", _sec: SEC }, deps);
+  assert.equal((r.body as { track?: boolean }).track, true);
+  await r.after!();
+  assert.deepEqual(log, ["insert", "push", "setter", "zapier", "mailerlite", "capi"]);
+  const t = await processLead({ ...GOOD, name: "TEST Jane", _sec: SEC }, fakeDeps({ spamCheck: (raw) => spamReasonFor(raw, V) }).deps);
+  assert.equal((t.body as { track?: boolean }).track, false);
+});
+
+test("a throwing spam check never loses the lead", async () => {
+  const { deps, log } = fakeDeps({ spamCheck: () => { throw new Error("boom"); } });
+  const r = await processLead({ ...GOOD, intent: "contact" }, deps);
+  assert.equal(r.status, 200);
+  await r.after!();
+  assert.ok(log.includes("zapier"));
+});
+
+test("extra and utm over 8 KB are replaced by { truncated: true }, never rejected", () => {
+  const big = { blob: "x".repeat(JSON_FIELD_MAX) };
+  const r = validateLead({ ...GOOD, extra: big, utm: big });
+  assert.equal(r.ok, true);
+  if (r.ok) { assert.deepEqual(r.lead.extra, { truncated: true }); assert.deepEqual(r.lead.utm, { truncated: true }); }
+  const small = validateLead({ ...GOOD, extra: { a: 1 }, utm: { fts: "fb" } });
+  if (small.ok) { assert.deepEqual(small.lead.extra, { a: 1 }); assert.deepEqual(small.lead.utm, { fts: "fb" }); }
+  assert.deepEqual(capJson({ a: "y".repeat(JSON_FIELD_MAX - 20) }), { a: "y".repeat(JSON_FIELD_MAX - 20) });
+});
+
+test("contact always sends the setter a message, even an empty one, as /api/contact did", async () => {
+  const seen: unknown[] = [];
+  const { deps } = fakeDeps({ setter: async (l) => { seen.push(l); } });
+  const r = await processLead({ ...GOOD, intent: "contact" }, deps);
+  await r.after!();
+  assert.deepEqual(seen, [{ name: "Jane Smith", email: "jane@example.com", message: "", source: "contact" }]);
+});
+
+test("gym_partnership: any valid phone (validateAnyPhone) and gymName required", () => {
+  const P = { ...GOOD, intent: "gym_partnership", extra: { gymName: "Iron Wolf" } };
+  const uk = validateLead(P);
+  assert.equal(uk.ok && uk.lead.phone, "07700900123", "UK numbers keep the national form");
+  const ie = validateLead({ ...P, phone: "+353 87 123 4567" });
+  assert.equal(ie.ok && ie.lead.phone, "+353871234567");
+  const us = validateLead({ ...P, phone: "+1 (415) 555-0100" });
+  assert.equal(us.ok && us.lead.phone, "+14155550100");
+  assert.deepEqual(validateLead({ ...P, phone: "abc" }), { ok: false, field: "phone", message: "Enter a valid phone number." });
+  assert.deepEqual(validateLead({ ...P, extra: {} }), { ok: false, field: "gymName", message: "Enter your gym's name." });
+  assert.deepEqual(validateLead({ ...P, extra: { gymName: " " } }), { ok: false, field: "gymName", message: "Enter your gym's name." });
+  // Other intents still need a UK number.
+  assert.equal(validateLead({ ...GOOD, phone: "+353 87 123 4567" }).ok, false);
+});
+
+test("push badge colours match the real push_status values", () => {
+  assert.equal(pushTone(pushStatus({ sent: 1 })), "green");
+  assert.equal(pushTone(pushStatus({ sent: 0 })), "red");
+  assert.equal(pushTone(pushStatus({ sent: 0, error: "x" })), "red");
+  assert.equal(pushTone("skipped"), "neutral");
+  assert.equal(pushTone(null), "neutral");
 });

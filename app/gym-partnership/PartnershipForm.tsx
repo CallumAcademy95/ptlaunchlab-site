@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { submitLead } from "@/app/lib/submitLead";
+import { useFormSecurity } from "@/app/lib/security/client";
 
 // Saves through /api/lead (intent gym_partnership). The route stores the lead
 // first, then sends today's Zapier payload and the CAPI Lead server-side;
@@ -12,7 +13,7 @@ export default function PartnershipForm() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState("");
-  const [honeypot, setHoneypot] = useState("");
+  const sec = useFormSecurity();
 
   const FALLBACK_ERROR =
     "Something went wrong — please try again, or email partnerships@ptlaunchlab.co.uk.";
@@ -39,7 +40,7 @@ export default function PartnershipForm() {
           gymSize: form.gymSize,
           referredBy: form.referredBy.trim(),
         },
-        honeypot,
+        _sec: sec.payload(),
       });
       if (result.ok) {
         setStatus("success");
@@ -72,10 +73,7 @@ export default function PartnershipForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Honeypot: off-screen, non-semantic name so autofill never fills it; bots do. */}
-      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
-        <input name="hp_field_7" tabIndex={-1} autoComplete="new-password" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
-      </div>
+      <sec.Honeypot />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[#8CA3BF] text-[11px] font-semibold mb-1.5 uppercase tracking-wider">

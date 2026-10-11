@@ -4,6 +4,7 @@
 // operations is unit-tested: validate → insert → respond → after-steps.
 // Nothing after the insert can lose the lead or block the response.
 // No `@/` imports so node --test can load it.
+import { validateAnyPhone } from "./security/phone.ts";
 
 export const LEAD_INTENTS = ["call", "prospectus", "quiz", "career_planner", "gym_callback", "whatsapp", "live", "salary", "checkout_start", "contact", "gym_partnership"] as const;
 export type LeadIntent = (typeof LEAD_INTENTS)[number];
@@ -42,18 +43,45 @@ export function normaliseUkPhone(raw: string): string | null {
   return /^0[1-36]\d{8,9}$/.test(d) ? d : null;
 }
 
+/** Largest `extra` / `utm` we store, measured as JSON. Bigger is replaced, never rejected. */
+export const JSON_FIELD_MAX = 8 * 1024;
+export function capJson(o: Record<string, unknown>): Record<string, unknown> {
+  try {
+    return JSON.stringify(o).length > JSON_FIELD_MAX ? { truncated: true } : o;
+  } catch {
+    return { truncated: true };
+  }
+}
+
+/**
+ * Phone for gym_partnership, which (as /api/gym-partnership did) takes any
+ * valid number: UK numbers in the national 0… form like every other lead,
+ * anything else as validateAnyPhone's +… form.
+ */
+function partnerPhone(raw: string): string | null {
+  const uk = normaliseUkPhone(raw);
+  if (uk) return uk;
+  const any = validateAnyPhone(raw);
+  return any.ok ? any.normalised : null;
+}
+
 export function validateLead(raw: unknown): { ok: true; lead: CleanLead } | { ok: false; field: string; message: string } {
   const r = obj(raw);
   const intent = str(r.intent, 40) as LeadIntent;
   if (!(LEAD_INTENTS as readonly string[]).includes(intent)) return { ok: false, field: "intent", message: "Unknown form." };
-  const name = str(r.name, 120);
+  const name = str(r.name, 120).replace(/\s+/g, " ");
   if (!name) return { ok: false, field: "name", message: "Enter your name." };
   const email = str(r.email, 254).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { ok: false, field: "email", message: "Enter a valid email address." };
   const phoneRaw = str(r.phone, 40);
-  const phone = phoneRaw ? normaliseUkPhone(phoneRaw) : null;
-  if (intent !== "checkout_start" && !phone) return { ok: false, field: "phone", message: "Enter a UK phone number." };
-  if (intent === "checkout_start" && phoneRaw && !phone) return { ok: false, field: "phone", message: "Enter a UK phone number." };
+  const partner = intent === "gym_partnership";
+  const phone = phoneRaw ? (partner ? partnerPhone(phoneRaw) : normaliseUkPhone(phoneRaw)) : null;
+  const phoneMsg = partner ? "Enter a valid phone number." : "Enter a UK phone number.";
+  if (intent !== "checkout_start" && !phone) return { ok: false, field: "phone", message: phoneMsg };
+  if (intent === "checkout_start" && phoneRaw && !phone) return { ok: false, field: "phone", message: phoneMsg };
+  const extra = obj(r.extra);
+  // /api/gym-partnership required the gym's name (gymPartnershipSchema, min 2).
+  if (partner && str(extra.gymName, 200).length < 2) return { ok: false, field: "gymName", message: "Enter your gym's name." };
   const source = str(r.source, 80) || intent;
   return {
     ok: true,
@@ -63,7 +91,7 @@ export function validateLead(raw: unknown): { ok: true; lead: CleanLead } | { ok
       intent, source,
       pagePath: str(r.pagePath, 300) || null,
       gymSlug: str(r.gymSlug, 60) || null,
-      extra: obj(r.extra), utm: obj(r.utm),
+      extra: capJson(extra), utm: capJson(obj(r.utm)),
       referrer: str(r.referrer, 500) || null,
       isTest: name.startsWith("TEST "),
       isSpam: str(r.honeypot, 200) !== "",
@@ -114,6 +142,11 @@ export function pushStatus(r: { sent: number; error?: string }): StepStatus {
   return r.error ? `failed: ${r.error}` : r.sent > 0 ? "ok" : "failed: no device";
 }
 
+/** Admin badge colour for a push_status value ("ok", "skipped", "failed: <reason>"). */
+export function pushTone(s: string | null): "green" | "red" | "neutral" {
+  return s === "ok" ? "green" : s?.startsWith("failed") ? "red" : "neutral";
+}
+
 /**
  * Resolve `p`, or `{ error }` after `ms`. Used where a save must never hold up
  * the visitor (checkout start). The underlying promise is not cancelled.
@@ -137,10 +170,16 @@ export interface LeadDeps {
   mailerlite(intent: LeadIntent, lead: CleanLead & { id: string }): Promise<StepStatus>;
   capi(intent: LeadIntent, lead: CleanLead & { id: string }, eventId: string): Promise<StepStatus>;
   newEventId(): string;
+  /**
+   * Today's bot/junk gates (sec nonce + time-trap, junk names, disposable/role
+   * emails). A reason flags the lead as spam: it is still saved, but nothing
+   * external runs. Optional so tests and direct callers can omit it.
+   */
+  spamCheck?(raw: unknown): string | null;
 }
 
 export type LeadResult =
-  | { status: 200; body: { ok: true; id: string; eventId: string }; after: () => Promise<void> }
+  | { status: 200; body: { ok: true; id: string; eventId: string; track: boolean }; after: () => Promise<void> }
   | { status: 400 | 500; body: { ok: false; field?: string; message: string }; after?: () => Promise<void> };
 
 const failed = (e: unknown) => `failed: ${e instanceof Error ? e.message : String(e)}`.slice(0, 300);
@@ -149,6 +188,13 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
   const v = validateLead(raw);
   if (!v.ok) return { status: 400, body: { ok: false, field: v.field, message: v.message } };
   const lead = v.lead;
+  if (!lead.isSpam && deps.spamCheck) {
+    let reason: string | null = null;
+    try { reason = deps.spamCheck(raw); } catch (e) { console.error("[lead] spam check threw", e); }
+    if (reason) { lead.isSpam = true; lead.extra = { ...lead.extra, spamReason: reason }; }
+  } else if (lead.isSpam) {
+    lead.extra = { ...lead.extra, spamReason: "honeypot" };
+  }
   const eventId = deps.newEventId();
 
   let inserted: { id: string } | { error: string };
@@ -184,12 +230,14 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
     // TEST leads are saved and pushed-skipped, and never reach external systems.
     await step("setter_status", async () => {
       if (lead.isTest || !SETTER_INTENTS.has(lead.intent)) return "skipped";
-      await deps.setter({ name: lead.name, email: lead.email, ...(lead.intent === "contact" && lead.question ? { message: lead.question } : {}), source: setterSourceFor(lead.intent) });
+      // /api/contact always sent `message` (it was required there); the others never did.
+      await deps.setter({ name: lead.name, email: lead.email, ...(lead.intent === "contact" ? { message: lead.question ?? "" } : {}), source: setterSourceFor(lead.intent) });
       return "ok";
     });
     await step("zapier_status", async () => (lead.isTest ? "skipped" : deps.zapier(lead.intent, full)));
     await step("mailerlite_status", async () => (lead.isTest ? "skipped" : deps.mailerlite(lead.intent, full)));
     await step("capi_status", async () => (lead.isTest ? "skipped" : deps.capi(lead.intent, full, eventId)));
   };
-  return { status: 200, body: { ok: true, id, eventId }, after };
+  // track: false tells the browser not to fire the Pixel Lead for TEST or spam rows.
+  return { status: 200, body: { ok: true, id, eventId, track: !lead.isSpam && !lead.isTest }, after };
 }

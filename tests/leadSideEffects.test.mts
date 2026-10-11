@@ -163,7 +163,7 @@ test("salary: nested inputs/results payload and email-server nurture", async () 
   assert.equal(z.hours_per_week, 30);
   assert.equal(z.projected_year2_3, 2);
   assert.equal(seen[1].url, "https://es/leads/new");
-  assert.deepEqual(JSON.parse(seen[1].init!.body as string), { name: "Jane Smith", email: "jane@example.com", phone: "07700900123", source: "salary_calculator" });
+  assert.deepEqual(JSON.parse(seen[1].init!.body as string), { name: "Jane Smith", email: "jane@example.com", phone: "+447700900123", source: "salary_calculator" });
   const bad = makeSideEffects(req, { env: { EMAIL_SERVER_URL: "https://es" }, fetchImpl: fetchOf(500) });
   assert.equal(await bad.mailerlite("salary", l), "failed: 500");
 });
@@ -192,4 +192,106 @@ test("liveExtras returns the stream link for live only, and only when configured
   assert.deepEqual(liveExtras("live", env), { streamUrl: "https://stream.example/x" });
   for (const i of ["contact", "prospectus", "quiz", "call", "gym_callback", "salary"]) assert.deepEqual(liveExtras(i, env), {});
   assert.deepEqual(liveExtras("live", {}), {});
+});
+
+// ---- final review fixes ----
+import { attributionFromTouches } from "../app/lib/attribution.ts";
+import { externalPhone, SIDE_EFFECT_TIMEOUT_MS } from "../app/lib/leadSideEffects.ts";
+
+const FIRST = { utm_source: "facebook", utm_medium: "paid", utm_campaign: "oct", utm_content: "vid1", landing_path: "/quiz", referrer: "https://l.facebook.com/l.php?u=x", fbclid: "FB1", gclid: "G1" };
+const LAST = { utm_source: "google", utm_medium: "cpc", utm_campaign: "brand", landing_path: "/book-call" };
+
+test("call: attribution fields come from readAttribution() keys (real attributionFromTouches output)", async () => {
+  const seen: { url: string; init?: RequestInit }[] = [];
+  const fx = makeSideEffects(req, { env: { ZAPIER_PHONE_CALLBACK_HOOK: "https://h" }, fetchImpl: fetchOf(200, seen) });
+  const utm = attributionFromTouches(FIRST, LAST) as Record<string, unknown>;
+  await fx.zapier("call", { ...lead("call"), utm, referrer: "https://www.google.com/search?q=pt+course" });
+  const b = Object.fromEntries((seen[0].init!.body as URLSearchParams).entries());
+  assert.equal(b.first_touch_source, "facebook");
+  assert.equal(b.first_touch_medium, "paid");
+  assert.equal(b.first_touch_campaign, "oct");
+  assert.equal(b.first_touch_content, "vid1");
+  assert.equal(b.first_touch_landing, "/quiz");
+  assert.equal(b.first_touch_referrer, "https://www.google.com/search?q=pt+course", "full URL, as the old form sent");
+  assert.equal(b.last_touch_source, "google");
+  assert.equal(b.last_touch_medium, "cpc");
+  assert.equal(b.last_touch_campaign, "brand");
+  assert.equal(b.fbclid, "FB1");
+  assert.equal(b.gclid, "G1");
+  assert.equal(b.mobile, "+447700900123");
+
+  // Last touch same as first: last_* falls back to first, as `lastTouch.x || firstTouch.x` did.
+  seen.length = 0;
+  await fx.zapier("call", { ...lead("call"), utm: attributionFromTouches(FIRST, FIRST) as Record<string, unknown> });
+  const same = Object.fromEntries((seen[0].init!.body as URLSearchParams).entries());
+  assert.equal(same.last_touch_source, "facebook");
+  assert.equal(same.last_touch_campaign, "oct");
+  assert.equal(same.first_touch_referrer, "");
+
+  // No touches at all: today's defaults.
+  seen.length = 0;
+  await fx.zapier("call", { ...lead("call"), utm: attributionFromTouches(null, null) as Record<string, unknown> });
+  const none = Object.fromEntries((seen[0].init!.body as URLSearchParams).entries());
+  assert.deepEqual([none.first_touch_source, none.first_touch_medium, none.first_touch_campaign, none.last_touch_source], ["(direct)", "(none)", "(none)", "(direct)"]);
+});
+
+test("gym_callback: attribution from readAttribution() keys, E.164 mobile in Zapier and the admin email", async () => {
+  const seen: { url: string; init?: RequestInit }[] = [];
+  const fx = makeSideEffects(req, {
+    env: { ZAPIER_PHONE_CALLBACK_HOOK: "https://h" }, fetchImpl: fetchOf(200, seen),
+    gymLookup: () => ({ gymName: "Real Gym", canonicalPath: "/real" }), consentText: "C",
+  });
+  const utm = attributionFromTouches(FIRST, LAST) as Record<string, unknown>;
+  await fx.zapier("gym_callback", { ...lead("gym_callback"), gymSlug: "real-gym", utm });
+  const b = Object.fromEntries((seen[0].init!.body as URLSearchParams).entries());
+  assert.deepEqual(
+    [b.first_touch_source, b.first_touch_medium, b.first_touch_campaign, b.last_touch_source, b.mobile],
+    ["facebook", "paid", "oct", "google", "+447700900123"],
+  );
+});
+
+test("E.164 phone to every external system; national form stays on the lead", async () => {
+  assert.equal(externalPhone("07700900123"), "+447700900123");
+  assert.equal(externalPhone("01977285014"), "+441977285014");
+  assert.equal(externalPhone("+353871234567"), "+353871234567", "non-UK partner number passes through");
+  assert.equal(externalPhone(null), null);
+
+  const E = "+447700900123";
+  const zap = async (intent: CleanLead["intent"], env: Record<string, string>, extra: Record<string, unknown> = {}) => {
+    const seen: { url: string; init?: RequestInit }[] = [];
+    const l = lead(intent, extra);
+    await makeSideEffects(req, { env, fetchImpl: fetchOf(200, seen) }).zapier(intent, l);
+    assert.equal(l.phone, "07700900123", "the lead itself is not changed");
+    return seen[0].init!.body;
+  };
+  for (const [intent, key] of [["contact", "CONTACT_ZAPIER_WEBHOOK_URL"], ["prospectus", "PROSPECTUS_ZAPIER_WEBHOOK_URL"], ["quiz", "QUIZ_ZAPIER_WEBHOOK_URL"],
+    ["live", "LIVE_ZAPIER_WEBHOOK_URL"], ["salary", "SALARY_CALC_ZAPIER_WEBHOOK_URL"], ["gym_partnership", "GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL"]] as const) {
+    assert.equal(JSON.parse(await zap(intent, { [key]: "https://h" }) as string).phone, E, intent);
+  }
+  // email-server /leads/new
+  for (const intent of ["prospectus", "quiz", "salary"] as const) {
+    const seen: { url: string; init?: RequestInit }[] = [];
+    await makeSideEffects(req, { env: { EMAIL_SERVER_URL: "https://es" }, fetchImpl: fetchOf(200, seen) }).mailerlite(intent, lead(intent));
+    assert.equal(JSON.parse(seen[0].init!.body as string).phone, E, intent);
+  }
+  // CAPI userData
+  assert.equal(((await capiCall("quiz", {}, {})).call.userData as Record<string, unknown>).phone, E);
+});
+
+test("every side-effect fetch carries an 8 s abort signal", async () => {
+  assert.equal(SIDE_EFFECT_TIMEOUT_MS, 8000);
+  const seen: { url: string; init?: RequestInit }[] = [];
+  const fx = makeSideEffects(req, { env: { CONTACT_ZAPIER_WEBHOOK_URL: "https://h", EMAIL_SERVER_URL: "https://es" }, fetchImpl: fetchOf(200, seen) });
+  await fx.zapier("contact", lead("contact"));
+  await fx.mailerlite("prospectus", lead("prospectus"));
+  assert.equal(seen.length, 2);
+  for (const s of seen) assert.ok(s.init?.signal instanceof AbortSignal, s.url);
+});
+
+test("a hung CAPI send gives up instead of stalling", async (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const fx = makeSideEffects(req, { env: {}, capiSend: () => new Promise(() => {}) });
+  const p = fx.capi("call", lead("call"), "e");
+  t.mock.timers.tick(SIDE_EFFECT_TIMEOUT_MS);
+  await assert.rejects(p, /timeout after 8000 ms/);
 });

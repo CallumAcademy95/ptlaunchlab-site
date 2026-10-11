@@ -27,16 +27,19 @@ export type SubmitLeadInput = {
   source: string;
   gymSlug?: string;
   extra?: Record<string, unknown>;
+  /** useFormSecurity().payload(): honeypot, time-trap and nonce, checked server-side as a spam flag. */
+  _sec?: { hp: string; t: number; n: string };
   honeypot?: string;
 };
 export type SubmitLeadResult =
-  | { ok: true; id: string; eventId: string; streamUrl?: string }
+  | { ok: true; id: string; eventId: string; streamUrl?: string; track?: boolean }
   | { ok: false; field?: string; message: string };
 
 const FALLBACK = "Something went wrong. Call us on 01977 285014 or try again.";
 
 // Fires the Meta Pixel Lead ONLY after the server confirms the lead is saved,
-// deduplicated against the server-side CAPI event by eventID.
+// deduplicated against the server-side CAPI event by eventID. A saved TEST or
+// spam row comes back with track: false and fires nothing.
 export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
@@ -54,7 +57,7 @@ export async function submitLead(input: SubmitLeadInput): Promise<SubmitLeadResu
     });
     const data = (await res.json().catch(() => null)) as SubmitLeadResult | null;
     if (res.ok && data && data.ok) {
-      try {
+      if (data.track !== false) try {
         const fbq = (window as unknown as { fbq?: (...a: unknown[]) => void }).fbq;
         fbq?.("track", "Lead", { content_name: input.intent }, { eventID: data.eventId });
       } catch {

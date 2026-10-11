@@ -100,3 +100,19 @@ test("body includes pagePath, referrer and utm; posts to /api/lead", async () =>
   assert.equal(body.utm.fts, "facebook");
   assert.equal(body.utm.ftc, "oct");
 });
+
+test("track:false (TEST or spam row) returns the saved result but fires no Pixel Lead", async () => {
+  stubEnv(() => json(200, { ok: true, id: "lead-2", eventId: "evt-2", track: false }));
+  const r = await submitLead(INPUT);
+  assert.equal(r.ok, true);
+  assert.equal(fbqCalls.length, 0);
+  stubEnv(() => json(200, { ok: true, id: "lead-3", eventId: "evt-3", track: true }));
+  await submitLead(INPUT);
+  assert.equal(fbqCalls.length, 1);
+});
+
+test("_sec from useFormSecurity is sent through to /api/lead", async () => {
+  await submitLead({ ...INPUT, _sec: { hp: "", t: 4000, n: "abcd1234" } });
+  const body = JSON.parse(fetchCalls[0].init.body as string);
+  assert.deepEqual(body._sec, { hp: "", t: 4000, n: "abcd1234" });
+});

@@ -3,8 +3,25 @@
 // Heavy `@/` modules are imported lazily so node --test can load this file.
 import { QUIZ_RESULT_LABELS } from "./quizResultLabels.ts";
 import type { CleanLead, LeadIntent, StepStatus } from "./leads.ts";
+import { validateUKPhone } from "./security/phone.ts";
 
 type Lead = CleanLead & { id: string };
+
+/** Each external call gets this long, so one hung call can't stall the rest. */
+export const SIDE_EFFECT_TIMEOUT_MS = 8_000;
+
+/**
+ * The phone every external system gets: what the legacy validators produced,
+ * E.164 `+44…` (validateUKPhone). leads.phone keeps the national 07… form for
+ * the admin tel: link. A gym_partnership number that is not UK is already `+…`
+ * (validateAnyPhone) and passes through.
+ */
+export function externalPhone(phone: string | null): string | null {
+  if (!phone) return phone;
+  const uk = validateUKPhone(phone);
+  return uk.ok ? uk.normalised : phone;
+}
+const forExternal = (lead: Lead): Lead => ({ ...lead, phone: externalPhone(lead.phone) });
 type Env = Record<string, string | undefined>;
 export type SideEffectOpts = {
   fetchImpl?: typeof fetch;
@@ -86,14 +103,19 @@ export function zapierPayload(lead: Lead, ctx: Ctx = {}): Payload | null {
     case "gym_partnership": // app/api/gym-partnership/route.ts:51-60
       return { kind: "json", data: { gym_name: x.gymName ?? "", name: lead.name, email: lead.email, phone: lead.phone, location: x.location ?? "", gym_size: x.gymSize ?? "", referred_by: x.referredBy ?? "", submitted_at: now } };
     case "call": { // app/book-call/components/PhoneCallbackForm.tsx:66-86 (form-encoded)
+      // lead.utm is readAttribution()'s output (attribution.ts): ft* = first touch,
+      // lt* = last touch, present only when it differs from first touch, so
+      // `lt* || ft*` equals the old `lastTouch.x || firstTouch.x`.
+      // first_touch_referrer was the full first-touch referrer URL; utm only keeps
+      // its host (ftr), so the full referrer the lead arrived with is sent instead.
       const u = lead.utm;
       return { kind: "form", data: {
         call_type: "phone", name: lead.name, mobile: lead.phone, email: lead.email, topics: lead.question ?? "",
         page_url: s(x.page_url) || (lead.pagePath ? "https://ptlaunchlab.co.uk" + lead.pagePath : ""), page_referrer: lead.referrer ?? "", submitted_at: now,
-        first_touch_source: s(u.first_source) || "(direct)", first_touch_medium: s(u.first_medium) || "(none)", first_touch_campaign: s(u.first_campaign) || "(none)",
-        first_touch_content: s(u.first_content), first_touch_landing: s(u.first_landing), first_touch_referrer: s(u.first_referrer),
-        last_touch_source: s(u.last_source) || s(u.first_source) || "(direct)", last_touch_medium: s(u.last_medium) || s(u.first_medium) || "(none)",
-        last_touch_campaign: s(u.last_campaign) || s(u.first_campaign) || "(none)", fbclid: s(u.fbclid), gclid: s(u.gclid),
+        first_touch_source: s(u.fts) || "(direct)", first_touch_medium: s(u.ftm) || "(none)", first_touch_campaign: s(u.ftc) || "(none)",
+        first_touch_content: s(u.ftco), first_touch_landing: s(u.ftl), first_touch_referrer: lead.referrer ?? "",
+        last_touch_source: s(u.lts) || s(u.fts) || "(direct)", last_touch_medium: s(u.ltm) || s(u.ftm) || "(none)",
+        last_touch_campaign: s(u.ltc) || s(u.ftc) || "(none)", fbclid: s(u.fbclid), gclid: s(u.gclid),
       } };
     }
     case "gym_callback": { // app/api/gym-callback/route.ts:85-101 (form-encoded)
@@ -103,8 +125,9 @@ export function zapierPayload(lead: Lead, ctx: Ctx = {}): Payload | null {
         topics: `Ring-me request from the ${ctx.gymName ?? ""} PT Academy page`,
         gym_slug: lead.gymSlug ?? "", gym_name: ctx.gymName ?? "", consent: `Privacy notice shown: ${ctx.consentText ?? ""}`, consent_at: now,
         page_url: s(x.page_url, 300) || (lead.pagePath ? "https://ptlaunchlab.co.uk" + lead.pagePath : ""), submitted_at: now,
-        first_touch_source: s(u.first_source, 200) || "(direct)", first_touch_medium: s(u.first_medium, 200) || "(none)",
-        first_touch_campaign: s(u.first_campaign, 200) || "(none)", last_touch_source: s(u.last_source, 200) || s(u.first_source, 200) || "(direct)",
+        // readAttribution() keys, as for call above (old GymCallbackForm sent first_source/… from the same touches).
+        first_touch_source: s(u.fts, 200) || "(direct)", first_touch_medium: s(u.ftm, 200) || "(none)",
+        first_touch_campaign: s(u.ftc, 200) || "(none)", last_touch_source: s(u.lts, 200) || s(u.fts, 200) || "(direct)",
       } };
     }
     default: return null;
@@ -115,7 +138,16 @@ const esc = (v: unknown) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "
 
 export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
   const env: Env = opts.env ?? (process.env as Env);
-  const doFetch: typeof fetch = opts.fetchImpl ?? fetch;
+  const rawFetch: typeof fetch = opts.fetchImpl ?? fetch;
+  const doFetch = (url: string, init: RequestInit) => rawFetch(url, { ...init, signal: AbortSignal.timeout(SIDE_EFFECT_TIMEOUT_MS) });
+  /** For calls that are not a plain fetch (Resend, MailerLite, CAPI): give up after the same timeout. */
+  function timed<T>(p: Promise<T>): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`timeout after ${SIDE_EFFECT_TIMEOUT_MS} ms`)), SIDE_EFFECT_TIMEOUT_MS);
+    });
+    return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
+  }
 
   async function gymFor(slug: string | null) {
     if (opts.gymLookup) return opts.gymLookup(slug ?? "");
@@ -144,7 +176,7 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
     const phone = lead.phone ?? "";
     const submittedAt = new Date().toISOString();
     const resend = new Resend(env.RESEND_API_KEY);
-    const { error } = await resend.emails.send({
+    const { error } = await timed(resend.emails.send({
       from: "PT Launch Lab Leads <enrolments@ptlaunchlab.co.uk>",
       to: env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk",
       replyTo: lead.email,
@@ -159,11 +191,12 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
           <p style="font-size:13px;color:#4A6280;">White-label: introduce yourself as the ${esc(gymName)} academy team.</p>
           <p style="font-size:12px;color:#8CA3BF;">Privacy notice shown: "${esc(await consent())}" at ${submittedAt}</p>
         </div>`,
-    });
+    }));
     return error ? `failed: email ${JSON.stringify(error).slice(0, 200)}` : "ok";
   }
 
-  async function zapier(intent: LeadIntent, lead: Lead): Promise<StepStatus> {
+  async function zapier(intent: LeadIntent, rawLead: Lead): Promise<StepStatus> {
+    const lead = forExternal(rawLead);
     const hook = zapierHookFor(intent, env);
     let ctx: Ctx = {};
     if (intent === "gym_callback") ctx = { gymName: (await gymFor(lead.gymSlug))?.gymName ?? "", consentText: await consent() };
@@ -186,12 +219,13 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
     return result;
   }
 
-  async function mailerlite(intent: LeadIntent, lead: Lead): Promise<StepStatus> {
+  async function mailerlite(intent: LeadIntent, rawLead: Lead): Promise<StepStatus> {
+    const lead = forExternal(rawLead);
     if (intent === "live") { // app/api/live-register/route.ts:70-77 (retries once)
       if (!env.MAILERLITE_TOKEN) return "skipped";
       const { mlAddSubscriber } = await import("@/app/lib/mailerlite");
       return retryOnce(async () => {
-        await mlAddSubscriber({ email: lead.email, name: lead.name, phone: lead.phone || undefined, groupId: env.LIVE_MAILERLITE_GROUP_ID || "191617669489756012" });
+        await timed(mlAddSubscriber({ email: lead.email, name: lead.name, phone: lead.phone || undefined, groupId: env.LIVE_MAILERLITE_GROUP_ID || "191617669489756012" }));
         return "ok";
       });
     }
@@ -226,21 +260,22 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
     }
   }
 
-  async function capi(intent: LeadIntent, lead: Lead, eventId: string): Promise<StepStatus> {
+  async function capi(intent: LeadIntent, rawLead: Lead, eventId: string): Promise<StepStatus> {
+    const lead = forExternal(rawLead);
     if (intent === "checkout_start") return "skipped";
     // With the capiSend test seam there is no metaCapi import (the @/ alias is unavailable under node --test).
     const mc = opts.capiSend ? null : await import("@/app/lib/metaCapi");
     const send = opts.capiSend ?? ((i: Record<string, unknown>) => mc!.sendCapiEvent(i as never));
     const requestUserData = mc ? mc.extractRequestUserData(req as never) : {};
     const [firstName, ...rest] = lead.name.split(/\s+/);
-    const out = await send({
+    const out = await timed(send({
       eventName: "Lead",
       eventId,
       eventSourceUrl: req.headers.get("referer") || "https://ptlaunchlab.co.uk" + (lead.pagePath ?? "/"),
       actionSource: "website",
       userData: { email: lead.email, phone: lead.phone ?? undefined, firstName, lastName: rest.join(" "), country: "gb", ...requestUserData },
       customData: capiCustomData(intent, lead),
-    });
+    }));
     if (out === null) return env.META_CAPI_ACCESS_TOKEN ? "failed: capi" : "skipped";
     return "ok";
   }

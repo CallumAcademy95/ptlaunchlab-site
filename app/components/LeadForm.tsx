@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { submitLead, type SubmitLeadResult } from "@/app/lib/submitLead";
+import { useFormSecurity } from "@/app/lib/security/client";
 import type { LeadIntent } from "@/app/lib/leads";
 
 // The one lead form. Posts to /api/lead via submitLead, which saves first and
@@ -81,12 +82,13 @@ export default function LeadForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [answer, setAnswer] = useState("");
-  const [honeypot, setHoneypot] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldError, setFieldError] = useState("");
   const [done, setDone] = useState(false);
   const mountedAt = useRef(Date.now());
+  // Today's bot gate (honeypot + time-trap + nonce), as the old forms sent it.
+  const sec = useFormSecurity();
   const errId = `${uid}-error`;
 
   async function submit(e: FormEvent) {
@@ -106,7 +108,7 @@ export default function LeadForm({
         gymSlug,
         // Informational only: we never drop a lead on a heuristic.
         extra: Date.now() - mountedAt.current < 1500 ? { ...extra, fastSubmit: true } : extra,
-        honeypot,
+        _sec: sec.payload(),
       });
       if (result.ok) {
         setDone(true);
@@ -172,10 +174,7 @@ export default function LeadForm({
             )}
           </div>
         )}
-        {/* Honeypot: off-screen, non-semantic name so autofill never fills it; bots do. */}
-        <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
-          <input name="hp_field_7" tabIndex={-1} autoComplete="new-password" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
-        </div>
+        <sec.Honeypot />
         {error && <p id={errId} role="alert" className={T.error}>{error}</p>}
         <button type="submit" disabled={busy} aria-busy={busy} className={BUTTON} style={submitStyle}>
           {busy ? "Sending…" : submitLabel}

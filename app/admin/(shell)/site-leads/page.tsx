@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
-import { INTENT_LABEL } from "@/app/lib/leads";
+import { INTENT_LABEL, pushTone } from "@/app/lib/leads";
 import {
   AdminPage, PageHeader, Card, Badge, EmptyState, Notice,
   TableWrap, THEAD, TBODY, TR, TD, TH,
@@ -28,11 +28,15 @@ const when = (iso: string | null) =>
       })
     : "—";
 
+/** Server-side request time, outside the component so render stays pure. */
+function daysAgoIso(days: number): string {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
+
 const intentLabel = (i: string) => (INTENT_LABEL as Record<string, string>)[i] ?? i;
 
 function PushBadge({ s }: { s: string | null }) {
-  const tone = s === "sent" ? "green" : s === "failed" ? "red" : "neutral";
-  return <Badge tone={tone}>{s ?? "—"}</Badge>;
+  return <Badge tone={pushTone(s)}>{s ?? "—"}</Badge>;
 }
 
 export default async function SiteLeadsPage({
@@ -42,14 +46,22 @@ export default async function SiteLeadsPage({
 }) {
   const showAll = (await searchParams).all === "1";
 
-  const { data, error } = await getSupabaseAdmin()
+  const db = getSupabaseAdmin();
+  // Filter in the query, not after limit(100), so hidden rows never crowd out real ones.
+  let q = db
     .from("leads")
     .select("id,created_at,name,phone,intent,source,page_path,push_status,is_test,is_spam")
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false });
+  if (!showAll) q = q.eq("is_test", false).eq("is_spam", false);
+  const sevenDaysAgo = daysAgoIso(7);
+  const [{ data, error }, spam] = await Promise.all([
+    q.limit(100),
+    // Spam flags can catch a real person: show how many were hidden so they can be checked.
+    db.from("leads").select("id", { count: "exact", head: true }).eq("is_spam", true).gte("created_at", sevenDaysAgo),
+  ]);
 
-  const all = (error ? [] : (data ?? [])) as unknown as Row[];
-  const rows = showAll ? all : all.filter((r) => !r.is_test && !r.is_spam);
+  const rows = (error ? [] : (data ?? [])) as unknown as Row[];
+  const spamLastWeek = spam.error ? null : (spam.count ?? 0);
 
   return (
     <AdminPage>
@@ -65,6 +77,13 @@ export default async function SiteLeadsPage({
           </Link>
         }
       />
+
+      {!showAll && spamLastWeek ? (
+        <p className="mb-3 text-sm text-slate-500">
+          {spamLastWeek} lead{spamLastWeek === 1 ? "" : "s"} flagged as spam in the last 7 days are hidden.{" "}
+          <Link href="/admin/site-leads?all=1" className="font-semibold text-blue-700 hover:underline">Check them</Link>
+        </p>
+      ) : null}
 
       {error && (
         <Notice tone="rose" title="Could not read site leads">
