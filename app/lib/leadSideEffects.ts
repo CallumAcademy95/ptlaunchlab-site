@@ -17,6 +17,11 @@ export type SideEffectOpts = {
   consentText?: string;
 };
 
+/** Extra fields the /api/lead route adds to its 200 body: the private watch link, for `live` only. */
+export function liveExtras(intent: string, env: Env): { streamUrl?: string } {
+  return intent === "live" && env.LIVE_STREAM_URL ? { streamUrl: env.LIVE_STREAM_URL } : {};
+}
+
 export const quizLabel = (result: string): string => QUIZ_RESULT_LABELS[result] ?? result;
 
 /** Gym-callback gate for the route: a bogus gym slug is rejected before anything is saved. */
@@ -96,7 +101,7 @@ export function zapierPayload(lead: Lead, ctx: Ctx = {}): Payload | null {
       return { kind: "form", data: {
         call_type: "gym_callback", name: lead.name, mobile: lead.phone, email: lead.email,
         topics: `Ring-me request from the ${ctx.gymName ?? ""} PT Academy page`,
-        gym_slug: lead.gymSlug ?? "", gym_name: ctx.gymName ?? "", consent: ctx.consentText ?? "", consent_at: now,
+        gym_slug: lead.gymSlug ?? "", gym_name: ctx.gymName ?? "", consent: `Privacy notice shown: ${ctx.consentText ?? ""}`, consent_at: now,
         page_url: s(x.page_url, 300) || (lead.pagePath ? "https://ptlaunchlab.co.uk" + lead.pagePath : ""), submitted_at: now,
         first_touch_source: s(u.first_source, 200) || "(direct)", first_touch_medium: s(u.first_medium, 200) || "(none)",
         first_touch_campaign: s(u.first_campaign, 200) || "(none)", last_touch_source: s(u.last_source, 200) || s(u.first_source, 200) || "(direct)",
@@ -152,7 +157,7 @@ export function makeSideEffects(req: Request, opts: SideEffectOpts = {}) {
           (agreement clause 4.2) the sale belongs to ${esc(gymName)}. Send them that gym's enrol link
           (https://ptlaunchlab.co.uk${esc(canonicalPath)}/enrol) so it is attributed automatically.</p>
           <p style="font-size:13px;color:#4A6280;">White-label: introduce yourself as the ${esc(gymName)} academy team.</p>
-          <p style="font-size:12px;color:#8CA3BF;">Consent: "${esc(await consent())}" at ${submittedAt}</p>
+          <p style="font-size:12px;color:#8CA3BF;">Privacy notice shown: "${esc(await consent())}" at ${submittedAt}</p>
         </div>`,
     });
     return error ? `failed: email ${JSON.stringify(error).slice(0, 200)}` : "ok";

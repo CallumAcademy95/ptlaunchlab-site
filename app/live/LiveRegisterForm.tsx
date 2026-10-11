@@ -23,6 +23,7 @@ type Props = {
 
 export default function LiveRegisterForm({ calendarUrl, whenLabel }: Props) {
   const [submitted, setSubmitted] = useState(false);
+  const [streamUrl, setStreamUrl] = useState("");
 
   if (submitted) {
     return (
@@ -43,6 +44,17 @@ export default function LiveRegisterForm({ calendarUrl, whenLabel }: Props) {
           >
             Add to Calendar
           </a>
+          {streamUrl && (
+            <a
+              href={streamUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cta="live-stream-link"
+              className="inline-block text-center px-8 py-3.5 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30"
+            >
+              Save Your Watch Link →
+            </a>
+          )}
         </div>
         <div className="mt-7 pt-6 border-t border-white/[0.08]">
           <p className="text-white font-semibold text-base mb-1">Got a question for the panel?</p>
@@ -74,7 +86,8 @@ export default function LiveRegisterForm({ calendarUrl, whenLabel }: Props) {
         source="live_page"
         tone="dark"
         submitLabel="Save My Free Seat →"
-        onSuccess={() => {
+        onSuccess={(result) => {
+          if (result.streamUrl) setStreamUrl(result.streamUrl);
           trackEvent("live_register_submitted", { source: "live-page" });
           setSubmitted(true);
         }}

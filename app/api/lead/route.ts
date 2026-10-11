@@ -7,7 +7,7 @@ import { sendOwnerPush } from "@/app/lib/owner-push";
 import { notifySetter } from "@/app/lib/setter-intake";
 import type { OwnerPushDb } from "@/app/lib/owner-push";
 import { getGymByPartnerSlug } from "@/app/lib/gyms";
-import { makeSideEffects, validateGymCallback } from "@/app/lib/leadSideEffects";
+import { liveExtras, makeSideEffects, validateGymCallback } from "@/app/lib/leadSideEffects";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -41,5 +41,8 @@ export async function POST(req: NextRequest) {
 
   const result = await processLead(body, deps);
   if (result.after) after(result.after);
-  return NextResponse.json(result.body, { status: result.status });
+  const saved = result.status === 200 && (result.body as { ok?: boolean }).ok === true;
+  const intent = typeof b?.intent === "string" ? b.intent : "";
+  const out = saved ? { ...result.body, ...liveExtras(intent, process.env) } : result.body;
+  return NextResponse.json(out, { status: result.status });
 }

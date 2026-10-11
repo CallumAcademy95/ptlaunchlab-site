@@ -18,7 +18,7 @@ import {
 //
 // Event details live in ./event.ts (single source of truth, edited monthly).
 // The stream link lives server-side in LIVE_STREAM_URL and is returned by
-// /api/live-register after signup.
+// /api/lead (as `streamUrl`, live intent only) once the registration is saved.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {

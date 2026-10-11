@@ -30,7 +30,7 @@ export type SubmitLeadInput = {
   honeypot?: string;
 };
 export type SubmitLeadResult =
-  | { ok: true; id: string; eventId: string }
+  | { ok: true; id: string; eventId: string; streamUrl?: string }
   | { ok: false; field?: string; message: string };
 
 const FALLBACK = "Something went wrong. Call us on 01977 285014 or try again.";

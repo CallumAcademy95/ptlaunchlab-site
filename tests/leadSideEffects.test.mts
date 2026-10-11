@@ -140,7 +140,7 @@ test("gym_callback zapier uses server-side gym name and consent, not client extr
   assert.equal(await fx.zapier("gym_callback", l), "ok");
   const b = seen[0].init!.body as URLSearchParams;
   assert.equal(b.get("gym_name"), "Real Gym");
-  assert.equal(b.get("consent"), "SERVER CONSENT");
+  assert.equal(b.get("consent"), "Privacy notice shown: SERVER CONSENT");
   assert.equal(b.get("topics"), "Ring-me request from the Real Gym PT Academy page");
 });
 
@@ -184,4 +184,12 @@ test("retry once for quiz/live/gym_partnership, not for others", async () => {
   let n = 0;
   const thrower = (async () => { if (n++ === 0) throw new Error("boom"); return new Response("", { status: 200 }); }) as unknown as typeof fetch;
   assert.equal(await makeSideEffects(req, { env: { QUIZ_ZAPIER_WEBHOOK_URL: "https://h" }, fetchImpl: thrower }).zapier("quiz", lead("quiz")), "ok");
+});
+
+test("liveExtras returns the stream link for live only, and only when configured", async () => {
+  const { liveExtras } = await import("../app/lib/leadSideEffects.ts");
+  const env = { LIVE_STREAM_URL: "https://stream.example/x" };
+  assert.deepEqual(liveExtras("live", env), { streamUrl: "https://stream.example/x" });
+  for (const i of ["contact", "prospectus", "quiz", "call", "gym_callback", "salary"]) assert.deepEqual(liveExtras(i, env), {});
+  assert.deepEqual(liveExtras("live", {}), {});
 });
