@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { submitLead, type SubmitLeadResult } from "@/app/lib/submitLead";
 import type { LeadIntent } from "@/app/lib/leads";
 
@@ -17,7 +17,13 @@ export type LeadFormProps = {
   question?: { label: string; options?: string[]; required?: boolean };
   extra?: Record<string, unknown>;
   successMessage?: string | ((firstName: string) => string);
-  onSuccess?: (result: Extract<SubmitLeadResult, { ok: true }>) => void;
+  onSuccess?: (result: Extract<SubmitLeadResult, { ok: true }>, values: { name: string; phone: string; email: string }) => void;
+  /** "dark" for navy host surfaces (bg-deep fields, white text). Default "light". */
+  tone?: "light" | "dark";
+  /** Small print under the button (privacy line, reassurance). */
+  footnote?: ReactNode;
+  /** Inline style for the submit button, e.g. a per-gym accent colour. */
+  submitStyle?: CSSProperties;
   variant?: Variant;
   submitLabel?: string;
 };
@@ -28,9 +34,24 @@ const WRAPPER: Record<Variant, string> = {
   page: "w-full max-w-xl mx-auto px-6 py-10",
 };
 
-const FIELD =
-  "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-gray-400";
-const LABEL = "block text-sm font-semibold mb-1";
+const TONES = {
+  light: {
+    field: "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-gray-400",
+    label: "block text-left text-sm font-semibold mb-1 text-black",
+    error: "text-red-600 text-sm",
+    box: "rounded-2xl border border-gray-100 bg-gray-50 p-6 text-center",
+    msg: "text-black font-black text-lg",
+    note: "text-gray-500 text-xs leading-relaxed text-center",
+  },
+  dark: {
+    field: "w-full rounded-xl border border-white/10 bg-deep px-4 py-3 text-sm text-white placeholder-soft/50 focus:outline-none focus:border-gold/60 transition-colors",
+    label: "block text-left text-sm font-semibold mb-1 text-white",
+    error: "text-red-400 text-sm",
+    box: "rounded-2xl border border-white/10 bg-card p-6 text-center",
+    msg: "text-white font-black text-lg",
+    note: "text-soft/60 text-xs leading-relaxed text-center",
+  },
+} as const;
 const BUTTON =
   "w-full py-3.5 rounded-full font-black bg-gold text-deep text-sm uppercase tracking-wide hover:opacity-90 transition-all disabled:opacity-60";
 
@@ -48,7 +69,13 @@ export default function LeadForm({
   onSuccess,
   variant = "inline",
   submitLabel = "Send",
+  tone = "light",
+  footnote,
+  submitStyle,
 }: LeadFormProps) {
+  const T = TONES[tone];
+  const FIELD = T.field;
+  const LABEL = T.label;
   const uid = useId();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -83,7 +110,7 @@ export default function LeadForm({
       });
       if (result.ok) {
         setDone(true);
-        onSuccess?.(result);
+        onSuccess?.(result, { name: name.trim(), phone: phone.trim(), email: email.trim() });
       } else {
         setError(result.message);
         setFieldError(result.field ?? "");
@@ -99,8 +126,8 @@ export default function LeadForm({
     const msg = typeof successMessage === "function" ? successMessage(first) : (successMessage ?? defaultSuccess(intent, first));
     return (
       <div className={WRAPPER[variant]}>
-        <div role="status" className="rounded-2xl border border-gray-100 bg-gray-50 p-6 text-center">
-          <p className="text-black font-black text-lg">{msg}</p>
+        <div role="status" className={T.box}>
+          <p className={T.msg}>{msg}</p>
         </div>
       </div>
     );
@@ -149,10 +176,11 @@ export default function LeadForm({
         <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
           <input name="hp_field_7" tabIndex={-1} autoComplete="new-password" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
         </div>
-        {error && <p id={errId} role="alert" className="text-red-600 text-sm">{error}</p>}
-        <button type="submit" disabled={busy} aria-busy={busy} className={BUTTON}>
+        {error && <p id={errId} role="alert" className={T.error}>{error}</p>}
+        <button type="submit" disabled={busy} aria-busy={busy} className={BUTTON} style={submitStyle}>
           {busy ? "Sending…" : submitLabel}
         </button>
+        {footnote && <div className={T.note}>{footnote}</div>}
       </form>
     </div>
   );

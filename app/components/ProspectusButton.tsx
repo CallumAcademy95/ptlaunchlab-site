@@ -1,56 +1,17 @@
 "use client";
 import { useState } from "react";
 import { trackEvent } from "@/app/lib/gtag";
-import { useFormSecurity } from "@/app/lib/security/client";
+import LeadForm from "@/app/components/LeadForm";
 
 export default function ProspectusButton() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", phone: "", email: "" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const sec = useFormSecurity();
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    // Shared event_id so server CAPI Lead (in /api/prospectus) and the
-    // browser fbq Lead below dedup on Meta's side.
-    const eventId =
-      typeof window !== "undefined" && window.crypto?.randomUUID
-        ? window.crypto.randomUUID()
-        : `prospectus-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    try {
-      const res = await fetch("/api/prospectus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, event_id: eventId, [sec.SEC_KEY]: sec.payload() }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        setError(data.error || "Something went wrong.");
-        setLoading(false);
-        return;
-      }
-      setOpen(false);
-      setForm({ name: "", phone: "", email: "" });
-      trackEvent('prospectus_download');
-      if (typeof window !== "undefined" && (window as { fbq?: (...args: unknown[]) => void }).fbq) {
-        (window as { fbq: (...args: unknown[]) => void }).fbq(
-          "track",
-          "Lead",
-          { content_name: "prospectus_download" },
-          { eventID: eventId },
-        );
-      }
-      // Clear the once-flag so the thank-you page will open the PDF
-      try { sessionStorage.removeItem('ptll_prospectus_opened'); } catch {}
-      window.location.href = "/prospectus/thank-you";
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  // Lead already saved and Pixel Lead fired by submitLead; keep analytics + the prospectus redirect.
+  function handleSuccess() {
+    trackEvent('prospectus_download');
+    // Clear the once-flag so the thank-you page will open the PDF
+    try { sessionStorage.removeItem('ptll_prospectus_opened'); } catch {}
+    window.location.href = "/prospectus/thank-you";
   }
 
   return (
@@ -83,41 +44,14 @@ export default function ProspectusButton() {
               </div>
               <button onClick={() => setOpen(false)} className="text-[#4A6280] hover:text-white transition-colors text-2xl leading-none ml-4">×</button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <sec.Honeypot />
-              <input
-                type="text"
-                placeholder="Full name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-                className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 text-sm"
-              />
-              <input
-                type="tel"
-                placeholder="Phone number"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                required
-                className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 text-sm"
-              />
-              <input
-                type="email"
-                placeholder="Email address"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-                className="w-full bg-[#072B4A] border border-[#3B82F6]/25 rounded-xl px-4 py-3 text-white placeholder-[#4A6280] focus:outline-none focus:border-[#F5C518]/50 text-sm"
-              />
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-sm hover:brightness-110 transition-all disabled:opacity-60"
-              >
-                {loading ? "Sending…" : "Download Prospectus →"}
-              </button>
-            </form>
+            <LeadForm
+              intent="prospectus"
+              source="prospectus_button"
+              tone="dark"
+              submitLabel="Download Prospectus →"
+              successMessage="Thanks, opening the prospectus…"
+              onSuccess={handleSuccess}
+            />
           </div>
         </div>
       )}
