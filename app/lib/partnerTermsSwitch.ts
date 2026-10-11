@@ -59,17 +59,28 @@ export interface PartnerForSwitch {
 export interface TermsUpdate {
   agreement_version: string;
   agreement_signed_at: string;
-  commission_terms: string;
+  commission_terms?: string;
   fee_per_learner_pence?: number;
 }
 
+/**
+ * The notice period in the 11 Oct 2026 partner email: anyone who enrols through
+ * an existing gym before this moment still earns that gym its current fee (£500).
+ * A gym that signs v4.x before then has its signature recorded straight away,
+ * but its commission terms only move to the new schedule from this date
+ * (scripts/partner-notice-switch.mts does that on the day). Without this, a gym
+ * signing early would see a sale inside the notice period paid at the new rate,
+ * breaking the promise in that email.
+ */
+export const NOTICE_TERMS_FROM_MS = Date.UTC(2026, 10, 10, 0, 0, 0); // 10 Nov 2026 00:00 UK (GMT)
+
 /** The fields to write for a partner that has just signed `version`. */
-export function termsUpdateFor(partner: PartnerForSwitch, version: string, signedAtIso: string): TermsUpdate {
-  const update: TermsUpdate = {
-    agreement_version: version,
-    agreement_signed_at: signedAtIso,
-    commission_terms: signedTermsFor(version),
-  };
+export function termsUpdateFor(partner: PartnerForSwitch, version: string, signedAtIso: string, nowMs = Date.parse(signedAtIso)): TermsUpdate {
+  const update: TermsUpdate = { agreement_version: version, agreement_signed_at: signedAtIso, commission_terms: signedTermsFor(version) };
+  if (Number.isFinite(nowMs) && nowMs < NOTICE_TERMS_FROM_MS) {
+    // Inside the notice period: record the signature only. Terms stay as they are.
+    return { agreement_version: version, agreement_signed_at: signedAtIso } as TermsUpdate;
+  }
   if (!FEE_HELD_BY_DEAL.has(partner.slug)) update.fee_per_learner_pence = PARTNER_FEE_PENCE;
   return update;
 }
@@ -84,6 +95,9 @@ export type SwitchOutcome =
 export function describeOutcome(o: SwitchOutcome, repEmail: string): string {
   switch (o.kind) {
     case "switched": {
+      if (o.update.commission_terms === undefined) {
+        return `Signature recorded for ${o.slug} (v${o.update.agreement_version}). Its commission terms stay as they are until the notice period ends on 10 November 2026, so sales before then keep their current fee; run scripts/partner-notice-switch.mts --apply on 10 November to move it to the new schedule.`;
+      }
       const fee = o.update.fee_per_learner_pence === undefined
         ? `fee left at £${o.before.fee_per_learner_pence / 100} (held by a separate deal — change it by hand when that ends)`
         : `fee £${o.before.fee_per_learner_pence / 100} → £${o.update.fee_per_learner_pence / 100}`;
