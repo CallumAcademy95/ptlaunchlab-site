@@ -84,20 +84,13 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               <p className="text-white/60 text-lg font-semibold uppercase tracking-widest mb-8">{c.heroSubline}</p>
             )}
 
-            {atp ? (
-              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
-                <span className="font-black text-xl uppercase tracking-wide" style={{ color: bg }}>{ATP_SIX_MONTH_TOTAL} on our 6-month plan</span>
-                <span className="text-sm font-semibold" style={{ color: bg }}>or pay in full with your member code</span>
-              </div>
-            ) : (
-              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
-                <span className="text-white font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
-                <span className="text-white/80 text-sm">or {MONTHLY_PRICE_LABEL} a month for {MONTHLY_PAYMENTS} months</span>
-                {memberPriceLabel && (
-                  <span className="text-white text-sm font-bold">· Member price {memberPriceLabel} in full</span>
-                )}
-              </div>
-            )}
+            <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
+              <span className="text-white font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
+              <span className="text-white/80 text-sm">or {MONTHLY_PRICE_LABEL} a month for {MONTHLY_PAYMENTS} months</span>
+              {memberPriceLabel && (
+                <span className="text-white text-sm font-bold">· Member price {memberPriceLabel} in full</span>
+              )}
+            </div>
 
             <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-10">
               {[
@@ -276,49 +269,11 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
         {/* ── PRICING ── */}
         <section className="bg-gray-50 py-16 md:py-20">
           <div className="max-w-3xl mx-auto px-6 text-center">
-            <h2 className={`text-3xl md:text-4xl font-black text-black uppercase ${atp ? "mb-10" : "mb-4"}`}>Your Investment</h2>
-            {!atp && (
-              <p className="text-gray-600 text-base mb-10">
-                Most PT qualifications cost {TYPICAL_COST_LABEL}. Through {c.gymName} PT Academy it&apos;s{" "}
-                {COURSE_PRICE_LABEL}, everything included.
-              </p>
-            )}
-            {atp ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
-                <div className="bg-white rounded-2xl p-7 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
-                  <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>6-Month Plan</p>
-                  <p className="font-black text-4xl mb-1" style={{ color: c.primaryColor }}>{ATP_DEPOSIT} <span className="text-lg text-gray-500 font-bold">today</span></p>
-                  <p className="text-gray-500 text-sm mb-4">then {ATP_LADDER.sixMonth.instalments} monthly payments of {ATP_INSTALMENT}, {ATP_SIX_MONTH_TOTAL} in total</p>
-                  <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-white text-sm text-center hover:opacity-90 transition-all" style={{ backgroundColor: c.primaryColor }}>
-                    Start the 6-Month Plan →
-                  </a>
-                </div>
-                <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
-                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Pay in Full, Member Code</p>
-                  <p className="font-black text-4xl text-black mb-1">{ATP_SIX_MONTH_TOTAL}</p>
-                  <p className="text-gray-500 text-sm mb-4">Have an ATP member code? Enter it when you enrol and it comes off here.</p>
-                  <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                    Enrol With My Code →
-                  </a>
-                </div>
-                <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
-                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Pay in Full</p>
-                  <p className="font-black text-4xl text-black mb-1">{COURSE_PRICE_LABEL}</p>
-                  <p className="text-gray-500 text-sm mb-4">One payment, nothing further to pay</p>
-                  <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                    Enrol Now →
-                  </a>
-                </div>
-                <div className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm">
-                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Pay Monthly</p>
-                  <p className="font-black text-4xl text-black mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-gray-400 font-bold"> /month</span></p>
-                  <p className="text-gray-500 text-sm mb-4">{MONTHLY_PAYMENTS} monthly payments, the first today, {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total</p>
-                  <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                    Pay Monthly →
-                  </a>
-                </div>
-              </div>
-            ) : (
+            <h2 className="text-3xl md:text-4xl font-black text-black uppercase mb-4">Your Investment</h2>
+            <p className="text-gray-600 text-base mb-10">
+              Most PT qualifications cost {TYPICAL_COST_LABEL}. Through {c.gymName} PT Academy it&apos;s{" "}
+              {COURSE_PRICE_LABEL}, everything included.
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
                 <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>One Payment</p>
@@ -342,6 +297,20 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 </a>
               </div>
             </div>
+            {/* ATP Fitness Felixstowe only: its 6-month plan, as a third way to
+                pay. It costs more than the two above, so it sits under them and
+                says what it is for: paying the course off in 6 months, not 10. */}
+            {atp && (
+              <div className="mt-5 bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-left sm:flex sm:items-center sm:justify-between sm:gap-8">
+                <div className="mb-4 sm:mb-0">
+                  <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">6-Month Plan</p>
+                  <p className="font-black text-3xl text-black mb-1">{ATP_DEPOSIT} <span className="text-lg text-gray-400 font-bold">today</span></p>
+                  <p className="text-gray-500 text-sm">then {ATP_LADDER.sixMonth.instalments} monthly payments of {ATP_INSTALMENT}, {ATP_SIX_MONTH_TOTAL} in total. Paid off in 6 months.</p>
+                </div>
+                <a href={enrolPath} className="block shrink-0 py-3 px-8 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
+                  Start the 6-Month Plan →
+                </a>
+              </div>
             )}
           </div>
         </section>
@@ -356,9 +325,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               Start Your PT Journey Today
             </h2>
             <p className="text-white/70 font-bold uppercase tracking-wide mb-8">
-              {atp
-                ? `${ATP_SIX_MONTH_TOTAL} on our 6-month plan, or pay in full with your member code`
-                : `${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL} a month`}
+              {`${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL} a month`}
             </p>
             <a href={enrolPath}
               className="inline-block bg-white font-black uppercase tracking-wide text-base px-12 py-5 rounded-full hover:opacity-90 transition-all shadow-xl mb-5"
