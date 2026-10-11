@@ -78,6 +78,56 @@ export type LeadRow = {
 };
 export type StepStatus = "ok" | "skipped" | string;
 
+/** The `leads` row for a validated lead. Shared by processLead and the routes that insert directly. */
+export function leadRowFrom(lead: CleanLead, eventId: string): LeadRow {
+  return {
+    name: lead.name, phone: lead.phone, email: lead.email, question: lead.question, intent: lead.intent,
+    source: lead.source, page_path: lead.pagePath, gym_slug: lead.gymSlug, extra: lead.extra, utm: lead.utm,
+    referrer: lead.referrer, event_id: eventId, is_test: lead.isTest, is_spam: lead.isSpam,
+  };
+}
+
+type PushPayload = { title: string; body?: string; url?: string; tag?: string };
+
+/** The owner alert when a lead could not be saved. */
+export function notSavedPush(lead: CleanLead, eventId: string): PushPayload {
+  return {
+    title: `NOT SAVED — lead: ${lead.name}`,
+    body: `${lead.phone ?? "no phone"} · ${lead.email} · ${INTENT_LABEL[lead.intent]} · ${lead.pagePath ?? ""}`,
+    url: "/admin/site-leads",
+    tag: `lead-unsaved-${eventId}`,
+  };
+}
+
+/** The owner alert for a saved lead. */
+export function newLeadPush(lead: CleanLead, id: string): PushPayload {
+  return {
+    title: `New lead: ${lead.name}`,
+    body: `${lead.phone ?? "no phone"} · ${INTENT_LABEL[lead.intent]} · ${lead.pagePath ?? lead.source}`,
+    url: `/admin/site-leads/${id}`,
+    tag: `lead-${id}`,
+  };
+}
+
+/** push_status value from a sendOwnerPush result. */
+export function pushStatus(r: { sent: number; error?: string }): StepStatus {
+  return r.error ? `failed: ${r.error}` : r.sent > 0 ? "ok" : "failed: no device";
+}
+
+/**
+ * Resolve `p`, or `{ error }` after `ms`. Used where a save must never hold up
+ * the visitor (checkout start). The underlying promise is not cancelled.
+ */
+export async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | { error: string }> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<{ error: string }>((resolve) => { timer = setTimeout(() => resolve({ error: `timeout after ${ms} ms` }), ms); });
+  try {
+    return await Promise.race([p.catch((e: unknown) => ({ error: e instanceof Error ? e.message : String(e) })), timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export interface LeadDeps {
   insert(row: LeadRow): Promise<{ id: string } | { error: string }>;
   update(id: string, patch: Record<string, unknown>): Promise<void>;
@@ -103,11 +153,7 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
 
   let inserted: { id: string } | { error: string };
   try {
-    inserted = await deps.insert({
-      name: lead.name, phone: lead.phone, email: lead.email, question: lead.question, intent: lead.intent,
-      source: lead.source, page_path: lead.pagePath, gym_slug: lead.gymSlug, extra: lead.extra, utm: lead.utm,
-      referrer: lead.referrer, event_id: eventId, is_test: lead.isTest, is_spam: lead.isSpam,
-    });
+    inserted = await deps.insert(leadRowFrom(lead, eventId));
   } catch (e) {
     inserted = { error: failed(e) };
   }
@@ -116,12 +162,7 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
     console.error("[lead] insert failed", inserted.error);
     if (!lead.isSpam) {
       try {
-        await deps.push({
-          title: `NOT SAVED — lead: ${lead.name}`,
-          body: `${lead.phone ?? "no phone"} · ${lead.email} · ${INTENT_LABEL[lead.intent]} · ${lead.pagePath ?? ""}`,
-          url: "/admin/site-leads",
-          tag: `lead-unsaved-${eventId}`,
-        });
+        await deps.push(notSavedPush(lead, eventId));
       } catch (e) { console.error("[lead] push after failed insert also failed", e); }
     }
     return { status: 500, body: { ok: false, message: "Something went wrong. Call us on 01977 285014 or try again." } };
@@ -137,13 +178,7 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
     };
     await step("push_status", async () => {
       if (lead.isSpam || lead.isTest) return "skipped";
-      const r = await deps.push({
-        title: `New lead: ${lead.name}`,
-        body: `${lead.phone ?? "no phone"} · ${INTENT_LABEL[lead.intent]} · ${lead.pagePath ?? lead.source}`,
-        url: `/admin/site-leads/${id}`,
-        tag: `lead-${id}`,
-      });
-      return r.error ? `failed: ${r.error}` : r.sent > 0 ? "ok" : "failed: no device";
+      return pushStatus(await deps.push(newLeadPush(lead, id)));
     });
     if (lead.isSpam) return;
     // TEST leads are saved and pushed-skipped, and never reach external systems.

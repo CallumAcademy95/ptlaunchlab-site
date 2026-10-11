@@ -4,6 +4,10 @@ import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { validateEnrolmentSec } from "@/app/lib/security/validate";
 import { logSec } from "@/app/lib/security/log";
 import { COURSE_PRICE_LABEL, MONTHLY_PLAN_LABEL } from "@/app/lib/pricing";
+import { randomUUID } from "node:crypto";
+import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
+import { checkoutStartLead, insertDirect } from "@/app/lib/directLeads";
+import type { LeadRow } from "@/app/lib/leads";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/enrolment-pending
@@ -92,6 +96,22 @@ export async function POST(req: NextRequest) {
     hour: "2-digit", minute: "2-digit",
     timeZone: "Europe/London",
   });
+
+  // ── Save to `leads` (intent checkout_start) ─────────────────────────────
+  // Capped at 1.5 s and never blocks: the buyer is on their way to Stripe.
+  // A timeout or failure is logged only. No owner push: the email below covers it.
+  await insertDirect(
+    checkoutStartLead({ name, email, plan, rung: body.rung, gymReferral }),
+    `checkout_${randomUUID()}`,
+    {
+      insert: async (row: LeadRow) => {
+        const { data, error } = await getSupabaseAdmin().from("leads").insert(row).select("id").single();
+        return error || !data ? { error: error?.message ?? "no row" } : { id: data.id as string };
+      },
+      log: (msg, detail) => console.error("[enrolment-pending]", msg, detail),
+    },
+    1_500,
+  );
 
   // ── Admin "checkout started" email ──────────────────────────────────────
   const adminHtml = `

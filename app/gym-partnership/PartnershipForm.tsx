@@ -1,6 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useFormSecurity } from "@/app/lib/security/client";
+import { submitLead } from "@/app/lib/submitLead";
+
+// Saves through /api/lead (intent gym_partnership). The route stores the lead
+// first, then sends today's Zapier payload and the CAPI Lead server-side;
+// submitLead fires the browser Pixel Lead (same event id) only after the save.
 
 export default function PartnershipForm() {
   const [form, setForm] = useState({
@@ -8,7 +12,7 @@ export default function PartnershipForm() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState("");
-  const sec = useFormSecurity();
+  const [honeypot, setHoneypot] = useState("");
 
   const FALLBACK_ERROR =
     "Something went wrong — please try again, or email partnerships@ptlaunchlab.co.uk.";
@@ -22,34 +26,27 @@ export default function PartnershipForm() {
     setStatus("loading");
     setError("");
     try {
-      // Shared id so the browser fbq Lead below and the server-side CAPI Lead
-      // (fired in /api/gym-partnership) dedup on Meta's side.
-      const eventId =
-        window.crypto?.randomUUID?.() ??
-        `gym-lead-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const res = await fetch("/api/gym-partnership", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, event_id: eventId, [sec.SEC_KEY]: sec.payload() }),
+      const result = await submitLead({
+        intent: "gym_partnership",
+        source: "gym-partnership",
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        // Keys read by the gym_partnership Zapier payload (app/lib/leadSideEffects.ts).
+        extra: {
+          gymName: form.gymName.trim(),
+          location: form.location.trim(),
+          gymSize: form.gymSize,
+          referredBy: form.referredBy.trim(),
+        },
+        honeypot,
       });
-      const data = await res.json();
-      if (data.success) {
-        // Only fire for a genuinely captured lead — the server returns
-        // lead:false for honeypot/junk so we don't inflate the Lead signal.
-        if (data.lead !== false && typeof window.fbq === "function") {
-          window.fbq(
-            "track",
-            "Lead",
-            { content_category: "gym_partnership", content_name: "partner_application" },
-            { eventID: eventId },
-          );
-        }
+      if (result.ok) {
         setStatus("success");
         return;
       }
-      // Show what the server actually objected to. Without this every
-      // rejection reads as a broken form and the applicant can't self-correct.
-      setError(typeof data.error === "string" && data.error ? data.error : FALLBACK_ERROR);
+      // Show what the server objected to, so the applicant can self-correct.
+      setError(result.message || FALLBACK_ERROR);
       setStatus("error");
     } catch {
       setError(FALLBACK_ERROR);
@@ -75,7 +72,10 @@ export default function PartnershipForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <sec.Honeypot />
+      {/* Honeypot: off-screen, non-semantic name so autofill never fills it; bots do. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+        <input name="hp_field_7" tabIndex={-1} autoComplete="new-password" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} />
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-[#8CA3BF] text-[11px] font-semibold mb-1.5 uppercase tracking-wider">
@@ -152,8 +152,3 @@ export default function PartnershipForm() {
   );
 }
 
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-  }
-}

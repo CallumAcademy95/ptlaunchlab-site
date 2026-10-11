@@ -479,11 +479,7 @@ export default function ResultScreen({ name, resultKey, avatar, onStartOver }: P
 
         <a
           href={avatar ? `/book-call?avatar=${avatar}` : '/book-call'}
-          onClick={() => {
-            if (typeof window !== 'undefined' && (window as { fbq?: (...args: unknown[]) => void }).fbq) {
-              (window as { fbq: (...args: unknown[]) => void }).fbq('track', 'Schedule', avatar ? { content_category: avatar } : undefined);
-            }
-          }}
+          onClick={() => trackEvent('schedule_click', avatar ? { avatar } : undefined)}
           className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20"
         >
           {cta.button}

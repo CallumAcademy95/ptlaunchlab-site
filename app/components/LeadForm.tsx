@@ -17,7 +17,7 @@ export type LeadFormProps = {
   question?: { label: string; options?: string[]; required?: boolean };
   extra?: Record<string, unknown>;
   successMessage?: string | ((firstName: string) => string);
-  onSuccess?: (result: Extract<SubmitLeadResult, { ok: true }>, values: { name: string; phone: string; email: string }) => void;
+  onSuccess?: (result: Extract<SubmitLeadResult, { ok: true }>, values: { name: string; phone: string; email: string; question: string }) => void;
   /** "dark" for navy host surfaces (bg-deep fields, white text). Default "light". */
   tone?: "light" | "dark";
   /** Small print under the button (privacy line, reassurance). */
@@ -110,7 +110,7 @@ export default function LeadForm({
       });
       if (result.ok) {
         setDone(true);
-        onSuccess?.(result, { name: name.trim(), phone: phone.trim(), email: email.trim() });
+        onSuccess?.(result, { name: name.trim(), phone: phone.trim(), email: email.trim(), question: answer.trim() });
       } else {
         setError(result.message);
         setFieldError(result.field ?? "");

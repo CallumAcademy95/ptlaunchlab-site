@@ -34,12 +34,12 @@ export const PHONE_SCHEMA = PHONE_TEL.replace(/^(\+44)(\d{4})(\d{6})$/, "$1 $2 $
 /**
  * WhatsApp number — deliberately SEPARATE from PHONE_NATIONAL.
  *
- * These two are the same today, but they diverge the moment the 01977 landline
- * goes live: a geographic landline cannot receive WhatsApp. Do not collapse
- * them into one constant, and do not update these when the landline changes.
+ * A geographic landline cannot receive WhatsApp. This is the Cloud-API line,
+ * whose messages land in Leads Central for the setter. Every wa.me link on the
+ * site uses this one number. Do not collapse it into the phone constants.
  */
-export const WHATSAPP_DISPLAY = "+44 7822 012186";
-export const WHATSAPP_LINK = "https://wa.me/447822012186";
+export const WHATSAPP_DISPLAY = "+44 7418 609039";
+export const WHATSAPP_LINK = "https://wa.me/447418609039";
 
 /** Public contact inbox, repeated in the same templates as the phone. */
 export const CONTACT_EMAIL = "info@ptlaunchlab.co.uk";

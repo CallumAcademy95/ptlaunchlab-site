@@ -2,11 +2,13 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { questions, calculateResult, QuizOption, ResultKey } from './quiz-config';
 import ResultScreen from './ResultScreen';
 import { trackEvent } from '@/app/lib/gtag';
 import { useFormSecurity } from '@/app/lib/security/client';
+import { submitLead } from '@/app/lib/submitLead';
 
 type Avatar = 'starter' | 'switcher' | 'returner';
 const VALID_AVATARS: ReadonlyArray<Avatar> = ['starter', 'switcher', 'returner'];
@@ -155,18 +157,35 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
     setScreen('submitting');
 
     const calcResult = calculateResult(answers);
+    const answerLabels = answers.map((a) => ({ label: a.label }));
+
+    // Save first. /api/lead stores the lead, then sends the quiz Zapier hook,
+    // the email-server nurture, the setter and the CAPI Lead; submitLead fires
+    // the browser Pixel Lead with the same event id only after the save.
+    const saved = await submitLead({
+      intent: 'quiz',
+      source: 'quiz',
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim().toLowerCase(),
+      extra: { quiz_result: calcResult, answers: answerLabels, ...(avatar ? { avatar } : {}) },
+    });
+    if (!saved.ok) {
+      // Not saved: no result until it is. A phone problem goes back to that step.
+      setFormError(saved.message);
+      setScreen(saved.field === 'phone' ? 'mobile' : 'email');
+      bump();
+      return;
+    }
+
     setResult(calcResult);
+    trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
 
-    // Generate a shared event_id so the server-side CAPI Lead event (fired in
-    // /api/quiz-submission) and the browser fbq Lead below dedup on Meta's
-    // side. Meta merges duplicates by event_name + event_id within 7 days.
-    const eventId =
-      typeof window !== 'undefined' && window.crypto?.randomUUID
-        ? window.crypto.randomUUID()
-        : `quiz-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
+    // Today's quiz route still runs for its validation/security log, told that
+    // the lead is saved so it does not repeat Zapier, the email-server nurture,
+    // the setter or the CAPI Lead (app/lib/quizSubmissionPlan.ts).
     try {
-      const res = await fetch('/api/quiz-submission', {
+      await fetch('/api/quiz-submission', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -174,34 +193,16 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
           phone:   phone.trim(),
           email:   email.trim().toLowerCase(),
           result:  calcResult,
-          event_id: eventId,
+          event_id: saved.eventId,
+          leadSaved: true,
+          skipCapiLead: true,
           ...(avatar ? { avatar } : {}),
-          answers: answers.map((a) => ({ label: a.label })),
+          answers: answerLabels,
           [sec.SEC_KEY]: sec.payload(),
         }),
       });
-
-      // Only fire the conversion events when the server confirms it accepted a
-      // REAL lead (`lead === true`). Suspected spam/bot submissions are silently
-      // blocked server-side and return `lead: false` — firing Lead/quiz_complete
-      // for those inflates Meta + GA4 and teaches the algorithm to chase junk.
-      // The server-side CAPI Lead (in /api/quiz-submission) is the deduped
-      // partner of the fbq Lead below via the shared eventID.
-      const data = (await res.json().catch(() => null)) as { lead?: boolean } | null;
-      if (data?.lead === true) {
-        trackEvent('quiz_complete', { quiz_result: calcResult, ...(avatar ? { avatar } : {}) });
-        if (typeof window !== 'undefined' && (window as any).fbq) {
-          // 4th argument carries the eventID for dedup with the server CAPI event
-          (window as any).fbq(
-            'track',
-            'Lead',
-            { content_name: calcResult, ...(avatar ? { content_category: avatar } : {}) },
-            { eventID: eventId },
-          );
-        }
-      }
     } catch {
-      // Non-blocking — user still gets their result if the save fails
+      // Non-blocking: the lead is already saved.
     }
 
     setScreen('result');
@@ -241,7 +242,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
 
           {/* Header */}
           <header className="relative z-10 flex items-center justify-between px-6 py-3 bg-deep border-b border-white/[0.06]">
-            <a href="/">
+            <Link href="/">
               <Image
                 src="/logo.png"
                 alt="PT Launch Lab"
@@ -250,7 +251,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
                 className="h-12 w-auto object-contain"
                 priority
               />
-            </a>
+            </Link>
             <span className="text-soft/50 text-sm">Career Path Quiz</span>
           </header>
         </>

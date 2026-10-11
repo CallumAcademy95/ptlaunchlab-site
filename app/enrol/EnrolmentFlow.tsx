@@ -273,6 +273,8 @@ export default function EnrolmentFlow({
     // abandoned post-payment form (paid but never enrolled) can be chased.
     fetch("/api/enrolment-pending", {
       method: "POST",
+      // keepalive: the request survives the redirect to Stripe, so the lead row is written.
+      keepalive: true,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: fullName.trim(),

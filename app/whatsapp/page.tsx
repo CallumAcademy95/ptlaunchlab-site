@@ -3,8 +3,8 @@ import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import WhatsAppEnquiry from "../components/WhatsAppEnquiry";
+import { WHATSAPP_LINK } from "../lib/contactDetails";
 
-const BUSINESS_WA = "447418609039"; // Cloud-API line → Leads Central setter
 const PREFILL = encodeURIComponent(
   "*New PT Launch Lab enquiry*\n\nHi — I'd like to know more about becoming a PT with PT Launch Lab."
 );
@@ -41,7 +41,7 @@ export default function WhatsAppPage() {
               </p>
 
               <a
-                href={`https://wa.me/${BUSINESS_WA}?text=${PREFILL}`}
+                href={`${WHATSAPP_LINK}?text=${PREFILL}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cta="whatsapp-direct"
