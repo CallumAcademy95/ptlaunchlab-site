@@ -34,3 +34,33 @@ test("sticky bar: mobile only, observes the hero CTA, broadcasts visibility, hid
 test("chat bubble listens for the sticky bar signal", () => {
   assert.match(src("app/components/Chatbot.tsx"), /ptll:sticky-cta/);
 });
+
+test("hero copy is exact and the hero has no geo lookup", () => {
+  const h = src("app/components/home/HomeHero.tsx");
+  assert.match(h, /Become a qualified Personal Trainer, around your job\./);
+  assert.match(h, /NCFE LEVEL 2 &amp; 3 · OFQUAL · CIMSPA|NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA/);
+  assert.match(h, /Online NCFE Level 3\. Qualify in 8–16 weeks\. Built by gym owners who(&apos;|')ve hired 500\+ PTs\./);
+  assert.match(h, /COURSE_PRICE_LABEL/);
+  assert.match(h, /MONTHLY_PRICE_LABEL/);
+  assert.match(h, /source="home-hero"/);
+  assert.match(h, /priority/);
+  assert.doesNotMatch(h, /geoDetect|headers\(\)|HeroSlideshow/);
+});
+
+test("price block reads pricing.ts, not hard-coded numbers", () => {
+  const p = src("app/components/home/PriceBlock.tsx");
+  assert.match(p, /COURSE_PRICE_LABEL/);
+  assert.match(p, /MONTHLY_PRICE_LABEL/);
+  assert.match(p, /MONTHLY_PLAN_TOTAL_PENCE/);
+  assert.doesNotMatch(p, /999\.9|99\.99/);
+  assert.match(p, /home-pricing/);
+});
+
+test("proof strip reuses existing review and partner data", () => {
+  const p = src("app/components/home/ProofStrip.tsx");
+  assert.match(p, /from "@\/app\/components\/Reviews"|from "\.\.\/Reviews"/);
+  assert.match(p, /from "@\/app\/components\/GymPartners"|from "\.\.\/GymPartners"/);
+  assert.match(p, /\/podcast/);
+  assert.match(p, /603\/4388\/6/);
+  assert.match(p, /home-proof/);
+});

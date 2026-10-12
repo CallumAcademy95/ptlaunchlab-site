@@ -6,7 +6,7 @@ import { LADDER_PIF_COMMISSION_PENCE, VOLUME_BONUS_PIF_PENCE } from "@/app/lib/p
 
 // `dark` is unused by the rendering below (kept for a future light/dark logo
 // swap that was never wired up) — do not rely on it to affect layout.
-const gymPartners = [
+export const gymPartners = [
   { name: "Leodis 24/7 Gym",       src: "/logos/leodis-gym.png",          dark: false },
   { name: "Iron Wolf Gym",         src: "/logos/iron-wolf-gym.png",       dark: false },
   { name: "1079 Fitness",          src: "/logos/1079-fitness.png",        dark: false },
