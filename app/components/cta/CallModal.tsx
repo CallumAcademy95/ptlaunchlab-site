@@ -58,7 +58,16 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
       window.dispatchEvent(new CustomEvent("ptll:call-modal", { detail: { open: false } }));
-      openerRef.current?.focus();
+      // The opener can unmount while the pop-up is open (the mobile nav menu
+      // closes when its "Book a free call" is pressed). Fall back to the menu
+      // toggle, else drop focus to the document rather than lose it silently.
+      const opener = openerRef.current;
+      if (opener?.isConnected) opener.focus();
+      else {
+        const toggle = document.querySelector<HTMLElement>('nav button[aria-label="Toggle menu"]');
+        if (toggle && toggle.offsetParent !== null) toggle.focus();
+        else if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      }
     };
   }, [isOpen, close]);
 

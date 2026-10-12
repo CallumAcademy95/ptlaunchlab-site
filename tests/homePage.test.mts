@@ -139,3 +139,18 @@ test("nav offers the two ways to buy: call pop-up and enrol", () => {
   assert.match(n, /source: "nav"/);
   assert.doesNotMatch(n, /Discover Your Pathway|Start Today/);
 });
+
+test("home VSL keeps the Meta VSLPlay event with the old payload", () => {
+  const f = src("app/components/FounderStory.tsx");
+  assert.match(f, /metaEvent="VSLPlay"/);
+  assert.match(f, /trackAs="homepage_vsl"/);
+  const c = src("app/components/ClickToPlay.tsx");
+  assert.match(c, /window\.fbq\?\.\("trackCustom", metaEvent, \{ content_name: trackAs \}\)/);
+  assert.match(c, /window\.gtag\?\.\("event", "video_play"/);
+});
+
+test("call pop-up restores focus even when its opener has unmounted", () => {
+  const m = src("app/components/cta/CallModal.tsx");
+  assert.match(m, /isConnected/);
+  assert.match(m, /Toggle menu/);
+});

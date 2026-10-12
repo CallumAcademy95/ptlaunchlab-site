@@ -17,13 +17,6 @@ const SOURCES = {
 };
 const POSTER = "/video/homepage-vsl-poster.jpg";
 
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-    fbq?: (...args: unknown[]) => void;
-  }
-}
-
 export default function VslPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<"idle" | "playing" | "ended">("idle");

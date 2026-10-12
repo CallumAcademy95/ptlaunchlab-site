@@ -88,6 +88,7 @@ export default function FounderStory({ video = false }: { video?: boolean } = {}
               title="What PT Launch Lab actually is, in 47 seconds"
               label="47 sec · sound on"
               trackAs="homepage_vsl"
+              metaEvent="VSLPlay"
             />
           )}
           <div className="grid grid-cols-2 gap-4">

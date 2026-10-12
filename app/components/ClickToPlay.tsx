@@ -7,6 +7,15 @@ import Image from "next/image";
 // player JavaScript and no bytes of video. The click swaps in the real player
 // with autoplay, so one click starts playback.
 
+// Window.gtag / Window.fbq types live here (moved from VslPlayer.tsx, which
+// the home page no longer renders). Identical declarations elsewhere merge.
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 type Source =
   | { kind: "file"; src: string; srcSmall?: string }
   | { kind: "youtube"; id: string };
@@ -17,6 +26,7 @@ export default function ClickToPlay({
   title,
   label,
   trackAs,
+  metaEvent,
   sizes = "(min-width:1024px) 50vw, 100vw",
 }: {
   source: Source;
@@ -27,6 +37,8 @@ export default function ClickToPlay({
   label?: string;
   /** video_title sent with the GA4 video_play event. */
   trackAs: string;
+  /** Meta Pixel custom event fired on first play, e.g. "VSLPlay". */
+  metaEvent?: string;
   sizes?: string;
 }) {
   const [playing, setPlaying] = useState(false);
@@ -39,6 +51,7 @@ export default function ClickToPlay({
     }
     setPlaying(true);
     window.gtag?.("event", "video_play", { video_title: trackAs });
+    if (metaEvent) window.fbq?.("trackCustom", metaEvent, { content_name: trackAs });
   };
 
   return (
