@@ -7,7 +7,9 @@ import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN
 
 const SOURCE = "home-pricing";
 
-// Titles follow WhatYouGet.tsx so the two sections name things the same way.
+// Titles follow WhatYouGet.tsx so the two sections name things the same way,
+// except "Business Training", which WhatYouGet has no card for; it comes from
+// the about page (app/about/page.tsx: "business training isn't an add-on").
 const VALUE_STACK = [
   { title: "NCFE Level 3 PT Qualification", detail: "Ofqual-regulated, CIMSPA-recognised" },
   { title: "Your Own Personal Tutor", detail: "Assigned within 24 hours of enrolling" },
@@ -53,7 +55,7 @@ export default function PriceBlock() {
               <p className="font-display font-extrabold text-5xl text-gold leading-none">{COURSE_PRICE_LABEL}</p>
               <WasPrice className="text-soft text-lg mb-0.5" />
             </div>
-            <p className="text-soft/65 text-sm mb-7 flex-1">One payment, nothing further to pay</p>
+            <p className="text-soft/80 text-sm mb-7 flex-1">One payment, nothing further to pay</p>
             <a
               href={ENROL_HREF}
               onClick={enrolClick}
@@ -71,7 +73,7 @@ export default function PriceBlock() {
               {MONTHLY_PRICE_LABEL}
               <span className="font-sans text-lg text-soft/70 font-semibold">/month</span>
             </p>
-            <p className="text-soft/65 text-sm mb-7 flex-1">
+            <p className="text-soft/80 text-sm mb-7 flex-1">
               {`${MONTHLY_PAYMENTS} payments, the first today, ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total`}
             </p>
             <a
@@ -93,7 +95,7 @@ export default function PriceBlock() {
                 <Check />
                 <span className="leading-snug">
                   <span className="block text-white text-[15px] font-semibold">{v.title}</span>
-                  <span className="block text-soft/60 text-sm">{v.detail}</span>
+                  <span className="block text-soft/80 text-sm">{v.detail}</span>
                 </span>
               </li>
             ))}

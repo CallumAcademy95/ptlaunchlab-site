@@ -84,7 +84,7 @@ export default function HomeHero() {
               </span>
               <span className="leading-tight">
                 <span className="block text-white text-sm font-semibold">Qualified, certificate in hand</span>
-                <span className="block text-soft/70 text-xs">NCFE Level 3 · Ofqual regulated</span>
+                <span className="block text-soft/80 text-xs">NCFE Level 3 · Ofqual regulated</span>
               </span>
             </div>
           </div>

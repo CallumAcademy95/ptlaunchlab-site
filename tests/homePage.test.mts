@@ -58,9 +58,22 @@ test("price block reads pricing.ts, not hard-coded numbers", () => {
 
 test("proof strip reuses existing review and partner data", () => {
   const p = src("app/components/home/ProofStrip.tsx");
-  assert.match(p, /from "@\/app\/components\/Reviews"|from "\.\.\/Reviews"/);
-  assert.match(p, /from "@\/app\/components\/GymPartners"|from "\.\.\/GymPartners"/);
+  assert.match(p, /from "@\/app\/lib\/reviewsData"/);
+  assert.match(p, /from "@\/app\/lib\/gymPartnersData"/);
+  assert.doesNotMatch(p, /^["']use client["']/m, "ProofStrip stays a server component");
   assert.match(p, /\/podcast/);
   assert.match(p, /603\/4388\/6/);
   assert.match(p, /home-proof/);
+});
+
+test("review and partner data live in plain modules the old components reuse", () => {
+  for (const f of ["app/lib/reviewsData.ts", "app/lib/gymPartnersData.ts"]) assert.doesNotMatch(src(f), /^["']use client["']/m);
+  assert.match(src("app/components/Reviews.tsx"), /from "@\/app\/lib\/reviewsData"/);
+  assert.match(src("app/components/GymPartners.tsx"), /from "@\/app\/lib\/gymPartnersData"/);
+  assert.match(src("app/lib/gymPartnersData.ts"), /lightTile: (true|false)/);
+});
+
+test("home components render exactly one H1", () => {
+  const all = ["HomeHero", "ProofStrip", "PriceBlock"].map((n) => src(`app/components/home/${n}.tsx`)).join("\n");
+  assert.equal((all.match(/<h1[\s>]/g) ?? []).length, 1);
 });

@@ -1,13 +1,11 @@
-"use client";
-// A client component on purpose: `reviews` and `gymPartners` live in
-// "use client" modules, and a server component that imports a non-component
-// export from one gets a client reference, not the array.
+// Server component: the review and partner data come from plain modules, so
+// the excerpts are computed here and only TwoWayCTA ships as client JS.
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TwoWayCTA from "@/app/components/cta/TwoWayCTA";
-import { reviews } from "@/app/components/Reviews";
-import { gymPartners } from "@/app/components/GymPartners";
+import { reviews } from "@/app/lib/reviewsData";
+import { gymPartners } from "@/app/lib/gymPartnersData";
 
 const EXCERPT_MAX = 140;
 
@@ -21,15 +19,10 @@ function excerpt(text: string): string {
 
 const excerpts = [reviews[1], reviews[2], reviews[3]].map((r) => ({ name: r.name, text: excerpt(r.quote) }));
 
-// Logos drawn in dark ink vanish on navy, so they get a light tile. Measured
-// from the PNGs (mean luminance of the opaque pixels below ~128). A logo not
-// listed here sits on the dark tile.
-const DARK_INK_LOGOS = new Set(["Leodis 24/7 Gym", "Iron Wolf Gym", "1079 Fitness", "MOF Gym", "Muscle Bound Gym"]);
-
 const BADGES = ["NCFE", "Ofqual 603/4388/6", "CIMSPA"];
 
 function ColumnHeading({ children }: { children: ReactNode }) {
-  return <h3 className="font-display font-extrabold text-2xl md:text-[28px] text-white leading-none tracking-tight mb-5">{children}</h3>;
+  return <h2 className="font-display font-extrabold text-2xl md:text-[28px] text-white leading-none tracking-tight mb-5">{children}</h2>;
 }
 
 export default function ProofStrip() {
@@ -61,8 +54,8 @@ export default function ProofStrip() {
             <ColumnHeading>
               <span className="text-gold">500+ PTs</span> hired by our team
             </ColumnHeading>
-            <p className="text-soft/70 text-sm leading-relaxed mb-5">
-              Our founders run gyms and hire trainers. On qualifying, we introduce you to one.
+            <p className="text-soft/80 text-sm leading-relaxed mb-5">
+              Our founders run gyms and hire trainers. On qualifying, we introduce you to a gym.
             </p>
             <div className="relative -mx-6 flex-1">
               <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-card to-transparent z-10" aria-hidden="true" />
@@ -74,7 +67,7 @@ export default function ProofStrip() {
                   <li
                     key={g.name}
                     className={`snap-start h-16 rounded-xl border flex items-center justify-center px-3 ${
-                      DARK_INK_LOGOS.has(g.name) ? "bg-white/90 border-white/20" : "bg-white/[0.05] border-white/[0.08]"
+                      g.lightTile ? "bg-white/90 border-white/20" : "bg-white/[0.05] border-white/[0.08]"
                     }`}
                   >
                     <Image src={g.src} alt={g.name} width={120} height={40} loading="lazy" className="h-10 w-auto max-w-full object-contain" />
@@ -102,7 +95,7 @@ export default function ProofStrip() {
             <div className="rounded-xl bg-white/90 h-20 flex items-center justify-center mb-4">
               <Image src="/logos/ncfe.png" alt="NCFE" width={1634} height={530} loading="lazy" className="h-12 w-auto" />
             </div>
-            <p className="text-soft/70 text-sm leading-relaxed flex-1">
+            <p className="text-soft/80 text-sm leading-relaxed flex-1">
               An NCFE Level 3 qualification, regulated by Ofqual and recognised by CIMSPA: the one UK gym managers ask for by name.
             </p>
             <Link
