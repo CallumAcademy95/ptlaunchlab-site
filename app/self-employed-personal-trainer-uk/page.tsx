@@ -1,4 +1,5 @@
 import Nav from "@/app/components/Nav";
+import TwoWayCTA from "@/app/components/cta/TwoWayCTA";
 import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import RelatedGuides from "@/app/components/RelatedGuides";
 import PainPoints from "@/app/components/PainPoints";
@@ -48,8 +49,7 @@ export default function Page() {
                   We train you to get your Level 3 qualification and build a real self-employed PT business from scratch — getting clients, setting rates, and creating the income and freedom you actually want. Our mentors have done exactly this, and they'll be with you every step of the way.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                  <a href="/enrol" className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center">Start Today →</a>
-                  <a href="/book-call" className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">Discover Your Pathway</a>
+                  <TwoWayCTA source="guide-hero" />
                 </div>
                 <div className="flex flex-wrap gap-3 text-blue-200/70 text-xs">
                   <span>⭐ 5-Star Rated</span><span className="opacity-40">·</span>

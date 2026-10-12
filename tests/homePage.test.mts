@@ -174,7 +174,8 @@ test("home page: static, new order, CTA in every section, sticky bar, title", ()
   let at = -1;
   for (const c of order) { const i = p.indexOf(`<${c}`); assert.ok(i > at, `${c} out of order or missing`); at = i; }
   for (const gone of ["<Hero ", "<Hero/>", "<HomepageVsl", "<Reframe", "<Accreditation", "<ConversionSection", "<StickyMobileCTA"]) assert.ok(!p.includes(gone), `${gone} still on the page`);
-  assert.match(p, /<CallModalProvider/);
+  assert.doesNotMatch(p, /<CallModalProvider/); // provider lives in app/layout.tsx
+  assert.match(src("app/layout.tsx"), /<CallModalProvider/);
   assert.match(p, /<StickyCtaBar/);
   assert.match(p, /faqSchema/);
   assert.match(p, /videoSchema/);
@@ -295,7 +296,7 @@ test("home FinalCTA and PriceBlock send the legacy events", () => {
   const f = src("app/components/FinalCTA.tsx");
   assert.match(f, /LEGACY_EVENTS\.finalCall/);
   assert.match(f, /LEGACY_EVENTS\.finalEnrol/);
-  assert.match(f, /trackEvent\('book_call_click', \{ location: 'final_cta' \}\)/, "landing pages unchanged");
+  assert.match(f, /source=\{source \?\? "final"\}/, "landing pages get the same buttons and legacy events");
   const p = src("app/components/home/PriceBlock.tsx");
   for (const k of ["pricingFull", "pricingMonthly", "pricingCall"]) assert.match(p, new RegExp(`LEGACY_EVENTS\\.${k}`), k);
 });
@@ -323,11 +324,11 @@ test("call-modal context is a tiny module; LeadForm loads only via next/dynamic"
   const m = src("app/components/cta/CallModal.tsx");
   assert.match(m, /from "next\/dynamic"/);
   assert.doesNotMatch(m, /^import LeadForm/m);
-  // Nothing but the home page imports CallModal.tsx itself.
+  // Nothing but the root layout imports CallModal.tsx itself.
   const root = fileURLToPath(new URL("../", import.meta.url)).replace(/\\/g, "/");
   const walk = (d: string): string[] => readdirSync(d).flatMap((n) => { const p = `${d}/${n}`; return statSync(p).isDirectory() ? walk(p) : /\.tsx?$/.test(n) ? [p] : []; });
   const importers = walk(`${root}app`).filter((p) => /from ["'][^"']*\/CallModal["']/.test(readFileSync(p, "utf8")));
-  assert.deepEqual(importers.map((p) => p.slice(root.length)), ["app/page.tsx"]);
+  assert.deepEqual(importers.map((p) => p.slice(root.length)), ["app/layout.tsx"]);
 });
 
 test("pop-up Esc is ignored while a <select> has focus", () => {

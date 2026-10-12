@@ -1,6 +1,7 @@
 "use client";
+import { usePathname } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
-import { CALL_HREF, shouldOpenCallModal } from "@/app/lib/homeCta";
+import { CALL_HREF, shouldOpenCallModalAt } from "@/app/lib/homeCta";
 import { useOptionalCallModal } from "./callModalContext";
 
 // "Book a free call" as a real link. In the static HTML (and before hydration,
@@ -20,9 +21,10 @@ export default function CallLink({
   onClick?: () => void;
 }) {
   const modal = useOptionalCallModal();
+  const pathname = usePathname();
   const handle = (e: MouseEvent<HTMLAnchorElement>) => {
     onClick?.();
-    if (modal && shouldOpenCallModal(e)) {
+    if (modal && shouldOpenCallModalAt(e, pathname)) {
       e.preventDefault();
       modal.open(source, e.currentTarget);
     }

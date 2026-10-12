@@ -15,7 +15,6 @@ import Podcast from "./components/Podcast";
 import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
-import { CallModalProvider } from "./components/cta/CallModal";
 import TwoWayCTA from "./components/cta/TwoWayCTA";
 import StickyCtaBar from "./components/cta/StickyCtaBar";
 
@@ -131,7 +130,6 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema) }}
       />
-      <CallModalProvider>
         <Nav />
         <main>
           <HomeHero />
@@ -185,7 +183,6 @@ export default function Home() {
         </main>
         <Footer />
         <StickyCtaBar watchSelector="[data-cta-source='home-hero']" />
-      </CallModalProvider>
     </>
   );
 }

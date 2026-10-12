@@ -22,6 +22,21 @@ export function shouldOpenCallModal(e: { button: number; metaKey: boolean; ctrlK
   return !e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 }
 
+/** Routes where "Book a free call" must navigate instead of opening the pop-up:
+ *  /book-call has its own Calendly booking, /enrol/success is a customer who has just paid. */
+export const NO_POPUP_PATHS = ["/book-call", "/enrol/success"];
+
+export function popupAllowedOnPath(pathname: string | null | undefined): boolean {
+  if (!pathname) return true;
+  const p = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return !NO_POPUP_PATHS.includes(p);
+}
+
+/** The open-or-navigate decision: pop-up only on a plain left click, on a route that allows it. */
+export function shouldOpenCallModalAt(e: Parameters<typeof shouldOpenCallModal>[0], pathname: string | null | undefined): boolean {
+  return popupAllowedOnPath(pathname) && shouldOpenCallModal(e);
+}
+
 export type GaEvent = { name: string; params: Record<string, string> };
 
 /** GA events the old home page fired, kept alongside cta_click so existing
