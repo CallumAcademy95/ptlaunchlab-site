@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 import Nav from "./components/Nav";
-import Hero from "./components/Hero";
-import HomepageVsl from "./components/HomepageVsl";
+import HomeHero from "./components/home/HomeHero";
+import ProofStrip from "./components/home/ProofStrip";
+import PriceBlock from "./components/home/PriceBlock";
 import PainPoints from "./components/PainPoints";
-import Reframe from "./components/Reframe";
-import FounderStory from "./components/FounderStory";
 import HowItWorks from "./components/HowItWorks";
-import WhatYouGet from "./components/WhatYouGet";
-import VideoTestimonial from "./components/VideoTestimonial";
+import FounderStory from "./components/FounderStory";
 import Reviews from "./components/Reviews";
-import Accreditation from "./components/Accreditation";
+import VideoTestimonial from "./components/VideoTestimonial";
 import GymPartners from "./components/GymPartners";
 import Podcast from "./components/Podcast";
-import ConversionSection from "./components/ConversionSection";
 import FAQ from "./components/FAQ";
 import FinalCTA from "./components/FinalCTA";
 import Footer from "./components/Footer";
-import StickyMobileCTA from "./components/StickyMobileCTA";
+import { CallModalProvider } from "./components/cta/CallModal";
+import TwoWayCTA from "./components/cta/TwoWayCTA";
+import StickyCtaBar from "./components/cta/StickyCtaBar";
 
 export const metadata: Metadata = {
+  title: "Online NCFE Level 3 Personal Trainer Course | PT Launch Lab",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk",
   },
@@ -130,26 +130,69 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema) }}
       />
-      <Nav />
-      <main>
-        <Hero />
-        <HomepageVsl />
-        <PainPoints />
-        <Reframe />
-        <FounderStory />
-        <HowItWorks />
-        <WhatYouGet />
-        <VideoTestimonial />
-        <Reviews />
-        <Accreditation />
-        <GymPartners />
-        <Podcast />
-        <ConversionSection />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-      <StickyMobileCTA />
+      <CallModalProvider>
+        <Nav />
+        <main>
+          <HomeHero />
+          <ProofStrip />
+
+          <PainPoints limit={3} />
+          <SectionEnd bg="bg-base">
+            <TwoWayCTA source="home-pain" className={CTA_WIDTH} />
+          </SectionEnd>
+
+          <HowItWorks compact />
+          <SectionEnd bg="bg-surface">
+            <div className="w-full flex flex-col items-center gap-5">
+              <a href="/courses" className="text-gold font-semibold hover:underline underline-offset-4">
+                See the full course →
+              </a>
+              <TwoWayCTA source="home-how" className={CTA_WIDTH} />
+            </div>
+          </SectionEnd>
+
+          <PriceBlock />
+
+          <FounderStory video />
+          <SectionEnd bg="bg-base">
+            <TwoWayCTA source="home-founders" className={CTA_WIDTH} />
+          </SectionEnd>
+
+          <section id="reviews" className="scroll-mt-[72px]">
+            <Reviews />
+            <VideoTestimonial />
+            <SectionEnd bg="bg-surface">
+              <TwoWayCTA source="home-reviews" className={CTA_WIDTH} />
+            </SectionEnd>
+          </section>
+
+          <section id="partners" className="scroll-mt-[72px]">
+            <GymPartners />
+            <Podcast />
+            <SectionEnd bg="bg-surface">
+              <TwoWayCTA source="home-partners" className={CTA_WIDTH} />
+            </SectionEnd>
+          </section>
+
+          <FAQ />
+          <FinalCTA source="home-final" />
+        </main>
+        <Footer />
+        <StickyCtaBar watchSelector="[data-cta-source='home-hero']" />
+      </CallModalProvider>
     </>
+  );
+}
+
+// Full-width buttons on phones (like the hero), side by side from sm up.
+const CTA_WIDTH = "w-full max-w-sm sm:w-auto sm:max-w-none";
+
+// Closes a section with its two-way CTA, on the section's own background so
+// it reads as that section's ending rather than a band of its own.
+function SectionEnd({ bg, children }: { bg: string; children: React.ReactNode }) {
+  return (
+    <div className={bg}>
+      <div className="max-w-6xl mx-auto px-6 pb-12 flex justify-center">{children}</div>
+    </div>
   );
 }

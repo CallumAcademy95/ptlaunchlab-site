@@ -1,3 +1,5 @@
+import ClickToPlay from "./ClickToPlay";
+
 export default function VideoTestimonial() {
   return (
     <section className="bg-surface py-24">
@@ -15,14 +17,16 @@ export default function VideoTestimonial() {
           in her own words.
         </p>
 
-        <div className="relative rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/50 aspect-video max-w-4xl mx-auto mb-6">
-          <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
-          <iframe
-            src="https://www.youtube.com/embed/pAm1jvDKRM0"
+        {/* Click-to-play: only the YouTube thumbnail loads with the page; the
+            iframe (and YouTube's ~1 MB of player JS) arrives on click. */}
+        <div className="max-w-4xl mx-auto mb-6">
+          <ClickToPlay
+            source={{ kind: "youtube", id: "pAm1jvDKRM0" }}
+            poster="https://i.ytimg.com/vi/pAm1jvDKRM0/hqdefault.jpg"
             title="How I escaped the 9-5 with PT Launch Lab — Gemma's Story"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="w-full h-full absolute inset-0"
+            label="Gemma's story"
+            trackAs="gemma_testimonial"
+            sizes="(min-width:1024px) 896px, 100vw"
           />
         </div>
 

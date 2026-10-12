@@ -25,6 +25,7 @@ const steps = [
     num: "01",
     Icon: ClipboardIcon,
     title: "Enrol",
+    compactTitle: "Enrol today",
     subtitle: "Meet your personal tutor from day one",
     body: "From day one, you're assigned a dedicated personal tutor — not a support inbox, not a chatbot. A real person who knows your name, tracks your progress, and is available whenever you're stuck. They'll walk you through the course structure and set a realistic study schedule around your current job and life.",
     bullets: [
@@ -38,6 +39,7 @@ const steps = [
     num: "02",
     Icon: GradCapIcon,
     title: "Qualify",
+    compactTitle: "Qualify in 8–16 weeks",
     subtitle: "The qualification — plus the business training no one else includes",
     body: "You'll work through your NCFE Level 3 PT qualification online at a pace that fits your life. Alongside the accredited content, you complete PT Launch Lab's business modules — how to get your first clients, how to price yourself, and how to build a sustainable PT income from day one.",
     bullets: [
@@ -51,6 +53,7 @@ const steps = [
     num: "03",
     Icon: RocketIcon,
     title: "Launch",
+    compactTitle: "Get your gym introduction",
     subtitle: "Qualify, then get in front of a gym",
     body: "When you complete your qualification we make your guaranteed introduction: we approach either a gym in our partner network or one local to you, on your behalf. Not a certificate and good luck. Whether they interview you and whether you get the job is between you and them. Making the introduction is on us.",
     bullets: [
@@ -62,7 +65,13 @@ const steps = [
   },
 ];
 
-export default function HowItWorks() {
+/**
+ * @param compact  Home page version: the same three steps under shorter
+ *   titles, without the long body copy, and without this section's own
+ *   "Secure Your Place" link (the page puts its own CTA after it).
+ *   Default false keeps the full section every other page uses.
+ */
+export default function HowItWorks({ compact = false }: { compact?: boolean } = {}) {
   return (
     <section className="bg-surface py-14 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
@@ -78,7 +87,7 @@ export default function HowItWorks() {
           Here&apos;s exactly what the journey looks like — no ambiguity, no surprises.
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-14">
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-5 ${compact ? "" : "mb-14"}`}>
           {steps.map((step) => (
             <div
               key={step.num}
@@ -105,7 +114,7 @@ export default function HowItWorks() {
                   <p className={`text-[10px] font-bold tracking-widest uppercase ${step.highlight ? "text-gold" : "text-blue"}`}>
                     Step {step.num}
                   </p>
-                  <h3 className="font-display font-bold text-white text-2xl leading-none">{step.title}</h3>
+                  <h3 className="font-display font-bold text-white text-2xl leading-none">{compact ? step.compactTitle : step.title}</h3>
                 </div>
                 {step.highlight && (
                   <span className="ml-auto text-[10px] bg-gold text-deep px-2.5 py-1 rounded-full font-bold uppercase tracking-wide shrink-0">
@@ -114,8 +123,8 @@ export default function HowItWorks() {
                 )}
               </div>
 
-              <p className="text-white font-semibold text-sm mb-3">{step.subtitle}</p>
-              <p className="text-soft/65 text-sm leading-relaxed mb-5">{step.body}</p>
+              <p className={`text-white font-semibold text-sm ${compact ? "mb-4" : "mb-3"}`}>{step.subtitle}</p>
+              {!compact && <p className="text-soft/65 text-sm leading-relaxed mb-5">{step.body}</p>}
 
               <ul className="space-y-2.5">
                 {step.bullets.map((b) => (
@@ -133,6 +142,7 @@ export default function HowItWorks() {
           ))}
         </div>
 
+        {!compact && (
         <div className="text-center">
           <a
             href="/enrol"
@@ -141,6 +151,7 @@ export default function HowItWorks() {
             Secure Your Place →
           </a>
         </div>
+        )}
       </div>
     </section>
   );

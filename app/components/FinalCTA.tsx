@@ -1,7 +1,15 @@
 'use client';
 import { trackEvent } from '@/app/lib/gtag';
+import TwoWayCTA from '@/app/components/cta/TwoWayCTA';
 
-export default function FinalCTA() {
+/**
+ * @param source  When given (the home page passes "home-final"), the section
+ *   ends in the shared two-way CTA: Enrol now + Book a free call, which opens
+ *   the call pop-up inside a CallModalProvider and links to /book-call
+ *   outside one. Without it, the 36 landing pages keep their original
+ *   "Discover Your Pathway" / "Start Today" buttons and events unchanged.
+ */
+export default function FinalCTA({ source }: { source?: string } = {}) {
   return (
     <section className="bg-base py-28 relative overflow-hidden">
       {/* Background glow */}
@@ -37,22 +45,26 @@ export default function FinalCTA() {
           Every month you wait is another month you&apos;re not earning in a career you love. If we can get you qualified in 8–16 weeks, around your current job, with a guaranteed gym introduction at the end — is there a reason not to start?
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-          <a
-            href="/book-call"
-            onClick={() => trackEvent('book_call_click', { location: 'final_cta' })}
-            className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-2xl shadow-gold/25"
-          >
-            Discover Your Pathway →
-          </a>
-          <a
-            href="/enrol"
-            onClick={() => trackEvent('enrol_click', { location: 'final_cta' })}
-            className="px-10 py-4 rounded-full border border-gold/50 text-gold font-semibold text-base hover:bg-gold hover:text-deep transition-all"
-          >
-            Start Today
-          </a>
-        </div>
+        {source ? (
+          <TwoWayCTA source={source} className="justify-center mb-4" />
+        ) : (
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+            <a
+              href="/book-call"
+              onClick={() => trackEvent('book_call_click', { location: 'final_cta' })}
+              className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-2xl shadow-gold/25"
+            >
+              Discover Your Pathway →
+            </a>
+            <a
+              href="/enrol"
+              onClick={() => trackEvent('enrol_click', { location: 'final_cta' })}
+              className="px-10 py-4 rounded-full border border-gold/50 text-gold font-semibold text-base hover:bg-gold hover:text-deep transition-all"
+            >
+              Start Today
+            </a>
+          </div>
+        )}
         <p className="text-faint text-xs mb-8">Free 15-min call · No pressure · Straight answers</p>
 
         <div className="w-12 h-px bg-white/[0.1] mx-auto mb-6" />

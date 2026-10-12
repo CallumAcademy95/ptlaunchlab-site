@@ -1,9 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { trackEvent } from "@/app/lib/gtag";
+import { useOptionalCallModal } from "@/app/components/cta/CallModal";
+
+// The site's two points of sale. "Book a free call" opens the call pop-up on
+// pages wrapped in <CallModalProvider> (the home page) and is a plain link to
+// /book-call everywhere else, so Nav keeps working on every page.
+function NavCallButton({ className, onDone }: { className: string; onDone?: () => void }) {
+  const modal = useOptionalCallModal();
+  const track = () => trackEvent("cta_click", { source: "nav", action: "call" });
+  if (modal) {
+    return (
+      <button type="button" className={className} onClick={() => { track(); onDone?.(); modal.open("nav"); }}>
+        Book a free call
+      </button>
+    );
+  }
+  return <a href="/book-call" className={className} onClick={track}>Book a free call</a>;
+}
 
 /**
- * @param ctaHref  Destination for the gold "Start Today" button. Defaults to
+ * @param ctaHref  Destination for the gold "Enrol now" button. Defaults to
  *   /enrol. (The /september offer page that used to override it is retired.)
  */
 export default function Nav({ ctaHref = "/enrol" }: { ctaHref?: string } = {}) {
@@ -76,17 +94,13 @@ export default function Nav({ ctaHref = "/enrol" }: { ctaHref?: string } = {}) {
 
         {/* CTA buttons */}
         <div className="hidden lg:flex items-center gap-3">
-          <a
-            href="/book-call"
-            className="px-5 py-2.5 rounded-full border border-gold/50 text-gold text-sm font-semibold hover:bg-gold hover:text-deep transition-all duration-200"
-          >
-            Discover Your Pathway
-          </a>
+          <NavCallButton className="px-5 py-2.5 rounded-full border border-gold/50 text-gold text-sm font-semibold hover:bg-gold hover:text-deep transition-all duration-200" />
           <a
             href={ctaHref}
+            onClick={() => trackEvent("cta_click", { source: "nav", action: "enrol" })}
             className="px-5 py-2.5 rounded-full bg-gold text-deep text-sm font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/20"
           >
-            Start Today →
+            Enrol now
           </a>
         </div>
 
@@ -122,17 +136,16 @@ export default function Nav({ ctaHref = "/enrol" }: { ctaHref?: string } = {}) {
             Partner Your Gym
           </a>
           <div className="flex flex-col gap-3 pt-4 border-t border-white/[0.06]">
-            <a
-              href="/book-call"
+            <NavCallButton
               className="text-center px-5 py-3 rounded-full border border-gold/50 text-gold font-semibold hover:bg-gold hover:text-deep transition-all"
-            >
-              Discover Your Pathway
-            </a>
+              onDone={() => setOpen(false)}
+            />
             <a
               href={ctaHref}
+              onClick={() => trackEvent("cta_click", { source: "nav", action: "enrol" })}
               className="text-center px-5 py-3 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all"
             >
-              Start Today →
+              Enrol now
             </a>
           </div>
         </div>

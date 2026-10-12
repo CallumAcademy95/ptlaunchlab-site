@@ -77,3 +77,65 @@ test("home components render exactly one H1", () => {
   const all = ["HomeHero", "ProofStrip", "PriceBlock"].map((n) => src(`app/components/home/${n}.tsx`)).join("\n");
   assert.equal((all.match(/<h1[\s>]/g) ?? []).length, 1);
 });
+
+test("home page: static, new order, CTA in every section, sticky bar, title", () => {
+  const p = src("app/page.tsx");
+  assert.doesNotMatch(p, /geoDetect|headers\(|cookies\(/);
+  assert.match(p, /Online NCFE Level 3 Personal Trainer Course \| PT Launch Lab/);
+  const order = ["HomeHero", "ProofStrip", "PainPoints", "HowItWorks", "PriceBlock", "FounderStory", "Reviews", "GymPartners", "Podcast", "FAQ", "FinalCTA"];
+  let at = -1;
+  for (const c of order) { const i = p.indexOf(`<${c}`); assert.ok(i > at, `${c} out of order or missing`); at = i; }
+  for (const gone of ["<Hero ", "<Hero/>", "<HomepageVsl", "<Reframe", "<Accreditation", "<ConversionSection", "<StickyMobileCTA"]) assert.ok(!p.includes(gone), `${gone} still on the page`);
+  assert.match(p, /<CallModalProvider/);
+  assert.match(p, /<StickyCtaBar/);
+  assert.match(p, /faqSchema/);
+  assert.match(p, /videoSchema/);
+});
+
+test("every home CTA source is used exactly where planned", () => {
+  const all = ["app/page.tsx", "app/components/home/HomeHero.tsx", "app/components/home/ProofStrip.tsx", "app/components/home/PriceBlock.tsx", "app/components/cta/StickyCtaBar.tsx"].map(src).join("\n");
+  for (const s of ["home-hero", "home-proof", "home-pain", "home-how", "home-pricing", "home-founders", "home-reviews", "home-partners", "home-final", "home-sticky"]) assert.match(all, new RegExp(s), s);
+});
+
+test("home page anchors the proof strip links point at", () => {
+  const p = src("app/page.tsx");
+  assert.match(p, /id="reviews"/);
+  assert.match(p, /id="partners"/);
+});
+
+test("shared sections take optional props only (other pages unchanged)", () => {
+  assert.match(src("app/components/PainPoints.tsx"), /limit\?: number/);
+  assert.match(src("app/components/HowItWorks.tsx"), /compact\?: boolean/);
+  assert.match(src("app/components/FounderStory.tsx"), /video\?: boolean/);
+  assert.match(src("app/components/FinalCTA.tsx"), /source\?: string/);
+});
+
+test("videos are click-to-play: poster image first, no player until clicked", () => {
+  const c = src("app/components/ClickToPlay.tsx");
+  assert.match(c, /from "next\/image"/);
+  assert.match(c, /useState\(false\)/);
+  // The <video>/<iframe> exist only in the `playing` branch; the idle branch is the poster button.
+  const playingAt = c.indexOf("{playing ? (");
+  const idleAt = c.search(/\)\s*:\s*\(\s*<button/);
+  assert.ok(playingAt > -1 && idleAt > playingAt, "player branch first, poster button in the else branch");
+  const player = c.slice(playingAt, idleAt);
+  assert.match(player, /<video/);
+  assert.match(player, /<iframe/);
+  assert.doesNotMatch(c.slice(0, playingAt) + c.slice(idleAt), /<video|<iframe/, "no player outside the playing branch");
+  for (const f of ["app/components/FounderStory.tsx", "app/components/VideoTestimonial.tsx"]) {
+    const s = src(f);
+    assert.match(s, /import ClickToPlay/, f);
+    assert.doesNotMatch(s, /<iframe|<video/, `${f} embeds a player on load`);
+  }
+  assert.match(src("app/components/FounderStory.tsx"), /\/video\/homepage-vsl-poster\.jpg/);
+  assert.match(src("app/components/FounderStory.tsx"), /\/video\/homepage-vsl-1080\.mp4/);
+});
+
+test("nav offers the two ways to buy: call pop-up and enrol", () => {
+  const n = src("app/components/Nav.tsx");
+  assert.match(n, /useOptionalCallModal/);
+  assert.match(n, /Book a free call/);
+  assert.match(n, /Enrol now/);
+  assert.match(n, /source: "nav"/);
+  assert.doesNotMatch(n, /Discover Your Pathway|Start Today/);
+});
