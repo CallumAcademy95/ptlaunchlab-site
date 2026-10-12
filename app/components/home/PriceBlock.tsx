@@ -5,7 +5,7 @@ import { trackEvent } from "@/app/lib/gtag";
 import { ENROL_HREF, LEGACY_EVENTS, ctaClickEvents, type GaEvent } from "@/app/lib/homeCta";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, TYPICAL_COST_LABEL } from "@/app/lib/pricing";
 
-const SOURCE = "home-pricing";
+const HOME_SOURCE = "home-pricing";
 
 // Titles follow WhatYouGet.tsx so the two sections name things the same way,
 // except "Business Training", which WhatYouGet has no card for; it comes from
@@ -27,11 +27,30 @@ const Check = () => (
 );
 
 // cta_click plus the event ConversionSection used to send for the same button.
-const track = (action: "enrol" | "call", legacy: GaEvent) =>
-  ctaClickEvents(SOURCE, action, legacy).forEach(([name, params]) => trackEvent(name, params));
+const trackCta = (source: string, action: "enrol" | "call", legacy: GaEvent) =>
+  ctaClickEvents(source, action, legacy).forEach(([name, params]) => trackEvent(name, params));
 
-/** @param reserveWasPrice  Build-time hint: keep room for the was-price so it doesn't shift the card on mount. */
-export default function PriceBlock({ reserveWasPrice = false }: { reserveWasPrice?: boolean }) {
+/**
+ * @param source  cta_click source. Defaults to the home page's "home-pricing".
+ * @param legacy  Which page's legacy GA events to send alongside cta_click: "home" (default) or "conversion"
+ *   (the shared ConversionSection). Today both resolve to the same LEGACY_EVENTS, because Phase 2 mapped
+ *   PriceBlock's events 1:1 onto ConversionSection's old ones (enrol_click method full/deposit,
+ *   book_call_click location conversion_section). The prop keeps the call sites explicit and is the one
+ *   place to diverge them later.
+ * @param reserveWasPrice  Build-time hint: keep room for the was-price so it doesn't shift the card on mount.
+ */
+export default function PriceBlock({
+  source = HOME_SOURCE,
+  legacy = "home",
+  reserveWasPrice = false,
+}: {
+  source?: string;
+  legacy?: "home" | "conversion";
+  reserveWasPrice?: boolean;
+}) {
+  // Both modes send the same legacy events today (see @param legacy), so there is nothing to switch on yet.
+  void legacy;
+  const track = (action: "enrol" | "call", ev: GaEvent) => trackCta(source, action, ev);
 
   return (
     <section id="pricing" className="bg-surface py-14 md:py-24 relative overflow-hidden">
@@ -96,7 +115,7 @@ export default function PriceBlock({ reserveWasPrice = false }: { reserveWasPric
 
         <div className="mt-8 text-center">
           <CallLink
-            source={SOURCE}
+            source={source}
             onClick={() => track("call", LEGACY_EVENTS.pricingCall)}
             className="inline-flex items-center gap-2 text-gold font-semibold hover:underline underline-offset-4"
           >
