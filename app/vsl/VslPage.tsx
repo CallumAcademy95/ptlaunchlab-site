@@ -112,6 +112,7 @@ export default function VslPage({ content: c }: { content: VslContent }) {
             poster: `https://i.ytimg.com/vi/${c.youtubeId}/hqdefault.jpg`,
             trackAs: `vsl_${c.avatar}`,
             metaEvent: "VSLPlay",
+            title: "Watch: why PT Launch Lab, from the founders",
           }}
         />
 
@@ -135,7 +136,8 @@ export default function VslPage({ content: c }: { content: VslContent }) {
         </section>
 
         {/* QUIZ BAND: the soft option for the undecided */}
-        <div className="bg-base px-6 pb-16">
+        <section className="bg-base px-6 pb-16">
+          <h2 className="sr-only">Not sure yet?</h2>
           <div className="max-w-3xl mx-auto rounded-2xl border border-white/[0.08] bg-white/[0.02] px-6 py-5 text-center">
             <Link
               href={c.quizHref}
@@ -145,7 +147,7 @@ export default function VslPage({ content: c }: { content: VslContent }) {
               Not sure yet? Take the 60-second PT career quiz →
             </Link>
           </div>
-        </div>
+        </section>
 
         {/* EMPATHY */}
         <section className="bg-surface py-20 md:py-24 px-6 border-y border-white/[0.05]">
@@ -417,7 +419,8 @@ export default function VslPage({ content: c }: { content: VslContent }) {
 
       </main>
       <Footer />
-      <StickyMobileCTA />
+      {/* Appears once this page's hero buttons have scrolled away. */}
+      <StickyMobileCTA watchSelector={`[data-cta-source='vsl-${c.avatar}-hero']`} />
     </>
   );
 }

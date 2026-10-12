@@ -28,7 +28,7 @@ test("MoneyHero: props are the spec's, verbatim", () => {
     /goldTail: string;/,
     /subline: string;/,
     /source: string;/,
-    /video\?: \{ kind: "mp4" \| "youtube"; src: string; poster: string; trackAs: string; metaEvent\?: string \};/,
+    /video\?: \{ kind: "mp4" \| "youtube"; src: string; poster: string; trackAs: string; metaEvent\?: string; title\?: string \};/,
     /image\?: \{ src: string; alt: string \};/,
   ]) assert.match(h, p, String(p));
 });
@@ -258,4 +258,77 @@ test("Task 3 pages carry no credit wording or old CTA labels", () => {
     const s = src(p);
     for (const b of [...BANNED, ...OLD_CTAS]) assert.doesNotMatch(s, b, `${p}: ${b}`);
   }
+});
+
+// ─── Final review fixes ──────────────────────────────────────────────────────
+
+test("/career-blueprint FAQ: leads with the full price, no PT-session affordability line", () => {
+  const b = src("app/career-blueprint/page.tsx");
+  assert.doesNotMatch(b, /session a week/i);
+  const faq = b.slice(b.indexOf('q: "What are the payment options?"'));
+  const answer = faq.slice(0, faq.indexOf("},"));
+  assert.ok(answer.indexOf("COURSE_PRICE_LABEL") > -1, "full price in the answer");
+  assert.ok(answer.indexOf("COURSE_PRICE_LABEL") < answer.indexOf("MONTHLY_PRICE_LABEL"), "full price before monthly");
+});
+
+test("ClickToPlay supports priority for the poster; MoneyHero's video passes it", () => {
+  const c = src("app/components/ClickToPlay.tsx");
+  assert.match(c, /priority\?: boolean/);
+  assert.match(c, /<Image[^>]*priority=\{priority\}/);
+  const h = src("app/components/money/MoneyHero.tsx");
+  const player = h.slice(h.indexOf("<ClickToPlay"), h.indexOf("/>", h.indexOf("<ClickToPlay")));
+  assert.match(player, /\n\s*priority\n/);
+});
+
+test("MoneyHero: optional video.title names the player; /vsl passes the founders' title", () => {
+  const h = src("app/components/money/MoneyHero.tsx");
+  assert.match(h, /title\?: string/);
+  assert.match(h, /title=\{video\.title \?\? title\}/);
+  assert.match(src("app/vsl/VslPage.tsx"), /title: "Watch: why PT Launch Lab, from the founders"/);
+});
+
+test("/vsl content: step titles don't sell monthly as the affordable option", async () => {
+  const { VSL_CONTENT } = await import("../app/vsl/content.ts");
+  for (const p of VSL_PAGES) {
+    for (const s of VSL_CONTENT[p.key].steps.items) assert.doesNotMatch(s.title, /salary|household/i, `${p.key}: ${s.title}`);
+  }
+  const s = src("app/vsl/content.ts");
+  assert.doesNotMatch(s, /including the way it's priced/);
+  assert.doesNotMatch(s, /The next paragraph is for you/);
+});
+
+test("VslPage: the quiz band is a section with an sr-only heading", () => {
+  const v = src("app/vsl/VslPage.tsx");
+  const band = v.slice(v.indexOf("QUIZ BAND"), v.indexOf("EMPATHY"));
+  assert.match(band, /<section[\s>]/);
+  assert.match(band, /<h2 className="sr-only">Not sure yet\?<\/h2>/);
+});
+
+test("/vsl sticky bar watches that page's hero buttons, still hidden from lg", () => {
+  const v = src("app/vsl/VslPage.tsx");
+  assert.match(v, /<StickyMobileCTA watchSelector=\{`\[data-cta-source='vsl-\$\{c\.avatar\}-hero'\]`\} \/>/);
+  const m = src("app/components/StickyMobileCTA.tsx");
+  assert.match(m, /watchSelector=\{watchSelector\}/);
+  assert.match(m, /hideFrom="lg"/);
+});
+
+test("touched pages: no credit wording or monthly-first selling lines", () => {
+  const files = [
+    "app/career-blueprint/page.tsx", "app/components/ClickToPlay.tsx", "app/vsl/content.ts", "app/vsl/VslPage.tsx",
+    "app/components/StickyMobileCTA.tsx", "app/components/money/MoneyHero.tsx", "app/funnel/FunnelClient.tsx",
+    "app/courses/page.tsx", "app/lib/careerPlannerV2.ts", "app/funnel/layout.tsx",
+  ];
+  const lines = [/Payment plans available/, /Spread the cost while you study/, /Flexible payment plans/, /cost isn't the barrier/, /covered in under six weeks/, /or spread it monthly\./, /Both options are below/];
+  for (const f of files) {
+    const s = src(f);
+    for (const b of [...BANNED, ...lines]) assert.doesNotMatch(s, b, `${f}: ${b}`);
+  }
+});
+
+test("/courses: monthly card carries no 'no interest'; objection answer leads with the full price", () => {
+  const c = src("app/courses/page.tsx");
+  const card = c.slice(c.indexOf('title: "10 Monthly Payments"'), c.indexOf("badge: null"));
+  assert.doesNotMatch(card, /no interest/i);
+  const obj = c.slice(c.indexOf("is still a lot of money"), c.indexOf("What if it's not the right fit"));
+  assert.ok(obj.indexOf("COURSE_PRICE_LABEL") < obj.indexOf("MONTHLY_PRICE_LABEL"), "full price first");
 });

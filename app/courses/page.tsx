@@ -163,7 +163,7 @@ const objections = [
   {
     quote: `${COURSE_PRICE_LABEL} is still a lot of money.`,
     answer:
-      `You can pay it as ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, with no interest. A working PT in the UK charges £30–50 a session. Six regular clients at £30, once a week, is £180 a week. At that rate the course fee is covered in under six weeks.`,
+      `${COURSE_PRICE_LABEL} paid in full, everything included. If you'd rather pay monthly, it's ${MONTHLY_PAYMENTS} payments of ${MONTHLY_PRICE_LABEL}. A working PT in the UK charges £30–50 a session.`,
     link: null,
   },
   {
@@ -195,8 +195,8 @@ const pricing = [
     title: "10 Monthly Payments",
     headlineFigure: MONTHLY_PRICE_LABEL,
     headlineSuffix: "/month",
-    subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total · no interest`,
-    saving: "Spread the cost while you study",
+    subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total`,
+    saving: `${MONTHLY_PAYMENTS} monthly payments`,
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay monthly →",
     ctaHref: "/enrol",
@@ -450,7 +450,7 @@ export default function CoursesPage() {
               One price. <span className="text-gold">Everything included.</span>
             </h3>
             <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
-              {COURSE_PRICE_LABEL} for the full NCFE Level 2 &amp; 3 course, mentorship and gym introduction. Flexible ways to pay at checkout, or spread it monthly.
+              {COURSE_PRICE_LABEL} for the full NCFE Level 2 &amp; 3 course, mentorship and gym introduction. Flexible ways to pay at checkout, or pay monthly.
             </p>
 
             <div className="flex flex-col gap-6 max-w-xl mx-auto">

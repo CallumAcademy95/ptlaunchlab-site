@@ -120,9 +120,9 @@ const CONCERN: Record<Blocker, { title: string; answer: string }> = {
 };
 const PAYMENT_LINE: Record<Payment, string> = {
   full: "You said you'd most likely pay in full.",
-  monthly: "You said you'd most likely spread it monthly. Both options are below.",
-  unsure: "Not sure how you'd pay yet? Both options are below.",
-  save_first: "Saving first? You can spread it over 10 monthly payments instead of paying up front. Both options are below.",
+  monthly: "You said you'd most likely spread it monthly. Your options are below.",
+  unsure: "Not sure how you'd pay yet? Your options are below.",
+  save_first: "Saving first? You can spread it over 10 monthly payments instead of paying up front. Your options are below.",
 };
 const BTN = {
   start: { label: "Start now", href: "/enrol" },

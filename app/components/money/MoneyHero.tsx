@@ -25,7 +25,8 @@ export type MoneyHeroProps = {
   goldTail: string;
   subline: string;
   source: string;
-  video?: { kind: "mp4" | "youtube"; src: string; poster: string; trackAs: string; metaEvent?: string };
+  /** title: the player's accessible name; defaults to the H1 text. */
+  video?: { kind: "mp4" | "youtube"; src: string; poster: string; trackAs: string; metaEvent?: string; title?: string };
   image?: { src: string; alt: string };
 };
 
@@ -86,11 +87,12 @@ export default function MoneyHero({ eyebrow, headline, goldTail, subline, source
               <ClickToPlay
                 source={video.kind === "youtube" ? { kind: "youtube", id: youtubeId(video.src) } : { kind: "file", src: video.src }}
                 poster={video.poster}
-                title={title}
+                title={video.title ?? title}
                 label="Watch · sound on"
                 trackAs={video.trackAs}
                 metaEvent={video.metaEvent}
                 sizes="(min-width:1024px) 45vw, 100vw"
+                priority
               />
             </div>
           ) : image ? (

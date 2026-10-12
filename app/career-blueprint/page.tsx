@@ -77,7 +77,7 @@ const faqs = [
   { q: "Am I too old to start?", a: "No. Career-changers in their 30s, 40s and 50s often do better — clients trust maturity, and you bring real-world people skills the 19-year-olds don't have yet." },
   { q: "Will you actually help me get clients?", a: "Yes — that's the whole point. The Mentorship Hub walks you through pricing, marketing and client conversations as a system, and we make warm introductions into our partner gym network when you qualify." },
   { q: "Will employers recognise the qualification?", a: "Yes. It's NCFE, Ofqual regulated (Level 3 ref 603/4388/6) — the qualification gym managers hire against as standard across the UK." },
-  { q: "What are the payment options?", a: `Two simple options: pay ${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. The first payment is taken when you enrol. Once qualified, one PT session a week covers the monthly payment.` },
+  { q: "What are the payment options?", a: `${COURSE_PRICE_LABEL} paid in full, everything included. There is also a monthly option: ${MONTHLY_PAYMENTS} payments of ${MONTHLY_PRICE_LABEL} with no interest, the first taken when you enrol.` },
 ];
 
 // ─── PAGE ─────────────────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ export default function CareerBlueprintPage() {
         {/* SOCIAL PROOF STRIP */}
         <section className="bg-surface py-6 px-6 border-y border-white/[0.05]">
           <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-center">
-            {["★★★★★ 5.0 rated", "500+ trained", "Hiring partners", "Flexible payment plans", "NCFE · Ofqual regulated"].map((item) => (
+            {["★★★★★ 5.0 rated", "500+ trained", "Hiring partners", "Flexible ways to pay at checkout", "NCFE · Ofqual regulated"].map((item) => (
               <span key={item} className="text-soft/80 text-sm font-semibold">{item}</span>
             ))}
           </div>

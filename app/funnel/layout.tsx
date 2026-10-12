@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-// The page is a client component and cannot export metadata itself.
+// noindex for /funnel (an ad landing page). page.tsx is a server shell that
+// could export metadata, but it lives here so it also covers anything nested.
 export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };

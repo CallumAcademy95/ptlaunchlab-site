@@ -77,7 +77,7 @@ const faqs = [
   { q: "Do I need any experience?",             a: "No. We teach everything step by step, from the foundations up. All you need is a genuine passion for fitness and the drive to make it your career." },
   { q: "Is the qualification recognised?",      a: "Yes. You earn an industry-recognised Level 2 & Level 3 PT qualification — NCFE accredited, Ofqual regulated, and on the public Ofqual regider in the UK." },
   { q: "Will I get help getting work?",         a: "Yes — mentoring and gym interview opportunities are included. We've personally hired over 500 PTs across our gym network, so we know exactly what gets you through the door." },
-  { q: "Do I need to pay in full?",             a: `No. You can pay ${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. We work hard to make sure the cost isn't the barrier.` },
+  { q: "Do I need to pay in full?",             a: `No. The course is ${COURSE_PRICE_LABEL} paid in full, everything included. You can also pay monthly: ${MONTHLY_PAYMENTS} payments of ${MONTHLY_PRICE_LABEL} with no interest.` },
   { q: "How long does it take?",                a: "Most students complete in 8–16 weeks, studying around their job. You set the pace — qualify faster if you want, or take your time if life gets busy." },
   { q: "When can I start?",                     a: "Immediately. From the moment you enrol, you have full access to the course, your learning platform, and your personal tutor. No waiting around." },
 ];
@@ -498,7 +498,7 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
               "Industry recognised certification",
               "Gym interview opportunities",
               "Business & coaching guidance",
-              "Payment plans available",
+              "Flexible ways to pay at checkout",
             ].map((item) => (
               <div key={item} className="flex items-center gap-3 bg-[#072B4A] border border-[#3B82F6]/20 rounded-xl px-5 py-3">
                 <span className="text-[#F5C518] font-bold shrink-0">✔</span>

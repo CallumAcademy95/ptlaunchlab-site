@@ -92,7 +92,7 @@ const starter: VslContent = {
     "You want a career you'd actually talk about at a dinner party",
     "You're worried half the courses online are a scam",
   ],
-  forYouOutro: "If you ticked four or more, you're not browsing. You're closer than you think. The next paragraph is for you.",
+  forYouOutro: "If you ticked four or more, you're not browsing. You're closer than you think. If that's you, keep reading.",
   empathy: {
     heading: { lead: "You're going to be in a gym", gold: "for the rest of your life anyway." },
     paras: [
@@ -259,7 +259,7 @@ const switcher: VslContent = {
     layout: "grid",
     eyebrow: "Designed around real life",
     heading: { lead: "No quitting on Monday.", gold: "No financial freefall." },
-    intro: "Every single piece of this course is built to be done on top of a full-time job, including the way it's priced.",
+    intro: "Every single piece of this course is built to be done on top of a full-time job, including how you study around your shifts.",
     items: [
       { tag: "Hours", title: "8–10 hours a week, on your terms", body: "100% online. No fixed class times, no commute, no commitments outside your control. Most learners study evenings and weekends." },
       { tag: "Cost", title: "One fee, everything included", body: BOTH_WAYS },
@@ -319,7 +319,7 @@ const switcher: VslContent = {
     intro: "Most career-changers finish in 8–16 weeks while still earning full-time, then transition employed-first before going solo.",
     items: [
       { n: 1, title: "Book a free 15-min call", body: "Tell us your situation honestly. Current role, hours, financial pressure, when you want to be out. We'll tell you if the maths actually works, and if it doesn't." },
-      { n: 2, title: "Enrol on a plan that doesn't stress your salary", body: BOTH_WAYS },
+      { n: 2, title: "Enrol in minutes, pay in full or monthly", body: BOTH_WAYS },
       { n: 3, title: "Study evenings and weekends, and keep earning", body: "Tutor introduced within 24 hours. Average 8–10 hours per week alongside full-time work. Level 2 done in ~4 weeks, Level 3 in another ~6–8." },
       { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by name. Register with CIMSPA, get insured (~£60/year), legally take paying 1-to-1 clients anywhere in the UK." },
       { n: 5, title: "Transition employed-first, with a warm gym introduction", body: "We've personally hired 500+ PTs through our network. A warm introduction into a salaried PT role rather than a cold CV drop. Overlap salaries while you build your client base." },
@@ -459,7 +459,7 @@ const returner: VslContent = {
     intro: "Most returners finish in 8–16 weeks fitting study around school runs, bedtimes, and weekends. Faster if you've got the energy, slower if life gets in the way. Your call entirely.",
     items: [
       { n: 1, title: "Book a free 15-min chat, no pressure", body: "Tell us your situation: kids' ages, what time you've actually got, what's pulling you towards PT. We'll listen first, then tell you honestly if it's the right move." },
-      { n: 2, title: "Enrol on a plan that fits the household", body: BOTH_WAYS },
+      { n: 2, title: "Enrol in minutes, pay in full or monthly", body: BOTH_WAYS },
       { n: 3, title: "Study from home, on your hours", body: "100% online. Tutor introduced within 24 hours. While they're at school, after bedtime, weekend mornings. Entirely your call." },
       { n: 4, title: "Smash Level 2: Gym Instructor", body: "Anatomy, physiology, gym floor coaching, client consultations. The legal prerequisite, already included in your fee, with full tutor support." },
       { n: 5, title: "Qualify in Level 3: NCFE, Ofqual regulated", body: "Programming, nutrition, business planning, video-assessed practicals. The qualification UK gyms and insurers both recognise by default." },
