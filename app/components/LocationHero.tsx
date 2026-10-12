@@ -1,4 +1,6 @@
 import HeroSlideshow from "./HeroSlideshow";
+import TwoWayCTA from "./cta/TwoWayCTA";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 
 export default function LocationHero({ location, headline }: { location: string; headline?: string }) {
   return (
@@ -51,21 +53,13 @@ export default function LocationHero({ location, headline }: { location: string;
               The NCFE Level 3 qualification UK gym managers ask for by name — plus our £500 business mentorship community, included free in the course fee. Most UK academies sell mentorship separately. We bundle it.
             </p>
 
+            {/* Price line */}
+            <p className="text-sm text-blue-100/80 mb-6 animate-fade-in-up animate-delay-100">
+              <span className="text-[#F5C518] font-bold">{COURSE_PRICE_LABEL}</span> · Everything included · Flexible ways to pay at checkout
+            </p>
+
             {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-4 animate-fade-in-up animate-delay-200">
-              <a
-                href="/book-call"
-                className="px-8 py-4 rounded-full bg-[#F5C518] text-[#072B4A] font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-[#F5C518]/30 text-center"
-              >
-                Discover Your Pathway →
-              </a>
-              <a
-                href="/enrol"
-                className="px-8 py-4 rounded-full border-2 border-white/60 text-white font-semibold text-base hover:bg-white/10 transition-all text-center"
-              >
-                Start Today
-              </a>
-            </div>
+            <TwoWayCTA source="location-hero" className="mb-4 animate-fade-in-up animate-delay-200" />
 
             {/* Urgency line */}
             <p className="text-blue-200/60 text-xs mb-6 animate-fade-in-up animate-delay-200">

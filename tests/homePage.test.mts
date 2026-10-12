@@ -296,7 +296,7 @@ test("home FinalCTA and PriceBlock send the legacy events", () => {
   const f = src("app/components/FinalCTA.tsx");
   assert.match(f, /LEGACY_EVENTS\.finalCall/);
   assert.match(f, /LEGACY_EVENTS\.finalEnrol/);
-  assert.match(f, /trackEvent\('book_call_click', \{ location: 'final_cta' \}\)/, "landing pages unchanged");
+  assert.match(f, /source=\{source \?\? "final"\}/, "landing pages get the same buttons and legacy events");
   const p = src("app/components/home/PriceBlock.tsx");
   for (const k of ["pricingFull", "pricingMonthly", "pricingCall"]) assert.match(p, new RegExp(`LEGACY_EVENTS\\.${k}`), k);
 });
