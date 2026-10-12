@@ -204,7 +204,7 @@ export function generatePartnershipAgreementPDFServer(
 
     // Callum's pre-embedded signature
     try {
-      const callumBuf = Buffer.from(CALLUM_SIGNATURE_B64, "base64");
+      const callumBuf = Buffer.from(CALLUM_SIGNATURE_B64.replace(/^data:[^,]*,/, ""), "base64");
       doc.image(callumBuf, colL, y, { width: 100, height: 28 });
     } catch {
       doc.fillColor(DARK).font("Helvetica-Oblique").fontSize(16)
