@@ -17,3 +17,20 @@ test("call form question and success copy", () => {
   assert.deepEqual(CALL_QUESTION, { label: "Best time to call? (optional)", options: ["Morning", "Afternoon", "Evening"] });
   assert.equal(callSuccessMessage("Jane"), "Thanks Jane, we'll call you today.");
 });
+
+import { readFileSync } from "node:fs";
+const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
+
+test("sticky bar: mobile only, observes the hero CTA, broadcasts visibility, hides while the pop-up is open", () => {
+  const s = src("app/components/cta/StickyCtaBar.tsx");
+  assert.match(s, /md:hidden/);
+  assert.match(s, /IntersectionObserver/);
+  assert.match(s, /ptll:sticky-cta/);
+  assert.match(s, /ptll:call-modal/);
+  assert.match(s, /safe-area-inset-bottom/);
+  assert.match(s, /home-sticky/);
+});
+
+test("chat bubble listens for the sticky bar signal", () => {
+  assert.match(src("app/components/Chatbot.tsx"), /ptll:sticky-cta/);
+});
