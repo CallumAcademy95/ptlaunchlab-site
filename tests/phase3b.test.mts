@@ -171,3 +171,91 @@ test("/vsl: 'no interest' only inside FAQ answers", async () => {
   }
   assert.doesNotMatch(src("app/vsl/VslPage.tsx"), /no interest/i);
 });
+
+// ─── Task 3: /courses, /funnel, /career-blueprint ────────────────────────────
+
+const EYEBROW = 'eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"';
+const OLD_CTAS = [/Discover Your Pathway/, /Start Application/];
+/** The props of the page's one <MoneyHero …/> element. */
+const heroOf = (s: string) => {
+  const at = s.indexOf("<MoneyHero");
+  assert.ok(at > -1, "uses <MoneyHero");
+  assert.equal(s.indexOf("<MoneyHero", at + 1), -1, "one MoneyHero");
+  return s.slice(at, s.indexOf("/>", at));
+};
+
+test("/courses: MoneyHero with the spec copy and image, sticky bar watching it", () => {
+  const c = src("app/courses/page.tsx");
+  const h = heroOf(c);
+  assert.ok(h.includes(EYEBROW), "eyebrow");
+  assert.ok(h.includes('headline="The online NCFE Level 2 & 3 PT course,"'), "headline");
+  assert.ok(h.includes('goldTail="around your job."'), "goldTail");
+  assert.ok(h.includes('subline="Qualify in 8–16 weeks, with business training and a guaranteed gym introduction."'), "subline");
+  assert.ok(h.includes('source="courses-hero"'), "source");
+  assert.ok(h.includes('src: "/learner-2.webp"'), "image");
+  assert.match(c, /<StickyCtaBar watchSelector="\[data-cta-source='courses-hero'\]"/);
+  assert.match(c, /<TwoWayCTA source="courses-final"/);
+  assert.match(c, /<ProspectusButton \/>/);
+  assert.doesNotMatch(c, /<h1/, "the only H1 is MoneyHero's");
+  assert.doesNotMatch(c, /<main className="pt-\[72px\]"/, "MoneyHero brings its own nav offset");
+});
+
+test("/courses: JSON-LD kept", () => {
+  const c = src("app/courses/page.tsx");
+  assert.match(c, /JSON\.stringify\(faqPageSchema\(faqs\)\)/);
+  assert.match(c, /JSON\.stringify\(courseSchema\)/);
+  assert.match(c, /"@type": "Course"/);
+});
+
+test("/funnel: server page puts MoneyHero and PriceBlock into the client page; noindex stays", () => {
+  const p = src("app/funnel/page.tsx");
+  assert.doesNotMatch(p, /^["']use client["']/m, "MoneyHero renders on the server");
+  const h = heroOf(p);
+  assert.ok(h.includes(EYEBROW), "eyebrow");
+  assert.ok(h.includes('headline="Become a qualified Personal Trainer,"'), "headline");
+  assert.ok(h.includes('goldTail="around your job."'), "goldTail");
+  assert.ok(h.includes('source="funnel-hero"'), "source");
+  assert.ok(h.includes('src: "/learner-3.webp"'), "image");
+  assert.match(p, /<PriceBlock source="funnel-pricing" bg="base"/);
+  assert.match(src("app/funnel/layout.tsx"), /robots:\s*\{\s*index:\s*false/);
+});
+
+test("/funnel client: top bar is Enrol now + CallLink, prospectus modal kept, no slideshow or two cards", () => {
+  const f = src("app/funnel/FunnelClient.tsx");
+  assert.match(f, /^["']use client["']/m);
+  const bar = f.slice(f.indexOf("STICKY TOP BAR"), f.indexOf("{hero}"));
+  assert.match(bar, />\s*Enrol now\s*</);
+  assert.match(bar, /<CallLink[\s\S]*?>\s*Book a free call\s*<\/CallLink>/);
+  assert.ok(f.indexOf("{hero}") > -1 && f.indexOf("{pricing}") > f.indexOf("{hero}"), "hero and pricing slots");
+  assert.match(f, /PROSPECTUS MODAL/);
+  assert.match(f, /<LeadForm[\s\S]*?intent="prospectus"[\s\S]*?source="funnel_prospectus_modal"/);
+  assert.doesNotMatch(f, /HeroSlideshow/);
+  assert.doesNotMatch(f, /I&apos;m ready\. Let&apos;s go\.|I have a few questions first\./, "the two conversion cards are gone");
+  assert.equal((f.match(/<h1[\s>]/g) ?? []).length, 0, "the only H1 is MoneyHero's");
+});
+
+test("/career-blueprint: MoneyHero, pricing source, investment leads with the full price, shared final pair", () => {
+  const b = src("app/career-blueprint/page.tsx");
+  const h = heroOf(b);
+  assert.ok(h.includes(EYEBROW), "eyebrow");
+  assert.ok(h.includes('headline="Become a qualified Personal Trainer,"'), "headline");
+  assert.ok(h.includes('goldTail="around your job."'), "goldTail");
+  assert.ok(h.includes('source="blueprint-hero"'), "source");
+  assert.ok(h.includes('src: "/learner-4.webp"'), "image");
+  assert.match(b, /<FunnelPricingBlock source="blueprint-pricing" \/>/);
+  const inv = b.slice(b.indexOf("The investment"), b.indexOf("<Reviews"));
+  assert.match(inv, /\{COURSE_PRICE_LABEL\}, <span[^>]*>everything included/);
+  assert.match(inv, /Or \{MONTHLY_PAYMENTS\} monthly payments of \{MONTHLY_PRICE_LABEL\}, the first taken today \(\{formatPence\(MONTHLY_PLAN_TOTAL_PENCE\)\} in total\)\./);
+  assert.ok(inv.indexOf("COURSE_PRICE_LABEL") < inv.indexOf("MONTHLY_PRICE_LABEL"), "full price before monthly");
+  assert.doesNotMatch(inv, /a month|one PT session a week|cheapest bet/, "no monthly-first selling");
+  assert.match(inv, /£20–50k\+/);
+  assert.match(b, /<TwoWayCTA source="blueprint-final"/);
+  assert.doesNotMatch(b, /<h1/, "the only H1 is MoneyHero's");
+});
+
+test("Task 3 pages carry no credit wording or old CTA labels", () => {
+  for (const p of ["app/courses/page.tsx", "app/funnel/page.tsx", "app/funnel/FunnelClient.tsx", "app/career-blueprint/page.tsx"]) {
+    const s = src(p);
+    for (const b of [...BANNED, ...OLD_CTAS]) assert.doesNotMatch(s, b, `${p}: ${b}`);
+  }
+});

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import Breadcrumbs from "../components/Breadcrumbs";
@@ -9,8 +8,10 @@ import Reviews from "../components/Reviews";
 import ProofStrip from "../components/ProofStrip";
 import FunnelPricingBlock from "../components/FunnelPricingBlock";
 import PromoBar from "../components/PromoBar";
+import MoneyHero from "../components/money/MoneyHero";
+import TwoWayCTA from "../components/cta/TwoWayCTA";
 import { faqPageSchema } from "@/app/lib/faqSchema";
-import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, formatPence } from "@/app/lib/pricing";
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/career-blueprint";
 
@@ -87,38 +88,18 @@ export default function CareerBlueprintPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema(faqs)) }} />
       <PromoBar />
       <Nav />
-      <main className="pt-[72px]">
+      <main>
         <Breadcrumbs trail={[{ name: "Career Blueprint", url: PAGE_URL }]} />
 
-        {/* HERO */}
-        <section className="bg-base py-16 md:py-24 px-6 relative overflow-hidden">
-          <div className="absolute -left-48 top-0 w-[600px] h-[600px] rounded-full bg-gold opacity-[0.06] blur-3xl pointer-events-none" />
-          <div className="absolute -right-32 bottom-0 w-[500px] h-[500px] rounded-full bg-blue opacity-[0.07] blur-3xl pointer-events-none" />
-          <div className="relative max-w-5xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/40 bg-gold/5 mb-8">
-              <span className="text-gold text-[11px] font-bold tracking-widest uppercase">The complete roadmap · NCFE Level 2 + 3 · Ofqual regulated</span>
-            </div>
-            <h1 className="font-display font-extrabold text-5xl md:text-8xl text-white leading-[0.95] tracking-tight mb-7">
-              Become a qualified PT.
-              <br />
-              <span className="text-gold">And build a career that lasts.</span>
-            </h1>
-            <p className="text-xl text-soft/85 leading-relaxed mb-10 max-w-2xl mx-auto">
-              Not just a certificate — a complete roadmap into the fitness industry. The qualification, the business skills, the mentorship, the hiring partners and the community. Everything a new PT actually needs to earn.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-              <Link href="#included" data-cta="hero-included" className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30 text-center">
-                See What&apos;s Included →
-              </Link>
-              <Link href="/book-call" data-cta="hero-bookcall" className="px-10 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">
-                Book a Free Call
-              </Link>
-            </div>
-            <p className="text-soft/60 text-xs mt-4">
-              ⭐ 5.0 · 19 Verified Google Reviews &nbsp;·&nbsp; 500+ trainers trained &nbsp;·&nbsp; Run by gym owners who actually hire PTs
-            </p>
-          </div>
-        </section>
+        {/* HERO: what it is, what it costs, how to start */}
+        <MoneyHero
+          eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"
+          headline="Become a qualified Personal Trainer,"
+          goldTail="around your job."
+          subline="Not just a certificate: a complete roadmap into the fitness industry, with the business skills, mentorship and hiring partners a new PT needs to earn."
+          source="blueprint-hero"
+          image={{ src: "/learner-4.webp", alt: "PT Launch Lab graduate working as a qualified personal trainer in the UK" }}
+        />
 
         {/* SOCIAL PROOF STRIP */}
         <section className="bg-surface py-6 px-6 border-y border-white/[0.05]">
@@ -263,26 +244,26 @@ export default function CareerBlueprintPage() {
                 </div>
               ))}
             </div>
-            <FunnelPricingBlock />
+            <FunnelPricingBlock source="blueprint-pricing" />
           </div>
         </section>
 
-        {/* INVESTMENT FRAMING (two ways to pay, no third party) */}
+        {/* INVESTMENT: pay in full leads; monthly is one factual line */}
         <section className="bg-surface py-20 px-6 border-y border-white/[0.05]">
           <div className="max-w-3xl mx-auto text-center">
             <p className="text-gold text-xs font-semibold tracking-widest uppercase mb-4">The investment</p>
             <h2 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-8">
-              This isn&apos;t a cost.
-              <br />
-              <span className="text-gold">It&apos;s the cheapest bet on your own income.</span>
+              {COURSE_PRICE_LABEL}, <span className="text-gold">everything included.</span>
             </h2>
-            <p className="text-soft/85 text-lg leading-relaxed mb-8">
-              On the monthly plan it&apos;s <span className="text-white font-semibold">{MONTHLY_PRICE_LABEL} a month</span> — roughly a daily coffee habit, a mid-tier gym membership, or a couple of streaming subscriptions. Once you qualify, <span className="text-white font-semibold">one PT session a week at ~£30 covers it.</span>
+            <p className="text-soft/85 text-lg leading-relaxed mb-3">
+              One fee for the NCFE Level 2 and Level 3 qualifications, your personal tutor, business mentorship and hiring-partner support. Flexible ways to pay at checkout.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <p className="text-soft/70 text-base leading-relaxed mb-8">
+              Or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}, the first taken today ({formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total).
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
               {[
-                { big: COURSE_PRICE_LABEL, label: "Pay in full", note: "one payment, nothing to manage" },
-                { big: MONTHLY_PRICE_LABEL, label: "Monthly", note: `${MONTHLY_PAYMENTS} payments, no interest` },
+                { big: COURSE_PRICE_LABEL, label: "Pay in full", note: "everything included" },
                 { big: "£20–50k+", label: "PT earning range", note: "employed to self-employed" },
               ].map((s) => (
                 <div key={s.label} className="bg-card border border-white/[0.06] rounded-2xl p-6">
@@ -292,7 +273,6 @@ export default function CareerBlueprintPage() {
                 </div>
               ))}
             </div>
-            <p className="text-soft/60 text-sm">Two options only: pay in full, or {MONTHLY_PLAN_LABEL} monthly. No interest, no third party.</p>
           </div>
         </section>
 
@@ -333,14 +313,7 @@ export default function CareerBlueprintPage() {
             <p className="text-soft/85 text-lg mb-10 max-w-xl mx-auto">
               Book a free 15-minute call and we&apos;ll walk through your plan honestly — or enrol today and get started. No pressure, no hard sell.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/book-call" data-cta="final-bookcall" className="px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/30 text-center">
-                Book a Free Call →
-              </Link>
-              <Link href="#included" data-cta="final-included" className="px-10 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-base hover:bg-white/10 transition-all text-center">
-                View What&apos;s Included
-              </Link>
-            </div>
+            <TwoWayCTA source="blueprint-final" className="justify-center" />
           </div>
         </section>
       </main>
