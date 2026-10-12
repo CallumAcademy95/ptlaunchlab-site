@@ -22,7 +22,7 @@ export type { Block, Clause };
 export const MENTOR_AGREEMENT_VERSION = "1.0";
 
 export const MENTOR_AGREEMENT_SUMMARY =
-  "exclusivity to PTLL among PT course providers · learner data as processor · represents PTLL · no fees in this agreement";
+  "exclusivity to PTLL among PT course providers · learner data as processor (24h breach, 14-day deletion) · represents PTLL · no fees";
 
 export interface MentorAgreementParties {
   /** Trading or company name, e.g. "Axis Systems" or "Axis Systems Ltd". */
@@ -52,7 +52,7 @@ export const MENTOR_KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
     clause: "Clause 5",
     title: "Learner data",
     detail:
-      "Learner details we share (name, email, phone and whether they've paid) are ours. You use them only to deliver the mentorship, keep them secure, never pass them on, tell us within 48 hours of any breach, and delete them when the agreement ends.",
+      "Learner details we share (name, email, phone and whether they've paid) are ours. You use them only to deliver the mentorship, never add learners to your own marketing unless they agree to it with you directly, keep them secure, never pass them on, tell us within 24 hours of any breach, and delete them within 14 days when the agreement ends.",
   },
   {
     clause: "Clause 3",
@@ -156,14 +156,16 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
           "5.3  PT Launch Lab will share only what the mentorship needs: normally a learner’s name, email address, phone number and payment status. The Mentor Partner shall:"
         ),
         b("Use the data only to deliver the mentorship, and only on PT Launch Lab’s documented instructions, including this Agreement;"),
-        b("Not use the data to market its own services, or anyone else’s, except as agreed in writing with PT Launch Lab;"),
-        b("Not sell, share or disclose the data to any third party, other than service providers it needs to deliver the mentorship (such as email, calendar and video-call tools) that are bound by data protection terms no less protective than these;"),
-        b("Keep the data secure, including using strong passwords and two-factor authentication on accounts that hold it, and ensure anyone who handles it is bound by confidentiality;"),
+        b("Not use the data for its own marketing, or anyone else’s: it shall not add learners to its own lists, CRM, newsletters or advertising audiences unless a learner separately gives the Mentor Partner their own consent directly;"),
+        b("Not sell, share or disclose the data to anyone else, or put it into any software tool other than PT Launch Lab’s own sheet, phone, email, WhatsApp and the calendar and video-call tools used to hold the calls, without PT Launch Lab’s written consent;"),
+        b("Limit access to the data to Josh Clarke and anyone else PT Launch Lab approves in writing, and ensure anyone with access is bound by confidentiality;"),
+        b("Keep the data secure: password-protected devices and accounts with two-factor sign-in, and no exports or copies kept outside PT Launch Lab’s sheet;"),
         b("Not transfer the data outside the UK without adequate safeguards under the UK GDPR;"),
-        b("Notify PT Launch Lab without undue delay, and in any event within 48 hours, of becoming aware of any personal data breach affecting learner data;"),
-        b("Help PT Launch Lab respond to data subject requests, regulatory enquiries and breaches, and provide the information PT Launch Lab reasonably needs to show these obligations are met."),
+        b("Tell PT Launch Lab within 24 hours of becoming aware of any loss, leak or misuse of learner data;"),
+        b("Pass to PT Launch Lab straight away any request from a learner to see, correct or delete their data, or to stop being contacted, and stop contacting a learner who asks;"),
+        b("Help PT Launch Lab respond to regulatory enquiries and breaches, and provide the information PT Launch Lab reasonably needs to show these obligations are met."),
         p(
-          "5.4  When this Agreement ends, or earlier on PT Launch Lab’s written request, the Mentor Partner shall delete or return all learner data within 30 days and confirm in writing that it has done so."
+          "5.4  When this Agreement ends, when a learner leaves the programme (for that learner), or earlier on PT Launch Lab’s written request, the Mentor Partner shall delete all copies of the learner data within 14 days and confirm by email that it has done so."
         ),
         p(
           "5.5  Where a learner chooses to become a paying client of the Mentor Partner directly, the Mentor Partner may keep the details that learner gives it for that client relationship, as its own controller and under its own privacy notice. Clause 5.3 continues to apply to data received from PT Launch Lab."
