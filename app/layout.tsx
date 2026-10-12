@@ -7,11 +7,22 @@ import Tracking from "./components/Tracking";
 import { PHONE_SCHEMA } from "@/app/lib/contactDetails";
 import "./globals.css";
 
+// Fonts: every weight below renders somewhere on the site (checked with a
+// Playwright sweep of all 105 sitemap + funnel pages at 390 and 1366 px), so
+// none can be dropped without a visible weight change. Above the fold on the
+// home page (390 px) only Poppins 400/600/700 and Barlow 800 render.
+// next/font can only preload per family call, not per weight, and both
+// families are needed above the fold (H1 = Barlow 800; body, price and
+// buttons = Poppins 400/600/700). Turning Poppins' preload off was measured
+// (Lighthouse mobile, 3 runs): LCP and Speed Index got worse (later swap), so
+// both stay preloaded. See the perf report of 12 Oct 2026.
+// Keep the weight lists in step with tests/perfTracking.test.mts.
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  preload: true,
 });
 
 const barlowCondensed = Barlow_Condensed({
@@ -19,6 +30,7 @@ const barlowCondensed = Barlow_Condensed({
   subsets: ["latin"],
   weight: ["600", "700", "800"],
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -191,23 +203,67 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
         <Tracking />
         <Chatbot />
         <Analytics />
-        {/* 3. Google Analytics 4 */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-90W2KGSL55" strategy="afterInteractive" />
-        <Script id="ga4-init" strategy="afterInteractive">{`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-90W2KGSL55', { anonymize_ip: true });
-        `}</Script>
-        {/* 4. Microsoft Clarity — deferred to lazyOnload (fires after window
-            load) to keep it off the critical path. Heatmap/session data is
-            non-critical for early page interactions. */}
-        <Script id="microsoft-clarity" strategy="lazyOnload">{`
-          (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "w0qwj7lviw");
+        {/* 3. Google Analytics 4 — gtag.js (~180 KB, ~0.8 s of main thread on
+            a mid phone) loads only after window load + an idle slot, so it
+            stays out of the LCP render. Nothing is lost meanwhile: the consent
+            script above defined the gtag() stub, so every gtag()/dataLayer push
+            made before this (trackEvent, Tracking.tsx, CookieYes's consent
+            update) queues in window.dataLayer and gtag.js replays the queue
+            in order when it arrives.
+            The 'js' and 'config' commands are queued HERE, during HTML parse
+            (a dataLayer push, no network, no cost), not when gtag.js is
+            fetched: gtag.js drops any queued event that sits before the
+            config command, so a CTA click before window.load would otherwise
+            be lost (verified with Playwright on a slow load).
+            A plain inline <script> (not next/script) so it runs during HTML
+            parse and never gets a preload hint. */}
+        <script dangerouslySetInnerHTML={{ __html: `
+(function(){
+  window.dataLayer=window.dataLayer||[];
+  var g=window.gtag||function(){window.dataLayer.push(arguments);};
+  g('js',new Date());
+  g('config','G-90W2KGSL55',{anonymize_ip:true});
+  function loadGa(){
+    if(window.__ptllGaLoaded) return; window.__ptllGaLoaded=true;
+    var s=document.createElement('script');s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=G-90W2KGSL55';
+    document.head.appendChild(s);
+  }
+  function whenIdle(){
+    if('requestIdleCallback' in window) window.requestIdleCallback(loadGa,{timeout:2000});
+    else setTimeout(loadGa,2000);
+  }
+  if(document.readyState==='complete') whenIdle();
+  else window.addEventListener('load',whenIdle,{once:true});
+})();
+        `}} />
+        {/* 4. Microsoft Clarity — loads ONLY after CookieYes analytics consent
+            (same gate as the Meta Pixel below, category "analytics"), and
+            never before window load. No consent, no clarity.ms request. */}
+        <Script id="microsoft-clarity" strategy="afterInteractive">{`
+          (function(){
+            function ok(c){ if(!c||typeof c!=='object') return false;
+              if(c.categories&&c.categories.analytics===true) return true;
+              return Array.isArray(c.accepted)&&c.accepted.indexOf('analytics')>-1; }
+            function inject(){
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "w0qwj7lviw");
+            }
+            window.__ptllLoadClarity=function(){
+              if(window.__ptllClarityLoaded) return; window.__ptllClarityLoaded=true;
+              if(document.readyState==='complete') inject();
+              else window.addEventListener('load',inject,{once:true});
+            };
+            document.addEventListener('cookieyes_consent_update',function(e){
+              if(ok(e&&e.detail)) window.__ptllLoadClarity(); });
+            document.addEventListener('cookieyes_banner_load',function(){
+              try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadClarity(); }catch(_){}
+            });
+            try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadClarity(); }catch(_){}
+          })();
         `}</Script>
         {/* 5. Meta Pixel — loads ONLY after CookieYes advertisement consent
             (PECR). Before consent, window.fbq is a no-op so callers never
