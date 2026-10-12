@@ -5,13 +5,14 @@ import {
   COURSE_PRICE_PENCE,
   MONTHLY_PRICE_LABEL,
   MONTHLY_PAYMENTS,
-  MONTHLY_PLAN_TOTAL_PENCE,
   TYPICAL_COST_LABEL,
   formatPence,
 } from "@/app/lib/pricing";
 import { ATP_LADDER, isAtp, memberPricePence } from "@/app/lib/partnerCommission";
 import { memberSavingForGym } from "@/app/lib/gyms";
 import GymCallbackForm from "@/app/components/GymCallbackForm";
+import GymCtaLink from "@/app/components/GymCtaLink";
+import StickyCtaBar from "@/app/components/cta/StickyCtaBar";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
 /** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
@@ -54,8 +55,8 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <div className="absolute inset-0 opacity-25 pointer-events-none"
             style={{ background: `radial-gradient(ellipse at 80% 50%, ${dark}, transparent 55%)` }} />
 
-          <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-24">
-            <div className="flex items-center gap-3 mb-8">
+          <div className={atp ? "relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-24" : "relative z-10 max-w-5xl mx-auto px-6 pt-10 pb-14 md:py-24"}>
+            <div className={atp ? "flex items-center gap-3 mb-8" : "flex items-center gap-3 mb-6 md:mb-8"}>
               {/* Wide wordmarks get a fixed height and auto width — squeezing
                   one into the 52×52 tile renders it as an unreadable sliver.
                   Square marks keep the original rounded-tile treatment. */}
@@ -80,7 +81,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             </h1>
 
             {c.heroSubline && (
-              <p className="text-white/60 text-lg font-semibold uppercase tracking-widest mb-8">{c.heroSubline}</p>
+              <p className={atp ? "text-white/60 text-lg font-semibold uppercase tracking-widest mb-8" : "text-white/60 text-lg font-semibold uppercase tracking-widest mb-5 md:mb-8"}>{c.heroSubline}</p>
             )}
 
             {atp ? (
@@ -89,12 +90,26 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 <span className="text-white text-sm font-bold">Save {ATP_CODE_SAVING} with your ATP member code</span>
               </div>
             ) : (
-              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-6 py-3 mb-8" style={{ backgroundColor: dark }}>
+              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-5 py-2.5 mb-5 md:mb-8" style={{ backgroundColor: dark }}>
                 <span className="text-white font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
-                <span className="text-white/80 text-sm">or {MONTHLY_PRICE_LABEL} a month for {MONTHLY_PAYMENTS} months</span>
+                <span className="text-white/80 text-sm">Everything included · Flexible ways to pay at checkout</span>
                 {memberPriceLabel && (
                   <span className="text-white text-sm font-bold">· Member price {memberPriceLabel} in full</span>
                 )}
+              </div>
+            )}
+
+            {!atp && (
+              <div className="flex flex-col sm:flex-row gap-3 mb-8 md:mb-10" data-cta-source="gym-hero">
+                <GymCtaLink href={enrolPath} source="gym-hero" action="enrol" gym={c.gymSlug}
+                  className="px-10 py-3.5 rounded-full font-black uppercase tracking-wide text-base text-center hover:opacity-90 transition-all shadow-xl"
+                  style={{ backgroundColor: dark, color: bg }}>
+                  Enrol now
+                </GymCtaLink>
+                <GymCtaLink href="#ring-me" source="gym-hero" action="call" gym={c.gymSlug}
+                  className="px-10 py-3 rounded-full font-black uppercase tracking-wide text-base text-center border-2 border-white/40 text-white hover:bg-white/10 transition-all">
+                  Book a free call
+                </GymCtaLink>
               </div>
             )}
 
@@ -111,11 +126,13 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               ))}
             </ul>
 
+            {atp ? (
             <a href={enrolPath}
               className="inline-block px-10 py-4 rounded-full font-black uppercase tracking-wide text-base hover:opacity-90 transition-all shadow-xl"
               style={{ backgroundColor: dark, color: bg }}>
               Enrol Now →
             </a>
+            ) : null}
           </div>
         </section>
 
@@ -317,28 +334,35 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
               </p>
               </>
             ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
+            <div className="max-w-md mx-auto">
+              <div data-featured className="bg-white rounded-2xl p-8 border-2 shadow-sm" style={{ borderColor: c.primaryColor }}>
                 <p className="font-black uppercase text-xs tracking-widest mb-2" style={{ color: c.primaryColor }}>One Payment</p>
-                <p className="text-black font-black text-2xl mb-1">Pay in Full</p>
+                <p className="text-black font-black text-2xl mb-1">Pay in full</p>
                 <p className="font-black text-4xl mb-1" style={{ color: c.primaryColor }}>{COURSE_PRICE_LABEL}</p>
                 {memberPriceLabel && (
                   <p className="font-black text-base text-black mb-1">Member price {memberPriceLabel}</p>
                 )}
-                <p className="text-gray-400 text-sm mb-4">Nothing further to pay</p>
-                <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-white text-sm text-center hover:opacity-90 transition-all" style={{ backgroundColor: c.primaryColor }}>
-                  Enrol Now →
-                </a>
+                <p className="text-black font-bold text-sm">Everything included</p>
+                <p className="text-gray-400 text-sm mb-4">Flexible ways to pay at checkout</p>
+                <GymCtaLink href={enrolPath} source="gym-pricing" action="enrol" gym={c.gymSlug}
+                  className="block w-full py-3 rounded-full font-black text-white text-sm text-center hover:opacity-90 transition-all"
+                  style={{ backgroundColor: c.primaryColor }}>
+                  Enrol now
+                </GymCtaLink>
               </div>
-              <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-                <p className="font-black uppercase text-xs tracking-widest text-gray-400 mb-2">Spread the Cost</p>
-                <p className="text-black font-black text-2xl mb-1">Pay Monthly</p>
-                <p className="font-black text-4xl text-black mb-1">{MONTHLY_PRICE_LABEL}<span className="text-lg text-gray-400 font-bold"> /month</span></p>
-                <p className="text-gray-400 text-sm mb-4">{MONTHLY_PAYMENTS} monthly payments, the first today, {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total</p>
-                <a href={enrolPath} className="block w-full py-3 rounded-full font-black text-sm text-center border-2 hover:opacity-80 transition-all" style={{ borderColor: c.primaryColor, color: c.primaryColor }}>
-                  Pay Monthly →
-                </a>
-              </div>
+              <p className="mt-5 text-sm text-gray-600">
+                <GymCtaLink href={enrolPath} source="gym-pricing-monthly" action="enrol" gym={c.gymSlug}
+                  className="underline underline-offset-4 decoration-gray-300 hover:text-black hover:decoration-black">
+                  Prefer {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}? See payment options →
+                </GymCtaLink>
+              </p>
+              <p className="mt-3 text-sm">
+                <GymCtaLink href="#ring-me" source="gym-pricing" action="call" gym={c.gymSlug}
+                  className="font-bold underline underline-offset-4 hover:opacity-80"
+                  style={{ color: c.primaryColor }}>
+                  Not sure? Book a free call
+                </GymCtaLink>
+              </p>
             </div>
             )}
           </div>
@@ -356,13 +380,27 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             <p className="text-white/70 font-bold uppercase tracking-wide mb-8">
               {atp
                 ? `${ATP_SIX_MONTH_TOTAL} in full or over 6 months · ATP members save ${ATP_CODE_SAVING} with their code`
-                : `${COURSE_PRICE_LABEL} in full, or ${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL} a month`}
+                : `${COURSE_PRICE_LABEL}, everything included`}
             </p>
+            {atp ? (
             <a href={enrolPath}
               className="inline-block bg-white font-black uppercase tracking-wide text-base px-12 py-5 rounded-full hover:opacity-90 transition-all shadow-xl mb-5"
               style={{ color: c.primaryColor }}>
               Apply Now →
             </a>
+            ) : (
+              <div className="flex flex-col sm:flex-row justify-center gap-3 mb-5">
+                <GymCtaLink href={enrolPath} source="gym-final" action="enrol" gym={c.gymSlug}
+                  className="bg-white font-black uppercase tracking-wide text-base text-center px-12 py-5 rounded-full hover:opacity-90 transition-all shadow-xl"
+                  style={{ color: c.primaryColor }}>
+                  Enrol now
+                </GymCtaLink>
+                <GymCtaLink href="#ring-me" source="gym-final" action="call" gym={c.gymSlug}
+                  className="font-black uppercase tracking-wide text-base text-center px-12 py-5 rounded-full border-2 border-white/60 text-white hover:bg-white/10 transition-all">
+                  Book a free call
+                </GymCtaLink>
+              </div>
+            )}
           </div>
         </section>
 
@@ -379,6 +417,13 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           <a href="/privacy" className="hover:text-white/50 transition-colors">Privacy</a>
         </p>
       </footer>
+
+      {/* Mobile: Enrol and Book a call, both to this gym's own enrol page and
+          ring-me form, once the hero buttons have scrolled away. Not on ATP. */}
+      {!atp && (
+        <StickyCtaBar watchSelector="[data-cta-source='gym-hero']" source="gym-sticky" hideFrom="lg"
+          enrolHref={enrolPath} callHref="#ring-me" gym={c.gymSlug} />
+      )}
     </>
   );
 }

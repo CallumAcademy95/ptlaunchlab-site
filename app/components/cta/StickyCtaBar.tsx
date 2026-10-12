@@ -19,11 +19,22 @@ export default function StickyCtaBar({
   watchSelector,
   source = "home-sticky",
   hideFrom = "md",
+  enrolHref,
+  callHref,
+  gym,
 }: {
   watchSelector?: string;
   source?: string;
   hideFrom?: "md" | "lg";
+  /** Where Enrol goes. Defaults to the site's /enrol. */
+  enrolHref?: string;
+  /** Set it (e.g. a gym page's "#ring-me") and Book a call is a plain link: no pop-up. */
+  callHref?: string;
+  /** Gym slug, added to cta_click on gym pages. */
+  gym?: string;
 }) {
+  const track = (action: "enrol" | "call") => trackEvent("cta_click", gym ? { source, action, gym } : { source, action });
+  const callClass = "flex-1 text-center py-3 rounded-full border border-gold/60 text-gold font-semibold text-sm";
   const { isOpen: modalOpen } = useCallModal();
   const [heroOut, setHeroOut] = useState(false);
 
@@ -65,19 +76,21 @@ export default function StickyCtaBar({
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
       <a
-        href={ENROL_HREF}
-        onClick={() => trackEvent("cta_click", { source, action: "enrol" })}
+        href={enrolHref ?? ENROL_HREF}
+        onClick={() => track("enrol")}
         className="flex-1 text-center py-3 rounded-full bg-gold text-deep font-bold text-sm"
       >
         {enrolLabel(true)}
       </a>
-      <CallLink
-        source={source}
-        onClick={() => trackEvent("cta_click", { source, action: "call" })}
-        className="flex-1 text-center py-3 rounded-full border border-gold/60 text-gold font-semibold text-sm"
-      >
-        Book a call
-      </CallLink>
+      {callHref ? (
+        <a href={callHref} onClick={() => track("call")} className={callClass}>
+          Book a call
+        </a>
+      ) : (
+        <CallLink source={source} onClick={() => track("call")} className={callClass}>
+          Book a call
+        </CallLink>
+      )}
     </div>
   );
 }

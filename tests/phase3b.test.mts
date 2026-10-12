@@ -277,7 +277,7 @@ test("ClickToPlay supports priority for the poster; MoneyHero's video passes it"
   assert.match(c, /<Image[^>]*priority=\{priority\}/);
   const h = src("app/components/money/MoneyHero.tsx");
   const player = h.slice(h.indexOf("<ClickToPlay"), h.indexOf("/>", h.indexOf("<ClickToPlay")));
-  assert.match(player, /\n\s*priority\n/);
+  assert.match(player, /\n\s*priority\r?\n/);
 });
 
 test("MoneyHero: optional video.title names the player; /vsl passes the founders' title", () => {
