@@ -2,6 +2,7 @@
 
 import WasPrice from "@/app/components/WasPrice";
 import { trackEvent } from "@/app/lib/gtag";
+import { ENROL_HREF, ctaClickEvents } from "@/app/lib/homeCta";
 import {
   COURSE_PRICE_LABEL,
   MONTHLY_PRICE_LABEL,
@@ -16,15 +17,19 @@ import {
 // Drop-in pricing card for the avatar landing pages, the quiz result screen,
 // and prospectus thank-you page.
 //
-// From the October 2026 change-over it shows the same two options everyone
-// gets — £999.99 in full, or 10 × £99.99 a month — with no promo, no
-// countdown and no "window". Both CTAs go to /enrol, where the buyer chooses
-// and pays. (It used to poll a 48-hour discount cookie and route through
-// /api/funnel-promo/checkout; both are retired.)
+// Pay in full leads (Phase 3b, 12 Oct 2026): one featured card, pay in full,
+// everything included, then a quieter link for the monthly plan. Same price
+// for everyone, no promo, no countdown. Both go to /enrol, where the buyer
+// chooses and pays. (It used to poll a 48-hour discount cookie and route
+// through /api/funnel-promo/checkout; both are retired.)
 //
-// The value stack renders above the options by default. Set
+// Tracking: each click sends cta_click {source, action: "enrol"} plus the
+// event this block always sent, promo_checkout_clicked {plan: "pif" |
+// "monthly", has_promo: false}, so existing GA reports keep counting.
+//
+// The value stack renders above the card by default. Set
 // showValueStack={false} on call sites that already render their own stack.
-// Props are unchanged so existing call sites keep compiling.
+// Existing props are unchanged; `source` is optional.
 
 type StackRow = { label: string; sub?: string; rrp: string };
 
@@ -47,19 +52,23 @@ const VALUE_STACK: StackRow[] = [
 export default function FunnelPricingBlock({
   variant = "dark",
   showValueStack = true,
+  source = "funnel-pricing-block",
 }: {
   variant?: "dark" | "light";
   showValueStack?: boolean;
+  /** cta_click source. */
+  source?: string;
 }) {
   const accent = variant === "light" ? "#F5C518" : "#FFD24A";
   const cardBg = variant === "light" ? "bg-[#0D3559]" : "bg-card";
   const cardBorder = variant === "light" ? "border-[#F5C518]/40" : "border-gold/30";
 
-  const handleCheckout = (plan: CoursePlanChoice) => {
+  // Both are plain links to /enrol (they work without JS); the click only tracks.
+  // InitiateCheckout fires on /enrol at the actual pay step, with the real
+  // amount — firing it here as well would double-count.
+  const track = (plan: CoursePlanChoice) => {
+    ctaClickEvents(source, "enrol").forEach(([name, params]) => trackEvent(name, params));
     trackEvent("promo_checkout_clicked", { plan, has_promo: false });
-    // InitiateCheckout fires on /enrol at the actual pay step, with the real
-    // amount — firing it here as well would double-count.
-    window.location.href = "/enrol";
   };
 
   return (
@@ -113,69 +122,58 @@ export default function FunnelPricingBlock({
               </span>
             </div>
             <p className="text-faint text-[11px] mt-2">
-              Or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}. Same price for everyone.
+              Everything included. Same price for everyone.
             </p>
           </div>
         </>
       )}
 
-      {/* ─── THE TWO WAYS TO PAY ─── */}
+      {/* ─── PAY IN FULL: the one featured offer. Monthly is a quieter link to the same /enrol page. ─── */}
       {!showValueStack && (
-        <>
-          <h3 className="font-display font-extrabold text-white text-xl leading-tight tracking-tight mb-2">
-            Enrol on the course
-          </h3>
-          <p className="text-soft/60 text-sm mb-5 leading-relaxed">
-            {COURSE_PRICE_LABEL} in full, or {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}.
-          </p>
-        </>
+        <h3 className="font-display font-extrabold text-white text-xl leading-tight tracking-tight mb-4">
+          Enrol on the course
+        </h3>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-          <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-            Pay in full
-          </p>
+      <div
+        data-featured
+        className="relative rounded-xl border-2 bg-deep/40 p-6 sm:p-7 text-center"
+        style={{ borderColor: accent }}
+      >
+        <p className="text-xs font-semibold tracking-widest uppercase text-white/80 mb-2">
+          Pay in full
+        </p>
+        <div className="flex flex-wrap items-end justify-center gap-x-3 mb-1">
           <span
-            className="font-display font-extrabold text-3xl block mb-1"
+            className="font-display font-extrabold text-5xl leading-none"
             style={{ color: accent }}
           >
-            {COURSE_PRICE_LABEL} <WasPrice note className="ml-1 align-middle text-white" />
+            {COURSE_PRICE_LABEL}
           </span>
-          <p className="text-faint text-xs mb-4">One payment · nothing further to pay</p>
-          <button
-            onClick={() => handleCheckout("pif")}
-            className="w-full py-3 rounded-full font-bold text-sm hover:brightness-110 transition-all"
-            style={{ background: accent, color: "#072B4A" }}
-          >
-            Pay {COURSE_PRICE_LABEL} →
-          </button>
+          <WasPrice note className="text-white text-base mb-0.5" />
         </div>
-
-        <div className="rounded-xl border border-white/[0.08] bg-deep/40 p-5">
-          <p className="text-xs font-semibold tracking-widest uppercase text-soft/50 mb-1">
-            Pay monthly
-          </p>
-          <div className="flex items-baseline gap-2 mb-1">
-            <span
-              className="font-display font-extrabold text-3xl"
-              style={{ color: accent }}
-            >
-              {MONTHLY_PRICE_LABEL}
-            </span>
-            <span className="text-white/80 text-sm">/month × {MONTHLY_PAYMENTS}</span>
-          </div>
-          <p className="text-faint text-xs mb-4">
-            First payment today · {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total
-          </p>
-          <button
-            onClick={() => handleCheckout("monthly")}
-            className="w-full py-3 rounded-full font-bold text-sm border-2 hover:bg-white/5 transition-all"
-            style={{ borderColor: accent, color: accent }}
-          >
-            Pay {MONTHLY_PRICE_LABEL} today →
-          </button>
-        </div>
+        <p className="text-white font-semibold mt-2">Everything included</p>
+        <p className="text-soft/80 text-sm mt-1 mb-5">Flexible ways to pay at checkout</p>
+        <a
+          href={ENROL_HREF}
+          onClick={() => track("pif")}
+          className="block w-full py-3.5 rounded-full font-bold text-base text-center hover:brightness-110 transition-all"
+          style={{ background: accent, color: "#072B4A" }}
+        >
+          Enrol now
+        </a>
       </div>
+      <p className="mt-4 text-center text-soft/80 text-sm">
+        <a
+          href={ENROL_HREF}
+          onClick={() => track("monthly")}
+          className="hover:text-white underline underline-offset-4 decoration-white/30 hover:decoration-white"
+        >
+          Prefer {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}? See payment options →
+        </a>
+      </p>
+      <p className="mt-1 text-center text-faint text-xs">
+        First payment today · {formatPence(MONTHLY_PLAN_TOTAL_PENCE)} in total
+      </p>
 
       {/* ─── RISK REVERSAL (Hormozi: reduce perceived risk to zero) ─── */}
       <div className="mt-6 pt-6 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-2 gap-3">
