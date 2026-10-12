@@ -5,7 +5,7 @@ import PriceBlock from "@/app/components/home/PriceBlock";
 export default function ConversionSection() {
   return (
     <div id="book-call">
-      <PriceBlock source="conversion" legacy="conversion" />
+      <PriceBlock source="conversion" legacy="conversion" bg="base" />
     </div>
   );
 }

@@ -37,23 +37,26 @@ const trackCta = (source: string, action: "enrol" | "call", legacy: GaEvent) =>
  *   PriceBlock's events 1:1 onto ConversionSection's old ones (enrol_click method full/deposit,
  *   book_call_click location conversion_section). The prop keeps the call sites explicit and is the one
  *   place to diverge them later.
+ * @param bg  Section background: "surface" (home) or "base" (the shared ConversionSection band).
  * @param reserveWasPrice  Build-time hint: keep room for the was-price so it doesn't shift the card on mount.
  */
 export default function PriceBlock({
   source = HOME_SOURCE,
   legacy = "home",
   reserveWasPrice = false,
+  bg = "surface",
 }: {
   source?: string;
   legacy?: "home" | "conversion";
   reserveWasPrice?: boolean;
+  bg?: "surface" | "base";
 }) {
   // Both modes send the same legacy events today (see @param legacy), so there is nothing to switch on yet.
   void legacy;
   const track = (action: "enrol" | "call", ev: GaEvent) => trackCta(source, action, ev);
 
   return (
-    <section id="pricing" className="bg-surface py-14 md:py-24 relative overflow-hidden">
+    <section id="pricing" className={`${bg === "base" ? "bg-base" : "bg-surface"} py-14 md:py-24 relative overflow-hidden`}>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
         <div className="w-[760px] h-[460px] rounded-full bg-gold/[0.04] blur-[120px]" />
       </div>

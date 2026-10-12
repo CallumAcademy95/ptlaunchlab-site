@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { CALL_QUESTION, callSuccessMessage } from "@/app/lib/homeCta";
+import { usePathname } from "next/navigation";
+import { CALL_QUESTION, callSuccessMessage, popupAllowedOnPath } from "@/app/lib/homeCta";
 import { CallModalContext, type CallModalApi } from "./callModalContext";
 
 // LeadForm (and submitLead and the form security code behind it) loads only
@@ -16,7 +17,9 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 
 export function CallModalProvider({ children }: { children: ReactNode }) {
   const [source, setSource] = useState<string | null>(null);
-  const isOpen = source !== null;
+  const pathname = usePathname();
+  // Never shown on /book-call or /enrol/success, even if opened elsewhere and navigated here.
+  const isOpen = source !== null && popupAllowedOnPath(pathname);
   const panelRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLElement | null>(null);
   const titleId = useId();

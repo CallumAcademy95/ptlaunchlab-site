@@ -5,8 +5,8 @@ import { trackEvent } from "@/app/lib/gtag";
 import CallLink from "@/app/components/cta/CallLink";
 
 // The site's two points of sale. "Book a free call" is a link to /book-call
-// on every page; on pages wrapped in <CallModalProvider> (the home page) a
-// plain click opens the call pop-up instead.
+// on every page; the <CallModalProvider> is site-wide (app/layout.tsx), so a
+// plain click opens the call pop-up, except on /book-call and /enrol/success.
 function NavCallButton({ className, onDone }: { className: string; onDone?: () => void }) {
   return (
     <CallLink

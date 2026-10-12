@@ -53,3 +53,42 @@ test("LocationHero: two new buttons and the pay-in-full price line", () => {
   assert.match(l, /Flexible ways to pay at checkout/);
   assert.doesNotMatch(l, /MONTHLY_PRICE_LABEL/);
 });
+
+import { NO_POPUP_PATHS, popupAllowedOnPath, shouldOpenCallModalAt } from "../app/lib/homeCta.ts";
+
+const plainClick = { button: 0, metaKey: false, ctrlKey: false, shiftKey: false, altKey: false, defaultPrevented: false };
+
+test("no pop-up on /book-call and /enrol/success", () => {
+  assert.deepEqual(NO_POPUP_PATHS, ["/book-call", "/enrol/success"]);
+  for (const p of NO_POPUP_PATHS) {
+    assert.equal(popupAllowedOnPath(p), false);
+    assert.equal(popupAllowedOnPath(p + "/"), false);
+    assert.equal(shouldOpenCallModalAt(plainClick, p), false);
+  }
+  for (const p of ["/", "/enrol", "/best-personal-trainer-course-uk", null, undefined]) {
+    assert.equal(popupAllowedOnPath(p), true);
+    assert.equal(shouldOpenCallModalAt(plainClick, p), true);
+  }
+  assert.equal(shouldOpenCallModalAt({ ...plainClick, ctrlKey: true }, "/"), false);
+});
+
+test("CallLink and the provider both use the path rule", () => {
+  assert.match(src("app/components/cta/CallLink.tsx"), /shouldOpenCallModalAt\(e, pathname\)/);
+  assert.match(src("app/components/cta/CallModal.tsx"), /popupAllowedOnPath\(pathname\)/);
+});
+
+test("ConversionSection keeps the base band colour; home keeps surface", () => {
+  assert.match(src("app/components/ConversionSection.tsx"), /bg="base"/);
+  const p = src("app/components/home/PriceBlock.tsx");
+  assert.match(p, /bg = "surface"/);
+  assert.match(p, /"bg-base"/);
+  assert.match(p, /"bg-surface"/);
+});
+
+test("guide pages use the two new hero buttons", () => {
+  for (const d of ["best-personal-trainer-course-uk", "personal-trainer-course-near-me", "personal-trainer-course-with-business-support", "personal-trainer-mentorship-uk", "self-employed-personal-trainer-uk"]) {
+    const s = src(`app/${d}/page.tsx`);
+    assert.match(s, /<TwoWayCTA source="guide-hero" \/>/, d);
+    assert.doesNotMatch(s, /Discover Your Pathway|Start Today/, d);
+  }
+});
