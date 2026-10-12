@@ -59,14 +59,55 @@ test("price block reads pricing.ts, not hard-coded numbers", () => {
   assert.match(p, /home-pricing/);
 });
 
-test("proof strip reuses existing review and partner data", () => {
+test("proof band reuses existing review and partner data", () => {
   const p = src("app/components/home/ProofStrip.tsx");
   assert.match(p, /from "@\/app\/lib\/reviewsData"/);
   assert.match(p, /from "@\/app\/lib\/gymPartnersData"/);
   assert.doesNotMatch(p, /^["']use client["']/m, "ProofStrip stays a server component");
-  assert.match(p, /\/podcast/);
+  assert.match(p, /"\/podcast"/);
   assert.match(p, /603\/4388\/6/);
   assert.match(p, /home-proof/);
+});
+
+test("proof band: stats, one visually hidden H2, review rotator, anchors, no old cards", () => {
+  const p = src("app/components/home/ProofStrip.tsx");
+  for (const s of ["5.0★", "Google rating", "500+", "PTs hired by our team", "NCFE L3", "CIMSPA", "Podcast"]) assert.ok(p.includes(s), s);
+  assert.equal((p.match(/<h2[\s>]/g) ?? []).length, 1);
+  assert.match(p, /<h2 [^>]*className="sr-only"[^>]*>Why PT Launch Lab<\/h2>/);
+  assert.match(p, /<ReviewRotator/);
+  assert.match(p, /href="#reviews"[^>]*>\s*Read all reviews →/);
+  assert.doesNotMatch(p, /ncfe\.png/, "the white NCFE logo block is gone");
+  assert.doesNotMatch(p, /overflow-x-auto/, "no scrollbar");
+  assert.doesNotMatch(p, /bg-card/, "no boxed cards");
+});
+
+test("proof band marquee: one logo style, duplicate set hidden, lazy, static under reduced motion", () => {
+  const p = src("app/components/home/ProofStrip.tsx");
+  assert.match(p, /Gyms in our partner network/i);
+  assert.match(p, /brightness\(0\)_invert\(1\)|brightness\(0\) invert\(1\)/);
+  assert.doesNotMatch(p, /lightTile/, "no per-logo tile styles");
+  assert.match(p, /motion-reduce:/, "the marquee has a reduced-motion rule");
+  assert.match(p, /animation-play-state:paused/);
+  assert.match(p, /aria-hidden/);
+  assert.match(p, /loading="lazy"/);
+  assert.match(p, /alt=\{/);
+  // Every partner has a mono (white, trimmed) logo on disk.
+  const d = src("app/lib/gymPartnersData.ts");
+  const monos = [...d.matchAll(/mono: "([^"]+)"/g)].map((m) => m[1]);
+  assert.equal(monos.length, (d.match(/^\s*\{ name:/gm) ?? []).length);
+  for (const m of monos) assert.ok(existsSync(new URL(`../public${m}`, import.meta.url)), m);
+});
+
+test("review rotator: small client component, accessible, honours reduced motion", () => {
+  const r = src("app/components/home/ReviewRotator.tsx");
+  assert.match(r, /^["']use client["']/m);
+  assert.match(r, /aria-live="polite"/);
+  assert.match(r, /aria-label=/);
+  assert.match(r, /prefers-reduced-motion/);
+  assert.match(r, /6000/);
+  assert.match(r, /onMouseEnter/);
+  assert.match(r, /onFocus/);
+  assert.match(r, /★★★★★/);
 });
 
 test("review and partner data live in plain modules the old components reuse", () => {
@@ -247,12 +288,6 @@ test("call-modal context is a tiny module; LeadForm loads only via next/dynamic"
 
 test("pop-up Esc is ignored while a <select> has focus", () => {
   assert.match(src("app/components/cta/CallModal.tsx"), /tagName === "SELECT"/);
-});
-
-test("partner logos carry a caption; NCFE logo is sized small", () => {
-  const p = src("app/components/home/ProofStrip.tsx");
-  assert.match(p, /Gyms in our partner network/);
-  assert.match(p, /src="\/logos\/ncfe\.png"[^>]*width=\{148\}[^>]*height=\{48\}[^>]*sizes=/);
 });
 
 test("layout no longer hand-preloads the hero photo", () => {
