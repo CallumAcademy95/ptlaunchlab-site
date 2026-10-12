@@ -1,5 +1,6 @@
-// Server component: the stats, excerpts and logo marquee are static HTML.
+// Server component: the stats, review texts and logo marquee are static HTML.
 // Only ReviewRotator and TwoWayCTA ship as client JS.
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import TwoWayCTA from "@/app/components/cta/TwoWayCTA";
@@ -7,22 +8,26 @@ import ReviewRotator from "./ReviewRotator";
 import { reviews } from "@/app/lib/reviewsData";
 import { gymPartners } from "@/app/lib/gymPartnersData";
 
-const EXCERPT_MAX = 140;
+// Short reviews (~200 characters or less), shown in full, word for word.
+const ROTATING = ["Rachel Waldock", "Matthew Bell", "Jordan Wills"];
+const quotes = ROTATING.map((name) => {
+  const r = reviews.find((x) => x.name === name);
+  if (!r) throw new Error(`ProofStrip: review "${name}" not found in reviewsData`);
+  return { name: r.name, text: r.quote };
+});
 
-/** First 140 characters, cut back to a word boundary, plus "…". */
-function excerpt(text: string): string {
-  if (text.length <= EXCERPT_MAX) return text;
-  const cut = text.slice(0, EXCERPT_MAX + 1);
-  const space = cut.lastIndexOf(" ");
-  return `${(space > 0 ? cut.slice(0, space) : text.slice(0, EXCERPT_MAX)).replace(/[\s,;:.—–-]+$/, "")}…`;
-}
-
-const excerpts = [reviews[1], reviews[2], reviews[3]].map((r) => ({ name: r.name, text: excerpt(r.quote) }));
-
-const STATS: { value: string; label: string; href?: string }[] = [
+const STATS: { value: string; label: ReactNode; href?: string }[] = [
   { value: "5.0★", label: "Google rating" },
   { value: "500+", label: "PTs hired by our team" },
-  { value: "NCFE L3", label: "Ofqual 603/4388/6 · CIMSPA" },
+  {
+    value: "NCFE L3",
+    // The qualification number only from md up, so the label stays on one line on phones.
+    label: (
+      <>
+        Ofqual<span className="hidden md:inline"> 603/4388/6</span> · CIMSPA
+      </>
+    ),
+  },
   { value: "Podcast", label: "Listen →", href: "/podcast" },
 ];
 
@@ -80,7 +85,7 @@ export default function ProofStrip() {
 
         {/* 2. One rotating review */}
         <div className="mt-12 md:mt-14 max-w-2xl mx-auto text-center">
-          <ReviewRotator quotes={excerpts} />
+          <ReviewRotator quotes={quotes} />
           <a href="#reviews" className="mt-3 inline-block text-gold text-sm font-semibold hover:underline">
             Read all reviews →
           </a>

@@ -24,7 +24,6 @@ export default function ReviewRotator({ quotes }: { quotes: { name: string; text
     return () => window.clearTimeout(t);
   }, [i, reduced, paused, quotes.length]);
 
-  const q = quotes[i];
   return (
     <div
       onMouseEnter={() => setPaused(true)}
@@ -32,16 +31,23 @@ export default function ReviewRotator({ quotes }: { quotes: { name: string; text
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <figure aria-live="polite" className="min-h-[9rem] sm:min-h-[8rem] flex flex-col items-center justify-center">
-        <div key={i} className="motion-safe:animate-fade-in">
-          <p className="text-gold text-sm tracking-[0.2em]" aria-hidden="true">★★★★★</p>
-          <blockquote className="mt-3 text-white text-base sm:text-lg md:text-xl leading-relaxed">&ldquo;{q.text}&rdquo;</blockquote>
-          <figcaption className="mt-3 text-soft/85 text-sm font-semibold">
-            {q.name}
-            <span className="sr-only">, 5 stars</span>
-          </figcaption>
-        </div>
-      </figure>
+      {/* All quotes share one grid cell, so the box is as tall as the longest and never jumps. */}
+      <div aria-live="polite" className="grid">
+        {quotes.map((r, n) => (
+          <figure
+            key={r.name}
+            aria-hidden={n !== i}
+            className={`[grid-area:1/1] flex flex-col items-center justify-center motion-safe:transition-opacity motion-safe:duration-500 ${n === i ? "opacity-100" : "invisible opacity-0"}`}
+          >
+            <p className="text-gold text-sm tracking-[0.2em]" aria-hidden="true">★★★★★</p>
+            <blockquote className="mt-3 text-white text-base sm:text-lg md:text-xl leading-relaxed">&ldquo;{r.text}&rdquo;</blockquote>
+            <figcaption className="mt-3 text-soft/85 text-sm font-semibold">
+              {r.name}
+              <span className="sr-only">, 5 stars</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
       {quotes.length > 1 && (
         <div className="mt-4 flex justify-center gap-1">
           {quotes.map((r, n) => (

@@ -75,6 +75,8 @@ test("proof band: stats, one visually hidden H2, review rotator, anchors, no old
   assert.equal((p.match(/<h2[\s>]/g) ?? []).length, 1);
   assert.match(p, /<h2 [^>]*className="sr-only"[^>]*>Why PT Launch Lab<\/h2>/);
   assert.match(p, /<ReviewRotator/);
+  assert.doesNotMatch(p, /EXCERPT_MAX|…/, "short reviews are shown in full, not truncated");
+  assert.match(p, /hidden md:inline"> 603\/4388\/6/, "compact NCFE label on mobile");
   assert.match(p, /href="#reviews"[^>]*>\s*Read all reviews →/);
   assert.doesNotMatch(p, /ncfe\.png/, "the white NCFE logo block is gone");
   assert.doesNotMatch(p, /overflow-x-auto/, "no scrollbar");
