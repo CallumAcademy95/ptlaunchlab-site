@@ -6,7 +6,8 @@ import CallLink from "./CallLink";
 import { ENROL_HREF, enrolLabel } from "@/app/lib/homeCta";
 import { trackEvent } from "@/app/lib/gtag";
 
-// Mobile-only bar. Shows once the watched hero CTA has scrolled off the top,
+// Mobile-only bar. Shows once the watched hero CTA has scrolled off the top
+// (or, with no hero to watch, after 400px of scroll),
 // hides while the call pop-up is open, and broadcasts its visibility so the
 // chat bubble can lift clear of it.
 //
@@ -14,18 +15,30 @@ import { trackEvent } from "@/app/lib/gtag";
 // can hand focus back to "Book a call" on close. The pop-up state comes from
 // context, so the bar is un-inerted in the same commit the dialog closes,
 // before the dialog's cleanup restores focus.
-export default function StickyCtaBar({ watchSelector }: { watchSelector: string }) {
+export default function StickyCtaBar({
+  watchSelector,
+  source = "home-sticky",
+}: {
+  watchSelector?: string;
+  source?: string;
+}) {
   const { isOpen: modalOpen } = useCallModal();
   const [heroOut, setHeroOut] = useState(false);
 
   useEffect(() => {
-    const el = document.querySelector(watchSelector);
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => {
-      setHeroOut(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-    });
-    io.observe(el);
-    return () => io.disconnect();
+    const el = watchSelector ? document.querySelector(watchSelector) : null;
+    if (el) {
+      const io = new IntersectionObserver(([entry]) => {
+        setHeroOut(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      });
+      io.observe(el);
+      return () => io.disconnect();
+    }
+    // No hero to watch (any page but the home page): show after 400px of scroll.
+    const onScroll = () => setHeroOut(window.scrollY > 400);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, [watchSelector]);
 
   const visible = heroOut && !modalOpen;
@@ -51,14 +64,14 @@ export default function StickyCtaBar({ watchSelector }: { watchSelector: string 
     >
       <a
         href={ENROL_HREF}
-        onClick={() => trackEvent("cta_click", { source: "home-sticky", action: "enrol" })}
+        onClick={() => trackEvent("cta_click", { source, action: "enrol" })}
         className="flex-1 text-center py-3 rounded-full bg-gold text-deep font-bold text-sm"
       >
         {enrolLabel(true)}
       </a>
       <CallLink
-        source="home-sticky"
-        onClick={() => trackEvent("cta_click", { source: "home-sticky", action: "call" })}
+        source={source}
+        onClick={() => trackEvent("cta_click", { source, action: "call" })}
         className="flex-1 text-center py-3 rounded-full border border-gold/60 text-gold font-semibold text-sm"
       >
         Book a call

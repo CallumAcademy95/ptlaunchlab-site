@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import Chatbot from "./components/ChatbotLazy";
 import Tracking from "./components/Tracking";
+import { CallModalProvider } from "./components/cta/CallModal";
 import { PHONE_SCHEMA } from "@/app/lib/contactDetails";
 import "./globals.css";
 
@@ -199,7 +200,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
           src="https://cdn-cookieyes.com/client_data/04abe099864c49fd5daf17ec/script.js"
           strategy="afterInteractive"
         />
-        {children}
+        <CallModalProvider>{children}</CallModalProvider>
         <Tracking />
         <Chatbot />
         <Analytics />
