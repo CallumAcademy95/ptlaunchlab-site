@@ -44,7 +44,9 @@ test("hero copy is exact and the hero has no geo lookup", () => {
   assert.match(h, /NCFE LEVEL 2 &amp; 3 · OFQUAL · CIMSPA|NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA/);
   assert.match(h, /Online NCFE Level 3\. Qualify in 8–16 weeks\. Built by gym owners who(&apos;|')ve hired 500\+ PTs\./);
   assert.match(h, /COURSE_PRICE_LABEL/);
-  assert.match(h, /MONTHLY_PRICE_LABEL/);
+  assert.doesNotMatch(h, /MONTHLY_PRICE_LABEL|MONTHLY_PAYMENTS|\/month/, "pay in full is the hero offer; monthly lives behind the click");
+  assert.match(h, /everything included/);
+  assert.match(h, /Flexible ways to pay at checkout/);
   assert.match(h, /source="home-hero"/);
   assert.match(h, /priority/);
   assert.doesNotMatch(h, /geoDetect|headers\(\)|HeroSlideshow/);
@@ -54,9 +56,47 @@ test("price block reads pricing.ts, not hard-coded numbers", () => {
   const p = src("app/components/home/PriceBlock.tsx");
   assert.match(p, /COURSE_PRICE_LABEL/);
   assert.match(p, /MONTHLY_PRICE_LABEL/);
-  assert.match(p, /MONTHLY_PLAN_TOTAL_PENCE/);
+  assert.match(p, /MONTHLY_PAYMENTS/);
   assert.doesNotMatch(p, /999\.9|99\.99/);
   assert.match(p, /home-pricing/);
+});
+
+test("price block: one featured pay-in-full card, monthly as a secondary link", () => {
+  const p = src("app/components/home/PriceBlock.tsx");
+  assert.equal((p.match(/<h3[\s>]/g) ?? []).length, 1, "one card");
+  assert.match(p, /Pay in full/);
+  assert.match(p, /Everything included:/);
+  assert.doesNotMatch(p, /Both options include/);
+  assert.match(p, /Flexible ways to pay at checkout/);
+  assert.match(p, /Prefer \{MONTHLY_PAYMENTS\} monthly payments of \{MONTHLY_PRICE_LABEL\}\? See payment options →/);
+  // The monthly link still fires the legacy deposit event, alongside cta_click.
+  const at = p.indexOf("Prefer {MONTHLY_PAYMENTS}");
+  const monthly = p.slice(at - 400, at);
+  assert.match(monthly, /href=\{ENROL_HREF\}/);
+  assert.match(monthly, /track\("enrol", LEGACY_EVENTS\.pricingMonthly\)/);
+});
+
+test("pricing copy never names a credit product or credit terms", () => {
+  for (const f of ["app/components/home/HomeHero.tsx", "app/components/home/PriceBlock.tsx", "app/courses/page.tsx"]) {
+    assert.doesNotMatch(src(f), /klarna|interest-free|interest free|pay in 3/i, f);
+  }
+});
+
+test("/courses: pay in full is the first, featured plan; JSON-LD prices unchanged", () => {
+  const c = src("app/courses/page.tsx");
+  assert.match(c, /One price\. (<span[^>]*>)?Everything included\./);
+  assert.match(c, /Flexible ways to pay at checkout/);
+  assert.doesNotMatch(c, /2\.74 a day|never think about it again|Pick the payment that suits you/);
+  const plans = c.slice(c.indexOf("const pricing = ["), c.indexOf("const compare"));
+  const pifAt = plans.indexOf('"Pay In Full"');
+  const moAt = plans.indexOf('"10 Monthly Payments"');
+  assert.ok(pifAt > -1 && pifAt < moAt, "pay in full first");
+  assert.match(plans.slice(pifAt, moAt), /recommended: true/);
+  assert.match(plans.slice(pifAt, moAt), /badge: "Recommended"/);
+  assert.match(plans.slice(moAt), /recommended: false/);
+  assert.match(plans.slice(moAt), /badge: null/);
+  const ld = c.slice(c.indexOf("offers: ["), c.indexOf("hasCourseInstance"));
+  assert.ok(ld.indexOf("COURSE_PRICE_PENCE") > -1 && ld.indexOf("COURSE_PRICE_PENCE") < ld.indexOf("MONTHLY_PLAN_TOTAL_PENCE"), "999.99 offer first");
 });
 
 test("proof band reuses existing review and partner data", () => {

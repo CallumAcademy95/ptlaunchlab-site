@@ -34,7 +34,7 @@ export const LEGACY_EVENTS = {
   finalEnrol: { name: "enrol_click", params: { location: "final_cta" } },
   /** ConversionSection pay-in-full button → PriceBlock "Enrol now". */
   pricingFull: { name: "enrol_click", params: { method: "full" } },
-  /** ConversionSection "Start Paying Monthly" (method deposit) → PriceBlock "Pay monthly". */
+  /** ConversionSection "Start Paying Monthly" (method deposit) → PriceBlock "Prefer 10 monthly payments…" link. */
   pricingMonthly: { name: "enrol_click", params: { method: "deposit" } },
   /** ConversionSection "book a call" link → PriceBlock "Not sure? Book a free call". */
   pricingCall: { name: "book_call_click", params: { location: "conversion_section" } },

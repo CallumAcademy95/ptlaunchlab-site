@@ -171,10 +171,23 @@ const objections = [
   },
 ];
 
-// Two payment options — identical product, different cadence. Prices come
+// Two payment options — identical product, different cadence. Pay in full is
+// the lead offer (first, featured); monthly is the secondary option. Prices come
 // from app/lib/pricing.ts. The monthly plan totals 9p less than paying in
 // full, so never call pay-in-full "best value".
 const pricing = [
+  {
+    title: "Pay In Full",
+    headlineFigure: COURSE_PRICE_LABEL,
+    headlineSuffix: "one-off",
+    subPrice: "Flexible ways to pay at checkout",
+    saving: "Everything included, one price",
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
+    cta: "Pay in full →",
+    ctaHref: "/enrol",
+    recommended: true,
+    badge: "Recommended" as string | null,
+  },
   {
     title: "10 Monthly Payments",
     headlineFigure: MONTHLY_PRICE_LABEL,
@@ -184,20 +197,8 @@ const pricing = [
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay monthly →",
     ctaHref: "/enrol",
-    recommended: true,
-    badge: "Spread the cost" as string | null,
-  },
-  {
-    title: "Pay In Full",
-    headlineFigure: COURSE_PRICE_LABEL,
-    headlineSuffix: "one-off",
-    subPrice: "About £2.74 a day spread across a year",
-    saving: "Pay once and never think about it again",
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
-    cta: "Pay in full →",
-    ctaHref: "/enrol",
     recommended: false,
-    badge: "Pay once" as string | null,
+    badge: null as string | null,
   },
 ];
 
@@ -468,17 +469,17 @@ export default function CoursesPage() {
               </p>
             </div>
 
-            <p className="text-center text-gold text-[11px] font-semibold tracking-widest uppercase mb-3">Two ways to pay</p>
+            <p className="text-center text-gold text-[11px] font-semibold tracking-widest uppercase mb-3">Pricing</p>
             <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-none tracking-tight mb-3">
-              Same course. <span className="text-gold">Pick the payment that suits you.</span>
+              One price. <span className="text-gold">Everything included.</span>
             </h3>
             <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
-              Both plans get the same qualification, the same mentorship, the same gym introduction. The only difference is how you spread the cost.
+              {COURSE_PRICE_LABEL} for the full NCFE Level 2 &amp; 3 course, mentorship and gym introduction. Flexible ways to pay at checkout, or spread it monthly.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="flex flex-col gap-6 max-w-xl mx-auto">
               {pricing.map((plan) => (
-                <div key={plan.title} className={`rounded-2xl p-7 border flex flex-col ${plan.recommended ? "bg-card border-gold/60 shadow-xl shadow-gold/10 md:scale-[1.03] relative" : "bg-card border-white/[0.07] relative"}`}>
+                <div key={plan.title} className={`rounded-2xl p-7 border flex flex-col ${plan.recommended ? "bg-card border-2 border-gold/60 shadow-xl shadow-gold/10 relative" : "bg-card/60 border-white/[0.07] relative"}`}>
                   {plan.badge && (
                     <div className={`absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-[11px] font-bold whitespace-nowrap ${plan.recommended ? "bg-gold text-deep" : "bg-blue/20 text-blue border border-blue/40"}`}>
                       {plan.badge}
@@ -486,10 +487,10 @@ export default function CoursesPage() {
                   )}
                   <h3 className="text-white text-lg font-bold mb-4 mt-1">{plan.title}</h3>
                   <div className="mb-2 flex items-baseline gap-1.5">
-                    <span className="font-display font-extrabold text-gold text-4xl md:text-5xl leading-none">{plan.headlineFigure}</span>
+                    <span className={`font-display font-extrabold leading-none ${plan.recommended ? "text-gold text-5xl md:text-6xl" : "text-white text-3xl md:text-4xl"}`}>{plan.headlineFigure}</span>
                     <span className="text-soft/80 text-sm font-semibold">{plan.headlineSuffix}</span>
                   </div>
-                  <p className="text-blue text-xs font-semibold mb-2 leading-snug">{plan.subPrice}</p>
+                  <p className={`text-xs font-semibold mb-2 leading-snug ${plan.recommended ? "text-soft/80 text-sm" : "text-blue"}`}>{plan.subPrice}</p>
                   <p className="text-soft/60 text-sm mb-6 leading-snug">{plan.saving}</p>
                   <ul className="space-y-2.5 mb-7 flex-1">
                     {plan.features.map((f) => (
@@ -500,7 +501,7 @@ export default function CoursesPage() {
                     ))}
                   </ul>
                   <a href={plan.ctaHref}
-                    className={`text-center px-5 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-gold text-deep hover:brightness-110 shadow-md shadow-gold/20" : "border border-gold/70 text-gold hover:bg-gold hover:text-deep"}`}>
+                    className={`text-center px-5 py-3 rounded-full font-bold text-sm transition-all ${plan.recommended ? "bg-gold text-deep hover:brightness-110 shadow-md shadow-gold/20" : "border border-white/30 text-white hover:bg-white/10"}`}>
                     {plan.cta}
                   </a>
                 </div>

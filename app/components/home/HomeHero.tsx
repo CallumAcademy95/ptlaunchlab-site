@@ -1,7 +1,7 @@
 import Image from "next/image";
 import TwoWayCTA from "@/app/components/cta/TwoWayCTA";
 import WasPrice from "@/app/components/WasPrice";
-import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
+import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 import { wasPriceActive } from "@/app/lib/priceDrop";
 
 // The five-second hero: what it is, what it costs, how to start.
@@ -58,13 +58,16 @@ export default function HomeHero() {
               Online NCFE Level 3. Qualify in 8–16 weeks. Built by gym owners who&apos;ve hired 500+ PTs.
             </p>
 
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-4 md:mb-6">
-              <p className="leading-tight">
-                <span className="text-gold font-bold text-3xl lg:text-4xl">{COURSE_PRICE_LABEL}</span>{" "}
-                <span className="text-soft">or</span>{" "}
-                <span className="text-white font-bold text-xl max-[389px]:text-lg whitespace-nowrap">{MONTHLY_PRICE_LABEL}/month × {MONTHLY_PAYMENTS}</span>
-              </p>
-              <WasPrice reserve={RESERVE_WAS_PRICE} className="text-soft text-base" />
+            {/* Pay in full is the offer; the monthly plan is on /enrol for whoever wants it. */}
+            <div className="mb-4 md:mb-6">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                <p className="leading-tight">
+                  <span className="text-gold font-bold text-3xl lg:text-4xl">{COURSE_PRICE_LABEL}</span>{" "}
+                  <span className="text-white font-semibold text-lg">everything included</span>
+                </p>
+                <WasPrice reserve={RESERVE_WAS_PRICE} className="text-soft text-base" />
+              </div>
+              <p className="text-soft/80 text-sm mt-1">Flexible ways to pay at checkout</p>
             </div>
 
             <TwoWayCTA source="home-hero" />

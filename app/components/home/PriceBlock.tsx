@@ -3,7 +3,7 @@ import WasPrice from "@/app/components/WasPrice";
 import CallLink from "@/app/components/cta/CallLink";
 import { trackEvent } from "@/app/lib/gtag";
 import { ENROL_HREF, LEGACY_EVENTS, ctaClickEvents, type GaEvent } from "@/app/lib/homeCta";
-import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, TYPICAL_COST_LABEL, formatPence } from "@/app/lib/pricing";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, TYPICAL_COST_LABEL } from "@/app/lib/pricing";
 
 const SOURCE = "home-pricing";
 
@@ -48,17 +48,17 @@ export default function PriceBlock({ reserveWasPrice = false }: { reserveWasPric
           Most PT qualifications cost <span className="whitespace-nowrap">{TYPICAL_COST_LABEL}</span>. Ours is <span className="text-white font-semibold">{COURSE_PRICE_LABEL}</span>, everything included.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {/* Pay in full */}
-          <div className="relative bg-card rounded-2xl p-7 md:p-8 border-2 border-gold/60 shadow-2xl shadow-black/30 flex flex-col">
+        {/* Pay in full: the one offer. Monthly is a quieter link to the same checkout page. */}
+        <div className="max-w-xl mx-auto">
+          <div className="relative bg-card rounded-2xl p-7 md:p-9 border-2 border-gold/60 shadow-2xl shadow-black/30 text-center">
             <div className="absolute top-0 inset-x-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-gold to-transparent" aria-hidden="true" />
-            <p className="text-gold font-semibold uppercase text-[11px] tracking-widest mb-2">One payment</p>
             <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-3">Pay in full</h3>
-            <div className="flex flex-wrap items-end gap-x-3 mb-1">
-              <p className="font-display font-extrabold text-5xl text-gold leading-none">{COURSE_PRICE_LABEL}</p>
+            <div className="flex flex-wrap items-end justify-center gap-x-3 mb-2">
+              <p className="font-display font-extrabold text-6xl text-gold leading-none">{COURSE_PRICE_LABEL}</p>
               <WasPrice reserve={reserveWasPrice} className="text-soft text-lg mb-0.5" />
             </div>
-            <p className="text-soft/80 text-sm mb-7 flex-1">One payment, nothing further to pay</p>
+            <p className="text-white font-semibold">Everything included</p>
+            <p className="text-soft/80 text-sm mt-1 mb-7">Flexible ways to pay at checkout</p>
             <a
               href={ENROL_HREF}
               onClick={() => track("enrol", LEGACY_EVENTS.pricingFull)}
@@ -67,31 +67,20 @@ export default function PriceBlock({ reserveWasPrice = false }: { reserveWasPric
               Enrol now
             </a>
           </div>
-
-          {/* Pay monthly */}
-          <div className="bg-card rounded-2xl p-7 md:p-8 border border-white/[0.09] shadow-2xl shadow-black/20 flex flex-col">
-            <p className="text-faint font-semibold uppercase text-[11px] tracking-widest mb-2">Spread the cost</p>
-            <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-3">Pay monthly</h3>
-            <p className="font-display font-extrabold text-5xl text-white leading-none mb-1">
-              {MONTHLY_PRICE_LABEL}
-              <span className="font-sans text-lg text-soft/70 font-semibold">/month</span>
-            </p>
-            <p className="text-soft/80 text-sm mb-7 flex-1">
-              {`${MONTHLY_PAYMENTS} payments, the first today, ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total`}
-            </p>
+          <p className="mt-4 text-center text-soft/80 text-sm">
             <a
               href={ENROL_HREF}
               onClick={() => track("enrol", LEGACY_EVENTS.pricingMonthly)}
-              className="block w-full py-4 rounded-full border-2 border-gold/50 text-gold font-bold text-base text-center hover:bg-gold hover:text-deep transition-all"
+              className="hover:text-white underline underline-offset-4 decoration-white/30 hover:decoration-white"
             >
-              Pay monthly
+              Prefer {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}? See payment options →
             </a>
-          </div>
+          </p>
         </div>
 
-        {/* Value stack: the same in both options */}
-        <div className="mt-5 bg-card/60 border border-white/[0.07] rounded-2xl p-6 md:p-8">
-          <p className="text-white font-semibold mb-5">Both options include:</p>
+        {/* Value stack */}
+        <div className="mt-10 bg-card/60 border border-white/[0.07] rounded-2xl p-6 md:p-8">
+          <p className="text-white font-semibold mb-5">Everything included:</p>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             {VALUE_STACK.map((v) => (
               <li key={v.title} className="flex items-start gap-3">
