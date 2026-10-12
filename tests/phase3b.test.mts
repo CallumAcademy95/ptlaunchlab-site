@@ -84,3 +84,90 @@ test("prices come from pricing.ts, not literals", () => {
     assert.doesNotMatch(src(p), /999\.9|99\.99/, p);
   }
 });
+
+// ─── Task 2: the /vsl ad landing pages share one template ────────────────────
+
+const VSL_PAGES = [
+  { key: "starter", path: "app/vsl/become-a-personal-trainer-uk/page.tsx", h1: "Become a qualified Personal Trainer, around your job." },
+  { key: "switcher", path: "app/vsl/career-change-to-personal-trainer/page.tsx", h1: "Change career to Personal Trainer, around your current job." },
+  { key: "returner", path: "app/vsl/retrain-as-a-personal-trainer/page.tsx", h1: "Retrain as a Personal Trainer, from home." },
+] as const;
+
+test("/vsl pages: each renders VslPage with its content and keeps its own metadata", () => {
+  for (const p of VSL_PAGES) {
+    const s = src(p.path);
+    assert.match(s, new RegExp(`<VslPage content=\{VSL_CONTENT\.${p.key}\} />`), p.path);
+    assert.match(s, /export const metadata: Metadata = \{/, p.path);
+    assert.match(s, /alternates: \{ canonical: PAGE_URL \}/, p.path);
+    assert.ok(s.split("\n").length < 80, `${p.path} is a thin wrapper`);
+  }
+});
+
+test("/vsl content: starter, switcher, returner with the spec H1, quiz URL and YouTube id", async () => {
+  const { VSL_CONTENT } = await import("../app/vsl/content.ts");
+  for (const p of VSL_PAGES) {
+    const c = VSL_CONTENT[p.key];
+    assert.ok(c, p.key);
+    assert.equal(`${c.hero.headline} ${c.hero.goldTail}`, p.h1, p.key);
+    assert.equal(c.quizHref, `/quiz?avatar=${p.key}`, p.key);
+    assert.match(c.youtubeId, /^[\w-]{11}$/, p.key);
+    assert.equal(c.avatar, p.key);
+    assert.ok(!/\.\s+\S/.test(c.hero.subline.trim()), `${p.key}: subline is one sentence`);
+  }
+});
+
+test("VslPage: MoneyHero with the video, a quiz band to content.quizHref, no separate video section", () => {
+  const v = src("app/vsl/VslPage.tsx");
+  assert.match(v, /<MoneyHero[\s\S]*?video=\{\{/);
+  assert.match(v, /kind: "youtube"/);
+  assert.match(v, /i\.ytimg\.com\/vi\/\$\{c\.youtubeId\}\/hqdefault\.jpg/);
+  assert.match(v, /trackAs: `vsl_\$\{c\.avatar\}`/);
+  assert.match(v, /metaEvent: "VSLPlay"/);
+  assert.match(v, /source=\{`vsl-\$\{c\.avatar\}-hero`\}/);
+  assert.match(v, /eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"/);
+  assert.match(v, /href=\{c\.quizHref\}/);
+  assert.match(v, /Not sure yet\? Take the 60-second PT career quiz →/);
+  assert.doesNotMatch(v, /<iframe/, "the video only lives in the hero");
+  assert.doesNotMatch(v, /Watch first/);
+  // Quiz band comes right after "This is for you if…"
+  const forYou = v.indexOf("This is for you");
+  const band = v.indexOf("Not sure yet?");
+  const empathy = v.indexOf("c.empathy");
+  assert.ok(forYou > 0 && band > forYou && empathy > band, "quiz band sits between For-you-if and the empathy section");
+});
+
+test("VslPage: keeps the shared sections, the order, and the pricing/final CTA sources", () => {
+  const v = src("app/vsl/VslPage.tsx");
+  const order = ["<MoneyHero", "This is for you", "Not sure yet?", "c.empathy", "<HeroLeadForm", "c.founders", "c.pathway", "c.comparison", "c.future", "c.objections", "c.steps", "c.learnerStripLabel", "<FunnelPricingBlock", "<ProofStrip", "<Reviews", "<Accreditation", "c.faqHeading", "<TwoWayCTA", "<StickyMobileCTA"];
+  let at = -1;
+  for (const s of order) { const i = v.indexOf(s); assert.ok(i > at, `${s} out of order or missing`); at = i; }
+  assert.match(v, /<FunnelPricingBlock variant="dark" source=\{`vsl-\$\{c\.avatar\}-pricing`\} \/>/);
+  assert.match(v, /<TwoWayCTA source="vsl-final"/);
+  assert.match(v, /application\/ld\+json/);
+  assert.match(v, /FAQPage/);
+});
+
+test("/vsl: pricing intro leads with the full price, everything included", async () => {
+  const { VSL_CONTENT } = await import("../app/vsl/content.ts");
+  for (const p of VSL_PAGES) {
+    assert.match(VSL_CONTENT[p.key].pricingIntro, /^£999\.99, everything included/, p.key);
+  }
+});
+
+test("/vsl files carry no credit or affordability selling lines", () => {
+  const files = ["app/vsl/VslPage.tsx", "app/vsl/content.ts", ...VSL_PAGES.map((p) => p.path)];
+  for (const f of files) {
+    const s = src(f);
+    for (const b of [...BANNED, /one PT session a week/i, /school year/i, /food shop/i]) assert.doesNotMatch(s, b, `${f}: ${b}`);
+  }
+});
+
+test("/vsl: 'no interest' only inside FAQ answers", async () => {
+  const { VSL_CONTENT } = await import("../app/vsl/content.ts");
+  for (const p of VSL_PAGES) {
+    const { faqs, ...rest } = VSL_CONTENT[p.key];
+    assert.doesNotMatch(JSON.stringify(rest), /no interest/i, p.key);
+    void faqs;
+  }
+  assert.doesNotMatch(src("app/vsl/VslPage.tsx"), /no interest/i);
+});
