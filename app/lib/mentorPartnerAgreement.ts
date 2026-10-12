@@ -95,7 +95,14 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
       title: "Purpose & Call Fee",
       blocks: [
         p(
-          "2.1  The Mentor Partner provides business mentorship to PT Launch Lab’s learners as part of PT Launch Lab’s course. This includes the Dream Customer Profile work, 1:1 calls, coaching systems and recorded education, as agreed between the parties from time to time."
+          "2.1  The Mentor Partner provides business mentorship to PT Launch Lab’s learners as part of PT Launch Lab’s course (the “included mentorship”), at no extra cost to the learner. It consists of:"
+        ),
+        b("The Dream Customer Profile worksheet, given to each learner when they reach the business stage of the course, to complete before their call;"),
+        b("One 1:1 business call with each learner, normally offered within about two weeks of them reaching the business stage. Timing is flexible around both sides’ availability, and the learner keeps progressing with the worksheet and resources while they wait;"),
+        b("Building the learner’s own branded coaching sheets, such as progress tracking, training logs, phase planning and meal planning templates;"),
+        b("Recorded business education and group Q&A sessions, added to PT Launch Lab’s platform, at a frequency the parties agree and review from time to time."),
+        p(
+          "Capacity — the Mentor Partner runs its own business alongside this Agreement and does not offer unlimited call capacity. It may cap weekly calls, stagger bookings, batch calls into set days or introduce a short waiting period, provided learners have the worksheet and resources in the meantime and PT Launch Lab is told of any cap. If learner numbers grow significantly, the parties will review call volume and scheduling together in good faith."
         ),
         p(
           "2.2  This Agreement covers how the Mentor Partner works with PT Launch Lab and its learners: exclusivity, representation, learner data, materials and ending the arrangement."
@@ -113,7 +120,14 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
           "2.6  Other fees — any revenue share or fee for a paid package, or any other payment, is not set by this Agreement and must be agreed separately in writing. Until it is, no payment is owed under this Agreement other than under Clause 2.3."
         ),
         p(
-          "2.7  PT Launch Lab remains responsible for the course, qualification, assessment, learner administration and customer service. The Mentor Partner is not responsible for these."
+          "2.7  PT Launch Lab remains responsible for the course, qualification, assessment, learner administration and customer service, and for running its learner community. The Mentor Partner is not responsible for:"
+        ),
+        b("Delivering the qualification, assessments or qualification compliance;"),
+        b("Moderating or managing the community, monitoring every post, or replying to learners within a set time;"),
+        b("Chasing learner engagement or managing attendance;"),
+        b("Customer service, complaints about the course, or general learner administration."),
+        p(
+          "The Mentor Partner may post content, answer questions and join conversations in PT Launch Lab’s community where it adds value, but is not required to."
         ),
       ],
     },
