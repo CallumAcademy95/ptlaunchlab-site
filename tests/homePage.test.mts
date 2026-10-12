@@ -143,7 +143,9 @@ test("proof band marquee: one logo style, duplicate set hidden, lazy, static und
 test("review rotator: small client component, accessible, honours reduced motion", () => {
   const r = src("app/components/home/ReviewRotator.tsx");
   assert.match(r, /^["']use client["']/m);
-  assert.match(r, /aria-live="polite"/);
+  // Silent while auto-rotating; announces only when paused or under reduced motion.
+  assert.ok(r.includes('aria-live={paused || reduced ? "polite" : "off"}'), "aria-live off while auto-rotating");
+  assert.ok(r.includes("inert={n !== i}"), "hidden quotes are inert");
   assert.match(r, /aria-label=/);
   assert.match(r, /prefers-reduced-motion/);
   assert.match(r, /6000/);

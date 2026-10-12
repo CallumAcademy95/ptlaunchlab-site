@@ -32,11 +32,13 @@ export default function ReviewRotator({ quotes }: { quotes: { name: string; text
       onBlur={() => setPaused(false)}
     >
       {/* All quotes share one grid cell, so the box is as tall as the longest and never jumps. */}
-      <div aria-live="polite" className="grid">
+      {/* Announce only when the reader chose the quote (paused, or no auto-rotation), not every 6 s. */}
+      <div aria-live={paused || reduced ? "polite" : "off"} className="grid">
         {quotes.map((r, n) => (
           <figure
             key={r.name}
             aria-hidden={n !== i}
+            inert={n !== i}
             className={`[grid-area:1/1] flex flex-col items-center justify-center motion-safe:transition-opacity motion-safe:duration-500 ${n === i ? "opacity-100" : "invisible opacity-0"}`}
           >
             <p className="text-gold text-sm tracking-[0.2em]" aria-hidden="true">★★★★★</p>
