@@ -34,6 +34,7 @@ export default function ClickToPlay({
   trackAs,
   metaEvent,
   sizes = "(min-width:1024px) 50vw, 100vw",
+  priority = false,
 }: {
   source: Source;
   poster: string;
@@ -46,6 +47,8 @@ export default function ClickToPlay({
   /** Meta Pixel custom event fired on first play, e.g. "VSLPlay". */
   metaEvent?: string;
   sizes?: string;
+  /** Load the YouTube poster eagerly: set when the player is the hero's LCP image. */
+  priority?: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -85,7 +88,7 @@ export default function ClickToPlay({
       className="group absolute inset-0 flex items-end justify-start p-3 md:p-5 focus:outline-none focus-visible:ring-4 focus-visible:ring-gold/60"
       aria-label={`Play the video: ${title}`}
     >
-      {source.kind === "youtube" && <Image src={poster} alt="" fill sizes={sizes} className="object-cover" />}
+      {source.kind === "youtube" && <Image src={poster} alt="" fill sizes={sizes} priority={priority} className="object-cover" />}
       {/* Control sits bottom-left so the poster's own title stays readable. */}
       <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-deep/70 to-transparent" aria-hidden="true" />
       <span className="relative flex items-center gap-3">

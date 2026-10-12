@@ -2,6 +2,9 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ProspectusButton from "../components/ProspectusButton";
 import Breadcrumbs from "../components/Breadcrumbs";
+import MoneyHero from "../components/money/MoneyHero";
+import TwoWayCTA from "../components/cta/TwoWayCTA";
+import StickyCtaBar from "../components/cta/StickyCtaBar";
 import { faqPageSchema } from "@/app/lib/faqSchema";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, COURSE_PRICE_PENCE, formatPence } from "@/app/lib/pricing";
 
@@ -160,7 +163,7 @@ const objections = [
   {
     quote: `${COURSE_PRICE_LABEL} is still a lot of money.`,
     answer:
-      `You can pay it as ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, with no interest. A working PT in the UK charges £30–50 a session. Six regular clients at £30, once a week, is £180 a week. At that rate the course fee is covered in under six weeks.`,
+      `${COURSE_PRICE_LABEL} paid in full, everything included. If you'd rather pay monthly, it's ${MONTHLY_PAYMENTS} payments of ${MONTHLY_PRICE_LABEL}. A working PT in the UK charges £30–50 a session.`,
     link: null,
   },
   {
@@ -192,8 +195,8 @@ const pricing = [
     title: "10 Monthly Payments",
     headlineFigure: MONTHLY_PRICE_LABEL,
     headlineSuffix: "/month",
-    subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total · no interest`,
-    saving: "Spread the cost while you study",
+    subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total`,
+    saving: `${MONTHLY_PAYMENTS} monthly payments`,
     features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay monthly →",
     ctaHref: "/enrol",
@@ -235,64 +238,37 @@ export default function CoursesPage() {
       />
       <Breadcrumbs trail={[{ name: "Courses", url: "https://ptlaunchlab.co.uk/courses" }]} />
       <Nav />
-      <main className="pt-[72px]">
+      <main>
 
-        {/* HERO */}
-        <section className="bg-base py-14 md:py-24 px-6 text-center relative overflow-hidden">
-          <div className="absolute -left-48 top-0 w-[500px] h-[500px] rounded-full bg-gold opacity-[0.05] blur-3xl pointer-events-none" />
-          <div className="absolute -right-32 top-20 w-[400px] h-[400px] rounded-full bg-blue opacity-[0.06] blur-3xl pointer-events-none" />
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <line x1="0" y1="0" x2="40%" y2="100%" stroke="#F5C518" strokeWidth="1" />
-            <line x1="20%" y1="0" x2="65%" y2="100%" stroke="#F5C518" strokeWidth="0.5" />
-          </svg>
-          <div className="relative max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-gold/30 bg-surface mb-8">
-              <span className="text-gold text-xs font-semibold tracking-widest uppercase">
-                Level 2 &amp; 3 PT · NCFE · Ofqual · CIMSPA
-              </span>
-            </div>
-            <h1 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-6">
-              The PT course built by<br />
-              <span className="text-gold">gym owners who hire trainers.</span>
-            </h1>
-            <p className="text-xl text-white font-semibold mb-4">
-              Most PT courses teach theory. We build personal trainers gyms actually want to hire.
-            </p>
-            <p className="text-lg text-soft/70 max-w-2xl mx-auto mb-6">
-              NCFE Level 2 &amp; 3, fast-track, fully online — done around your current job. Mentorship, a guaranteed gym introduction, and a complete business launchpad included.
-            </p>
+        {/* HERO: what it is, what it costs, how to start */}
+        <MoneyHero
+          eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"
+          headline="The online NCFE Level 2 & 3 PT course,"
+          goldTail="around your job."
+          subline="Qualify in 8–16 weeks, with business training and a guaranteed gym introduction."
+          source="courses-hero"
+          image={{ src: "/learner-2.webp", alt: "PT Launch Lab graduate qualified through the NCFE Level 3 personal trainer course" }}
+        />
 
-            {/* Mentorship moat — surfaced above the fold as the single biggest
-                differentiator. Most UK PT academies sell the qualification
-                then upsell mentorship for £500-£3,000. We bundle it. This
-                is the line that disarms the "what if I can't get clients"
-                silent objection before the visitor even scrolls. */}
-            <div className="max-w-2xl mx-auto mb-8 px-5 py-4 rounded-2xl border border-gold/30 bg-card/40">
-              <p
-                className="text-white text-sm md:text-base leading-relaxed"
-                style={{ color: '#FFFFFF' }}
-              >
-                <span className="text-gold font-bold" style={{ color: '#F5C518' }}>£500 business mentorship — bundled free.</span>{" "}
-                The Mentorship Hub walks you from qualifying to your first paying client, with Callum, Miles &amp; Ryan a message away. Not an upsell. Not an upgrade.
-              </p>
-            </div>
-            <p className="text-sm text-soft/60 max-w-2xl mx-auto mb-10">
-              New to UK PT courses?{" "}
-              <a href="/online-personal-trainer-course-uk" className="text-gold hover:underline font-semibold">
-                Read our honest comparison of 10 UK providers →
-              </a>
+        {/* Mentorship moat (moved from the old hero): the single biggest
+            differentiator. Most UK PT academies sell the qualification then
+            upsell mentorship for £500-£3,000. We bundle it. */}
+        <section className="bg-base pt-10 pb-4 md:pt-14 md:pb-6 px-6 text-center">
+          <div className="max-w-2xl mx-auto px-5 py-4 rounded-2xl border border-gold/30 bg-card/40">
+            <p
+              className="text-white text-sm md:text-base leading-relaxed"
+              style={{ color: '#FFFFFF' }}
+            >
+              <span className="text-gold font-bold" style={{ color: '#F5C518' }}>£500 business mentorship — bundled free.</span>{" "}
+              The Mentorship Hub walks you from qualifying to your first paying client, with Callum, Miles &amp; Ryan a message away. Not an upsell. Not an upgrade.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/enrol"
-                className="px-8 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all shadow-lg shadow-gold/20">
-                Start Application →
-              </a>
-              <a href="/book-call"
-                className="px-8 py-4 rounded-full border border-gold text-gold font-semibold text-base hover:bg-gold hover:text-deep transition-all">
-                Discover Your Pathway
-              </a>
-            </div>
           </div>
+          <p className="text-sm text-soft/60 max-w-2xl mx-auto mt-6">
+            New to UK PT courses?{" "}
+            <a href="/online-personal-trainer-course-uk" className="text-gold hover:underline font-semibold">
+              Read our honest comparison of 10 UK providers →
+            </a>
+          </p>
         </section>
 
         {/* THE PT LAUNCH METHOD */}
@@ -474,7 +450,7 @@ export default function CoursesPage() {
               One price. <span className="text-gold">Everything included.</span>
             </h3>
             <p className="text-soft/60 text-center text-base mb-12 max-w-2xl mx-auto">
-              {COURSE_PRICE_LABEL} for the full NCFE Level 2 &amp; 3 course, mentorship and gym introduction. Flexible ways to pay at checkout, or spread it monthly.
+              {COURSE_PRICE_LABEL} for the full NCFE Level 2 &amp; 3 course, mentorship and gym introduction. Flexible ways to pay at checkout, or pay monthly.
             </p>
 
             <div className="flex flex-col gap-6 max-w-xl mx-auto">
@@ -538,20 +514,12 @@ export default function CoursesPage() {
             <p className="text-soft/60 text-lg mb-10">
               Enrol today and start your Level 2 &amp; 3 qualification immediately — or book a free call if you want to talk it through first.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/enrol"
-                className="px-8 py-4 rounded-full bg-gold text-deep font-bold hover:brightness-110 transition-all shadow-lg shadow-gold/20">
-                Enrol Now →
-              </a>
-              <a href="/book-call"
-                className="px-8 py-4 rounded-full border border-gold text-gold font-semibold hover:bg-gold hover:text-deep transition-all">
-                Discover Your Pathway
-              </a>
-            </div>
+            <TwoWayCTA source="courses-final" className="justify-center" />
           </div>
         </section>
 
       </main>
+      <StickyCtaBar watchSelector="[data-cta-source='courses-hero']" source="courses-sticky" />
       <Footer />
     </>
   );
