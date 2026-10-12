@@ -2,5 +2,5 @@
 import StickyCtaBar from "./cta/StickyCtaBar";
 
 export default function StickyMobileCTA() {
-  return <StickyCtaBar source="sticky" />;
+  return <StickyCtaBar source="sticky" hideFrom="lg" />;
 }

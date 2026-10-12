@@ -47,11 +47,10 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([OPENER]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  // Mirror StickyMobileCTA's visibility trigger (scrollY > 400). When the
-  // bottom CTA bar is showing, push the chatbot button up so its 56px circle
-  // doesn't overlap the bar's right edge / clip the "Start Today" button.
-  // Only applies under lg (where StickyMobileCTA is visible) — desktop is
-  // unaffected.
+  // StickyCtaBar broadcasts ptll:sticky-cta when its Enrol / Book a call bar
+  // is showing. Push the chatbot button up so its 56px circle doesn't overlap
+  // the bar's right edge or clip the "Book a call" button. The lift is
+  // dropped from lg up (the bar hides at md on the home page, lg elsewhere).
   const [stickyCtaVisible, setStickyCtaVisible] = useState(false);
   // True while the home hero's buttons are on screen: the bubble is hidden
   // below md and lifts clear of them from md up.
@@ -146,9 +145,9 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Toggle button — lifts above the StickyMobileCTA (~64px tall) on
-          mobile when the sticky CTA is visible. Desktop (lg+) is unaffected
-          because StickyMobileCTA is hidden via lg:hidden. */}
+      {/* Toggle button — lifts above the StickyCtaBar (~64px tall) on
+          mobile when the sticky bar is visible. Desktop (lg+) is unaffected
+          because the bar is hidden there. */}
       <button
         onClick={() => setOpen(!open)}
         aria-label="Open chat"

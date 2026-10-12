@@ -20,3 +20,10 @@ test("sticky bar falls back to a scroll trigger when there is no hero to watch",
   assert.match(s, /scrollY\s*>\s*400/);
   assert.match(s, /source\s*=\s*"home-sticky"|source = "home-sticky"/);
 });
+
+test("sticky bar hides from md on home, from lg on the site-wide pages", () => {
+  assert.match(src("app/components/StickyMobileCTA.tsx"), /hideFrom="lg"/);
+  const s = src("app/components/cta/StickyCtaBar.tsx");
+  assert.match(s, /"lg:hidden"/);
+  assert.match(s, /"md:hidden"/);
+});

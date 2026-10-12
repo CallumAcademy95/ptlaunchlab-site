@@ -18,9 +18,11 @@ import { trackEvent } from "@/app/lib/gtag";
 export default function StickyCtaBar({
   watchSelector,
   source = "home-sticky",
+  hideFrom = "md",
 }: {
   watchSelector?: string;
   source?: string;
+  hideFrom?: "md" | "lg";
 }) {
   const { isOpen: modalOpen } = useCallModal();
   const [heroOut, setHeroOut] = useState(false);
@@ -57,7 +59,7 @@ export default function StickyCtaBar({
     <div
       inert={!visible}
       aria-hidden={!visible}
-      className={`fixed bottom-0 inset-x-0 z-50 md:hidden bg-deep/95 backdrop-blur-md border-t border-white/[0.08] px-4 pt-3 flex gap-3 transition-[transform,opacity] duration-200 ${
+      className={`fixed bottom-0 inset-x-0 z-50 ${hideFrom === "lg" ? "lg:hidden" : "md:hidden"} bg-deep/95 backdrop-blur-md border-t border-white/[0.08] px-4 pt-3 flex gap-3 transition-[transform,opacity] duration-200 ${
         visible ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
       }`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
