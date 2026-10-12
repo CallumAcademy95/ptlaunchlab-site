@@ -2,6 +2,7 @@ import Image from "next/image";
 import TwoWayCTA from "@/app/components/cta/TwoWayCTA";
 import WasPrice from "@/app/components/WasPrice";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
+import { wasPriceActive } from "@/app/lib/priceDrop";
 
 // The five-second hero: what it is, what it costs, how to start.
 // No geo lookup (keeps the home page static) and no min-h-screen: on a
@@ -9,6 +10,15 @@ import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app
 // bubble, with the photo pushed below the buttons.
 const HEADLINE = "Become a qualified Personal Trainer, around your job.";
 const HEADLINE_GOLD = "around your job."; // the tail of HEADLINE, set in gold
+
+/**
+ * Build-time hint only (the home page is static, so this is evaluated when it
+ * is built): while the was-price can still show, WasPrice holds its space
+ * invisibly until the browser decides, so the buttons below it don't move.
+ * Builds after 9 Nov reserve nothing. The show/hide decision stays in the
+ * browser (WasPrice).
+ */
+export const RESERVE_WAS_PRICE = wasPriceActive(Date.now());
 
 export default function HomeHero() {
   return (
@@ -54,7 +64,7 @@ export default function HomeHero() {
                 <span className="text-soft">or</span>{" "}
                 <span className="text-white font-bold text-xl max-[389px]:text-lg whitespace-nowrap">{MONTHLY_PRICE_LABEL}/month × {MONTHLY_PAYMENTS}</span>
               </p>
-              <WasPrice className="text-soft text-base" />
+              <WasPrice reserve={RESERVE_WAS_PRICE} className="text-soft text-base" />
             </div>
 
             <TwoWayCTA source="home-hero" />

@@ -1,9 +1,9 @@
 "use client";
 import WasPrice from "@/app/components/WasPrice";
-import { useCallModal } from "@/app/components/cta/CallModal";
+import CallLink from "@/app/components/cta/CallLink";
 import { trackEvent } from "@/app/lib/gtag";
-import { ENROL_HREF } from "@/app/lib/homeCta";
-import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, formatPence } from "@/app/lib/pricing";
+import { ENROL_HREF, LEGACY_EVENTS, ctaClickEvents, type GaEvent } from "@/app/lib/homeCta";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, TYPICAL_COST_LABEL, formatPence } from "@/app/lib/pricing";
 
 const SOURCE = "home-pricing";
 
@@ -26,9 +26,12 @@ const Check = () => (
   </span>
 );
 
-export default function PriceBlock() {
-  const modal = useCallModal();
-  const enrolClick = () => trackEvent("cta_click", { source: SOURCE, action: "enrol" });
+// cta_click plus the event ConversionSection used to send for the same button.
+const track = (action: "enrol" | "call", legacy: GaEvent) =>
+  ctaClickEvents(SOURCE, action, legacy).forEach(([name, params]) => trackEvent(name, params));
+
+/** @param reserveWasPrice  Build-time hint: keep room for the was-price so it doesn't shift the card on mount. */
+export default function PriceBlock({ reserveWasPrice = false }: { reserveWasPrice?: boolean }) {
 
   return (
     <section id="pricing" className="bg-surface py-14 md:py-24 relative overflow-hidden">
@@ -42,7 +45,7 @@ export default function PriceBlock() {
           Your investment
         </h2>
         <p className="text-soft/70 text-lg text-center max-w-xl mx-auto mb-10 md:mb-14">
-          Most PT qualifications cost <span className="whitespace-nowrap">£1,200–£2,800</span>. Ours is <span className="text-white font-semibold">{COURSE_PRICE_LABEL}</span>, everything included.
+          Most PT qualifications cost <span className="whitespace-nowrap">{TYPICAL_COST_LABEL}</span>. Ours is <span className="text-white font-semibold">{COURSE_PRICE_LABEL}</span>, everything included.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -53,12 +56,12 @@ export default function PriceBlock() {
             <h3 className="font-display font-extrabold text-3xl text-white tracking-tight mb-3">Pay in full</h3>
             <div className="flex flex-wrap items-end gap-x-3 mb-1">
               <p className="font-display font-extrabold text-5xl text-gold leading-none">{COURSE_PRICE_LABEL}</p>
-              <WasPrice className="text-soft text-lg mb-0.5" />
+              <WasPrice reserve={reserveWasPrice} className="text-soft text-lg mb-0.5" />
             </div>
             <p className="text-soft/80 text-sm mb-7 flex-1">One payment, nothing further to pay</p>
             <a
               href={ENROL_HREF}
-              onClick={enrolClick}
+              onClick={() => track("enrol", LEGACY_EVENTS.pricingFull)}
               className="block w-full py-4 rounded-full bg-gold text-deep font-bold text-base text-center hover:brightness-110 transition-all shadow-xl shadow-gold/20"
             >
               Enrol now
@@ -78,7 +81,7 @@ export default function PriceBlock() {
             </p>
             <a
               href={ENROL_HREF}
-              onClick={enrolClick}
+              onClick={() => track("enrol", LEGACY_EVENTS.pricingMonthly)}
               className="block w-full py-4 rounded-full border-2 border-gold/50 text-gold font-bold text-base text-center hover:bg-gold hover:text-deep transition-all"
             >
               Pay monthly
@@ -103,16 +106,13 @@ export default function PriceBlock() {
         </div>
 
         <div className="mt-8 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              trackEvent("cta_click", { source: SOURCE, action: "call" });
-              modal.open(SOURCE);
-            }}
+          <CallLink
+            source={SOURCE}
+            onClick={() => track("call", LEGACY_EVENTS.pricingCall)}
             className="inline-flex items-center gap-2 text-gold font-semibold hover:underline underline-offset-4"
           >
             Not sure? Book a free call →
-          </button>
+          </CallLink>
         </div>
       </div>
     </section>

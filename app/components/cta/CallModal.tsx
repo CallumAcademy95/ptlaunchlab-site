@@ -1,12 +1,16 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import LeadForm from "@/app/components/LeadForm";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { CALL_QUESTION, callSuccessMessage } from "@/app/lib/homeCta";
+import { CallModalContext, type CallModalApi } from "./callModalContext";
 
-type CallModalApi = { open: (source: string) => void; close: () => void; isOpen: boolean };
-
-const CallModalCtx = createContext<CallModalApi | null>(null);
+// LeadForm (and submitLead and the form security code behind it) loads only
+// when the pop-up first opens, so it doesn't ship with the page.
+const LeadForm = dynamic(() => import("@/app/components/LeadForm"), {
+  ssr: false,
+  loading: () => <p className="px-6 pb-6 pt-4 text-soft text-sm" role="status">Loading the form…</p>,
+});
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -17,8 +21,8 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
   const openerRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
 
-  const open = useCallback((s: string) => {
-    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const open = useCallback((s: string, opener?: HTMLElement | null) => {
+    openerRef.current = opener ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     setSource(s);
   }, []);
   const close = useCallback(() => setSource(null), []);
@@ -28,10 +32,29 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.dispatchEvent(new CustomEvent("ptll:call-modal", { detail: { open: true } }));
-    panelRef.current?.querySelector<HTMLElement>("input")?.focus();
+    // The form arrives a moment later (next/dynamic): focus the close button
+    // now, then the first field as soon as it renders.
+    const panel = panelRef.current;
+    const firstInput = () => panel?.querySelector<HTMLElement>("input");
+    let mo: MutationObserver | null = null;
+    if (firstInput()) firstInput()!.focus();
+    else {
+      panel?.querySelector<HTMLElement>("button")?.focus();
+      if (panel) {
+        mo = new MutationObserver(() => {
+          const input = firstInput();
+          if (!input) return;
+          if (!panel.contains(document.activeElement) || document.activeElement === panel.querySelector("button")) input.focus();
+          mo?.disconnect();
+        });
+        mo.observe(panel, { childList: true, subtree: true });
+      }
+    }
 
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
+        // Esc on a <select> closes its own list; it mustn't close the pop-up too.
+        if (e.target instanceof HTMLElement && e.target.tagName === "SELECT") return;
         e.preventDefault();
         close();
         return;
@@ -55,6 +78,7 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
     }
     document.addEventListener("keydown", onKey);
     return () => {
+      mo?.disconnect();
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
       window.dispatchEvent(new CustomEvent("ptll:call-modal", { detail: { open: false } }));
@@ -62,8 +86,11 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
       // closes when its "Book a free call" is pressed). Fall back to the menu
       // toggle, else drop focus to the document rather than lose it silently.
       const opener = openerRef.current;
-      if (opener?.isConnected) opener.focus();
-      else {
+      if (opener?.isConnected) {
+        opener.focus();
+        // If the opener was still inert/hidden in this commit, retry next frame.
+        if (document.activeElement !== opener) requestAnimationFrame(() => opener.focus());
+      } else {
         const toggle = document.querySelector<HTMLElement>('nav button[aria-label="Toggle menu"]');
         if (toggle && toggle.offsetParent !== null) toggle.focus();
         else if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
@@ -74,7 +101,7 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
   const api = useMemo<CallModalApi>(() => ({ open, close, isOpen }), [open, close, isOpen]);
 
   return (
-    <CallModalCtx.Provider value={api}>
+    <CallModalContext.Provider value={api}>
       {children}
       {isOpen && (
         <div
@@ -111,16 +138,6 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
-    </CallModalCtx.Provider>
+    </CallModalContext.Provider>
   );
-}
-
-export function useOptionalCallModal(): CallModalApi | null {
-  return useContext(CallModalCtx);
-}
-
-export function useCallModal(): CallModalApi {
-  const ctx = useContext(CallModalCtx);
-  if (!ctx) throw new Error("useCallModal must be used inside <CallModalProvider>");
-  return ctx;
 }

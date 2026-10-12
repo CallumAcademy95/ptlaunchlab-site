@@ -1,12 +1,14 @@
 'use client';
 import { trackEvent } from '@/app/lib/gtag';
 import TwoWayCTA from '@/app/components/cta/TwoWayCTA';
+import { LEGACY_EVENTS } from '@/app/lib/homeCta';
 
 /**
  * @param source  When given (the home page passes "home-final"), the section
  *   ends in the shared two-way CTA: Enrol now + Book a free call, which opens
  *   the call pop-up inside a CallModalProvider and links to /book-call
- *   outside one. Without it, the 36 landing pages keep their original
+ *   outside one. It still sends the old book_call_click / enrol_click
+ *   {location: "final_cta"} events alongside cta_click. Without it, the 36 landing pages keep their original
  *   "Discover Your Pathway" / "Start Today" buttons and events unchanged.
  */
 export default function FinalCTA({ source }: { source?: string } = {}) {
@@ -46,7 +48,11 @@ export default function FinalCTA({ source }: { source?: string } = {}) {
         </p>
 
         {source ? (
-          <TwoWayCTA source={source} className="justify-center mb-4" />
+          <TwoWayCTA
+            source={source}
+            className="justify-center mb-4"
+            legacy={{ call: LEGACY_EVENTS.finalCall, enrol: LEGACY_EVENTS.finalEnrol }}
+          />
         ) : (
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
             <a

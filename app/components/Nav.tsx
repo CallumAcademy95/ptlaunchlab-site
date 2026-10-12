@@ -2,22 +2,24 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { trackEvent } from "@/app/lib/gtag";
-import { useOptionalCallModal } from "@/app/components/cta/CallModal";
+import CallLink from "@/app/components/cta/CallLink";
 
-// The site's two points of sale. "Book a free call" opens the call pop-up on
-// pages wrapped in <CallModalProvider> (the home page) and is a plain link to
-// /book-call everywhere else, so Nav keeps working on every page.
+// The site's two points of sale. "Book a free call" is a link to /book-call
+// on every page; on pages wrapped in <CallModalProvider> (the home page) a
+// plain click opens the call pop-up instead.
 function NavCallButton({ className, onDone }: { className: string; onDone?: () => void }) {
-  const modal = useOptionalCallModal();
-  const track = () => trackEvent("cta_click", { source: "nav", action: "call" });
-  if (modal) {
-    return (
-      <button type="button" className={className} onClick={() => { track(); onDone?.(); modal.open("nav"); }}>
-        Book a free call
-      </button>
-    );
-  }
-  return <a href="/book-call" className={className} onClick={track}>Book a free call</a>;
+  return (
+    <CallLink
+      source="nav"
+      className={className}
+      onClick={() => {
+        trackEvent("cta_click", { source: "nav", action: "call" });
+        onDone?.();
+      }}
+    >
+      Book a free call
+    </CallLink>
+  );
 }
 
 /**

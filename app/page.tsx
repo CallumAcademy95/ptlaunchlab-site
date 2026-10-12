@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PAYMENTS } from "@/app/lib/pricing";
 import Nav from "./components/Nav";
-import HomeHero from "./components/home/HomeHero";
+import Link from "next/link";
+import HomeHero, { RESERVE_WAS_PRICE } from "./components/home/HomeHero";
 import ProofStrip from "./components/home/ProofStrip";
 import PriceBlock from "./components/home/PriceBlock";
 import PainPoints from "./components/PainPoints";
@@ -151,7 +152,7 @@ export default function Home() {
             </div>
           </SectionEnd>
 
-          <PriceBlock />
+          <PriceBlock reserveWasPrice={RESERVE_WAS_PRICE} />
 
           <FounderStory video />
           <SectionEnd bg="bg-base">
@@ -170,7 +171,12 @@ export default function Home() {
             <GymPartners />
             <Podcast />
             <SectionEnd bg="bg-surface">
-              <TwoWayCTA source="home-partners" className={CTA_WIDTH} />
+              <div className="w-full flex flex-col items-center gap-5">
+                <Link href="/podcast" className="text-gold font-semibold hover:underline underline-offset-4">
+                  Listen to the podcast →
+                </Link>
+                <TwoWayCTA source="home-partners" className={CTA_WIDTH} />
+              </div>
             </SectionEnd>
           </section>
 

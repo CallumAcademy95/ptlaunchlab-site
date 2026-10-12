@@ -57,6 +57,8 @@ export default function ProofStrip() {
             <p className="text-soft/80 text-sm leading-relaxed mb-5">
               Our founders run gyms and hire trainers. On qualifying, we introduce you to a gym.
             </p>
+            {/* The gyms in the network, not the gyms that hired the 500+. */}
+            <p className="text-faint text-[11px] font-semibold tracking-widest uppercase mb-2">Gyms in our partner network</p>
             <div className="relative -mx-6 flex-1">
               <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-card to-transparent z-10" aria-hidden="true" />
               <ul
@@ -93,7 +95,7 @@ export default function ProofStrip() {
               ))}
             </ul>
             <div className="rounded-xl bg-white/90 h-20 flex items-center justify-center mb-4">
-              <Image src="/logos/ncfe.png" alt="NCFE" width={1634} height={530} loading="lazy" className="h-12 w-auto" />
+              <Image src="/logos/ncfe.png" alt="NCFE" width={148} height={48} sizes="148px" loading="lazy" className="h-12 w-auto" />
             </div>
             <p className="text-soft/80 text-sm leading-relaxed flex-1">
               An NCFE Level 3 qualification, regulated by Ofqual and recognised by CIMSPA: the one UK gym managers ask for by name.
