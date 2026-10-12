@@ -118,6 +118,7 @@ test("pricing: one featured pay-in-full card, then the monthly link and the call
   assert.match(card, /href=\{enrolPath\}[\s\S]*?>\s*Enrol now\s*</);
   assert.match(p, /href=\{enrolPath\}[\s\S]{0,400}?Prefer \{MONTHLY_PAYMENTS\} monthly payments of \{MONTHLY_PRICE_LABEL\}\? See payment options →/);
   assert.match(p, /href="#ring-me"[\s\S]{0,400}?Not sure\? Book a free call/);
+  assert.match(p, /source="gym-pricing-monthly"[\s\S]{0,300}?Prefer \{MONTHLY_PAYMENTS\}/, "the monthly link has its own source");
   assert.doesNotMatch(p, /Pay Monthly/, "no second card");
 });
 
@@ -172,7 +173,7 @@ test("tracking: every new gym button sends cta_click with the gym", () => {
   const links = p.match(/<GymCtaLink[\s\S]*?>/g) ?? [];
   assert.ok(links.length >= 7, `expected at least 7 tracked gym links, got ${links.length}`);
   for (const l of links) {
-    assert.match(l, /source="gym-(hero|pricing|final)"/, l);
+    assert.match(l, /source="gym-(hero|pricing|pricing-monthly|final)"/, l);
     assert.match(l, /action="(enrol|call)"/, l);
     assert.match(l, /gym=\{c\.gymSlug\}/, l);
   }
@@ -187,4 +188,17 @@ test("banned words are absent", () => {
     const s = src(f);
     for (const b of BANNED) assert.doesNotMatch(s, b, `${f}: ${b}`);
   }
+});
+
+test("chat bubble hides below md behind ANY page's hero CTA, not just home's", () => {
+  const c = src("app/components/Chatbot.tsx");
+  assert.match(c, /const HERO_CTA = "\[data-cta-source\$='-hero'\]";/);
+  assert.equal((c.match(/querySelector\(HERO_CTA\)/g) ?? []).length, 2, "both hero lookups use HERO_CTA");
+  assert.doesNotMatch(c, /data-cta-source='home-hero'/);
+});
+
+test("chat Talk to the Team goes to the gym's #ring-me form when the page has one", () => {
+  const c = src("app/components/Chatbot.tsx");
+  assert.match(c, /action === "call"[\s\S]{0,200}?document\.getElementById\("ring-me"\)/);
+  assert.match(c, /href: "\/book-call"/, "other pages still go to /book-call");
 });

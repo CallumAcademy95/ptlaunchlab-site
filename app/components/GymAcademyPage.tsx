@@ -351,7 +351,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 </GymCtaLink>
               </div>
               <p className="mt-5 text-sm text-gray-600">
-                <GymCtaLink href={enrolPath} source="gym-pricing" action="enrol" gym={c.gymSlug}
+                <GymCtaLink href={enrolPath} source="gym-pricing-monthly" action="enrol" gym={c.gymSlug}
                   className="underline underline-offset-4 decoration-gray-300 hover:text-black hover:decoration-black">
                   Prefer {MONTHLY_PAYMENTS} monthly payments of {MONTHLY_PRICE_LABEL}? See payment options →
                 </GymCtaLink>

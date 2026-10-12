@@ -34,9 +34,13 @@ function parseRaw(raw: string): { blocks: string[]; actions: string[] } {
   return { blocks: blocks.length ? blocks : [""], actions };
 }
 
+// Any page's hero CTA wrapper: home-hero, gym-hero, courses-hero, the
+// funnel, blueprint, guide, location and vsl heroes all end in "-hero".
+const HERO_CTA = "[data-cta-source$='-hero']";
+
 function heroOnScreen(): boolean {
   if (typeof document === "undefined") return false;
-  const hero = document.querySelector("[data-cta-source='home-hero']");
+  const hero = document.querySelector(HERO_CTA);
   if (!hero) return false;
   const r = hero.getBoundingClientRect();
   return r.bottom > 0 && r.top < window.innerHeight;
@@ -52,8 +56,8 @@ export default function Chatbot() {
   // the bar's right edge or clip the "Book a call" button. The lift is
   // dropped from lg up (the bar hides at md on the home page, lg elsewhere).
   const [stickyCtaVisible, setStickyCtaVisible] = useState(false);
-  // True while the home hero's buttons are on screen: the bubble is hidden
-  // below md and lifts clear of them from md up.
+  // True while a page's hero buttons (any HERO_CTA) are on screen: the bubble
+  // is hidden below md and lifts clear of them from md up.
   // Chatbot is client-only (ChatbotLazy, ssr:false), so the first render can
   // read the hero's position and the bubble never flashes over its buttons.
   const [heroInView, setHeroInView] = useState(heroOnScreen);
@@ -79,8 +83,8 @@ export default function Chatbot() {
     window.addEventListener("ptll:sticky-cta", onSignal);
     onScroll();
 
-    // Home hero: no-op when the element doesn't exist.
-    const hero = document.querySelector("[data-cta-source='home-hero']");
+    // The page's hero CTA, if it has one: no-op when the element doesn't exist.
+    const hero = document.querySelector(HERO_CTA);
     let io: IntersectionObserver | null = null;
     if (hero) {
       io = new IntersectionObserver(([entry]) => setHeroInView(entry.isIntersecting));
@@ -155,8 +159,8 @@ export default function Chatbot() {
           stickyCtaVisible
             ? "bottom-24 lg:bottom-6"
             : heroInView && !open
-              ? // Home hero on screen. Hidden below md (a phone has no room beside
-                // the hero buttons), lifted clear of them from md to lg.
+              ? // A hero CTA is on screen. Hidden below md (a phone has no room
+                // beside the hero buttons), lifted clear of them from md to lg.
                 "max-md:hidden bottom-28 lg:bottom-6"
               : heroInView
                 ? "bottom-28 lg:bottom-6"
@@ -245,6 +249,21 @@ export default function Chatbot() {
                             href={cfg.href}
                             target={isExternal ? "_blank" : undefined}
                             rel={isExternal ? "noopener noreferrer" : undefined}
+                            onClick={(e) => {
+                              // Gym academy pages: "Talk to the Team" goes to the gym's
+                              // own ring-me form (intent=gym_callback with the gym's
+                              // slug), so the call keeps the gym's attribution.
+                              // Pages without #ring-me still go to /book-call.
+                              if (action === "call") {
+                                const ringMe = document.getElementById("ring-me");
+                                if (ringMe) {
+                                  e.preventDefault();
+                                  setOpen(false);
+                                  history.replaceState(null, "", "#ring-me");
+                                  ringMe.scrollIntoView({ behavior: "smooth", block: "start" });
+                                }
+                              }
+                            }}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all hover:brightness-110"
                             style={{ background: "#F5C518", color: "#072B4A" }}
                           >
