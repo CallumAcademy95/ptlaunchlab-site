@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { WHATSAPP_LINK } from "@/app/lib/contactDetails";
 
 type Message =
@@ -33,6 +34,14 @@ function parseRaw(raw: string): { blocks: string[]; actions: string[] } {
   return { blocks: blocks.length ? blocks : [""], actions };
 }
 
+function heroOnScreen(): boolean {
+  if (typeof document === "undefined") return false;
+  const hero = document.querySelector("[data-cta-source='home-hero']");
+  if (!hero) return false;
+  const r = hero.getBoundingClientRect();
+  return r.bottom > 0 && r.top < window.innerHeight;
+}
+
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([OPENER]);
@@ -44,6 +53,12 @@ export default function Chatbot() {
   // Only applies under lg (where StickyMobileCTA is visible) — desktop is
   // unaffected.
   const [stickyCtaVisible, setStickyCtaVisible] = useState(false);
+  // True while the home hero's buttons are on screen: the bubble is hidden
+  // below md and lifts clear of them from md up.
+  // Chatbot is client-only (ChatbotLazy, ssr:false), so the first render can
+  // read the hero's position and the bubble never flashes over its buttons.
+  const [heroInView, setHeroInView] = useState(heroOnScreen);
+  const pathname = usePathname();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,11 +66,34 @@ export default function Chatbot() {
   }, [messages, loading]);
 
   useEffect(() => {
-    const onScroll = () => setStickyCtaVisible(window.scrollY > 400);
+    // Pages with StickyCtaBar broadcast ptll:sticky-cta; once one arrives it
+    // is the source of truth. Other pages keep the scrollY > 400 rule.
+    let useSignal = false;
+    const onScroll = () => {
+      if (!useSignal) setStickyCtaVisible(window.scrollY > 400);
+    };
+    const onSignal = (e: Event) => {
+      useSignal = true;
+      setStickyCtaVisible(Boolean((e as CustomEvent<{ visible: boolean }>).detail?.visible));
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("ptll:sticky-cta", onSignal);
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+
+    // Home hero: no-op when the element doesn't exist.
+    const hero = document.querySelector("[data-cta-source='home-hero']");
+    let io: IntersectionObserver | null = null;
+    if (hero) {
+      io = new IntersectionObserver(([entry]) => setHeroInView(entry.isIntersecting));
+      io.observe(hero);
+    }
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("ptll:sticky-cta", onSignal);
+      io?.disconnect();
+      setHeroInView(false);
+    };
+  }, [pathname]);
 
   async function send() {
     const text = input.trim();
@@ -115,7 +153,15 @@ export default function Chatbot() {
         onClick={() => setOpen(!open)}
         aria-label="Open chat"
         className={`fixed right-6 z-50 w-14 h-14 rounded-full bg-[#F5C518] text-[#072B4A] flex items-center justify-center shadow-lg hover:brightness-110 transition-all duration-200 ${
-          stickyCtaVisible ? "bottom-24 lg:bottom-6" : "bottom-6"
+          stickyCtaVisible
+            ? "bottom-24 lg:bottom-6"
+            : heroInView && !open
+              ? // Home hero on screen. Hidden below md (a phone has no room beside
+                // the hero buttons), lifted clear of them from md to lg.
+                "max-md:hidden bottom-28 lg:bottom-6"
+              : heroInView
+                ? "bottom-28 lg:bottom-6"
+                : "bottom-6"
         }`}
         style={{ boxShadow: "0 4px 24px rgba(245,197,24,0.4)" }}
       >
@@ -135,7 +181,7 @@ export default function Chatbot() {
       {open && (
         <div
           className={`fixed right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] flex flex-col rounded-2xl overflow-hidden shadow-2xl ${
-            stickyCtaVisible ? "bottom-[10.5rem] lg:bottom-24" : "bottom-24"
+            stickyCtaVisible ? "bottom-[10.5rem] lg:bottom-24" : heroInView ? "bottom-[9.5rem] lg:bottom-24" : "bottom-24"
           }`}
           style={{ height: "480px", background: "#072B4A", border: "1px solid rgba(59,130,246,0.25)" }}
         >

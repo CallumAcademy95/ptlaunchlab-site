@@ -63,20 +63,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* Preload first hero slide on desktop only — on mobile the image is
-            below the fold (single column, image follows the H1), so a
-            high-priority preload there steals bandwidth from CSS and pushes
-            FCP back. fetchPriority "high" removed for the same reason —
-            "auto" lets the browser balance against CSS/font requests. */}
-        <link
-          rel="preload"
-          as="image"
-          href="/learner-1.webp"
-          type="image/webp"
-          media="(min-width: 1024px)"
-        />
-      </head>
+      {/* No hand-written hero preload: the home hero's next/image `priority`
+          emits its own preload for the optimised, correctly sized image. A raw
+          /learner-1.webp preload here fetched the full-size file a second time,
+          on every page. */}
       <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
         {/* Organization JSON-LD schema — graph with EducationalOrganization
             (the brand/course provider) + LocalBusiness (the Pontefract HQ)

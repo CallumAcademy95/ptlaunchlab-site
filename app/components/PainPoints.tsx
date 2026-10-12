@@ -32,7 +32,9 @@ const cards = [
   },
 ];
 
-export default function PainPoints() {
+/** @param limit  Render only the first N cards (default: all). */
+export default function PainPoints({ limit }: { limit?: number } = {}) {
+  const shown = limit === undefined ? cards : cards.slice(0, limit);
   return (
     <section className="bg-base py-14 md:py-24 border-t border-white/[0.05]">
       <div className="max-w-6xl mx-auto px-6">
@@ -48,7 +50,7 @@ export default function PainPoints() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {cards.map((card) => (
+          {shown.map((card) => (
             <div
               key={card.title}
               className="bg-card border border-white/[0.07] rounded-2xl p-6 md:p-8 hover:border-gold/30 transition-all duration-300 hover:-translate-y-1 group"

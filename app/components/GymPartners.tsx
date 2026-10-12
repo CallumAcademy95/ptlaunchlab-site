@@ -3,30 +3,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { formatPence } from "@/app/lib/pricing";
 import { LADDER_PIF_COMMISSION_PENCE, VOLUME_BONUS_PIF_PENCE } from "@/app/lib/partnerCommission";
-
-// `dark` is unused by the rendering below (kept for a future light/dark logo
-// swap that was never wired up) — do not rely on it to affect layout.
-const gymPartners = [
-  { name: "Leodis 24/7 Gym",       src: "/logos/leodis-gym.png",          dark: false },
-  { name: "Iron Wolf Gym",         src: "/logos/iron-wolf-gym.png",       dark: false },
-  { name: "1079 Fitness",          src: "/logos/1079-fitness.png",        dark: false },
-  { name: "Ultimate Shred",        src: "/logos/ultimate-shred.png",      dark: true  },
-  { name: "6FitGym",               src: "/logos/6fit-gym.png",            dark: true  },
-  { name: "MOF Gym",               src: "/logos/mof.png",                 dark: true  },
-  { name: "Muscle Bound Gym",      src: "/logos/muscle bound gym.png",    dark: true  },
-  { name: "Ebor Gym",              src: "/logos/EBOR GYM.png",            dark: false },
-  { name: "HITIO Gym Orpington",   src: "/logos/hitio-gym.png",           dark: true  },
-  // Added 2026-09-13. These are partners with a commercial record in
-  // pp_partners — fee_per_learner_pence, a promo code, the lot — and they were
-  // missing from this wall while three gyms with NO such record were on it.
-  // Their logos already existed under /gym-logos/ for their own landing pages.
-  { name: "Gym n Go",              src: "/gym-logos/gym-n-go.png",        dark: false },
-  { name: "Xcelerate Gyms",        src: "/gym-logos/xcelerate.png",       dark: false },
-  { name: "ATP Fitness Felixstowe", src: "/logos/atp-fitness.png",        dark: true  },
-  // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
-  // and still missing here, because no logo file exists anywhere in the repo.
-  // Drop one at public/logos/superflex.png and add the row.
-];
+import { gymPartners } from "@/app/lib/gymPartnersData";
 
 const accreditations = [
   { name: "NCFE", src: "/logos/ncfe.png", dark: false },

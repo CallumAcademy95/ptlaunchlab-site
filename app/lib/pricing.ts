@@ -39,6 +39,12 @@ export function formatPence(pence: number): string {
 
 export const COURSE_PRICE_LABEL = formatPence(COURSE_PRICE_PENCE); // £999.99
 export const MONTHLY_PRICE_LABEL = formatPence(MONTHLY_PRICE_PENCE); // £99.99
+/**
+ * What a PT qualification typically costs elsewhere. The site's own figure:
+ * the "typical" column of the comparison table on /courses ("NCFE Level 2 & 3
+ * qualification: £1,200 – £2,800"). Change it there and here together.
+ */
+export const TYPICAL_COST_LABEL = "£1,200–£2,800";
 /** "10 × £99.99" */
 export const MONTHLY_PLAN_LABEL = `${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL}`;
 

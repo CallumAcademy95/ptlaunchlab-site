@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ClickToPlay from "./ClickToPlay";
 
 const founders = [
   { src: "/callum.webp", name: "Callum", alt: "Callum Brown — co-founder of PT Launch Lab and Head of Education" },
@@ -13,7 +14,14 @@ const stats = [
   { value: "1",      label: "Personal tutor assigned\nto you from day one" },
 ];
 
-export default function FounderStory() {
+/**
+ * @param video  Home page version: the 47-second "what we actually are" video
+ *   (click-to-play) heads the right column in place of Gemma's story card
+ *   (her video follows in the reviews section), and the two buttons become one
+ *   "Read our story" text link, because the page puts its own two-way CTA
+ *   straight after this section. Default false is what every other page shows.
+ */
+export default function FounderStory({ video = false }: { video?: boolean } = {}) {
   return (
     <section className="bg-base py-14 md:py-24">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-center">
@@ -49,24 +57,40 @@ export default function FounderStory() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-4">
-            <a
-              href="/courses"
-              className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-gold/20"
-            >
-              View Course Details →
+          {video ? (
+            <a href="/about#our-story" className="text-gold font-semibold hover:underline underline-offset-4">
+              Read our story →
             </a>
-            <a
-              href="/about#our-story"
-              className="px-7 py-3.5 rounded-full border border-gold/50 text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all"
-            >
-              Read Our Story
-            </a>
-          </div>
+          ) : (
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="/courses"
+                className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-gold/20"
+              >
+                View Course Details →
+              </a>
+              <a
+                href="/about#our-story"
+                className="px-7 py-3.5 rounded-full border border-gold/50 text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all"
+              >
+                Read Our Story
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Right — stats + case study */}
         <div className="space-y-4">
+          {video && (
+            <ClickToPlay
+              source={{ kind: "file", src: "/video/homepage-vsl-1080.mp4", srcSmall: "/video/homepage-vsl-720.mp4" }}
+              poster="/video/homepage-vsl-poster.jpg"
+              title="What PT Launch Lab actually is, in 47 seconds"
+              label="47 sec · sound on"
+              trackAs="homepage_vsl"
+              metaEvent="VSLPlay"
+            />
+          )}
           <div className="grid grid-cols-2 gap-4">
             {stats.map((stat) => (
               <div
@@ -80,13 +104,15 @@ export default function FounderStory() {
           </div>
 
           {/* Student success story */}
-          <div className="bg-card border border-gold/20 rounded-2xl p-6">
-            <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Student Success Story</p>
-            <h4 className="text-white font-bold text-lg mb-2">Gemma&apos;s Journey: Corporate to Coaching</h4>
-            <p className="text-soft/70 text-sm leading-relaxed">
-              Gemma left a corporate career behind and retrained through PT Launch Lab. She had a personal tutor from day one, completed in 12 weeks around her job, and walked into a guaranteed gym introduction on the other side. Now she runs her own PT business, earns more than she ever did in the office, and hasn&apos;t dreaded a Monday since.
-            </p>
-          </div>
+          {!video && (
+            <div className="bg-card border border-gold/20 rounded-2xl p-6">
+              <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-3">Student Success Story</p>
+              <h4 className="text-white font-bold text-lg mb-2">Gemma&apos;s Journey: Corporate to Coaching</h4>
+              <p className="text-soft/70 text-sm leading-relaxed">
+                Gemma left a corporate career behind and retrained through PT Launch Lab. She had a personal tutor from day one, completed in 12 weeks around her job, and walked into a guaranteed gym introduction on the other side. Now she runs her own PT business, earns more than she ever did in the office, and hasn&apos;t dreaded a Monday since.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>

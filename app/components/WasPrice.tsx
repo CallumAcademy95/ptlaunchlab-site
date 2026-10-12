@@ -7,13 +7,19 @@ import { PRICE_DROP_NOTE, WAS_PRICE_LABEL, wasPriceActive } from "@/app/lib/pric
  * "£1,599" struck through (and optionally the price-drop note), shown only
  * until WAS_PRICE_ENDS_MS. Decided in the browser after mount, so it switches
  * off on time even if the page was built before the end date.
+ *
+ * @param reserve  Until mount, render the same box invisibly so its space is
+ *   held and nothing below it moves when it appears. The server and the first
+ *   client render are identical (no hydration mismatch). Pass a build-time
+ *   `wasPriceActive(...)` so pages built after the end date reserve nothing.
  */
-export default function WasPrice({ note = false, className = "" }: { note?: boolean; className?: string }) {
-  const [on, setOn] = useState(false);
-  useEffect(() => setOn(wasPriceActive(Date.now())), []);
-  if (!on) return null;
+export default function WasPrice({ note = false, className = "", reserve = false }: { note?: boolean; className?: string; reserve?: boolean }) {
+  const [state, setState] = useState<"pending" | "on" | "off">("pending");
+  useEffect(() => setState(wasPriceActive(Date.now()) ? "on" : "off"), []);
+  if (state === "off" || (state === "pending" && !reserve)) return null;
+  const placeholder = state === "pending";
   return (
-    <span className={`inline-flex flex-col leading-tight ${className}`}>
+    <span className={`inline-flex flex-col leading-tight ${placeholder ? "invisible" : ""} ${className}`} aria-hidden={placeholder || undefined}>
       <span className="line-through opacity-60 text-[0.85em] font-semibold" aria-label={`was ${WAS_PRICE_LABEL}`}>
         {WAS_PRICE_LABEL}
       </span>

@@ -6,16 +6,12 @@ import {
   MONTHLY_PRICE_LABEL,
   MONTHLY_PAYMENTS,
   MONTHLY_PLAN_TOTAL_PENCE,
+  TYPICAL_COST_LABEL,
   formatPence,
 } from "@/app/lib/pricing";
 import { ATP_LADDER, isAtp, memberPricePence } from "@/app/lib/partnerCommission";
 import { memberSavingForGym } from "@/app/lib/gyms";
 import GymCallbackForm from "@/app/components/GymCallbackForm";
-
-// What a PT qualification typically costs elsewhere. The site's own figure —
-// the "typical" column of the comparison table on /courses ("NCFE Level 2 & 3
-// qualification: £1,200 – £2,800"). Change it there and here together.
-const TYPICAL_COST_LABEL = "£1,200–£2,800";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
 /** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
