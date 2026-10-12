@@ -7,8 +7,9 @@
  * carry separate copies of the clause text).
  *
  * Scope is deliberately narrow: exclusivity, representing PT Launch Lab,
- * learner data, materials and ending it. Fees are NOT in here — they are agreed
- * separately in writing and set after the 90-day pilot review.
+ * learner data, materials and ending it, plus the £40 call fee for learners who
+ * enrol after signing (earlier learners are the unpaid pilot). The package split
+ * and any other fees are agreed separately in writing.
  *
  * VERSIONING: bump MENTOR_AGREEMENT_VERSION whenever the legal text changes.
  *
@@ -22,7 +23,7 @@ export type { Block, Clause };
 export const MENTOR_AGREEMENT_VERSION = "1.0";
 
 export const MENTOR_AGREEMENT_SUMMARY =
-  "exclusivity to PTLL among PT course providers · learner data as processor (24h breach, 14-day deletion) · represents PTLL · no fees";
+  "exclusivity to PTLL among PT course providers · learner data as processor (24h breach, 14-day deletion) · represents PTLL · £40 per call for post-signing learners, pre-signing learners are unpaid pilot";
 
 export interface MentorAgreementParties {
   /** Trading or company name, e.g. "Axis Systems" or "Axis Systems Ltd". */
@@ -42,6 +43,12 @@ const b = (text: string): Block => ({ kind: "bullet", text });
 
 /** Shown above the agreement and positively acknowledged before signing. */
 export const MENTOR_KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
+  {
+    clause: "Clause 2",
+    title: "Call fee and the pilot",
+    detail:
+      "We pay you £40 for the included 1:1 call you hold with each learner who enrols on or after the date you sign, invoiced monthly. Learners who enrolled before that date are the pilot: you mentor them as part of the course, but no call fee is paid for them. Any package split or other fee is agreed separately in writing.",
+  },
   {
     clause: "Clause 4",
     title: "Exclusivity",
@@ -85,7 +92,7 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
 
     {
       number: "2",
-      title: "Purpose",
+      title: "Purpose & Call Fee",
       blocks: [
         p(
           "2.1  The Mentor Partner provides business mentorship to PT Launch Lab’s learners as part of PT Launch Lab’s course. This includes the Dream Customer Profile work, 1:1 calls, coaching systems and recorded education, as agreed between the parties from time to time."
@@ -94,10 +101,19 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
           "2.2  This Agreement covers how the Mentor Partner works with PT Launch Lab and its learners: exclusivity, representation, learner data, materials and ending the arrangement."
         ),
         p(
-          "2.3  Fees and any revenue share are not set by this Agreement. They are agreed separately in writing. Until they are, neither party owes the other any payment under this Agreement."
+          "2.3  Call fee — PT Launch Lab shall pay the Mentor Partner £40 for the included 1:1 call it holds with each learner who enrols on PT Launch Lab’s course on or after the date of this Agreement. The fee covers one included call per learner. A call counts only if it takes place; no fee is due for a call the learner misses. Any further paid calls must be agreed in writing in advance. The fee is inclusive of VAT, if any."
         ),
         p(
-          "2.4  PT Launch Lab remains responsible for the course, qualification, assessment, learner administration and customer service. The Mentor Partner is not responsible for these."
+          "2.4  Pilot learners — learners who enrolled before the date of this Agreement form the pilot. The Mentor Partner delivers the included mentorship to them on the same basis, but no call fee is payable for their calls."
+        ),
+        p(
+          "2.5  Invoicing — the Mentor Partner shall invoice PT Launch Lab monthly in arrears, listing each learner and the date of their call. PT Launch Lab shall pay each valid invoice within 14 days."
+        ),
+        p(
+          "2.6  Other fees — any revenue share or fee for a paid package, or any other payment, is not set by this Agreement and must be agreed separately in writing. Until it is, no payment is owed under this Agreement other than under Clause 2.3."
+        ),
+        p(
+          "2.7  PT Launch Lab remains responsible for the course, qualification, assessment, learner administration and customer service. The Mentor Partner is not responsible for these."
         ),
       ],
     },
@@ -235,7 +251,7 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
         p(
           "10.4  When it ends, the Mentor Partner shall stop describing itself as PT Launch Lab’s partner and shall comply with Clause 5.4. Paid work already started with a learner is finished as agreed with that learner."
         ),
-        p("10.5  Clauses 5, 6, 7, 8 and 11 survive termination."),
+        p("10.5  Call fees for calls held before termination remain payable. Clauses 2.5, 5, 6, 7, 8 and 11 survive termination."),
       ],
     },
 
@@ -250,7 +266,7 @@ export function buildMentorAgreementClauses(party: MentorAgreementParties): Clau
           "11.2  Neither party may assign this Agreement without the other’s written consent. A person who is not a party has no right to enforce it under the Contracts (Rights of Third Parties) Act 1999."
         ),
         p(
-          "11.3  This Agreement, together with any fees agreed in writing under Clause 2.3, is the entire agreement between the parties on its subject. Changes must be in writing and agreed by both parties."
+          "11.3  This Agreement, together with any fees agreed in writing under Clause 2.6, is the entire agreement between the parties on its subject. Changes must be in writing and agreed by both parties."
         ),
         p(
           "11.4  If any provision is found unenforceable, it applies with the minimum change needed to make it enforceable, and the rest continues in force."

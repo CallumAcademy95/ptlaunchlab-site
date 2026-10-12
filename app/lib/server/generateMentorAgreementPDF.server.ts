@@ -244,7 +244,7 @@ export function generateMentorAgreementPDFServer(
     if (data.acknowledgedKeyTerms) {
       doc.fillColor(BODY).font("Helvetica").fontSize(7.5)
          .text(
-           `Before signing, ${data.repName} was shown a summary of the key terms — Clause 3 (representing PT Launch Lab), Clause 4 (exclusivity) and Clause 5 (learner data) — was required to scroll to the end of the Agreement, and confirmed having read it and being authorised to sign.`,
+           `Before signing, ${data.repName} was shown a summary of the key terms — Clause 2 (call fee and pilot), Clause 3 (representing PT Launch Lab), Clause 4 (exclusivity) and Clause 5 (learner data) — was required to scroll to the end of the Agreement, and confirmed having read it and being authorised to sign.`,
            M, y, { width: CW }
          );
       y = doc.y + 4;
