@@ -55,7 +55,7 @@ export default function WhatsAppPage() {
               </p>
 
               <p className="text-soft/60 text-xs mt-8">
-                ⭐ 5.0 · 19 Verified Google Reviews &nbsp;·&nbsp; Run by gym owners who&apos;ve hired 500+ trainers
+                ⭐ 5.0 Google rating &nbsp;·&nbsp; Run by gym owners who&apos;ve hired 500+ trainers
               </p>
             </div>
 

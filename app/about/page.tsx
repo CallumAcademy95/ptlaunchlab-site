@@ -3,6 +3,8 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import FounderTabs from "../components/FounderTabs";
 import Breadcrumbs from "../components/Breadcrumbs";
+import { PHONE_SCHEMA, GOOGLE_PROFILE_URL } from "@/app/lib/contactDetails";
+import { GEO } from "@/app/lib/siteSchema";
 
 export const metadata = {
   title: "About PT Launch Lab — PT Academy Founded by Gym Owners",
@@ -55,33 +57,28 @@ const stats = [
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
+  // Same @id as the site-wide org in app/lib/siteSchema.ts, so Google merges
+  // the two into one organisation rather than seeing a second one.
+  "@id": "https://ptlaunchlab.co.uk/#org",
   name: "PT Launch Lab",
   url: "https://ptlaunchlab.co.uk",
   logo: "https://ptlaunchlab.co.uk/logo.png",
   description: "UK personal trainer qualification academy offering NCFE Level 2 & 3 PT courses online. Ofqual regulated, CIMSPA recognised, founded by gym owners.",
   address: {
     "@type": "PostalAddress",
+    streetAddress: "Unit 3, Royals Business Park, King St",
     addressLocality: "Pontefract",
     addressRegion: "West Yorkshire",
-    postalCode: "WF8",
+    postalCode: "WF8 4AH",
     addressCountry: "GB",
   },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 53.6917,
-    longitude: -1.3127,
-  },
-  telephone: "",
+  geo: GEO,
+  telephone: PHONE_SCHEMA,
   sameAs: [
     "https://www.youtube.com/@ptlaunchlab",
     "https://www.instagram.com/ptlaunchlab",
+    GOOGLE_PROFILE_URL,
   ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "5.0",
-    reviewCount: "17",
-    bestRating: "5",
-  },
 };
 
 const foundersSchema = {

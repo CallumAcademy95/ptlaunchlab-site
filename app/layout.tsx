@@ -5,7 +5,7 @@ import Script from "next/script";
 import Chatbot from "./components/ChatbotLazy";
 import Tracking from "./components/Tracking";
 import { CallModalProvider } from "./components/cta/CallModal";
-import { PHONE_SCHEMA } from "@/app/lib/contactDetails";
+import { siteSchema } from "@/app/lib/siteSchema";
 import "./globals.css";
 
 // Fonts: every weight below renders somewhere on the site (checked with a
@@ -81,111 +81,11 @@ export default function RootLayout({
           /learner-1.webp preload here fetched the full-size file a second time,
           on every page. */}
       <body className={`${poppins.variable} ${barlowCondensed.variable} antialiased`}>
-        {/* Organization JSON-LD schema — graph with EducationalOrganization
-            (the brand/course provider) + LocalBusiness (the Pontefract HQ)
-            so Google can populate both knowledge panels and local SERPs. */}
+        {/* Organization JSON-LD (EducationalOrganization + LocalBusiness +
+            WebSite graph), built in app/lib/siteSchema.ts. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@graph": [
-                {
-                  "@type": "EducationalOrganization",
-                  "@id": "https://ptlaunchlab.co.uk/#org",
-                  name: "PT Launch Lab",
-                  alternateName: "PT Launch Lab Ltd",
-                  url: "https://ptlaunchlab.co.uk",
-                  logo: {
-                    "@type": "ImageObject",
-                    url: "https://ptlaunchlab.co.uk/logo.png",
-                    width: 512,
-                    height: 512,
-                  },
-                  image: "https://ptlaunchlab.co.uk/og-image.png",
-                  description:
-                    "NCFE Level 3 Personal Trainer qualification, 100% online, built by gym owners. Ofqual regulated, CIMSPA recognised. Business mentorship and a guaranteed gym introduction included.",
-                  foundingDate: "2024",
-                  founders: [
-                    { "@type": "Person", name: "Callum Brown" },
-                    { "@type": "Person", name: "Ryan Robinson" },
-                  ],
-                  email: "info@ptlaunchlab.co.uk",
-                  telephone: PHONE_SCHEMA,
-                  address: {
-                    "@type": "PostalAddress",
-                    streetAddress: "Unit 3, Royals Business Park, King Street",
-                    addressLocality: "Pontefract",
-                    addressRegion: "West Yorkshire",
-                    postalCode: "WF8 4AH",
-                    addressCountry: "GB",
-                  },
-                  areaServed: {
-                    "@type": "Country",
-                    name: "United Kingdom",
-                  },
-                  hasCredential: {
-                    "@type": "EducationalOccupationalCredential",
-                    name: "NCFE Level 2 & 3 Personal Trainer Qualification",
-                    credentialCategory: "certificate",
-                    educationalLevel: "Level 3",
-                    recognizedBy: [
-                      { "@type": "Organization", name: "Ofqual" },
-                      { "@type": "Organization", name: "CIMSPA" },
-                      { "@type": "Organization", name: "NCFE" },
-                    ],
-                  },
-                  sameAs: [
-                    "https://www.youtube.com/@ptlaunchlab",
-                    "https://www.instagram.com/ptlaunchlab",
-                    "https://www.tiktok.com/@pt.launch.lab",
-                    "https://www.facebook.com/profile.php?id=61583011678458",
-                    "https://find-and-update.company-information.service.gov.uk/company/16596168",
-                  ],
-                },
-                {
-                  "@type": "LocalBusiness",
-                  "@id": "https://ptlaunchlab.co.uk/#localbusiness",
-                  name: "PT Launch Lab",
-                  url: "https://ptlaunchlab.co.uk",
-                  image: "https://ptlaunchlab.co.uk/og-image.png",
-                  telephone: PHONE_SCHEMA,
-                  email: "info@ptlaunchlab.co.uk",
-                  priceRange: "££",
-                  address: {
-                    "@type": "PostalAddress",
-                    streetAddress: "Unit 3, Royals Business Park, King Street",
-                    addressLocality: "Pontefract",
-                    addressRegion: "West Yorkshire",
-                    postalCode: "WF8 4AH",
-                    addressCountry: "GB",
-                  },
-                  geo: {
-                    "@type": "GeoCoordinates",
-                    latitude: 53.6917,
-                    longitude: -1.3104,
-                  },
-                  openingHoursSpecification: [
-                    {
-                      "@type": "OpeningHoursSpecification",
-                      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                      opens: "09:00",
-                      closes: "17:00",
-                    },
-                  ],
-                  parentOrganization: { "@id": "https://ptlaunchlab.co.uk/#org" },
-                },
-                {
-                  "@type": "WebSite",
-                  "@id": "https://ptlaunchlab.co.uk/#website",
-                  url: "https://ptlaunchlab.co.uk",
-                  name: "PT Launch Lab",
-                  publisher: { "@id": "https://ptlaunchlab.co.uk/#org" },
-                  inLanguage: "en-GB",
-                },
-              ],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteSchema) }}
         />
         {/* 1. Consent Mode v2 defaults */}
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}

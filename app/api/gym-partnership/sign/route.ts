@@ -4,7 +4,7 @@ import { LADDER_MONTHLY_COMMISSION_PENCE, LADDER_PIF_COMMISSION_PENCE, VOLUME_BO
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generatePartnershipAgreementPDFServer } from "@/app/lib/server/generatePartnershipAgreementPDF.server";
-import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { PHONE_NATIONAL, PHONE_TEL, ADDRESS_ONE_LINE } from "@/app/lib/contactDetails";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { describeOutcome, switchSignedPartner, type SwitchOutcome } from "@/app/lib/partnerTermsSwitch";
 import {
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
     </div>
 
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH
+      PT Launch Lab · ${ADDRESS_ONE_LINE}
     </div>
   </div>
 </body>
@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
     </div>
 
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH · ${PHONE_NATIONAL}
+      PT Launch Lab · ${ADDRESS_ONE_LINE} · ${PHONE_NATIONAL}
     </div>
   </div>
 </body>

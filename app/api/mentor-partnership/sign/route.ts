@@ -6,6 +6,7 @@ import {
   MENTOR_AGREEMENT_VERSION,
   MENTOR_AGREEMENT_SUMMARY,
 } from "@/app/lib/mentorPartnerAgreement";
+import { ADDRESS_ONE_LINE } from "@/app/lib/contactDetails";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "info@ptlaunchlab.co.uk";
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
     </div>
     <div style="background:#0A2A44;padding:24px 28px;border-radius:0 0 12px 12px;">${inner}</div>
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH
+      PT Launch Lab · ${ADDRESS_ONE_LINE}
     </div>
   </div>
 </body></html>`;

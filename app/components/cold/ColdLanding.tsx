@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import QuizApp from "@/app/quiz/QuizApp";
+import NapLine from "@/app/components/NapLine";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ColdLanding — short-form, quiz-first landing page for COLD Meta ads traffic.
@@ -46,7 +47,7 @@ const DEFAULT_BULLETS = [
 ];
 
 const TRUST_ITEMS = [
-  "5.0★ Google Reviews",
+  "5.0★ Google rating",
   "500+ PTs hired",
   "Tutor within 24 hours",
   "Study around full-time work",
@@ -187,6 +188,7 @@ export default function ColdLanding({
             <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
           </nav>
         </div>
+        <NapLine className="max-w-5xl mx-auto px-6 pb-8 -mt-2 text-faint text-xs text-center sm:text-left" linkClassName="hover:text-white transition-colors" />
       </footer>
     </div>
   );

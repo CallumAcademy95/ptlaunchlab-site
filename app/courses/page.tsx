@@ -56,36 +56,6 @@ const courseSchema = {
       repeatFrequency: "P1W",
     },
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "5.0",
-    reviewCount: "3",
-    bestRating: "5",
-    worstRating: "1",
-  },
-  review: [
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Gemma" },
-      datePublished: "2025-09-12",
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody: "Left a corporate career to build her own independent PT business. Now coaching full-time on her own terms. The business training and mentorship made all the difference.",
-    },
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Matty Bell" },
-      datePublished: "2025-09-06",
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody: "Turned a personal journey through adversity into a running and coaching brand that's still growing. PT Launch Lab gave me the foundation and the confidence to do it.",
-    },
-    {
-      "@type": "Review",
-      author: { "@type": "Person", name: "Mac Livock" },
-      datePublished: "2025-08-08",
-      reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-      reviewBody: "Started as a trainee and rose to manager at PureGym. The guaranteed gym introductions and mentorship got me in the door — I did the rest.",
-    },
-  ],
 };
 
 const curriculum = [
@@ -344,7 +314,7 @@ export default function CoursesPage() {
                 { value: "4–8 wks", label: "Fast-track completion" },
                 { value: "100%", label: "Online delivery" },
                 { value: "500+", label: "PTs hired by our team" },
-                { value: "5.0★", label: "Google review rating" },
+                { value: "5.0★", label: "Google rating" },
               ].map((stat) => (
                 <div key={stat.label} className="bg-card border border-white/[0.07] rounded-2xl p-6">
                   <p className="font-display font-extrabold text-gold text-4xl mb-2">{stat.value}</p>

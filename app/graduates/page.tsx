@@ -49,7 +49,7 @@ export default function Page() {
                 ))}
               </div>
               <span className="text-white text-sm font-semibold">5.0</span>
-              <span className="text-soft/60 text-sm">· Verified Google reviews</span>
+              <span className="text-soft/60 text-sm">· Google rating</span>
             </div>
           </div>
         </section>

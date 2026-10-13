@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import LeadForm from "@/app/components/LeadForm";
 import CallLink from "@/app/components/cta/CallLink";
+import NapLine from "@/app/components/NapLine";
+import { GOOGLE_PROFILE_URL } from "@/app/lib/contactDetails";
 import { trackEvent } from "@/app/lib/gtag";
 import { ENROL_HREF, ctaClickEvents } from "@/app/lib/homeCta";
 import { faqPageSchema } from "@/app/lib/faqSchema";
@@ -544,8 +546,8 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
           <div className="flex items-center justify-center gap-2 mb-12">
             <span className="text-[#F5C518] text-lg">★★★★★</span>
             <span className="text-white text-sm font-semibold">5.0</span>
-            <span className="text-[#8CA3BF] text-sm">· 17 Verified Google Reviews</span>
-            <a href="https://www.google.com/search?q=pt+launch+lab+pontefract+reviews" target="_blank" rel="noopener noreferrer" className="text-[#F5C518] text-sm font-medium hover:underline ml-1">See all →</a>
+            <span className="text-[#8CA3BF] text-sm">· Google rating</span>
+            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="text-[#F5C518] text-sm font-medium hover:underline ml-1">See all →</a>
           </div>
 
           {/* Carousel nav */}
@@ -714,6 +716,9 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
           <span>© {new Date().getFullYear()} PT Launch Lab</span>
         </div>
         <Link href="/" className="text-sm text-[#8CA3BF] hover:text-white transition-colors font-medium">← Visit main site</Link>
+      </div>
+      <div className="bg-[#051D33] px-6 pb-8 text-center">
+        <NapLine className="text-[#4A6280] text-xs" linkClassName="hover:text-[#8CA3BF] transition-colors" />
       </div>
 
     </div>

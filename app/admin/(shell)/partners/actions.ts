@@ -8,7 +8,7 @@ import { isUkMobile, normaliseUkPhone, normaliseInstagram, phoneKind } from "./p
 import { getBankDetails, saveBankDetails } from "@/app/lib/partner-bank";
 import { RESOURCE_BUCKET, RESOURCE_CATEGORIES } from "@/app/lib/partner-resources";
 import { PLAYBOOK_TYPES } from "@/app/lib/partner-playbook-types";
-import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { PHONE_NATIONAL, PHONE_TEL, ADDRESS_ONE_LINE } from "@/app/lib/contactDetails";
 import { payoutRefusalReason } from "@/app/lib/security/payoutRules";
 import { saleMoney } from "@/app/lib/partnerCommission";
 
@@ -613,7 +613,7 @@ async function sendWelcomeEmail(args: {
     </div>
 
     <div style="text-align:center;padding:16px;color:#2A4A6C;font-size:11px;">
-      PT Launch Lab · Unit 3, Royals Business Park, Pontefract WF8 4AH
+      PT Launch Lab · ${ADDRESS_ONE_LINE}
     </div>
   </div>
 </body>
