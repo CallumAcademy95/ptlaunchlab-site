@@ -17,7 +17,8 @@ const ROOT = process.cwd();
 const SCAN_DIRS = ["app", "public"];
 const EXCLUDED = ["app/podcast/", "public/gbp/"];
 const TEXT_EXT = /\.(ts|tsx|md|txt|json|html|xml)$/i;
-const BANNED = [/skool/i, /mentorship community/i];
+// Live coaching ran in Skool and ended with it (Callum, 13 Oct 2026).
+const BANNED = [/skool/i, /mentorship community/i, /live coaching/i];
 
 function walk(dir: string, out: string[]): string[] {
   for (const name of readdirSync(dir)) {

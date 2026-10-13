@@ -42,7 +42,7 @@ const whoFor = [
 const comparison = [
   ["Qualification only", "Qualification + business mentoring"],
   ["Finish and leave", "Ongoing mentorship"],
-  ["Generic help desk", "Live coaching with real coaches"],
+  ["Generic help desk", "A personal tutor who knows your name"],
   ["Learn the theory", "Build your actual career"],
   ["You find your own clients", "Warm introductions to hiring partners"],
   ["Hope it works out", "A step-by-step roadmap to earning"],
@@ -62,7 +62,7 @@ const included = [
   "NCFE Level 3 Personal Trainer",
   "Business & marketing mentorship",
   "£500 Mentorship Hub",
-  "Live coaching sessions",
+  "Direct access to the founders",
   "Career & hiring-partner support",
   "Client & programme templates",
   "Personal tutor (24h)",
