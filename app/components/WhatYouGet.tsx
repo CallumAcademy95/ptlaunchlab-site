@@ -60,7 +60,7 @@ const features = [
   {
     Icon: ChartIcon,
     title: "£500 Business Mentorship, Included",
-    body: "Your private Mentorship Hub plus the Skool community, both built around one job: walking you from qualifying to your first paying client. You always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee, not sold as an upgrade afterwards.",
+    body: "Your private Mentorship Hub, built around one job: walking you from qualifying to your first paying client. You always know the next concrete thing to work on, and Callum's a message away when you're stuck. It is in the course fee, not sold as an upgrade afterwards.",
     badge: "£500 Included",
   },
   {

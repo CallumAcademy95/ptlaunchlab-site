@@ -18,13 +18,13 @@ const PAGE_URL = "https://ptlaunchlab.co.uk/career-blueprint";
 export const metadata: Metadata = {
   title: "The PT Career Blueprint — Not Just a Qualification, a Career | PT Launch Lab",
   description:
-    "Become a qualified UK personal trainer and build a career that lasts. NCFE Level 2 + 3, Ofqual regulated, business mentorship, hiring partners and community, the parts that decide the first yet.",
+    "Become a qualified UK personal trainer and build a career that lasts. NCFE Level 2 + 3, Ofqual regulated, business mentorship and hiring partners, the parts that decide the first yet.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "website",
     title: "The PT Career Blueprint — Not Just a Qualification, a Career",
     description:
-      "This does not stop at the certificate. We help you qualify, get clients, and build a career in fitness. NCFE Level 2 + 3, business mentorship, hiring partners, community.",
+      "This does not stop at the certificate. We help you qualify, get clients, and build a career in fitness. NCFE Level 2 + 3, business mentorship, hiring partners.",
     url: PAGE_URL,
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
@@ -41,7 +41,7 @@ const whoFor = [
 
 const comparison = [
   ["Qualification only", "Qualification + business mentoring"],
-  ["Finish and leave", "Ongoing community"],
+  ["Finish and leave", "Ongoing mentorship"],
   ["Generic help desk", "Live coaching with real coaches"],
   ["Learn the theory", "Build your actual career"],
   ["You find your own clients", "Warm introductions to hiring partners"],
@@ -61,7 +61,7 @@ const included = [
   "NCFE Level 2 Gym Instructor",
   "NCFE Level 3 Personal Trainer",
   "Business & marketing mentorship",
-  "Private community",
+  "£500 Mentorship Hub",
   "Live coaching sessions",
   "Career & hiring-partner support",
   "Client & programme templates",

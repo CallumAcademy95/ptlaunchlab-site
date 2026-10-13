@@ -18,8 +18,8 @@ import Footer from "@/app/components/Footer";
 import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
-  title: "Personal Trainer Mentorship UK | PT Launch Lab — £500 Community Included Free",
-  description: "PT Launch Lab includes our £500 business mentorship community at no extra cost with the NCFE Level 3 course. It is included in the fee rather than sold on afterwards. We bundle it.",
+  title: "Personal Trainer Mentorship UK | PT Launch Lab — £500 Mentorship Hub Included Free",
+  description: "PT Launch Lab includes our £500 Mentorship Hub at no extra cost with the NCFE Level 3 course. It is included in the fee rather than sold on afterwards. We bundle it.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/personal-trainer-mentorship-uk",
   },

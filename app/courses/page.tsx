@@ -10,7 +10,7 @@ import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PA
 
 export const metadata = {
   title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
-  description: `The straightforward route from your current job into personal training. NCFE Level 2 & 3, Ofqual regulated, done around your job. ${COURSE_PRICE_LABEL} or ${MONTHLY_PLAN_LABEL} monthly, with our £500 business mentorship community included.`,
+  description: `The straightforward route from your current job into personal training. NCFE Level 2 & 3, Ofqual regulated, done around your job. ${COURSE_PRICE_LABEL} or ${MONTHLY_PLAN_LABEL} monthly, with our £500 Mentorship Hub included.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/courses",
   },
@@ -21,7 +21,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    `100% online NCFE Level 2 & 3 PT qualification. ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. Includes our £500 business mentorship community, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.`,
+    `100% online NCFE Level 2 & 3 PT qualification. ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. Includes our £500 Mentorship Hub, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.`,
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -99,7 +99,7 @@ const curriculum = [
 
 const method = [
   { num: "01", title: "Qualification", body: "NCFE Level 2 & 3, Ofqual regulated, fast-track. Done around your job in 8–16 weeks." },
-  { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub plus our Skool community — included free in the course fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
+  { num: "02", title: "Mentorship", body: "The £500 Mentorship Hub, included free in the course fee. Built to walk you from qualifying to your first paying client. Direct access to Callum, Miles and Ryan when you're stuck." },
   { num: "03", title: "Gym Introduction", body: "A guaranteed introduction when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. We've hired 500+ PTs, so we prepare you properly.", highlight: true },
   { num: "04", title: "Income Building", body: "Pricing, first clients, rates, brand. How to make money from day one as a qualified PT." },
   { num: "05", title: "Online Coaching", body: "Expand beyond the gym. Build an income stream that scales without a ceiling." },
@@ -121,7 +121,7 @@ const objections = [
   {
     quote: "What if I qualify and still can't get clients?",
     answer:
-      "This is exactly what the Mentorship Hub is built for — it walks you from qualifying to your first paying client, milestone by milestone, with Callum a message away. You also stay in the Skool community for life. The part after qualifying is where this course keeps going. We stay until you've launched.",
+      "This is exactly what the Mentorship Hub is built for — it walks you from qualifying to your first paying client, milestone by milestone, with Callum a message away. The part after qualifying is where this course keeps going. We stay until you've launched.",
     link: null,
   },
   {
@@ -155,7 +155,7 @@ const pricing = [
     headlineSuffix: "one-off",
     subPrice: "Flexible ways to pay at checkout",
     saving: "Everything included, one price",
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 Mentorship Hub — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay in full →",
     ctaHref: "/enrol",
     recommended: true,
@@ -167,7 +167,7 @@ const pricing = [
     headlineSuffix: "/month",
     subPrice: `${MONTHLY_PLAN_LABEL} · first payment at checkout · ${formatPence(MONTHLY_PLAN_TOTAL_PENCE)} total`,
     saving: `${MONTHLY_PAYMENTS} monthly payments`,
-    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 business mentorship community — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
+    features: ["NCFE Level 2 & 3 qualification", "Personal tutor throughout", "£500 Mentorship Hub — included free", "A guaranteed gym introduction", "Direct access to Callum, Miles & Ryan"],
     cta: "Pay monthly →",
     ctaHref: "/enrol",
     recommended: false,
@@ -177,7 +177,7 @@ const pricing = [
 
 const compare = [
   { what: "NCFE Level 2 & 3 qualification", typical: "£1,200 – £2,800", us: "Included" },
-  { what: "Business mentorship community", typical: "£500 – £3,000", us: "Included free" },
+  { what: "Business mentorship", typical: "£500 – £3,000", us: "Included free" },
   { what: "Personal tutor", typical: "£200 – £600 extra", us: "Included" },
   { what: "A guaranteed gym introduction", typical: "On you to find them", us: "We introduce you" },
 ];
@@ -454,7 +454,7 @@ export default function CoursesPage() {
               ))}
             </div>
             <p className="text-center text-faint text-xs md:text-sm mt-10 max-w-2xl mx-auto leading-relaxed">
-              Both plans include the same qualification, mentorship community, personal tutor, and a guaranteed gym introduction. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
+              Both plans include the same qualification, Mentorship Hub, personal tutor, and a guaranteed gym introduction. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
             </p>
           </div>
         </section>

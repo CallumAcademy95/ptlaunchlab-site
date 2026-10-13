@@ -71,7 +71,7 @@ export default async function Hero() {
 
             {/* Sub */}
             <p className="text-[15px] text-soft/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              An 8–16 week online Level 3 qualification with business training and our <span className="text-white font-semibold">£500 business mentorship community, included in the fee</span> rather than sold on afterwards.
+              An 8–16 week online Level 3 qualification with business training and our <span className="text-white font-semibold">£500 Mentorship Hub, included in the fee</span> rather than sold on afterwards.
             </p>
 
             {/* CTA buttons */}

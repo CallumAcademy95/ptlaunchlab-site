@@ -19,7 +19,7 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
   title: "Personal Trainer Course with Business Support | PT Launch Lab",
-  description: `NCFE Level 3 PT qualification with our £500 business mentorship community bundled in at no extra cost. Most UK PT academies skip the business piece or charge £500–£3,000 separately for it. We bundle the lot for ${COURSE_PRICE_LABEL}.`,
+  description: `NCFE Level 3 PT qualification with our £500 Mentorship Hub bundled in at no extra cost. Most UK PT academies skip the business piece or charge £500–£3,000 separately for it. We bundle the lot for ${COURSE_PRICE_LABEL}.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/personal-trainer-course-with-business-support",
   },
@@ -47,7 +47,7 @@ export default function Page() {
                   Most PT courses teach you the exam. PT Launch Lab teaches you the exam and how to actually build a business from it.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  Our £500 business mentorship community is bundled into the {COURSE_PRICE_LABEL} course fee — not an optional add-on, not an upsell. Client acquisition, pricing, marketing, and a self-employed PT business — built into the course alongside your NCFE Level 3 qualification. It is included in the fee rather than sold on afterwards.
+                  Our £500 Mentorship Hub is bundled into the {COURSE_PRICE_LABEL} course fee — not an optional add-on, not an upsell. Client acquisition, pricing, marketing, and a self-employed PT business — built into the course alongside your NCFE Level 3 qualification. It is included in the fee rather than sold on afterwards.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <TwoWayCTA source="guide-hero" />

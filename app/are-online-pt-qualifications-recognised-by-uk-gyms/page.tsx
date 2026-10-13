@@ -194,7 +194,7 @@ export default function RecognisedPage() {
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">You can study around a job.</strong> PT Launch Lab learners typically qualify in 8–16 weeks while still working full-time.</li>
                   <li className="rounded-xl border border-white/[0.07] bg-card p-4"><strong className="text-white">Assessor feedback is permanent.</strong> You get written feedback on every video, which becomes a learning record you keep forever.</li>
                 </ul>
-                <p>What you don&apos;t get from a video-assessed course is immediate physical gym-floor practice with peers. Good online courses solve this with partner gym shadow days and an active mentorship community. PT Launch Lab includes the <strong className="text-white">£500 Skool mentorship community</strong> in its {COURSE_PRICE_LABEL} all-in price specifically for this — daily peer practice, weekly live coaching from founders Callum, Ryan and Miles, and warm-intro interviews with partner gyms.</p>
+                <p>What you don&apos;t get from a video-assessed course is immediate physical gym-floor practice with peers. Good online courses solve this with partner gym shadow days and ongoing mentorship. PT Launch Lab includes the <strong className="text-white">£500 Mentorship Hub</strong> in its {COURSE_PRICE_LABEL} all-in price specifically for this — a private dashboard that walks you from qualifying to your first paying client, direct access to founders Callum, Ryan and Miles, and warm-intro interviews with partner gyms.</p>
               </div>
             </section>
 

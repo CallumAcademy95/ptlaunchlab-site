@@ -19,7 +19,7 @@ import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
   title: "Best Personal Trainer Course UK: NCFE Level 3 | PT Launch Lab",
-  description: `Looking for the best UK PT course? PT Launch Lab bundles NCFE Level 3 (the qualification UK gym managers ask for by name), our £500 business mentorship community, a personal tutor, and a guaranteed gym introduction — all for ${COURSE_PRICE_LABEL}. Here it is in the fee rather than sold on afterwards.`,
+  description: `Looking for the best UK PT course? PT Launch Lab bundles NCFE Level 3 (the qualification UK gym managers ask for by name), our £500 Mentorship Hub, a personal tutor, and a guaranteed gym introduction — all for ${COURSE_PRICE_LABEL}. Here it is in the fee rather than sold on afterwards.`,
   alternates: { canonical: "https://ptlaunchlab.co.uk/best-personal-trainer-course-uk" },
 };
 
@@ -45,7 +45,7 @@ export default function Page() {
                   PT Launch Lab was built because most PT courses produce qualified trainers who still don&apos;t know how to get clients.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
-                  We fix that. NCFE Level 3 — the qualification UK gym managers ask for by name — plus our £500 business mentorship community, a personal tutor, and a guaranteed gym introduction, all bundled into the {COURSE_PRICE_LABEL} fee. It is in the fee rather than sold on afterwards. Qualify in 8–16 weeks and come out ready to earn.
+                  We fix that. NCFE Level 3 — the qualification UK gym managers ask for by name — plus our £500 Mentorship Hub, a personal tutor, and a guaranteed gym introduction, all bundled into the {COURSE_PRICE_LABEL} fee. It is in the fee rather than sold on afterwards. Qualify in 8–16 weeks and come out ready to earn.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <TwoWayCTA source="guide-hero" />
