@@ -82,9 +82,7 @@ export default function Footer() {
               PT courses near you:{" "}
               <a href="/personal-trainer-course-pontefract" className="hover:text-white transition-colors">Pontefract</a>
               {" · "}
-              <a href="/personal-trainer-course-wakefield" className="hover:text-white transition-colors">Wakefield</a>
-              {" · "}
-              <a href="/personal-trainer-course-leeds" className="hover:text-white transition-colors">Leeds</a>
+              <a href="/personal-trainer-course-west-yorkshire" className="hover:text-white transition-colors">West Yorkshire</a>
             </p>
             <p>PT Launch Lab is the business mentorship provider. NCFE qualifications are delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.</p>
           </div>

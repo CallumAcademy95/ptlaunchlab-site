@@ -28,17 +28,18 @@ export default function LocalCoursePage({ content: c }: { content: LocalPage }) 
           headline={c.hero.headline}
           goldTail={c.hero.goldTail}
           subline={c.hero.subline}
-          source={`local-${c.key}-hero`}
+          source={`local-${c.slug}-hero`}
           image={c.hero.image}
         />
 
-        {/* Local to {town}: the confirmed facts only */}
+        {/* Local to {place}: the confirmed facts only */}
         <section className="bg-base py-14 md:py-20 px-6">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">
-              Local to {c.town}
+              Local to {c.place}
             </h2>
             <p className="text-soft/80 text-lg leading-relaxed">{c.local.lead}</p>
+            {c.local.served && <p className="text-soft/80 text-lg leading-relaxed mt-4">{c.local.served}</p>}
             {c.local.partners && c.local.partners.length > 0 && (
               <div className="mt-8 bg-card border border-white/[0.07] rounded-2xl p-6 md:p-8">
                 <h3 className="text-white font-bold text-xl mb-2">Partner gyms in West Yorkshire</h3>
@@ -59,11 +60,11 @@ export default function LocalCoursePage({ content: c }: { content: LocalPage }) 
           </div>
         </section>
 
-        {/* How it works from {town} */}
+        {/* How it works from {place} */}
         <section className="bg-surface py-14 md:py-20 px-6">
           <div className="max-w-6xl mx-auto">
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-10 md:mb-14">
-              How it works from {c.town}
+              How it works from {c.place}
             </h2>
             <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {c.how.map((step, i) => (
@@ -77,14 +78,14 @@ export default function LocalCoursePage({ content: c }: { content: LocalPage }) 
           </div>
         </section>
 
-        <PriceBlock source={`local-${c.key}-pricing`} bg="base" reserveWasPrice={RESERVE_WAS_PRICE} />
+        <PriceBlock source={`local-${c.slug}-pricing`} bg="base" reserveWasPrice={RESERVE_WAS_PRICE} />
 
         {/* FAQ: the same array feeds the FAQPage JSON-LD above */}
         <section className="bg-surface py-14 md:py-24 px-6">
           <div className="max-w-3xl mx-auto">
             <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">FAQ</p>
             <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white text-center leading-none tracking-tight mb-10 md:mb-14">
-              Questions from {c.town}
+              Questions from {c.place}
             </h2>
             <div className="space-y-5">
               {c.faqs.map((f) => (
@@ -101,13 +102,13 @@ export default function LocalCoursePage({ content: c }: { content: LocalPage }) 
         <section className="bg-base py-14 md:py-24 px-6 text-center border-t border-white/[0.05]">
           <div className="max-w-3xl mx-auto">
             <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-8">
-              Ready to start from {c.town}?
+              Ready to start from {c.place}?
             </h2>
-            <TwoWayCTA source={`local-${c.key}-final`} className="justify-center" />
+            <TwoWayCTA source={`local-${c.slug}-final`} className="justify-center" />
           </div>
         </section>
       </main>
-      <StickyCtaBar watchSelector={`[data-cta-source='local-${c.key}-hero']`} source={`local-${c.key}-sticky`} />
+      <StickyCtaBar watchSelector={`[data-cta-source='local-${c.slug}-hero']`} source={`local-${c.slug}-sticky`} />
       <Footer />
     </>
   );
