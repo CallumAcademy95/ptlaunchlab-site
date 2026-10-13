@@ -223,6 +223,10 @@ export function localMetadata(p: LocalPage): Metadata {
   };
 }
 
+/** The qualification, exactly as the course JSON-LD and the learner prospectus name it. */
+export const COURSE_CREDENTIAL =
+  "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)";
+
 /** Course JSON-LD: the provider is the site-wide organisation; offers from pricing.ts. */
 export function courseSchema(p: LocalPage) {
   return {
@@ -232,7 +236,7 @@ export function courseSchema(p: LocalPage) {
     description: `Online NCFE Level 2 & 3 personal trainer course, studied from ${p.place} around your job. Qualify in 8–16 weeks. ${COURSE_PRICE_LABEL}, everything included.`,
     url: localUrl(p),
     provider: { "@id": `${BASE}/#org` },
-    educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
+    educationalCredentialAwarded: COURSE_CREDENTIAL,
     offers: [
       {
         "@type": "Offer",
