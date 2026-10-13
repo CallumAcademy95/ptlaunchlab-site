@@ -78,6 +78,12 @@ export default function Footer() {
           <div className="flex flex-col gap-1 text-center sm:text-left">
             <p>© 2026 PT Launch Lab. All rights reserved.</p>
             <NapLine linkClassName="hover:text-white transition-colors" />
+            <p>
+              PT courses near you:{" "}
+              <a href="/personal-trainer-course-pontefract" className="hover:text-white transition-colors">Pontefract</a>
+              {" · "}
+              <a href="/personal-trainer-course-west-yorkshire" className="hover:text-white transition-colors">West Yorkshire</a>
+            </p>
             <p>PT Launch Lab is the business mentorship provider. NCFE qualifications are delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.</p>
           </div>
           <div className="flex gap-5 shrink-0">

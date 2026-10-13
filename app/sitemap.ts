@@ -1,16 +1,7 @@
 import type { MetadataRoute } from "next";
-import { hubLocations } from "./lib/ukLocations";
-import { episodesIndex } from "./podcast/transcripts/_index";
+import { episodesIndex } from "./podcast/transcripts/_index.ts";
 
 const BASE = "https://ptlaunchlab.co.uk";
-
-// Sole canonical keyword template. All 30 other [location] templates declare
-// alternates.canonical pointing here, so the sitemap should only advertise
-// these canonical URLs to Google (listing duplicates would waste crawl
-// budget and contradict the canonical signal).
-const keywordRoutes = [
-  "level-3-personal-trainer-course",
-];
 
 // Static, not computed. Previously this was new Date() at build time, so every
 // deploy told Google that every URL on the site had changed that day. A lastmod
@@ -55,20 +46,13 @@ const staticPages: MetadataRoute.Sitemap = [
   { url: `${BASE}/ebor-fitness`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/mof-gym`,                             priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
   { url: `${BASE}/ironwolf-gym`,                        priority: 0.6,  changeFrequency: "monthly", lastModified: TODAY },
+  // Real local course pages (Phase 4b). They replace the 31 templated
+  // /<template>/<town> doorway routes, which now 308 to these or /courses.
+  { url: `${BASE}/personal-trainer-course-pontefract`,     priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-13" },
+  { url: `${BASE}/personal-trainer-course-west-yorkshire`, priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-13" },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Hub locations only — non-hub slugs 301 to their nearest hub, so listing
-  // them in the sitemap just wastes crawl budget on redirect chains.
-  const locationPages: MetadataRoute.Sitemap = keywordRoutes.flatMap((route) =>
-    hubLocations.map((loc) => ({
-      url: `${BASE}/${route}/${loc.slug}`,
-      priority: 0.7,
-      changeFrequency: "monthly" as const,
-      lastModified: TODAY,
-    }))
-  );
-
   // Per-episode podcast pages — full transcripts on each, deep crawlable
   // resources for AI-search citation.
   const podcastEpisodes: MetadataRoute.Sitemap = episodesIndex.map((e) => ({
@@ -78,5 +62,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: e.date,
   }));
 
-  return [...staticPages, ...locationPages, ...podcastEpisodes];
+  return [...staticPages, ...podcastEpisodes];
 }
