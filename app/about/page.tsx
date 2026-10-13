@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import FounderTabs from "../components/FounderTabs";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { PHONE_SCHEMA, GOOGLE_PROFILE_URL } from "@/app/lib/contactDetails";
+import { GEO } from "@/app/lib/siteSchema";
 
 export const metadata = {
   title: "About PT Launch Lab — PT Academy Founded by Gym Owners",
@@ -56,6 +57,9 @@ const stats = [
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
+  // Same @id as the site-wide org in app/lib/siteSchema.ts, so Google merges
+  // the two into one organisation rather than seeing a second one.
+  "@id": "https://ptlaunchlab.co.uk/#org",
   name: "PT Launch Lab",
   url: "https://ptlaunchlab.co.uk",
   logo: "https://ptlaunchlab.co.uk/logo.png",
@@ -68,11 +72,7 @@ const localBusinessSchema = {
     postalCode: "WF8 4AH",
     addressCountry: "GB",
   },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: 53.6917,
-    longitude: -1.3127,
-  },
+  geo: GEO,
   telephone: PHONE_SCHEMA,
   sameAs: [
     "https://www.youtube.com/@ptlaunchlab",

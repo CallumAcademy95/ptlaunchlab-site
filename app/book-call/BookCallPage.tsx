@@ -328,7 +328,7 @@ export default function BookCallPage() {
           </div>
           <div className="flex items-center justify-center gap-2 text-soft/60 text-sm">
             <StarIcon />
-            <span>Rated 5.0 based on Google reviews</span>
+            <span>5.0★ Google rating</span>
           </div>
         </div>
       </section>

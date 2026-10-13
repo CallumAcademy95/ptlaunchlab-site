@@ -47,7 +47,7 @@ const DEFAULT_BULLETS = [
 ];
 
 const TRUST_ITEMS = [
-  "5.0★ Google Reviews",
+  "5.0★ Google rating",
   "500+ PTs hired",
   "Tutor within 24 hours",
   "Study around full-time work",

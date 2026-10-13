@@ -314,7 +314,7 @@ export default function CoursesPage() {
                 { value: "4–8 wks", label: "Fast-track completion" },
                 { value: "100%", label: "Online delivery" },
                 { value: "500+", label: "PTs hired by our team" },
-                { value: "5.0★", label: "Google review rating" },
+                { value: "5.0★", label: "Google rating" },
               ].map((stat) => (
                 <div key={stat.label} className="bg-card border border-white/[0.07] rounded-2xl p-6">
                   <p className="font-display font-extrabold text-gold text-4xl mb-2">{stat.value}</p>

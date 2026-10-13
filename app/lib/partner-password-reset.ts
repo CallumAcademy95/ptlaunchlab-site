@@ -10,7 +10,7 @@
 
 import { Resend } from "resend";
 import { getSupabaseAdmin } from "./supabase-admin";
-import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { PHONE_NATIONAL, PHONE_TEL, ADDRESS_ONE_LINE } from "@/app/lib/contactDetails";
 
 const SITE = "https://ptlaunchlab.co.uk";
 
@@ -108,7 +108,7 @@ function resetEmail(args: { firstName: string | null; gymName: string; link: str
       </p>
     </div>
     <div style="background:#0B1F38;padding:18px 32px;text-align:center;">
-      <div style="color:#7C90A8;font-size:12px;">PT Launch Lab · Pontefract WF8 4AH</div>
+      <div style="color:#7C90A8;font-size:12px;">PT Launch Lab · ${ADDRESS_ONE_LINE}</div>
     </div>
   </div>
 </body></html>`;

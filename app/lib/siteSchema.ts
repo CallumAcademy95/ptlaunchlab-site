@@ -10,6 +10,13 @@ import { PHONE_SCHEMA, CONTACT_EMAIL, GOOGLE_PROFILE_URL } from "./contactDetail
  * The address must match the Google Business Profile and the footer
  * (ADDRESS_ONE_LINE). No aggregateRating: review counts are never published.
  */
+/** The Pontefract HQ, shared by every JSON-LD block that carries geo. */
+export const GEO = {
+  "@type": "GeoCoordinates",
+  latitude: 53.6917,
+  longitude: -1.3104,
+};
+
 const ADDRESS = {
   "@type": "PostalAddress",
   streetAddress: "Unit 3, Royals Business Park, King St",
@@ -79,11 +86,7 @@ export const siteSchema = {
       email: CONTACT_EMAIL,
       priceRange: "££",
       address: ADDRESS,
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: 53.6917,
-        longitude: -1.3104,
-      },
+      geo: GEO,
       openingHoursSpecification: [
         {
           "@type": "OpeningHoursSpecification",

@@ -192,3 +192,51 @@ test("listed pages' titles carry the keyword and fit in 65 characters", () => {
   }
   assert.equal(new Set(titles).size, titles.length, "titles are unique");
 });
+
+// ── Fix round: uniform badges, address in emails, one org ────────────────
+
+test("rating badges use the uniform wording, never 'Google reviews'", () => {
+  const hits: string[] = [];
+  for (const f of APP_FILES) {
+    const body = stripComments(src(f));
+    if (/5\.0★ Google Reviews|Verified Google reviews|based on Google reviews|Google review rating/i.test(body)) hits.push(f);
+  }
+  assert.deepEqual(hits, []);
+  assert.match(src("app/components/cold/ColdLanding.tsx"), /"5\.0★ Google rating"/);
+  assert.match(src("app/book-call/BookCallPage.tsx"), /5\.0★ Google rating/);
+  assert.match(src("app/courses/page.tsx"), /\{ value: "5\.0★", label: "Google rating" \}/);
+  assert.match(src("app/graduates/page.tsx"), /· Google rating/);
+});
+
+test("partner email footers print ADDRESS_ONE_LINE, not a hardcoded address", () => {
+  const files = [
+    "app/admin/(shell)/partners/actions.ts",
+    "app/api/gym-partnership/sign/route.ts",
+    "app/api/mentor-partnership/sign/route.ts",
+    "app/lib/partner-password-reset.ts",
+  ];
+  for (const f of files) {
+    const s = src(f);
+    assert.match(s, /PT Launch Lab · \$\{ADDRESS_ONE_LINE\}/, `${f} uses ADDRESS_ONE_LINE`);
+    assert.doesNotMatch(s, /Royals Business Park|Pontefract WF8/, `${f} has no hardcoded address`);
+  }
+  // Legal agreement text is deliberately left as written.
+  const legal = new Set(["app/lib/partnershipAgreement.ts", "app/lib/mentorPartnerAgreement.ts", "app/lib/contactDetails.ts", "app/lib/siteSchema.ts", "app/about/page.tsx", "app/contact/page.tsx"]);
+  const stray = APP_FILES.filter((f) => !legal.has(f) && /Royals Business Park, Pontefract/.test(src(f)));
+  assert.deepEqual(stray, []);
+});
+
+test("/about JSON-LD is the same org (#org) with the shared geo", async () => {
+  const s = src("app/about/page.tsx");
+  assert.match(s, /"@type": "EducationalOrganization",\n\s*(?:\/\/.*\n\s*)*"@id": "https:\/\/ptlaunchlab\.co\.uk\/#org"/);
+  assert.match(s, /geo: GEO,/);
+  assert.match(s, /import \{ GEO \} from "@\/app\/lib\/siteSchema"/);
+  assert.doesNotMatch(s, /latitude:|longitude:/);
+  const { GEO, siteSchema } = await import("../app/lib/siteSchema.ts");
+  const local = (siteSchema["@graph"] as Record<string, unknown>[]).find((n) => n["@type"] === "LocalBusiness")!;
+  assert.deepEqual(local.geo, GEO);
+});
+
+test("how-to title reads naturally", () => {
+  assert.equal(titleOf("app/how-to-become-a-personal-trainer-uk/page.tsx"), "How to Become a PT in the UK | NCFE Personal Trainer Course");
+});
