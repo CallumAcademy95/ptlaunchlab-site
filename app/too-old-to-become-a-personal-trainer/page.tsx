@@ -178,7 +178,7 @@ export default function TooOldPage() {
               <p className="text-soft/80 text-lg leading-relaxed mb-6">For someone qualifying with PT Launch Lab in their 40s while still working a day job:</p>
               <div className="space-y-4">
                 {[
-                  { stage: "Months 0–4", title: "Qualifying (Level 2 + Level 3)", body: "Fully online with video-assessed practical units. Most learners qualify in 8–16 weeks while still in their full-time role. Personal tutor response within 24 hours. The £500 Skool mentorship community starts immediately." },
+                  { stage: "Months 0–4", title: "Qualifying (Level 2 + Level 3)", body: "Fully online with video-assessed practical units. Most learners qualify in 8–16 weeks while still in their full-time role. Personal tutor response within 24 hours. The £500 Mentorship Hub is included in the fee." },
                   { stage: "Months 4–6", title: "First paying clients", body: "Warm introduction to a partner gym across Yorkshire and the UK mean you walk into your first conversation with a foot already in the door. Most learners pick up 3–6 paying clients in this window." },
                   { stage: "Months 6–12", title: "Replace day-job income", body: "Self-employed PTs in this stage typically hit £1,500–£3,000/month. Most career-changers leave their corporate role somewhere in months 9–12." },
                   { stage: "Months 12–18", title: "£35k+ self-employed", body: "With a settled book of 15–25 weekly sessions plus referrals from your existing professional network, this is where most 40+ career changers land.", highlight: true },
@@ -202,7 +202,7 @@ export default function TooOldPage() {
         <section className="bg-surface py-16 md:py-20 px-6 border-t border-blue/15">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white leading-none tracking-tight mb-4">Ready to start?</h2>
-            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">{COURSE_PRICE_LABEL} all-in</strong> — fully online, video-assessed practical units, 24-hour tutor response, £500 Skool mentorship community included.</p>
+            <p className="text-soft/70 text-lg mb-6">PT Launch Lab&apos;s NCFE Level 2 + Level 3 course is <strong className="text-white">{COURSE_PRICE_LABEL} all-in</strong> — fully online, video-assessed practical units, 24-hour tutor response, £500 Mentorship Hub included.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
               <Link href="/quiz" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Take the 60-Second Quiz →</Link>
               <Link href="/book-call" className="px-7 py-3.5 rounded-full border border-gold text-gold font-semibold text-sm hover:bg-gold hover:text-deep transition-all">Book a Free 15-Min Call</Link>
