@@ -2,7 +2,7 @@ import HeroSlideshow from "./HeroSlideshow";
 import { getVisitorGeo } from "@/app/lib/geoDetect";
 
 // Geo-aware variant of the homepage hero. Yorkshire visitors get a hero
-// that leans into the local advantage (Pontefract-based, workshops nearby,
+// that leans into the local advantage (Pontefract-based,
 // "built by Yorkshire gym owners"). Everyone else gets a neutral national
 // hero so the Yorkshire flavour doesn't read as "not for me" to a London
 // or Manchester visitor.
@@ -17,7 +17,7 @@ export default async function Hero() {
   const { isYorkshire } = await getVisitorGeo();
 
   const pillCopy = isYorkshire
-    ? "NCFE Level 3 · Pontefract-Based · Yorkshire Workshops · Ofqual · CIMSPA"
+    ? "NCFE Level 3 · Pontefract-Based · Ofqual · CIMSPA"
     : "NCFE Level 3 · Ofqual Regulated · CIMSPA Recognised · Qualify in 8–16 Weeks";
 
   const positioningCopy = isYorkshire
@@ -95,7 +95,7 @@ export default async function Hero() {
               Free 15-min call · No pressure · Tutor assigned within 24 hours of enrolling
             </p>
 
-            {/* Trust bar — one bullet swaps per geo variant */}
+            {/* Trust bar — the "100% online" bullet shows only on the national variant */}
             <div className="flex flex-wrap gap-3 md:gap-5 text-soft/60 text-xs animate-fade-in-up animate-delay-300">
               <span>✓ NCFE &amp; Ofqual Regulated</span>
               <span className="hidden sm:inline opacity-30">·</span>
@@ -105,8 +105,12 @@ export default async function Hero() {
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ 500+ PTs Hired by Our Team</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>{isYorkshire ? "✓ Yorkshire Workshops Available" : "✓ 100% Online, Study from Anywhere in the UK"}</span>
-              <span className="hidden sm:inline opacity-30">·</span>
+              {!isYorkshire && (
+                <>
+                  <span>✓ 100% Online, Study from Anywhere in the UK</span>
+                  <span className="hidden sm:inline opacity-30">·</span>
+                </>
+              )}
               <span>✓ Study Around Your Current Job</span>
             </div>
           </div>

@@ -44,6 +44,18 @@ export const WHATSAPP_LINK = "https://wa.me/447418609039";
 /** Public contact inbox, repeated in the same templates as the phone. */
 export const CONTACT_EMAIL = "info@ptlaunchlab.co.uk";
 
-/** Registered trading address, as printed in email and PDF footers. */
+/**
+ * Trading address, exactly as the Google Business Profile shows it. The site
+ * footer prints this, and the JSON-LD streetAddress ("Unit 3, Royals Business
+ * Park, King St") must match it: Google cross-checks name, address and phone.
+ */
 export const ADDRESS_ONE_LINE =
-  "Unit 3, Royals Business Park, Pontefract WF8 4AH";
+  "Unit 3, Royals Business Park, King St, Pontefract WF8 4AH";
+
+/**
+ * The Google Business Profile ("PT Launch Lab Pontefract", kgmid /g/11x_p4pkj_).
+ * Every "See all reviews" link and the JSON-LD sameAs use this one constant.
+ * Review counts are deliberately never shown: the badge reads "5.0★ Google
+ * rating" and the profile link carries the detail.
+ */
+export const GOOGLE_PROFILE_URL = "https://share.google/HnzgdMk7ijjYp8S0k";

@@ -18,7 +18,7 @@ import Footer from "@/app/components/Footer";
 import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
-  title: "Best Personal Trainer Course UK | PT Launch Lab — Everything Bundled",
+  title: "Best Personal Trainer Course UK: NCFE Level 3 | PT Launch Lab",
   description: `Looking for the best UK PT course? PT Launch Lab bundles NCFE Level 3 (the qualification UK gym managers ask for by name), our £500 business mentorship community, a personal tutor, and a guaranteed gym introduction — all for ${COURSE_PRICE_LABEL}. Here it is in the fee rather than sold on afterwards.`,
   alternates: { canonical: "https://ptlaunchlab.co.uk/best-personal-trainer-course-uk" },
 };

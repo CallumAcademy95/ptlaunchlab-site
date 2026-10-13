@@ -13,6 +13,7 @@ import { memberSavingForGym } from "@/app/lib/gyms";
 import GymCallbackForm from "@/app/components/GymCallbackForm";
 import GymCtaLink from "@/app/components/GymCtaLink";
 import StickyCtaBar from "@/app/components/cta/StickyCtaBar";
+import NapLine from "@/app/components/NapLine";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
 /** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
@@ -416,6 +417,7 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           {" "}·{" "}
           <a href="/privacy" className="hover:text-white/50 transition-colors">Privacy</a>
         </p>
+        <NapLine className="text-white/30 text-xs mt-2" linkClassName="hover:text-white/50 transition-colors" />
       </footer>
 
       {/* Mobile: Enrol and Book a call, both to this gym's own enrol page and

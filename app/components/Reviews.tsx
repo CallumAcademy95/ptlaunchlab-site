@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
 import { reviews } from "@/app/lib/reviewsData";
+import { GOOGLE_PROFILE_URL } from "@/app/lib/contactDetails";
 
 export default function Reviews() {
   const [current, setCurrent] = useState(0);
@@ -60,9 +61,9 @@ export default function Reviews() {
                 ))}
               </div>
               <span className="text-white text-sm font-semibold">5.0</span>
-              <span className="text-soft/60 text-sm">· 19 Verified Reviews</span>
+              <span className="text-soft/60 text-sm">· Google rating</span>
               <a
-                href="https://www.google.com/search?q=pt+launch+lab+pontefract+reviews"
+                href={GOOGLE_PROFILE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gold text-sm font-medium hover:underline ml-1"

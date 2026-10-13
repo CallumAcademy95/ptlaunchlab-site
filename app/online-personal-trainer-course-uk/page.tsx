@@ -15,7 +15,7 @@ const PUBLISHED = "2026-05-05";
 const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
-  title: "Online Personal Trainer Course UK 2026: Honest Buyer's Guide | PT Launch Lab",
+  title: "Online Personal Trainer Course UK 2026: Level 3 Buyer's Guide",
   description:
     "The complete UK guide to online personal trainer courses. Compare 10 providers (HFE, Train Fitness, OriGym, PT Launch Lab and more) on price, accreditation, mentorship and earnings. Written by gym owners who've hired 500+ PTs.",
   alternates: { canonical: PAGE_URL },

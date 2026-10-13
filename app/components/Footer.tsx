@@ -1,4 +1,5 @@
 import Image from "next/image";
+import NapLine from "./NapLine";
 
 const navLinks = [
   { label: "Home",    href: "/" },
@@ -76,6 +77,7 @@ export default function Footer() {
         <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-faint text-xs">
           <div className="flex flex-col gap-1 text-center sm:text-left">
             <p>© 2026 PT Launch Lab. All rights reserved.</p>
+            <NapLine linkClassName="hover:text-white transition-colors" />
             <p>PT Launch Lab is the business mentorship provider. NCFE qualifications are delivered through Ultimate Shred Academy — NCFE Accredited Centre No. 9002788.</p>
           </div>
           <div className="flex gap-5 shrink-0">

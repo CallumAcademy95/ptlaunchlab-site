@@ -15,7 +15,7 @@ const PUBLISHED = "2026-05-11";
 const UPDATED = "2026-07-27";
 
 export const metadata: Metadata = {
-  title: "How to Become a Personal Trainer in the UK (2026 Step-by-Step) | PT Launch Lab",
+  title: "How to Become a Personal Trainer UK: NCFE Personal Trainer Course",
   description:
     "The honest 2026 roadmap to becoming a UK personal trainer — 5 steps from decision to earning. Written by gym owners who've hired 500+ PTs. Costs, timelines, common mistakes.",
   alternates: { canonical: PAGE_URL },
