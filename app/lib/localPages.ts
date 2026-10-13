@@ -32,19 +32,30 @@ export const WEST_YORKSHIRE_TOWNS = [
   "Castleford", "Dewsbury", "Halifax", "Keighley", "Ossett", "Normanton",
 ] as const;
 
+/**
+ * Allow-listed names that are not unique to West Yorkshire (there is an Upton
+ * on the Wirral, in Dorset, ...). They count only when the location also says
+ * "West Yorkshire".
+ */
+export const AMBIGUOUS_TOWNS = ["Upton"] as const;
+
 export type Partner = { name: string; towns: string[]; town: string };
 
 /**
  * Partner gyms whose config `location` names a West Yorkshire town. Names and
  * towns come from the configs; `town` is the matched towns, e.g. "Upton" or
- * "Bradford & Huddersfield". A gym with no `location` is never listed.
+ * "Bradford & Huddersfield". A gym with no `location` is never listed, and an
+ * ambiguous town (AMBIGUOUS_TOWNS) needs "West Yorkshire" in the location too.
  */
 export function westYorkshirePartners(gyms: Record<string, GymConfig> = GYMS): Partner[] {
   const out: Partner[] = [];
   for (const g of Object.values(gyms)) {
     const loc = g.location;
     if (!loc) continue;
-    const towns = WEST_YORKSHIRE_TOWNS.filter((t) => new RegExp(`\\b${t}\\b`).test(loc));
+    const saysWestYorkshire = /West Yorkshire/.test(loc);
+    const towns = WEST_YORKSHIRE_TOWNS.filter(
+      (t) => new RegExp(`\\b${t}\\b`).test(loc) && (saysWestYorkshire || !(AMBIGUOUS_TOWNS as readonly string[]).includes(t)),
+    );
     if (towns.length) out.push({ name: g.gymName, towns, town: towns.join(" & ") });
   }
   return out;
@@ -108,7 +119,8 @@ const PONTEFRACT_FAQ: FaqItem = {
   a: `Yes. PT Launch Lab is based at ${ADDRESS_ONE_LINE} (${PHONE_NATIONAL}). ${CENTRE_SENTENCE} The course itself is fully online.`,
 };
 
-function faqs(): FaqItem[] {
+/** Shared FAQs. `withNap: false` drops the address question for a page that answers it itself. */
+function faqs({ withNap = true }: { withNap?: boolean } = {}): FaqItem[] {
   const partners = westYorkshirePartners();
   const introduction = partners.length
     ? `Once you qualify, we can introduce you to partner gyms in West Yorkshire such as ${partnerList(partners)}.`
@@ -118,10 +130,12 @@ function faqs(): FaqItem[] {
       q: "Do I need to go to a gym or attend in person?",
       a: `No. ${ONLINE_SENTENCE} ${introduction} ${INTERVIEW_QUALIFIER}`,
     },
-    {
-      q: "Where is PT Launch Lab based?",
-      a: `In Pontefract, West Yorkshire. Our business address is PT Launch Lab, ${ADDRESS_ONE_LINE}, phone ${PHONE_NATIONAL}.`,
-    },
+    ...(withNap
+      ? [{
+          q: "Where is PT Launch Lab based?",
+          a: `In Pontefract, West Yorkshire. Our business address is PT Launch Lab, ${ADDRESS_ONE_LINE}, phone ${PHONE_NATIONAL}.`,
+        }]
+      : []),
     {
       // app/courses/page.tsx:186
       q: "Is the qualification recognised?",
@@ -143,6 +157,8 @@ function page(p: {
   description: string; image: { src: string; alt: string }; local: LocalPage["local"];
   /** Page-specific questions, shown before the shared ones. */
   extraFaqs?: FaqItem[];
+  /** False when an extra FAQ already gives the address (Pontefract). */
+  sharedNapFaq?: boolean;
 }): LocalPage {
   return {
     key: p.key,
@@ -153,7 +169,7 @@ function page(p: {
     hero: hero(p.place, p.from, p.image),
     local: p.local,
     how: how(p.from),
-    faqs: [...(p.extraFaqs ?? []), ...faqs()],
+    faqs: [...(p.extraFaqs ?? []), ...faqs({ withNap: p.sharedNapFaq ?? true })],
   };
 }
 
@@ -168,7 +184,9 @@ export const LOCAL_PAGES: Record<LocalKey, LocalPage> = {
     local: {
       lead: `We are based in Pontefract. ${CENTRE_SENTENCE} ${ONLINE_SENTENCE}`,
     },
+    // Its own NAP question replaces the shared one: one address answer per page.
     extraFaqs: [PONTEFRACT_FAQ],
+    sharedNapFaq: false,
   }),
   westYorkshire: page({
     key: "westYorkshire",
@@ -179,7 +197,7 @@ export const LOCAL_PAGES: Record<LocalKey, LocalPage> = {
     image: { src: "/learner-2.webp", alt: "PT Launch Lab graduate qualified through the NCFE Level 3 personal trainer course" },
     local: {
       lead: `We are based in Pontefract, West Yorkshire. ${CENTRE_SENTENCE} ${ONLINE_SENTENCE}`,
-      served: "Learners study from Wakefield, Leeds, Bradford, Huddersfield and across West Yorkshire.",
+      served: "Study from Wakefield, Leeds, Bradford, Huddersfield or anywhere in West Yorkshire.",
       partnersIntro: `Once you qualify, we can introduce you to our partner gyms in West Yorkshire. ${INTERVIEW_QUALIFIER}`,
       partners: westYorkshirePartners(),
     },
@@ -214,7 +232,7 @@ export function courseSchema(p: LocalPage) {
     description: `Online NCFE Level 2 & 3 personal trainer course, studied from ${p.place} around your job. Qualify in 8–16 weeks. ${COURSE_PRICE_LABEL}, everything included.`,
     url: localUrl(p),
     provider: { "@id": `${BASE}/#org` },
-    educationalCredentialAwarded: "NCFE Level 3 Personal Training Certificate",
+    educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
     offers: [
       {
         "@type": "Offer",

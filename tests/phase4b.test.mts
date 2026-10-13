@@ -127,6 +127,9 @@ test("metadata: unique keyword titles in 65 characters, unique descriptions, can
 
 test("JSON-LD parses: Course (org provider, offers from pricing.ts, workload), FAQPage and BreadcrumbList", async () => {
   const { LOCAL_PAGES, courseSchema, breadcrumbTrail } = await load();
+  const CREDENTIAL = "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)";
+  assert.ok(src("app/vsl/VslPage.tsx").includes(CREDENTIAL), "VSL wording");
+  assert.ok(src("app/courses/page.tsx").includes(`educationalCredentialAwarded: "${CREDENTIAL}"`), "/courses matches");
   const { faqPageSchema } = await import("../app/lib/faqSchema.ts");
   const pricing = await import("../app/lib/pricing.ts");
   for (const p of PAGES) {
@@ -140,6 +143,7 @@ test("JSON-LD parses: Course (org provider, offers from pricing.ts, workload), F
     assert.equal(offers[0].price, (pricing.COURSE_PRICE_PENCE / 100).toFixed(2));
     assert.equal(offers[0].priceCurrency, "GBP");
     for (const s of strings(course)) assert.doesNotMatch(s, /interest/i);
+    assert.equal(course.educationalCredentialAwarded, CREDENTIAL);
     assert.equal(course.hasCourseInstance["@type"], "CourseInstance");
     assert.equal(course.hasCourseInstance.courseMode, "online");
     assert.match(course.hasCourseInstance.courseWorkload, /^P\d+W$/, "an ISO 8601 duration");
@@ -259,7 +263,7 @@ test("West Yorkshire local section: the owner's copy, and partner gyms as post-q
     l.lead,
     `We are based in Pontefract, West Yorkshire. ${CENTRE_SENTENCE} The course is fully online, with no in-person training.`,
   );
-  assert.equal(l.served, "Learners study from Wakefield, Leeds, Bradford, Huddersfield and across West Yorkshire.");
+  assert.equal(l.served, "Study from Wakefield, Leeds, Bradford, Huddersfield or anywhere in West Yorkshire.");
   assert.equal(
     l.partnersIntro,
     "Once you qualify, we can introduce you to our partner gyms in West Yorkshire. Whether they interview you and whether you get the job is between you and them.",
@@ -267,17 +271,22 @@ test("West Yorkshire local section: the owner's copy, and partner gyms as post-q
 });
 
 test("West Yorkshire partners are derived: a town allow-list matched against each gym config's location", async () => {
-  const { westYorkshirePartners, WEST_YORKSHIRE_TOWNS, LOCAL_PAGES } = await load();
+  const { westYorkshirePartners, WEST_YORKSHIRE_TOWNS, AMBIGUOUS_TOWNS, LOCAL_PAGES } = await load();
   const { GYMS } = await import("../app/lib/gyms/index.ts");
   assert.deepEqual(
     [...WEST_YORKSHIRE_TOWNS],
     ["Upton", "Bradford", "Huddersfield", "Wakefield", "Leeds", "Pontefract", "Castleford", "Dewsbury", "Halifax", "Keighley", "Ossett", "Normanton"],
   );
+  // Upton is not unique to West Yorkshire (Wirral, Poole, ...): it counts only
+  // when the location also says "West Yorkshire".
+  assert.deepEqual([...AMBIGUOUS_TOWNS], ["Upton"]);
   // Independent derivation over the registry.
   const word = (t: string) => new RegExp(`\\b${t}\\b`);
+  const matched = (loc: string) =>
+    WEST_YORKSHIRE_TOWNS.filter((t) => word(t).test(loc) && (!(AMBIGUOUS_TOWNS as readonly string[]).includes(t) || /West Yorkshire/.test(loc)));
   const expected = Object.values(GYMS)
-    .filter((g) => g.location && WEST_YORKSHIRE_TOWNS.some((t) => word(t).test(g.location!)))
-    .map((g) => ({ name: g.gymName, towns: WEST_YORKSHIRE_TOWNS.filter((t) => word(t).test(g.location!)) }));
+    .filter((g) => g.location && matched(g.location).length)
+    .map((g) => ({ name: g.gymName, towns: matched(g.location!) }));
   const got = westYorkshirePartners(GYMS);
   assert.deepEqual(got.map((p) => ({ name: p.name, towns: p.towns })), expected);
   assert.ok(got.length > 0, "the data supports at least one partner");
@@ -288,8 +297,10 @@ test("West Yorkshire partners are derived: a town allow-list matched against eac
     a: { ...Object.values(GYMS)[0], gymName: "Out", location: "York" },
     b: { ...Object.values(GYMS)[0], gymName: "In", location: "Halifax" },
     c: { ...Object.values(GYMS)[0], gymName: "None", location: undefined },
+    d: { ...Object.values(GYMS)[0], gymName: "Wirral", location: "Upton, Wirral" },
+    e: { ...Object.values(GYMS)[0], gymName: "Upton WY", location: "Upton, West Yorkshire" },
   };
-  assert.deepEqual(westYorkshirePartners(fake).map((p) => p.name), ["In"]);
+  assert.deepEqual(westYorkshirePartners(fake).map((p) => p.name), ["In", "Upton WY"]);
 });
 
 test("prices in the content come from pricing.ts", async () => {
@@ -480,6 +491,13 @@ test("6. the sitemap lists both local pages and no template or redirected URL", 
   assert.equal(new Set(urls).size, urls.length, "no duplicates");
 });
 
+test("6. llms.txt links no pruned template or redirected URL", async () => {
+  const rules = await configRedirects();
+  const paths = [...src("public/llms.txt").matchAll(/https:\/\/ptlaunchlab\.co\.uk(\/[^)\s`]*)/g)].map((m) => m[1]);
+  assert.ok(paths.length > 5);
+  for (const p of paths) if (!p.includes("<")) assert.equal(resolve(rules, p), null, `llms.txt: ${p} is redirected`);
+});
+
 // ── Small fixes carried into Task 2 ────────────────────────────────────────
 
 test("Pontefract has its own FAQ: based in Pontefract, with the NAP, the centre and fully online", async () => {
@@ -493,6 +511,12 @@ test("Pontefract has its own FAQ: based in Pontefract, with the NAP, the centre 
     "Yes. PT Launch Lab is based at Unit 3, Royals Business Park, King St, Pontefract WF8 4AH (01977 285014). Ultimate Shred Academy in Pontefract is our own gym and NCFE-approved centre (9002788). The course itself is fully online.",
   );
   assert.ok(!LOCAL_PAGES.westYorkshire.faqs.some((x) => x.q === f.q), "Pontefract only");
+  // One NAP answer per page: Pontefract drops the shared one; its own comes first.
+  assert.equal(LOCAL_PAGES.pontefract.faqs[0].q, f.q);
+  assert.ok(!LOCAL_PAGES.pontefract.faqs.some((x) => x.q === "Where is PT Launch Lab based?"), "no duplicate NAP FAQ on Pontefract");
+  assert.ok(LOCAL_PAGES.westYorkshire.faqs.some((x) => x.q === "Where is PT Launch Lab based?"), "West Yorkshire keeps the shared one");
+  assert.equal(LOCAL_PAGES.pontefract.faqs.length, 5);
+  assert.equal(LOCAL_PAGES.westYorkshire.faqs.length, 5);
   assert.ok(src("app/lib/localPages.ts").includes("${ADDRESS_ONE_LINE} (${PHONE_NATIONAL})"), "built from contactDetails");
 });
 

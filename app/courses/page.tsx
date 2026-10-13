@@ -28,7 +28,7 @@ const courseSchema = {
     sameAs: "https://ptlaunchlab.co.uk",
   },
   timeRequired: "P8W",
-  educationalCredentialAwarded: "NCFE Level 3 Personal Training Certificate",
+  educationalCredentialAwarded: "NCFE Level 3 Diploma in Gym Instructing and Personal Training (Ofqual ref 603/4388/6)",
   offers: [
     {
       "@type": "Offer",

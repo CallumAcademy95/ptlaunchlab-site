@@ -9,7 +9,7 @@ import { faqPageSchema } from "@/app/lib/faqSchema";
 import { breadcrumbTrail, courseSchema, type LocalPage } from "@/app/lib/localPages";
 import { wasPriceActive } from "@/app/lib/priceDrop";
 
-// One template for the three local course pages. All copy comes from
+// One template for the two local course pages (Pontefract, West Yorkshire). All copy comes from
 // app/lib/localPages.ts, which holds only the spec's confirmed facts.
 
 /** Build-time hint, as in MoneyHero: hold the was-price space until the browser decides. */
