@@ -46,14 +46,6 @@ test("FinalCTA always uses the two new buttons", () => {
   assert.doesNotMatch(f, /Discover Your Pathway|Start Today/);
 });
 
-test("LocationHero: two new buttons and the pay-in-full price line", () => {
-  const l = src("app/components/LocationHero.tsx");
-  assert.match(l, /<TwoWayCTA[^>]*source="location-hero"/);
-  assert.match(l, /COURSE_PRICE_LABEL/);
-  assert.match(l, /Flexible ways to pay at checkout/);
-  assert.doesNotMatch(l, /MONTHLY_PRICE_LABEL/);
-});
-
 import { NO_POPUP_PATHS, popupAllowedOnPath, shouldOpenCallModalAt } from "../app/lib/homeCta.ts";
 
 const plainClick = { button: 0, metaKey: false, ctrlKey: false, shiftKey: false, altKey: false, defaultPrevented: false };

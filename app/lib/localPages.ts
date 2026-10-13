@@ -102,6 +102,12 @@ function how(from: string) {
   ];
 }
 
+/** Pontefract only: the town page answers the town question first. */
+const PONTEFRACT_FAQ: FaqItem = {
+  q: "Is PT Launch Lab based in Pontefract?",
+  a: `Yes. PT Launch Lab is based at ${ADDRESS_ONE_LINE} (${PHONE_NATIONAL}). ${CENTRE_SENTENCE} The course itself is fully online.`,
+};
+
 function faqs(): FaqItem[] {
   const partners = westYorkshirePartners();
   const introduction = partners.length
@@ -135,6 +141,8 @@ function faqs(): FaqItem[] {
 function page(p: {
   key: LocalKey; slug: string; place: string; from: string;
   description: string; image: { src: string; alt: string }; local: LocalPage["local"];
+  /** Page-specific questions, shown before the shared ones. */
+  extraFaqs?: FaqItem[];
 }): LocalPage {
   return {
     key: p.key,
@@ -145,7 +153,7 @@ function page(p: {
     hero: hero(p.place, p.from, p.image),
     local: p.local,
     how: how(p.from),
-    faqs: faqs(),
+    faqs: [...(p.extraFaqs ?? []), ...faqs()],
   };
 }
 
@@ -160,6 +168,7 @@ export const LOCAL_PAGES: Record<LocalKey, LocalPage> = {
     local: {
       lead: `We are based in Pontefract. ${CENTRE_SENTENCE} ${ONLINE_SENTENCE}`,
     },
+    extraFaqs: [PONTEFRACT_FAQ],
   }),
   westYorkshire: page({
     key: "westYorkshire",
@@ -226,8 +235,7 @@ export function courseSchema(p: LocalPage) {
       },
     ],
     // 8 weeks: the fastest finish, as /courses (timeRequired P8W) and the /vsl
-    // pages (courseWorkload "PT8W") state. Written P8W here: weeks are a date
-    // component in ISO 8601, so "PT8W" is not a valid duration.
+    // pages state. Weeks are a date component in ISO 8601, so it is P8W, not PT8W.
     hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "P8W" },
   };
 }

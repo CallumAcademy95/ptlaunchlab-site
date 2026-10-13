@@ -80,7 +80,7 @@ const starter: VslContent = {
   schema: {
     courseName: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training",
     courseDescription: "Become a qualified UK Personal Trainer with an Ofqual-regulated NCFE Level 2 Gym Instructor and Level 3 Personal Trainer diploma. Fully online, includes business mentorship and a guaranteed gym introduction on graduation.",
-    courseWorkload: "PT8W",
+    courseWorkload: "P8W",
     articleHeadline: "Become a Personal Trainer in the UK — Level 2 & 3 Course (Online)",
     articleDescription: "Turn your gym obsession into a recognised career. NCFE Level 2 & 3, Ofqual regulated, fully online.",
   },
@@ -220,7 +220,7 @@ const switcher: VslContent = {
   schema: {
     courseName: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training (Career Change Pathway)",
     courseDescription: "Career-change-to-PT pathway for working UK adults. Study around a full-time job, qualify in 8–16 weeks, includes business mentorship and warm introductions into employed PT roles.",
-    courseWorkload: "PT12W",
+    courseWorkload: "P12W",
     articleHeadline: "Career Change to Personal Trainer (UK) — Qualify Without Quitting Your Job",
     articleDescription: "Realistic UK route from desk job to PT. Study around work. Business mentorship included. Transition safely.",
   },
@@ -360,7 +360,7 @@ const returner: VslContent = {
   schema: {
     courseName: "NCFE Level 2 & Level 3 Diploma in Gym Instructing and Personal Training (Returner Pathway)",
     courseDescription: "Online UK PT qualification for parents and returners. Study from home around school hours and family life. Ofqual-regulated NCFE Level 2 + 3 with business mentorship and supportive tutor model.",
-    courseWorkload: "PT16W",
+    courseWorkload: "P16W",
     articleHeadline: "Retrain as a Personal Trainer (UK) — Online Course Around the Kids",
     articleDescription: "Build a fitness career around school hours and family. Online UK NCFE Level 2 + 3, supportive route for parents and returners.",
   },

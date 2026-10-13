@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { locationRedirects } from "./app/lib/locationRedirects.ts";
 
 // Domains allowed to serve scripts
 const SCRIPT_HOSTS = [
@@ -110,6 +111,9 @@ const nextConfig: NextConfig = {
         destination: "https://www.ptlaunchlab.co.uk/",
         permanent: true,
       },
+      // The pruned [location] templates: one permanent hop to the nearest
+      // real page, generated from the location data (app/lib/locationRedirects.ts).
+      ...locationRedirects(),
     ];
   },
   serverExternalPackages: ["pdfkit"],

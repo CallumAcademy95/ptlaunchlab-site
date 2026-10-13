@@ -12,6 +12,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 // CRLF-safe: a Windows checkout must not change what the guards see.
@@ -313,4 +314,195 @@ test("the shared Footer links to the two local pages", () => {
   assert.match(near, />Pontefract<\/a>/);
   assert.match(near, />West Yorkshire<\/a>/);
   assert.doesNotMatch(f, /personal-trainer-course-(wakefield|leeds)/);
+});
+
+// ══ Task 2: prune the templated location routes ═════════════════════════════
+//   Testing, Unit items 4–6 (as amended: two local pages, not three):
+//   4. the redirect generator maps every location slug in the data to one of
+//      the targets: Pontefract, West Yorkshire or /courses;
+//   5. no target is itself redirected (and every target is a real page);
+//   6. the sitemap has the local pages and no template URLs.
+
+const require_ = createRequire(import.meta.url);
+// Next's own matcher for custom routes (case-insensitive, as next.config redirects are).
+const { getPathMatch } = require_("next/dist/shared/lib/router/utils/path-match.js") as {
+  getPathMatch: (path: string, options?: { strict?: boolean; sensitive?: boolean }) => (p: string) => false | Record<string, string>;
+};
+
+const loadRedirects = () => import("../app/lib/locationRedirects.ts");
+const PONTEFRACT_PAGE = "/personal-trainer-course-pontefract";
+const WEST_YORKSHIRE_PAGE = "/personal-trainer-course-west-yorkshire";
+
+type Rule = { source: string; destination: string; permanent?: boolean; statusCode?: number; has?: unknown[] };
+async function configRedirects(): Promise<Rule[]> {
+  const cfg = (await import("../next.config.ts")).default;
+  return (await cfg.redirects!()) as Rule[];
+}
+/** First matching redirect for a request to ptlaunchlab.co.uk, the way Next matches custom routes. */
+function resolve(rules: Rule[], path: string): Rule | null {
+  for (const r of rules) {
+    if (r.has) continue; // the host-scoped rules only match ultimateshredacademy.com
+    if (getPathMatch(r.source, { strict: true, sensitive: false })(path)) return r;
+  }
+  return null;
+}
+/** A real (static) page in app/ for this path. */
+const pageExists = (path: string) =>
+  existsSync(join(ROOT, "app", path === "/" ? "" : path.slice(1), "page.tsx"));
+
+test("the [location] templates are gone; the module lists all 31 of them", async () => {
+  const { TEMPLATES } = await loadRedirects();
+  assert.equal(TEMPLATES.length, 31);
+  assert.equal(new Set(TEMPLATES).size, 31);
+  const left = walk(join(ROOT, "app")).filter((f) => /[\\/]\[location\][\\/]/.test(f));
+  assert.deepEqual(left, [], "no [location] route remains");
+  for (const t of TEMPLATES) assert.ok(!existsSync(join(ROOT, "app", t, "[location]")), t);
+  // Only two templates ever had a root page; they stay.
+  for (const t of ["best-personal-trainer-course-uk", "personal-trainer-course-with-business-support"]) {
+    assert.ok(TEMPLATES.includes(t), t);
+    assert.ok(pageExists(`/${t}`), t);
+  }
+});
+
+test("4. every location slug in the data maps to Pontefract, West Yorkshire or /courses, by region", async () => {
+  const { targetForLocation, PONTEFRACT_AREA } = await loadRedirects();
+  const { ukLocations } = await import("../app/lib/ukLocations.ts");
+  const targets = new Set([PONTEFRACT_PAGE, WEST_YORKSHIRE_PAGE, "/courses"]);
+  for (const l of ukLocations) {
+    const t = targetForLocation(l.slug);
+    assert.ok(targets.has(t), `${l.slug} → ${t}`);
+    if (l.region !== "West Yorkshire") assert.equal(t, "/courses", `${l.slug} (${l.region}) is outside West Yorkshire`);
+    else assert.notEqual(t, "/courses", `${l.slug} is in West Yorkshire`);
+  }
+  // The Pontefract area is an explicit list; every entry is a West Yorkshire town in the data.
+  assert.deepEqual([...PONTEFRACT_AREA], ["pontefract", "castleford", "knottingley", "featherstone", "normanton", "hemsworth"]);
+  for (const s of PONTEFRACT_AREA) {
+    assert.equal(ukLocations.find((l) => l.slug === s)?.region, "West Yorkshire", s);
+    assert.equal(targetForLocation(s), PONTEFRACT_PAGE, s);
+  }
+  for (const s of ["wakefield", "leeds", "bradford", "huddersfield", "halifax", "dewsbury", "ossett", "keighley", "west-yorkshire"]) {
+    assert.equal(targetForLocation(s), WEST_YORKSHIRE_PAGE, s);
+  }
+  for (const s of ["york", "harrogate", "selby", "sheffield", "doncaster", "hull", "yorkshire", "manchester", "london", "no-such-town"]) {
+    assert.equal(targetForLocation(s), "/courses", s);
+  }
+});
+
+test("4. next.config redirects every /<template>/<town> to its target in one permanent hop", async () => {
+  const { TEMPLATES, targetForLocation } = await loadRedirects();
+  const { ukLocations } = await import("../app/lib/ukLocations.ts");
+  const rules = await configRedirects();
+  for (const t of TEMPLATES) {
+    for (const l of [...ukLocations, { slug: "no-such-town" }]) {
+      const r = resolve(rules, `/${t}/${l.slug}`);
+      assert.ok(r, `/${t}/${l.slug} is redirected`);
+      assert.equal(r.destination, targetForLocation(l.slug), `/${t}/${l.slug}`);
+      assert.equal(r.permanent, true, `/${t}/${l.slug} is permanent (308)`);
+    }
+  }
+  // The old chain: /level-3-personal-trainer-course/pontefract used to go via /wakefield.
+  assert.equal(resolve(rules, "/level-3-personal-trainer-course/pontefract")?.destination, PONTEFRACT_PAGE);
+  assert.equal(resolve(rules, "/level-3-personal-trainer-course/leeds")?.destination, WEST_YORKSHIRE_PAGE);
+  assert.equal(resolve(rules, "/Level-3-Personal-Trainer-Course/Leeds")?.destination, WEST_YORKSHIRE_PAGE, "case-insensitive");
+});
+
+test("4. bare template paths go to /courses unless the template has its own page", async () => {
+  const { TEMPLATES } = await loadRedirects();
+  const rules = await configRedirects();
+  for (const t of TEMPLATES) {
+    const r = resolve(rules, `/${t}`);
+    if (pageExists(`/${t}`)) assert.equal(r, null, `/${t} is a real page`);
+    else {
+      assert.equal(r?.destination, "/courses", `/${t}`);
+      assert.equal(r?.permanent, true);
+    }
+  }
+});
+
+test("4. the deleted Wakefield and Leeds local pages go to West Yorkshire", async () => {
+  const rules = await configRedirects();
+  for (const p of ["/personal-trainer-course-wakefield", "/personal-trainer-course-leeds"]) {
+    const r = resolve(rules, p);
+    assert.equal(r?.destination, WEST_YORKSHIRE_PAGE, p);
+    assert.equal(r?.permanent, true, p);
+  }
+});
+
+test("4. old-site slug aliases resolve straight to the final page, not via a template", async () => {
+  const { SLUG_ALIASES, TEMPLATES, targetForLocation } = await loadRedirects();
+  const rules = await configRedirects();
+  assert.equal(Object.keys(SLUG_ALIASES).length, 18, "all 18 aliases the middleware used to forward");
+  for (const [alias, to] of Object.entries(SLUG_ALIASES)) {
+    assert.ok(TEMPLATES.includes(to), `${alias} → ${to} is a template`);
+    for (const s of ["pontefract", "leeds", "york", "london"]) {
+      assert.equal(resolve(rules, `/${alias}/${s}`)?.destination, targetForLocation(s), `/${alias}/${s}`);
+    }
+    assert.equal(resolve(rules, `/${alias}`)?.destination, pageExists(`/${to}`) ? `/${to}` : "/courses", `/${alias}`);
+  }
+});
+
+test("5. every redirect target is a real page and is not itself redirected", async () => {
+  const rules = await configRedirects();
+  const ours = rules.filter((r) => !r.has);
+  assert.ok(ours.length > 0);
+  for (const r of ours) {
+    assert.ok(pageExists(r.destination), `${r.destination} is a page in app/`);
+    assert.equal(resolve(rules, r.destination), null, `${r.source} → ${r.destination} chains`);
+    assert.equal(r.permanent, true, `${r.source} is permanent`);
+  }
+});
+
+test("5. the middleware no longer forwards template URLs (no hub, base-only or alias hop)", async () => {
+  const m = stripComments(src("middleware.ts"));
+  for (const gone of ["LOCATION_ROUTE_BASES", "BASE_ONLY_REDIRECTS", "SLUG_REDIRECTS", "getHubForLocation", "hubSlugs", "level-3-personal-trainer-course"]) {
+    assert.ok(!m.includes(gone), `middleware still has ${gone}`);
+  }
+  // Old capitalised one-segment URLs (/Paisley) go straight to the final page.
+  assert.match(m, /targetForLocation\(/);
+  const u = src("app/lib/ukLocations.ts");
+  assert.ok(!/hubSlugs|CITY_TO_HUB|getHubForLocation|hubLocations/.test(u), "hub-and-spoke helpers removed");
+  const { ukLocations } = await import("../app/lib/ukLocations.ts");
+  assert.ok(ukLocations.length > 400, "the location data itself is kept");
+});
+
+test("6. the sitemap lists both local pages and no template or redirected URL", async () => {
+  const { TEMPLATES } = await loadRedirects();
+  const sitemap = (await import("../app/sitemap.ts")).default;
+  const rules = await configRedirects();
+  const urls = sitemap().map((e) => e.url);
+  for (const p of [PONTEFRACT_PAGE, WEST_YORKSHIRE_PAGE]) assert.ok(urls.includes(`${BASE}${p}`), p);
+  for (const u of urls) {
+    const path = u.slice(BASE.length) || "/";
+    const [first, ...rest] = path.slice(1).split("/");
+    assert.ok(!(TEMPLATES.includes(first) && rest.length), `${u} is a template URL`);
+    assert.equal(resolve(rules, path), null, `${u} is redirected`);
+  }
+  assert.equal(new Set(urls).size, urls.length, "no duplicates");
+});
+
+// ── Small fixes carried into Task 2 ────────────────────────────────────────
+
+test("Pontefract has its own FAQ: based in Pontefract, with the NAP, the centre and fully online", async () => {
+  const { LOCAL_PAGES } = await load();
+  const { ADDRESS_ONE_LINE, PHONE_NATIONAL } = await import("../app/lib/contactDetails.ts");
+  const f = LOCAL_PAGES.pontefract.faqs.find((x) => x.q === "Is PT Launch Lab based in Pontefract?");
+  assert.ok(f, "Pontefract FAQ present");
+  assert.equal(f.a, `Yes. PT Launch Lab is based at ${ADDRESS_ONE_LINE} (${PHONE_NATIONAL}). ${CENTRE_SENTENCE} The course itself is fully online.`);
+  assert.equal(
+    f.a,
+    "Yes. PT Launch Lab is based at Unit 3, Royals Business Park, King St, Pontefract WF8 4AH (01977 285014). Ultimate Shred Academy in Pontefract is our own gym and NCFE-approved centre (9002788). The course itself is fully online.",
+  );
+  assert.ok(!LOCAL_PAGES.westYorkshire.faqs.some((x) => x.q === f.q), "Pontefract only");
+  assert.ok(src("app/lib/localPages.ts").includes("${ADDRESS_ONE_LINE} (${PHONE_NATIONAL})"), "built from contactDetails");
+});
+
+test("every courseWorkload in app/ is a valid ISO 8601 duration", () => {
+  const found: string[] = [];
+  for (const f of APP_FILES) {
+    for (const m of src(f).matchAll(/courseWorkload:\s*["'`]([^"'`]*)["'`]/g)) {
+      found.push(`${f}: ${m[1]}`);
+      assert.match(m[1], /^P\d+[DWMY]$/, `${f}: courseWorkload "${m[1]}"`);
+    }
+  }
+  assert.ok(found.length >= 4, found.join("\n"));
 });
