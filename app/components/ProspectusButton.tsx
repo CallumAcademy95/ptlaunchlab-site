@@ -50,6 +50,7 @@ export default function ProspectusButton() {
               tone="dark"
               submitLabel="Download Prospectus →"
               successMessage="Thanks, opening the prospectus…"
+              footnote="We'll also send you useful emails about the course and becoming a PT. Unsubscribe any time."
               onSuccess={handleSuccess}
             />
           </div>
