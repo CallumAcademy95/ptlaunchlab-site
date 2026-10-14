@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { INTENT_LABEL, pushTone } from "@/app/lib/leads";
 import {
@@ -45,6 +46,10 @@ export default async function SiteLeadsPage({
   searchParams: Promise<{ all?: string }>;
 }) {
   const showAll = (await searchParams).all === "1";
+  // Website enquiries live in the CRM now. This list stays only as the place
+  // to check test and spam enquiries, which the CRM leaves out — a spam flag
+  // can catch a real person.
+  if (!showAll) redirect("/admin/crm");
 
   const db = getSupabaseAdmin();
   // Filter in the query, not after limit(100), so hidden rows never crowd out real ones.
@@ -66,14 +71,14 @@ export default async function SiteLeadsPage({
   return (
     <AdminPage>
       <PageHeader
-        title="Site leads"
-        subtitle="Enquiries from the website, newest first."
+        title="Site leads, including test and spam"
+        subtitle="Every website enquiry, newest first. Real ones are in the CRM."
         action={
           <Link
-            href={showAll ? "/admin/site-leads" : "/admin/site-leads?all=1"}
+            href="/admin/crm"
             className="inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-slate-50 px-3.5 text-[13px] font-semibold text-slate-600"
           >
-            {showAll ? "Hide test and spam" : "Show test and spam"}
+            Back to the CRM
           </Link>
         }
       />

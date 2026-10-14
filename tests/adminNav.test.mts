@@ -14,7 +14,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { ADMIN_NAV, ADMIN_NAV_ITEMS, isActiveNav } from "../app/admin/(shell)/nav.ts";
+import { ADMIN_NAV, ADMIN_NAV_ITEMS, isActiveNav, isActiveItem } from "../app/admin/(shell)/nav.ts";
 
 test("every nav entry points at a page that exists on disk", () => {
   for (const item of ADMIN_NAV_ITEMS) {
@@ -44,7 +44,7 @@ test("a sibling route with a longer name does not steal the highlight", () => {
 });
 
 test("an unrelated page highlights nothing", () => {
-  const lit = ADMIN_NAV_ITEMS.filter((i) => isActiveNav(i.href, "/admin/login"));
+  const lit = ADMIN_NAV_ITEMS.filter((i) => isActiveItem(i, "/admin/login"));
   assert.deepEqual(lit, []);
 });
 
@@ -56,14 +56,19 @@ test("exactly one entry is highlighted on any admin page", () => {
     "/admin/outreach",
     "/admin/outreach/template",
     "/admin/referrals",
+    "/admin/crm",
+    "/admin/crm/abc-123",
+    // The CRM replaced these; their redirects and the site-lead detail page
+    // still belong to it.
     "/admin/leads",
     "/admin/leads/abc-123",
+    "/admin/site-leads/abc-123",
     "/admin/ads",
     "/admin/ads/create",
     "/admin/whatsapp",
     "/admin/live-questions",
   ]) {
-    const lit = ADMIN_NAV_ITEMS.filter((i) => isActiveNav(i.href, pathname));
+    const lit = ADMIN_NAV_ITEMS.filter((i) => isActiveItem(i, pathname));
     assert.equal(lit.length, 1, `${pathname} highlighted ${lit.length} entries`);
   }
 });
@@ -81,4 +86,11 @@ test("every group has a label and at least one item", () => {
     assert.ok(g.label.trim().length > 0);
     assert.ok(g.items.length > 0, `group "${g.label}" is empty`);
   }
+});
+
+test("Leads and Site leads are folded into one CRM entry", () => {
+  const hrefs = ADMIN_NAV_ITEMS.map((i) => i.href);
+  assert.ok(hrefs.includes("/admin/crm"));
+  assert.ok(!hrefs.includes("/admin/leads"));
+  assert.ok(!hrefs.includes("/admin/site-leads"));
 });
