@@ -161,6 +161,10 @@ export interface PersonDetail {
   /** The matched website enquiry (leads row), if any. */
   siteLead: Record<string, unknown> | null;
   messages: Message[];
+  /** Channels they have a Leads Central identity on (lead_identities), e.g. "whatsapp". */
+  identityChannels: string[];
+  /** last_user_message_at of each WhatsApp identity: the time their last message was sent. */
+  whatsappIdentityTimes: (string | null)[];
   /** How many messages exist in all; more than messages.length when capped. */
   messageTotal: number;
   activities: Activity[];
@@ -246,7 +250,18 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
     let messages: Message[] = [];
     let messageTotal = 0;
     let signed = new Map<string, string>();
+    let identityChannels: string[] = [];
+    let whatsappIdentityTimes: (string | null)[] = [];
     if (person.kind === "person") {
+      // Which channels the reply box can offer (read only; Leads Central owns these rows).
+      const ir = await client.from("lead_identities").select("channel, last_user_message_at").eq("consultation_id", id).limit(20);
+      if (ir.error) problems.push(`identities: ${ir.error.message}`);
+      const idents = (ir.data ?? []) as { channel: unknown; last_user_message_at: unknown }[];
+      identityChannels = [...new Set(idents.map((r) => r.channel).filter((c): c is string => typeof c === "string"))];
+      whatsappIdentityTimes = idents
+        .filter((r) => r.channel === "whatsapp")
+        .map((r) => (typeof r.last_user_message_at === "string" ? r.last_user_message_at : null));
+
       // Newest MESSAGE_CAP, then reversed: a long thread keeps its latest
       // messages (the ones that need an answer), not its first.
       const mr = await client
@@ -278,7 +293,7 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
       activityTotal = Math.max(ar.count ?? 0, activities.length);
     }
 
-    return { person, consultation, siteLead, messages, messageTotal, activities, activityTotal, signed, problems };
+    return { person, consultation, siteLead, messages, identityChannels, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems };
   } catch (e) {
     return { problem: e instanceof Error ? e.message : "Could not read this person." };
   }

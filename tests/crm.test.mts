@@ -10,6 +10,9 @@
 //   - which mode changes are allowed, and that Do not contact needs a reason
 //   - saved views store only what the list page would accept
 //   - the "Already a qualified PT" toggle never drops other ai_profile keys
+//   - replying from the CRM (phase 1B): which channels are offered, what the
+//     button says per mode, the WhatsApp 24h window, the send action's input
+//     check, and how Leads Central's answers become what the box shows
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -44,6 +47,24 @@ import {
   validateQualifiedInput,
   viewIdOf,
   TAKEOVER_REASON,
+  AUTHOR_LABEL,
+  replyChannels,
+  defaultReplyChannel,
+  replyState,
+  lastInboundOn,
+  insideWhatsAppWindow,
+  willUseTemplate,
+  templateText,
+  replyCount,
+  validateSendInput,
+  ownerSendEndpoint,
+  interpretSendResponse,
+  interpretSendError,
+  TEMPLATE_NOT_APPROVED,
+  SEND_UNREACHABLE,
+  SEND_UNCONFIRMED,
+  SEND_IN_PROGRESS,
+  whatsappLastMessageAt,
   type CrmPerson,
 } from "../app/admin/(shell)/crm/crm.ts";
 
@@ -272,6 +293,17 @@ test("message author: lead, AI setter, template, Callum", () => {
   for (const via of ["reengage_nudge", "intake", "comment_to_dm"]) {
     assert.equal(messageAuthor({ direction: "outbound", ai_generated: true, meta: { via } }), "ai", via);
   }
+});
+
+test("a CRM reply (via crm_owner) is Callum, including when it went as the template", () => {
+  assert.equal(messageAuthor({ direction: "outbound", ai_generated: false, meta: { via: "crm_owner", author: "callum" } }), "human");
+  assert.equal(
+    messageAuthor({ direction: "outbound", ai_generated: false, meta: { via: "crm_owner", author: "callum", template: "ptll_owner_message" } }),
+    "human",
+  );
+  // The via wins even if the flag were ever written wrongly.
+  assert.equal(messageAuthor({ direction: "outbound", ai_generated: null, meta: { via: "crm_owner" } }), "human");
+  assert.equal(AUTHOR_LABEL.human, "👤 Callum");
 });
 
 // ─── mode transitions ───────────────────────────────────────────────────
@@ -505,4 +537,204 @@ test("a capped read says so instead of undercounting", () => {
   assert.equal(incompleteNote(76, 76), null);
   assert.equal(incompleteNote(76, null), null);
   assert.match(String(incompleteNote(1000, 1240)), /1000 of 1240/);
+});
+
+// ─── replying from the CRM (phase 1B) ───────────────────────────────────
+
+const CID = "11111111-1111-4111-8111-111111111111";
+const RID = "22222222-2222-4222-9222-222222222222";
+
+test("reply channels: WhatsApp from an identity or a phone, email only when it's a real address", () => {
+  assert.deepEqual(replyChannels({ email: "sam@example.com", phone: "07700 900123" }), ["whatsapp", "email"]);
+  // A WhatsApp-only lead: the email column holds a placeholder, not an address.
+  assert.deepEqual(replyChannels({ email: "whatsapp:447700900123", phone: "447700900123" }), ["whatsapp"]);
+  assert.deepEqual(replyChannels({ email: "messenger:12345", phone: null }), []);
+  assert.deepEqual(replyChannels({ email: "not-an-email", phone: null }), []);
+  // An identity is enough even without a stored phone.
+  assert.deepEqual(replyChannels({ email: null, phone: null }, ["whatsapp"]), ["whatsapp"]);
+  // Messenger/Instagram identities are not offered.
+  assert.deepEqual(replyChannels({ email: null, phone: null }, ["messenger", "instagram"]), []);
+  assert.deepEqual(replyChannels({ email: "sam@example.com", phone: "123" }), ["email"]);
+});
+
+test("default channel: their primary if offered, else the first offered", () => {
+  assert.equal(defaultReplyChannel(["whatsapp", "email"], "email"), "email");
+  assert.equal(defaultReplyChannel(["whatsapp", "email"], "whatsapp"), "whatsapp");
+  assert.equal(defaultReplyChannel(["email"], "whatsapp"), "email");
+  assert.equal(defaultReplyChannel(["whatsapp", "email"], "messenger"), "whatsapp");
+  assert.equal(defaultReplyChannel([], "email"), null);
+});
+
+test("button wording per mode: take over for the setter's modes, send for human, blocked for DNC/unsubscribed", () => {
+  assert.deepEqual(replyState("auto", false), { kind: "takeover", label: "Take over and send" });
+  assert.deepEqual(replyState("reply_only", false), { kind: "takeover", label: "Take over and send" });
+  for (const s of ["human", "paused", "booked"]) assert.deepEqual(replyState(s, false), { kind: "send", label: "Send" }, s);
+  assert.deepEqual(replyState("closed", false), { kind: "blocked", reason: "Marked do not contact" });
+  assert.deepEqual(replyState("closed", true), { kind: "blocked", reason: "Marked do not contact" });
+  assert.deepEqual(replyState("human", true), { kind: "blocked", reason: "Unsubscribed" });
+  assert.deepEqual(replyState("auto", true), { kind: "blocked", reason: "Unsubscribed" });
+  assert.equal(replyState(null, false).kind, "blocked");
+  assert.equal(replyState("something_new", false).kind, "blocked");
+});
+
+test("WhatsApp window: from their newest inbound WhatsApp message, under 24h is free text", () => {
+  const msgs = [
+    { channel: "whatsapp", direction: "inbound", created_at: ago(60 * 30) },
+    { channel: "whatsapp", direction: "inbound", created_at: ago(60 * 23) },
+    { channel: "email", direction: "inbound", created_at: ago(5) },
+    { channel: "whatsapp", direction: "outbound", created_at: ago(1) },
+  ];
+  assert.equal(lastInboundOn(msgs, "whatsapp"), ago(60 * 23));
+  assert.equal(lastInboundOn([], "whatsapp"), null);
+  assert.equal(insideWhatsAppWindow(ago(60 * 23), NOW), true);
+  assert.equal(insideWhatsAppWindow(ago(60 * 24), NOW), false);
+  assert.equal(insideWhatsAppWindow(null, NOW), false);
+  // Outbound and other channels never open the window.
+  assert.equal(willUseTemplate("whatsapp", lastInboundOn(msgs.slice(2), "whatsapp"), NOW), true);
+  assert.equal(willUseTemplate("whatsapp", ago(60), NOW), false);
+  assert.equal(willUseTemplate("email", null, NOW), false);
+});
+
+test("counter: 2000 for free text, 900 for the template's one-line text", () => {
+  assert.equal(templateText("Hi\n\nthere \r\n  you"), "Hi there you");
+  assert.deepEqual(replyCount("  hello  ", false), { length: 5, max: 2000, over: false });
+  assert.equal(replyCount("a".repeat(2001), false).over, true);
+  assert.deepEqual(replyCount("a".repeat(901), true), { length: 901, max: 900, over: true });
+  assert.equal(replyCount("a".repeat(450) + "\n\n" + "b".repeat(449), true).length, 900);
+});
+
+test("send input: ids, channel, status and text are checked before anything leaves the site", () => {
+  const good = { consultationId: CID, channel: "whatsapp", text: "  Hello there  ", expectStatus: "auto", requestId: RID };
+  const ok = validateSendInput(good);
+  assert.ok(ok.ok);
+  assert.deepEqual(ok.body, { consultationId: CID, channel: "whatsapp", text: "Hello there", actor: "callum", expectStatus: "auto", requestId: RID });
+
+  const bad = (over: Record<string, unknown>) => {
+    const r = validateSendInput({ ...good, ...over });
+    assert.equal(r.ok, false, JSON.stringify(over));
+    return r.ok ? "" : r.error;
+  };
+  bad({ consultationId: "x" });
+  bad({ channel: "messenger" });
+  bad({ channel: undefined });
+  bad({ expectStatus: "nonsense" });
+  bad({ expectStatus: null });
+  assert.match(bad({ expectStatus: "closed" }), /do not contact/i);
+  bad({ requestId: "not-a-uuid" });
+  bad({ requestId: "22222222-2222-1222-9222-222222222222" }); // not v4
+  assert.match(bad({ text: "   " }), /Write a message/);
+  bad({ text: 42 });
+  assert.match(bad({ text: "a".repeat(2001) }), /2000/);
+  assert.equal(validateSendInput({ ...good, text: "a".repeat(2000) }).ok, true);
+});
+
+test("endpoint: both env values required, https only (localhost may be http), no trailing-slash doubling", () => {
+  const missing = ownerSendEndpoint(undefined, undefined);
+  assert.equal(missing.ok, false);
+  assert.match(missing.ok ? "" : missing.error, /LEADS_CENTRAL_URL and CRM_SEND_SECRET are missing/);
+  const noKey = ownerSendEndpoint("https://lc.example.com", " ");
+  assert.match(noKey.ok ? "" : noKey.error, /CRM_SEND_SECRET is missing/);
+  assert.equal(ownerSendEndpoint("http://lc.example.com", "k").ok, false);
+  assert.equal(ownerSendEndpoint("not a url", "k").ok, false);
+  assert.deepEqual(ownerSendEndpoint("https://lc.example.com/", "k"), { ok: true, url: "https://lc.example.com/api/setter/owner-send", secret: "k" });
+  assert.deepEqual(ownerSendEndpoint("http://localhost:3001", "k"), { ok: true, url: "http://localhost:3001/api/setter/owner-send", secret: "k" });
+});
+
+test("error mapping: Leads Central's success answers", () => {
+  const j = (o: unknown) => JSON.stringify(o);
+  assert.deepEqual(
+    interpretSendResponse(200, j({ ok: true, mode: "human", tookOver: true, channel: "whatsapp", template: "ptll_owner_message", truncated: true, messageId: "m1", externalMessageId: "wamid.1" })),
+    { ok: true, mode: "human", tookOver: true, template: true, truncated: true, duplicate: false, messageId: "m1" },
+  );
+  assert.deepEqual(interpretSendResponse(200, j({ ok: true, mode: "human", template: null, messageId: "m2" })), {
+    ok: true,
+    mode: "human",
+    tookOver: false,
+    template: false,
+    truncated: false,
+    duplicate: false,
+    messageId: "m2",
+  });
+  // A duplicate: an earlier attempt with this requestId already sent; mode is null.
+  const dup = interpretSendResponse(200, j({ ok: true, mode: null, duplicate: true, template: null, messageId: "m1" }));
+  assert.ok(dup.ok);
+  assert.equal(dup.duplicate, true);
+  assert.equal(dup.mode, null);
+});
+
+test("error mapping: Leads Central's refusals, by code", () => {
+  const j = (o: unknown) => JSON.stringify(o);
+  const fail = (status: number, body: unknown) => {
+    const r = interpretSendResponse(status, j(body));
+    assert.equal(r.ok, false);
+    return r.ok ? null : r;
+  };
+
+  // conflict: fresh requestId and refresh.
+  assert.deepEqual(fail(409, { ok: false, code: "conflict", error: "Changed elsewhere — refresh." }), {
+    ok: false,
+    code: "conflict",
+    conflict: true,
+    refresh: true,
+    error: "Changed elsewhere — refresh.",
+    retrySameId: false,
+  });
+  // in_progress: the same id is still being sent, so keep it.
+  const busy = fail(409, { ok: false, code: "in_progress", error: "whatever" });
+  assert.equal(busy?.error, SEND_IN_PROGRESS);
+  assert.equal(busy?.retrySameId, true);
+  // DNC / unsubscribed / closed / opted out: shown as-is, panel refreshed, fresh id.
+  for (const code of ["dnc", "unsubscribed", "closed", "opted_out"]) {
+    const r = fail(409, { ok: false, code, error: `Refused: ${code}` });
+    assert.equal(r?.error, `Refused: ${code}`, code);
+    assert.equal(r?.refresh, true, code);
+    assert.equal(r?.retrySameId, false, code);
+  }
+  const noRecipient = fail(409, { ok: false, code: "no_recipient", error: "No WhatsApp number on file." });
+  assert.equal(noRecipient?.error, "No WhatsApp number on file.");
+  assert.equal(noRecipient?.refresh, undefined);
+  // A failure after the take-over happened: refresh, the lead is now Human.
+  const tookOver = fail(502, { ok: false, code: "send_failed", error: "Gmail said no", tookOver: true, messageId: "m3" });
+  assert.deepEqual(tookOver, { ok: false, code: "send_failed", refresh: true, error: "Gmail said no", retrySameId: false });
+  // Template not approved: Leads Central's words, else ours.
+  assert.equal(fail(502, { ok: false, code: "template_not_approved", error: "Template not approved yet." })?.error, "Template not approved yet.");
+  assert.equal(fail(502, { ok: false, code: "template_not_approved" })?.error, TEMPLATE_NOT_APPROVED);
+  // Auth: shown with where to look.
+  assert.match(String(fail(401, { ok: false, code: "unauthorized", error: "Unauthorized." })?.error), /^Unauthorized\. Check CRM_SEND_SECRET/);
+  assert.equal(fail(503, { ok: false, code: "not_configured", error: "Sending from the CRM isn't set up yet." })?.error, "Sending from the CRM isn't set up yet.");
+  assert.match(String(fail(503, { ok: false })?.error), /isn't set up/);
+  assert.equal(fail(400, { ok: false, code: "bad_request", error: "Text is too long." })?.error, "Text is too long.");
+  assert.equal(fail(500, { ok: false, code: "internal", error: "Something went wrong. Nothing was sent. Try again." })?.retrySameId, false);
+  assert.match(String(fail(500, { ok: false })?.error), /HTTP 500/);
+});
+
+test("error mapping: no JSON answer is 'couldn't reach', a gateway timeout 'couldn't confirm'; same id on retry", () => {
+  const j = (o: unknown) => JSON.stringify(o);
+  assert.deepEqual(interpretSendResponse(500, "<html>oops</html>"), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+  assert.deepEqual(interpretSendResponse(404, ""), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+  assert.deepEqual(interpretSendResponse(504, "An error occurred"), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
+  // 2xx that isn't ok:true is not a confirmed send.
+  assert.deepEqual(interpretSendResponse(200, j({ ok: false })), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
+  assert.deepEqual(interpretSendResponse(200, j([1])), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+});
+
+test("WhatsApp window estimate: Leads Central's rule (identity time at or before the newest inbound row)", () => {
+  const row = ago(60 * 20);
+  // The identity's own timestamp, earlier than the row (the job ran late): exact.
+  assert.deepEqual(whatsappLastMessageAt(row, [ago(60 * 26), null]), { at: ago(60 * 26), exact: true });
+  // An identity time after the row is ignored (it belongs to a message not stored yet).
+  assert.deepEqual(whatsappLastMessageAt(row, [ago(60)]), { at: row, exact: false });
+  // No identity time: the row's created_at, flagged as an estimate.
+  assert.deepEqual(whatsappLastMessageAt(row, []), { at: row, exact: false });
+  // Nothing inbound: no window, for certain.
+  assert.deepEqual(whatsappLastMessageAt(null, [ago(5)]), { at: null, exact: true });
+  // The decision follows: 26h by the identity → template, though the row says 20h.
+  assert.equal(willUseTemplate("whatsapp", whatsappLastMessageAt(row, [ago(60 * 26)]).at, NOW), true);
+});
+
+test("error mapping: a timeout may have sent (keep the id); a failed connection didn't", () => {
+  const timeout = Object.assign(new Error("The operation was aborted due to timeout"), { name: "TimeoutError" });
+  assert.deepEqual(interpretSendError(timeout), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
+  assert.deepEqual(interpretSendError(new TypeError("fetch failed")), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+  assert.deepEqual(interpretSendError("weird"), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
 });

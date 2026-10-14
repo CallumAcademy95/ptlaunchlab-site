@@ -22,12 +22,18 @@ import {
   waitBand,
   WAIT_DOT,
   formatWait,
+  replyChannels,
+  defaultReplyChannel,
+  lastInboundOn,
+  willUseTemplate,
+  whatsappLastMessageAt,
   type Author,
   type CrmMode,
   type CrmPerson,
 } from "./crm";
 import { ModeControls, ModeChip } from "./ModeControls";
 import { QualifiedToggle } from "./ClientBits";
+import { ReplyBox } from "./ReplyBox";
 import { MessageBody } from "./MessageBody";
 import { MessageMedia } from "./MessageMedia";
 
@@ -91,6 +97,12 @@ function activityText(a: Activity): string {
     return str(d.dnc_reason) ? `${arrow} (${d.dnc_reason})` : arrow;
   }
   if (a.action === "qualified_set") return d.already_qualified ? "Marked as a qualified PT" : "Unmarked as a qualified PT";
+  if (a.action === "owner_message_sent" || a.action === "owner_message_failed") {
+    const how = `${channelLabel(str(d.channel))}${d.template === true || str(d.template) ? " template" : ""}`;
+    return a.action === "owner_message_sent"
+      ? `Sent a ${how} message`
+      : `${how} message failed${str(d.error) ? `: ${d.error}` : ""}`;
+  }
   return a.action.replace(/_/g, " ");
 }
 
@@ -124,13 +136,16 @@ export async function PersonPanel({ id }: { id: string }) {
     );
   }
 
-  const { person: p, consultation, siteLead, messages, messageTotal, activities, activityTotal, signed, problems } = detail;
+  const { person: p, consultation, siteLead, messages, identityChannels, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems } = detail;
   const profile = consultation?.ai_profile;
   const planner = plannerRows(profile);
   const threadId = latestThreadId(messages);
   const gmail = gmailUrl(p.email, threadId);
   const wa = waNumber(p.phone);
-  const mins = waitingMinutes(p, requestTime());
+  const now = requestTime();
+  const mins = waitingMinutes(p, now);
+  const channels = replyChannels(p, identityChannels);
+  const waLast = whatsappLastMessageAt(lastInboundOn(messages, "whatsapp"), whatsappIdentityTimes);
   const summary = str(consultation?.ai_summary);
   const pausedReason = str(consultation?.setter_paused_reason);
   const modeChangedAt = str(consultation?.mode_changed_at);
@@ -215,7 +230,7 @@ export async function PersonPanel({ id }: { id: string }) {
         </div>
         {mode && mode !== "human" && (gmail || wa) && (
           <p className="text-xs text-slate-500">
-            Replying yourself? Take over first, or the setter may answer too.
+            Replying from Gmail or WhatsApp yourself? Take over first, or the setter may answer too.
           </p>
         )}
       </Card>
@@ -262,6 +277,19 @@ export async function PersonPanel({ id }: { id: string }) {
                 );
               })}
             </ol>
+          )}
+          {p.setter_status && mode && (
+            <ReplyBox
+              key={p.id}
+              consultationId={p.id}
+              setterStatus={p.setter_status}
+              unsubscribed={p.unsubscribed}
+              channels={channels}
+              defaultChannel={defaultReplyChannel(channels, p.primary_channel)}
+              lastWhatsAppInbound={waLast.at}
+              windowExact={waLast.exact}
+              templateAtRender={willUseTemplate("whatsapp", waLast.at, now)}
+            />
           )}
         </Card>
       )}

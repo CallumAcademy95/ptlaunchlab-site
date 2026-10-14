@@ -690,17 +690,23 @@ export function viaOf(meta: unknown): string | null {
   return typeof v === "string" ? v : null;
 }
 
+/** meta.via on a message Callum sent from the CRM's reply box (via Leads Central). */
+export const OWNER_VIA = "crm_owner";
+
 /**
  * Who wrote this message.
  *
- * Inbound is the lead. The planner template opener and nudge are labelled as
- * templates (they are stored ai_generated=false, but nobody typed them).
- * Callum only when ai_generated is explicitly false; anything else outbound —
- * true, or a missing flag — is the setter.
+ * Inbound is the lead. A CRM reply (via "crm_owner") is Callum, even when it
+ * went out as the ptll_owner_message template: he typed the words. The planner
+ * template opener and nudge are labelled as templates (they are stored
+ * ai_generated=false, but nobody typed them). Otherwise Callum only when
+ * ai_generated is explicitly false; anything else outbound — true, or a
+ * missing flag — is the setter.
  */
 export function messageAuthor(m: { direction: string; ai_generated: boolean | null; meta: unknown }): Author {
   if (m.direction === "inbound") return "lead";
   const via = viaOf(m.meta);
+  if (via === OWNER_VIA) return "human";
   if (via && (TEMPLATE_VIAS as readonly string[]).includes(via)) return "template";
   return m.ai_generated === false ? "human" : "ai";
 }
@@ -741,4 +747,320 @@ export function latestThreadId(messages: { channel: string | null; meta: unknown
 
 export function channelLabel(channel: string | null): string {
   return channel ? (CHANNEL_LABEL[channel] ?? channel) : "Unknown";
+}
+
+// ─── Replying from the CRM ──────────────────────────────────────────────
+//
+// The site never sends anything itself: sendOwnerMessage hands the text to
+// Leads Central (POST /api/setter/owner-send), which takes over if needed,
+// picks free text or the template, sends, and records. These are the rules
+// the reply box and the action share.
+
+export type ReplyChannel = "whatsapp" | "email";
+export const REPLY_CHANNELS: readonly ReplyChannel[] = ["whatsapp", "email"];
+
+/** Leads Central's cap on a typed reply. */
+export const REPLY_MAX = 2000;
+/** The template's {{2}} cap: the typed text with newlines collapsed. */
+export const TEMPLATE_TEXT_MAX = 900;
+export const WHATSAPP_WINDOW_MS = 24 * 60 * 60 * 1000;
+export const OWNER_TEMPLATE = "ptll_owner_message";
+
+export const TEMPLATE_NOTICE = "Outside WhatsApp's 24-hour window: this will go as a template";
+/** When the window was estimated from a stored row's time, not the message's own. */
+export const TEMPLATE_NOTICE_PROBABLY = "Probably outside WhatsApp's 24-hour window: this will likely go as a template";
+export const WINDOW_PROBABLY_OPEN = "Probably inside WhatsApp's 24-hour window. Leads Central decides; if it has closed, this goes as a template.";
+export const TEMPLATE_NOT_APPROVED = "WhatsApp template not approved yet. Message them from your phone.";
+export const SEND_UNREACHABLE = "Couldn't reach Leads Central — nothing was sent";
+export const SEND_UNCONFIRMED = "Couldn't confirm — check the conversation before resending";
+
+/**
+ * Which channels the reply box offers, in picker order.
+ *
+ * WhatsApp when they have a WhatsApp identity or a usable phone number. Email
+ * when the stored address is a real one: Leads Central stores
+ * "whatsapp:<id>"-style placeholders in consultations.email for people who
+ * never gave one. Messenger/Instagram are not offered (yet).
+ */
+export function replyChannels(
+  p: { email: string | null; phone: string | null },
+  identityChannels: readonly string[] = [],
+): ReplyChannel[] {
+  const out: ReplyChannel[] = [];
+  if (identityChannels.includes("whatsapp") || waNumber(p.phone)) out.push("whatsapp");
+  const email = (p.email ?? "").trim();
+  if (email.includes("@") && !email.includes(":")) out.push("email");
+  return out;
+}
+
+/** Their primary channel if the box offers it, else the first one it does. */
+export function defaultReplyChannel(channels: readonly ReplyChannel[], primary: string | null): ReplyChannel | null {
+  const hit = channels.find((c) => c === primary);
+  return hit ?? channels[0] ?? null;
+}
+
+export type ReplyState =
+  | { kind: "blocked"; reason: string }
+  | { kind: "takeover"; label: "Take over and send" }
+  | { kind: "send"; label: "Send" };
+
+/**
+ * What the send button does for a conversation in this state.
+ *
+ * AI active and Reply-only: the send hands the conversation to Callum first
+ * (Leads Central does the take-over), so the button says so. Human, paused and
+ * booked: just send. Do not contact and unsubscribed: no sending at all.
+ */
+export function replyState(setterStatus: string | null, unsubscribed: boolean): ReplyState {
+  if (setterStatus === "closed") return { kind: "blocked", reason: "Marked do not contact" };
+  if (unsubscribed) return { kind: "blocked", reason: "Unsubscribed" };
+  const mode = modeOf(setterStatus);
+  if (mode === "ai" || mode === "reply_only") return { kind: "takeover", label: "Take over and send" };
+  if (mode === "human") return { kind: "send", label: "Send" };
+  return { kind: "blocked", reason: "No conversation to reply in" };
+}
+
+/** The newest inbound message's time on one channel, from the loaded timeline. */
+export function lastInboundOn(
+  messages: readonly { channel: string | null; direction: string; created_at: string }[],
+  channel: string,
+): string | null {
+  let best: string | null = null;
+  let bestMs = -Infinity;
+  for (const m of messages) {
+    if (m.direction !== "inbound" || m.channel !== channel) continue;
+    const t = Date.parse(m.created_at);
+    if (Number.isFinite(t) && t > bestMs) {
+      bestMs = t;
+      best = m.created_at;
+    }
+  }
+  return best;
+}
+
+/** Free text is allowed while their last WhatsApp message is under 24h old. */
+export function insideWhatsAppWindow(lastInboundIso: string | null, now: number): boolean {
+  if (!lastInboundIso) return false;
+  const t = Date.parse(lastInboundIso);
+  return Number.isFinite(t) && now - t < WHATSAPP_WINDOW_MS;
+}
+
+/** Will this reply go as the ptll_owner_message template? */
+export function willUseTemplate(channel: ReplyChannel | null, lastWhatsAppInbound: string | null, now: number): boolean {
+  return channel === "whatsapp" && !insideWhatsAppWindow(lastWhatsAppInbound, now);
+}
+
+/** The template's {{2}}: the typed text on one line (same rule as Leads Central's oneLine). */
+export function templateText(text: string): string {
+  return text.replace(/[\n\t\r]+/g, " ").replace(/ {2,}/g, " ").trim();
+}
+
+/** What the counter counts, and against which cap. */
+export function replyCount(text: string, template: boolean): { length: number; max: number; over: boolean } {
+  const length = template ? templateText(text).length : text.trim().length;
+  const max = template ? TEMPLATE_TEXT_MAX : REPLY_MAX;
+  return { length, max, over: length > max };
+}
+
+const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+export function isUuidV4(v: unknown): v is string {
+  return typeof v === "string" && UUID_V4.test(v);
+}
+
+export interface OwnerSendBody {
+  consultationId: string;
+  channel: ReplyChannel;
+  text: string;
+  actor: "callum";
+  expectStatus: string;
+  requestId: string;
+}
+
+/**
+ * sendOwnerMessage's input check, before anything leaves the site.
+ *
+ * Mirrors Leads Central's own validation (1–2000 chars after trimming) so an
+ * obviously bad request is refused here with a clear message. Leads Central
+ * still re-checks everything against the live row.
+ */
+export function validateSendInput(input: {
+  consultationId: unknown;
+  channel: unknown;
+  text: unknown;
+  expectStatus: unknown;
+  requestId: unknown;
+}): { ok: true; body: OwnerSendBody } | { ok: false; error: string } {
+  if (!isUuid(input.consultationId)) return { ok: false, error: "Unknown person." };
+  if (input.channel !== "whatsapp" && input.channel !== "email") return { ok: false, error: "Pick WhatsApp or email." };
+  const status = typeof input.expectStatus === "string" ? input.expectStatus : null;
+  if (!status || !(KNOWN_STATUSES as readonly string[]).includes(status)) {
+    return { ok: false, error: "This person has no conversation to reply in." };
+  }
+  if (status === "closed") return { ok: false, error: "Marked do not contact." };
+  if (!isUuidV4(input.requestId)) return { ok: false, error: "Bad request id. Refresh and try again." };
+  const text = typeof input.text === "string" ? input.text.trim() : "";
+  if (!text) return { ok: false, error: "Write a message first." };
+  if (text.length > REPLY_MAX) return { ok: false, error: `Keep it under ${REPLY_MAX} characters.` };
+  return {
+    ok: true,
+    body: { consultationId: input.consultationId, channel: input.channel, text, actor: "callum", expectStatus: status, requestId: input.requestId },
+  };
+}
+
+/**
+ * Where to send, from the site's env. Both are server-only; either missing is
+ * a setup problem, said plainly rather than as a failed send.
+ */
+export function ownerSendEndpoint(
+  baseUrl: string | undefined,
+  secret: string | undefined,
+): { ok: true; url: string; secret: string } | { ok: false; error: string } {
+  const base = (baseUrl ?? "").trim();
+  const key = (secret ?? "").trim();
+  const missing = [!base && "LEADS_CENTRAL_URL", !key && "CRM_SEND_SECRET"].filter(Boolean);
+  if (missing.length) {
+    return { ok: false, error: `Sending isn't set up on the site: ${missing.join(" and ")} ${missing.length > 1 ? "are" : "is"} missing. Nothing was sent.` };
+  }
+  let u: URL;
+  try {
+    u = new URL(base);
+  } catch {
+    return { ok: false, error: "LEADS_CENTRAL_URL isn't a valid URL. Nothing was sent." };
+  }
+  const local = u.hostname === "localhost" || u.hostname === "127.0.0.1";
+  if (u.protocol !== "https:" && !(local && u.protocol === "http:")) {
+    return { ok: false, error: "LEADS_CENTRAL_URL must be https. Nothing was sent." };
+  }
+  return { ok: true, url: `${u.origin}${u.pathname.replace(/\/+$/, "")}/api/setter/owner-send`, secret: key };
+}
+
+export type SendResult =
+  | {
+      ok: true;
+      /** setter_status after the send; null on a duplicate (an earlier attempt already sent). */
+      mode: string | null;
+      tookOver: boolean;
+      /** Went as the ptll_owner_message template (outside the 24h window). */
+      template: boolean;
+      /** Leads Central shortened the text to fit the template. */
+      truncated: boolean;
+      /** This requestId had already been sent: nothing new went out. */
+      duplicate: boolean;
+      messageId: string | null;
+    }
+  | {
+      ok: false;
+      error: string;
+      /** Leads Central's code (dnc, conflict, in_progress, send_failed, …), when it gave one. */
+      code?: string;
+      /** The conversation changed under the panel (409 conflict): refresh, new requestId. */
+      conflict?: boolean;
+      /** Refresh the panel: what it shows is out of date (taken over, DNC, unsubscribed…). */
+      refresh?: boolean;
+      /**
+       * Keep the same requestId for the next attempt: the send may have reached
+       * Leads Central (timeout, lost connection, still in progress), and the
+       * same id makes a retry idempotent. False after a definite answer.
+       */
+      retrySameId: boolean;
+    };
+
+export const SEND_IN_PROGRESS = "Still sending — wait a moment";
+
+/** 409 codes after which the panel is out of date and should be re-read. */
+const STALE_CODES = ["conflict", "dnc", "unsubscribed", "closed", "opted_out"];
+
+const clip = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
+
+/**
+ * Leads Central's answer (status + raw body) as what the reply box shows.
+ *
+ * Its `error` is plain text written for Callum and is shown as-is. Anything
+ * that isn't a JSON answer is treated as "couldn't reach" (or, for a gateway
+ * timeout, "couldn't confirm"), and the same requestId is kept for a retry.
+ */
+export function interpretSendResponse(status: number, raw: string): SendResult {
+  let body: Record<string, unknown> | null = null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) body = parsed as Record<string, unknown>;
+  } catch {
+    body = null;
+  }
+
+  if (!body) {
+    // A gateway timeout means the function may still have sent.
+    if (status === 504 || status === 502) return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
+    return { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
+  }
+
+  if (status >= 200 && status < 300 && body.ok === true) {
+    const t = body.template;
+    return {
+      ok: true,
+      mode: typeof body.mode === "string" ? body.mode : null,
+      tookOver: body.tookOver === true,
+      template: (typeof t === "string" && t !== "") || t === true,
+      truncated: body.truncated === true,
+      duplicate: body.duplicate === true,
+      messageId: typeof body.messageId === "string" ? body.messageId : null,
+    };
+  }
+  if (status >= 200 && status < 300) {
+    // 2xx without ok:true is not a confirmed send, and not a refusal either.
+    return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
+  }
+
+  const code = typeof body.code === "string" ? body.code : undefined;
+  const said = typeof body.error === "string" && body.error.trim() ? clip(body.error) : null;
+  const tookOver = body.tookOver === true;
+  const out = (error: string, extra: { conflict?: boolean; refresh?: boolean; retrySameId?: boolean } = {}): SendResult => ({
+    ok: false,
+    error,
+    ...(code ? { code } : {}),
+    ...(extra.conflict ? { conflict: true } : {}),
+    ...(extra.refresh || extra.conflict || tookOver ? { refresh: true } : {}),
+    retrySameId: extra.retrySameId ?? false,
+  });
+
+  if (code === "in_progress") return out(SEND_IN_PROGRESS, { retrySameId: true });
+  if (code === "conflict") return out(said ?? "Changed elsewhere, refresh.", { conflict: true });
+  if (status === 409) return out(said ?? "Leads Central refused the send.", { refresh: !code || STALE_CODES.includes(code) });
+  if (code === "template_not_approved") return out(said ?? TEMPLATE_NOT_APPROVED);
+  if (status === 401 || code === "unauthorized") {
+    return out(`${said ?? "Unauthorized."} Check CRM_SEND_SECRET matches on both projects. Nothing was sent.`);
+  }
+  if (status === 503 && !said) return out("Leads Central isn't set up to send yet. Nothing was sent.");
+  return out(said ?? `Leads Central couldn't send (HTTP ${status}).`);
+}
+
+/** A fetch that threw: timed out (may have sent) or never connected. */
+export function interpretSendError(e: unknown): SendResult {
+  const name = e && typeof e === "object" && "name" in e ? String((e as { name: unknown }).name) : "";
+  if (name === "TimeoutError" || name === "AbortError") return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
+  return { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
+}
+
+// ─── The WhatsApp window, as Leads Central decides it ───────────────────
+
+/**
+ * When their last WhatsApp message was sent, by Leads Central's rule
+ * (lastInboundWhatsAppAt in pt-app lib/setter/owner-send.ts): a lead_messages
+ * row is written when the job runs, so its created_at can be hours late; the
+ * identity's last_user_message_at is the message's own time. Use the newest
+ * identity time at or before the newest inbound row, else the row's
+ * created_at. `exact` is false in that fallback, so the box can say
+ * "probably": Leads Central makes the real decision.
+ */
+export function whatsappLastMessageAt(
+  newestInboundRowAt: string | null,
+  identityLastUserAt: readonly (string | null | undefined)[],
+): { at: string | null; exact: boolean } {
+  if (!newestInboundRowAt) return { at: null, exact: true }; // nothing inbound: no window, for certain
+  const row = Date.parse(newestInboundRowAt);
+  if (!Number.isFinite(row)) return { at: null, exact: false };
+  const earlier = identityLastUserAt.map((s) => (s ? Date.parse(s) : NaN)).filter((t) => Number.isFinite(t) && t <= row);
+  return earlier.length
+    ? { at: new Date(Math.max(...earlier)).toISOString(), exact: true }
+    : { at: new Date(row).toISOString(), exact: false };
 }
