@@ -28,6 +28,7 @@ import { hitioOrpingtonAcademy } from "./hitio-orpington-academy.ts";
 import { ironwolfGym } from "./ironwolf-gym.ts";
 import { mofGym } from "./mof-gym.ts";
 import { muscleBoundAcademy } from "./muscle-bound-academy.ts";
+import { muscleMakersAcademy } from "./muscle-makers-academy.ts";
 import { superflexAcademy } from "./superflex-academy.ts";
 import { xcelerateAcademy } from "./xcelerate-academy.ts";
 import { demoAcademy } from "./demo-academy.ts";
@@ -41,6 +42,7 @@ export const GYMS: Record<string, GymConfig> = {
   "ironwolf-gym": ironwolfGym,
   "mof-gym": mofGym,
   "muscle-bound-academy": muscleBoundAcademy,
+  "muscle-makers-academy": muscleMakersAcademy,
   "superflex-academy": superflexAcademy,
   "xcelerate-academy": xcelerateAcademy,
   "demo-academy": demoAcademy,

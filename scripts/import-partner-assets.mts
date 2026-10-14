@@ -43,6 +43,7 @@ const FOLDER_TO_SLUG: Record<string, string> = {
   "iron wolf": "ironwolf",
   "ministry of fitness": "mof",
   "musclebound": "muscle-bound",
+  "muscle-makers": "muscle-makers",
   "superflex": "superflex",
   "xcelerate": "xcelerate",
 };
