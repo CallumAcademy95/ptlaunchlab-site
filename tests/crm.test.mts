@@ -64,6 +64,14 @@ import {
   SEND_UNREACHABLE,
   SEND_UNCONFIRMED,
   SEND_IN_PROGRESS,
+  isRealEmail,
+  replyForm,
+  sentNotice,
+  replyKey,
+  planAttempt,
+  attemptAfter,
+  TEMPLATE_CUT_WARNING,
+  type ReplyIdentity,
   whatsappLastMessageAt,
   type CrmPerson,
 } from "../app/admin/(shell)/crm/crm.ts";
@@ -544,17 +552,41 @@ test("a capped read says so instead of undercounting", () => {
 const CID = "11111111-1111-4111-8111-111111111111";
 const RID = "22222222-2222-4222-9222-222222222222";
 
-test("reply channels: WhatsApp from an identity or a phone, email only when it's a real address", () => {
-  assert.deepEqual(replyChannels({ email: "sam@example.com", phone: "07700 900123" }), ["whatsapp", "email"]);
-  // A WhatsApp-only lead: the email column holds a placeholder, not an address.
-  assert.deepEqual(replyChannels({ email: "whatsapp:447700900123", phone: "447700900123" }), ["whatsapp"]);
-  assert.deepEqual(replyChannels({ email: "messenger:12345", phone: null }), []);
-  assert.deepEqual(replyChannels({ email: "not-an-email", phone: null }), []);
-  // An identity is enough even without a stored phone.
-  assert.deepEqual(replyChannels({ email: null, phone: null }, ["whatsapp"]), ["whatsapp"]);
-  // Messenger/Instagram identities are not offered.
-  assert.deepEqual(replyChannels({ email: null, phone: null }, ["messenger", "instagram"]), []);
-  assert.deepEqual(replyChannels({ email: "sam@example.com", phone: "123" }), ["email"]);
+test("reply channels: Leads Central's rules (identity, consent, real email)", () => {
+  const wa = (over: Record<string, unknown> = {}) => ({ channel: "whatsapp", external_id: "447700900123", consent_state: "opted_in", created_at: ago(100), ...over }) as ReplyIdentity;
+  const em = (over: Record<string, unknown> = {}) => ({ channel: "email", external_id: "sam@example.com", consent_state: null, created_at: ago(100), ...over }) as ReplyIdentity;
+
+  assert.deepEqual(replyChannels({ email: "sam@example.com" }, [wa()]), ["whatsapp", "email"]);
+  // A phone alone is not enough: Leads Central sends to the WhatsApp identity.
+  assert.deepEqual(replyChannels({ email: null }, []), []);
+  // The identity needs a non-empty external_id.
+  assert.deepEqual(replyChannels({ email: null }, [wa({ external_id: "  " })]), []);
+  assert.deepEqual(replyChannels({ email: null }, [wa({ external_id: null })]), []);
+  // Opted out of WhatsApp: not offered. Judged on the newest usable identity, as Leads Central picks it.
+  assert.deepEqual(replyChannels({ email: null }, [wa({ consent_state: "opted_out" })]), []);
+  assert.deepEqual(replyChannels({ email: null }, [wa({ consent_state: "opted_out", created_at: ago(200) }), wa({ created_at: ago(10) })]), ["whatsapp"]);
+  assert.deepEqual(replyChannels({ email: null }, [wa({ created_at: ago(200) }), wa({ consent_state: "opted_out", created_at: ago(10) })]), []);
+
+  // Email: a real address on the newest email identity or on the consultation.
+  assert.deepEqual(replyChannels({ email: "whatsapp:447700900123" }, [wa()]), ["whatsapp"]);
+  assert.deepEqual(replyChannels({ email: "messenger:12345" }, []), []);
+  assert.deepEqual(replyChannels({ email: "not-an-email" }, []), []);
+  assert.deepEqual(replyChannels({ email: "sam@localhost" }, []), []); // isRealEmail wants a dot in the domain
+  assert.deepEqual(replyChannels({ email: "whatsapp:447700900123" }, [em()]), ["email"]);
+  assert.deepEqual(replyChannels({ email: "sam@example.com" }, []), ["email"]);
+  // Opted out of email: not offered, even with a real consultation email.
+  assert.deepEqual(replyChannels({ email: "sam@example.com" }, [em({ consent_state: "opted_out" })]), []);
+  // Messenger/Instagram identities are never offered.
+  assert.deepEqual(replyChannels({ email: null }, [{ channel: "messenger", external_id: "1" }, { channel: "instagram", external_id: "2" }]), []);
+});
+
+test("isRealEmail matches pt-app's rule", () => {
+  assert.equal(isRealEmail("a@b.co"), true);
+  assert.equal(isRealEmail("  a@b.co  "), true);
+  assert.equal(isRealEmail("whatsapp:a@b.co"), false);
+  assert.equal(isRealEmail("a b@c.co"), false);
+  assert.equal(isRealEmail("a@b"), false);
+  assert.equal(isRealEmail(null), false);
 });
 
 test("default channel: their primary if offered, else the first offered", () => {
@@ -595,12 +627,93 @@ test("WhatsApp window: from their newest inbound WhatsApp message, under 24h is 
   assert.equal(willUseTemplate("email", null, NOW), false);
 });
 
-test("counter: 2000 for free text, 900 for the template's one-line text", () => {
+test("counter: 2000 for free text, 900 for a certain template, 2000 + a warning for a probable one", () => {
   assert.equal(templateText("Hi\n\nthere \r\n  you"), "Hi there you");
-  assert.deepEqual(replyCount("  hello  ", false), { length: 5, max: 2000, over: false });
-  assert.equal(replyCount("a".repeat(2001), false).over, true);
-  assert.deepEqual(replyCount("a".repeat(901), true), { length: 901, max: 900, over: true });
-  assert.equal(replyCount("a".repeat(450) + "\n\n" + "b".repeat(449), true).length, 900);
+  assert.equal(templateText("a\tb   c"), "a b c");
+  assert.deepEqual(replyCount("  hello  ", "free"), { length: 5, max: 2000, over: false, willCut: false });
+  assert.equal(replyCount("a".repeat(2001), "free").over, true);
+  assert.equal(replyCount("a".repeat(1500), "free").willCut, false);
+  assert.deepEqual(replyCount("a".repeat(901), "template"), { length: 901, max: 900, over: true, willCut: false });
+  assert.equal(replyCount("a".repeat(450) + "\n\n" + "b".repeat(449), "template").length, 900);
+  // Only probably a template: not blocked at 900, but warned it'd be cut.
+  assert.deepEqual(replyCount("a".repeat(1200), "maybe_template"), { length: 1200, max: 2000, over: false, willCut: true });
+  assert.equal(replyCount("a".repeat(900), "maybe_template").willCut, false);
+  assert.equal(replyCount("a".repeat(2001), "maybe_template").over, true);
+  assert.match(TEMPLATE_CUT_WARNING, /cut to 900 characters/);
+});
+
+test("reply form: a template is certain only when the window time is exact", () => {
+  assert.equal(replyForm("email", true, true), "free");
+  assert.equal(replyForm("whatsapp", false, false), "free");
+  assert.equal(replyForm("whatsapp", true, true), "template");
+  assert.equal(replyForm("whatsapp", true, false), "maybe_template");
+  assert.equal(replyForm(null, true, true), "free");
+});
+
+test("sent notice: shortened templates say so; duplicates and take-overs too", () => {
+  const base = { template: false, truncated: false, duplicate: false, tookOver: false };
+  assert.equal(sentNotice(base, "email"), "Sent by Email.");
+  assert.equal(sentNotice({ ...base, template: true }, "whatsapp"), "Sent as the WhatsApp template.");
+  assert.equal(sentNotice({ ...base, template: true, truncated: true }, "whatsapp"), "Sent (shortened to 900 characters for the template).");
+  assert.match(sentNotice({ ...base, tookOver: true }, "whatsapp"), /^Sent by WhatsApp\. You've taken over/);
+  assert.match(sentNotice({ ...base, duplicate: true }, "whatsapp"), /Already sent/);
+});
+
+test("send attempts: same id only for a retry of the same message; anything else after a maybe-sent attempt needs a confirm", () => {
+  let n = 0;
+  const newId = () => `id-${++n}`;
+  const k1 = replyKey("whatsapp", " Hello ");
+  const k2 = replyKey("whatsapp", "Hello again");
+  assert.equal(k1, replyKey("whatsapp", "Hello")); // trimmed, as Leads Central trims
+  assert.notEqual(replyKey("email", "Hello"), k1);
+
+  // Nothing before: new id, no confirm.
+  assert.deepEqual(planAttempt(null, k1, newId), { requestId: "id-1", confirmResend: false });
+
+  // Timeout / network / non-JSON 5xx: may have sent, the id is reusable.
+  const timedOut = attemptAfter(interpretSendError(Object.assign(new Error("t"), { name: "TimeoutError" })), "A", k1);
+  assert.deepEqual(timedOut, { id: "A", key: k1, reusable: true, uncertain: true });
+  assert.deepEqual(planAttempt(timedOut, k1, newId), { requestId: "A", confirmResend: false });
+  // Edited text or another channel: a new message, so a new id, after a confirm.
+  assert.deepEqual(planAttempt(timedOut, k2, newId), { requestId: "id-2", confirmResend: true });
+  assert.deepEqual(planAttempt(timedOut, replyKey("email", "Hello"), newId), { requestId: "id-3", confirmResend: true });
+  const crashed = attemptAfter(interpretSendResponse(500, "<html>"), "B", k1);
+  assert.deepEqual(crashed, { id: "B", key: k1, reusable: true, uncertain: true });
+
+  // unknown_outcome: the id can't be reused; even the same text needs the confirm.
+  const unknown = attemptAfter(interpretSendResponse(409, JSON.stringify({ ok: false, code: "unknown_outcome", error: "?" })), "C", k1);
+  assert.deepEqual(unknown, { id: "C", key: k1, reusable: false, uncertain: true });
+  assert.deepEqual(planAttempt(unknown, k1, newId), { requestId: "id-4", confirmResend: true });
+
+  // Definitely not sent (refused to connect): same id kept for the same text, no confirm for new text.
+  const refused = attemptAfter(interpretSendError(Object.assign(new TypeError("fetch failed"), { cause: { code: "ECONNREFUSED" } })), "D", k1);
+  assert.deepEqual(refused, { id: "D", key: k1, reusable: true, uncertain: false });
+  assert.deepEqual(planAttempt(refused, k2, newId), { requestId: "id-5", confirmResend: false });
+
+  // A definite answer (conflict, send_failed, template_problem) or a success: forgotten, fresh id next time.
+  assert.equal(attemptAfter(interpretSendResponse(409, JSON.stringify({ ok: false, code: "conflict", error: "x" })), "E", k1), null);
+  assert.equal(attemptAfter(interpretSendResponse(502, JSON.stringify({ ok: false, code: "send_failed", error: "x" })), "F", k1), null);
+  assert.equal(attemptAfter(interpretSendResponse(502, JSON.stringify({ ok: false, code: "template_problem", error: "x" })), "H", k1), null);
+  assert.equal(attemptAfter(interpretSendResponse(200, JSON.stringify({ ok: true, mode: "human" })), "G", k1), null);
+});
+
+test("template_problem and send_failed: Leads Central's plain words shown as-is, no retry", () => {
+  const j = (o: unknown) => JSON.stringify(o);
+  const tp = interpretSendResponse(502, j({ ok: false, code: "template_problem", error: "Template problem (WhatsApp error 132012). Message them from your phone." }));
+  assert.deepEqual(tp, {
+    ok: false,
+    code: "template_problem",
+    error: "Template problem (WhatsApp error 132012). Message them from your phone.",
+    retrySameId: false,
+  });
+  const tpBare = interpretSendResponse(502, j({ ok: false, code: "template_problem" }));
+  assert.match(tpBare.ok ? "" : tpBare.error, /Template problem/);
+  const sf = interpretSendResponse(
+    502,
+    j({ ok: false, code: "send_failed", error: "Not sent: WhatsApp says their 24-hour window has closed. Message them from your phone." }),
+  );
+  assert.equal(sf.ok ? "" : sf.error, "Not sent: WhatsApp says their 24-hour window has closed. Message them from your phone.");
+  assert.equal(sf.ok ? true : sf.retrySameId, false);
 });
 
 test("send input: ids, channel, status and text are checked before anything leaves the site", () => {
@@ -696,6 +809,7 @@ test("error mapping: Leads Central's refusals, by code", () => {
     refresh: true,
     error: "Couldn't confirm whether that went — check the conversation on your phone before resending",
     retrySameId: false,
+    uncertain: true,
   });
   // `detail` never reaches the browser: only the error is passed on.
   const withDetail = fail(502, { ok: false, code: "send_failed", error: "Gmail said no", detail: { stack: "secret internals" } });
@@ -730,13 +844,15 @@ test("error mapping: Leads Central's refusals, by code", () => {
   assert.match(String(fail(500, { ok: false })?.error), /HTTP 500/);
 });
 
-test("error mapping: no JSON answer is 'couldn't reach', a gateway timeout 'couldn't confirm'; same id on retry", () => {
+test("error mapping: a non-JSON 5xx may have sent ('couldn't confirm'); a non-JSON 4xx never ran; same id on retry", () => {
   const j = (o: unknown) => JSON.stringify(o);
-  assert.deepEqual(interpretSendResponse(500, "<html>oops</html>"), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+  const unconfirmed = { ok: false, error: SEND_UNCONFIRMED, retrySameId: true, uncertain: true };
+  for (const status of [500, 502, 503, 504]) {
+    assert.deepEqual(interpretSendResponse(status, "<html>oops</html>"), unconfirmed, String(status));
+  }
   assert.deepEqual(interpretSendResponse(404, ""), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
-  assert.deepEqual(interpretSendResponse(504, "An error occurred"), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
   // 2xx that isn't ok:true is not a confirmed send.
-  assert.deepEqual(interpretSendResponse(200, j({ ok: false })), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
+  assert.deepEqual(interpretSendResponse(200, j({ ok: false })), unconfirmed);
   assert.deepEqual(interpretSendResponse(200, j([1])), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
 });
 
@@ -754,9 +870,18 @@ test("WhatsApp window estimate: Leads Central's rule (identity time at or before
   assert.equal(willUseTemplate("whatsapp", whatsappLastMessageAt(row, [ago(60 * 26)]).at, NOW), true);
 });
 
-test("error mapping: a timeout may have sent (keep the id); a failed connection didn't", () => {
-  const timeout = Object.assign(new Error("The operation was aborted due to timeout"), { name: "TimeoutError" });
-  assert.deepEqual(interpretSendError(timeout), { ok: false, error: SEND_UNCONFIRMED, retrySameId: true });
-  assert.deepEqual(interpretSendError(new TypeError("fetch failed")), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
-  assert.deepEqual(interpretSendError("weird"), { ok: false, error: SEND_UNREACHABLE, retrySameId: true });
+test("error mapping: only a connection that never opened is 'nothing was sent'; anything else 'couldn't confirm'", () => {
+  const unconfirmed = { ok: false, error: SEND_UNCONFIRMED, retrySameId: true, uncertain: true };
+  const unreachable = { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
+  const fetchFailed = (code: string) => Object.assign(new TypeError("fetch failed"), { cause: Object.assign(new Error(code), { code }) });
+  assert.deepEqual(interpretSendError(Object.assign(new Error("timeout"), { name: "TimeoutError" })), unconfirmed);
+  assert.deepEqual(interpretSendError(Object.assign(new Error("aborted"), { name: "AbortError" })), unconfirmed);
+  for (const code of ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "UND_ERR_CONNECT_TIMEOUT"]) {
+    assert.deepEqual(interpretSendError(fetchFailed(code)), unreachable, code);
+  }
+  // A reset mid-request, a redirect refused, or anything unrecognised may have come after the send.
+  assert.deepEqual(interpretSendError(fetchFailed("ECONNRESET")), unconfirmed);
+  assert.deepEqual(interpretSendError(fetchFailed("UND_ERR_SOCKET")), unconfirmed);
+  assert.deepEqual(interpretSendError(new TypeError("fetch failed")), unconfirmed);
+  assert.deepEqual(interpretSendError("weird"), unconfirmed);
 });

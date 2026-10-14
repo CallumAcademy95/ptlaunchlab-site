@@ -1,7 +1,7 @@
 import "server-only";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { parseMedia, signablePaths, LEAD_MEDIA_BUCKET } from "@/app/lib/message-media";
-import { normalisePerson, isUuid, incompleteNote, type CrmPerson } from "./crm";
+import { normalisePerson, isUuid, incompleteNote, type CrmPerson, type ReplyIdentity } from "./crm";
 
 // Reads for the CRM. Service role, server only.
 //
@@ -161,8 +161,8 @@ export interface PersonDetail {
   /** The matched website enquiry (leads row), if any. */
   siteLead: Record<string, unknown> | null;
   messages: Message[];
-  /** Channels they have a Leads Central identity on (lead_identities), e.g. "whatsapp". */
-  identityChannels: string[];
+  /** Their Leads Central identities (lead_identities): who the reply box can send to. */
+  identities: ReplyIdentity[];
   /** last_user_message_at of each WhatsApp identity: the time their last message was sent. */
   whatsappIdentityTimes: (string | null)[];
   /** How many messages exist in all; more than messages.length when capped. */
@@ -250,14 +250,17 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
     let messages: Message[] = [];
     let messageTotal = 0;
     let signed = new Map<string, string>();
-    let identityChannels: string[] = [];
+    let identities: ReplyIdentity[] = [];
     let whatsappIdentityTimes: (string | null)[] = [];
     if (person.kind === "person") {
       // Which channels the reply box can offer (read only; Leads Central owns these rows).
-      const ir = await client.from("lead_identities").select("channel, last_user_message_at").eq("consultation_id", id).limit(20);
+      const ir = await client.from("lead_identities").select("channel, external_id, consent_state, created_at, last_user_message_at").eq("consultation_id", id).limit(20);
       if (ir.error) problems.push(`identities: ${ir.error.message}`);
-      const idents = (ir.data ?? []) as { channel: unknown; last_user_message_at: unknown }[];
-      identityChannels = [...new Set(idents.map((r) => r.channel).filter((c): c is string => typeof c === "string"))];
+      const s = (v: unknown) => (typeof v === "string" ? v : null);
+      const idents = (ir.data ?? []) as Record<string, unknown>[];
+      identities = idents
+        .filter((r) => typeof r.channel === "string")
+        .map((r) => ({ channel: r.channel as string, external_id: s(r.external_id), consent_state: s(r.consent_state), created_at: s(r.created_at) }));
       whatsappIdentityTimes = idents
         .filter((r) => r.channel === "whatsapp")
         .map((r) => (typeof r.last_user_message_at === "string" ? r.last_user_message_at : null));
@@ -293,7 +296,7 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
       activityTotal = Math.max(ar.count ?? 0, activities.length);
     }
 
-    return { person, consultation, siteLead, messages, identityChannels, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems };
+    return { person, consultation, siteLead, messages, identities, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems };
   } catch (e) {
     return { problem: e instanceof Error ? e.message : "Could not read this person." };
   }

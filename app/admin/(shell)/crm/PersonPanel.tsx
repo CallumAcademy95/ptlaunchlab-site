@@ -136,7 +136,7 @@ export async function PersonPanel({ id }: { id: string }) {
     );
   }
 
-  const { person: p, consultation, siteLead, messages, identityChannels, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems } = detail;
+  const { person: p, consultation, siteLead, messages, identities, whatsappIdentityTimes, messageTotal, activities, activityTotal, signed, problems } = detail;
   const profile = consultation?.ai_profile;
   const planner = plannerRows(profile);
   const threadId = latestThreadId(messages);
@@ -144,7 +144,7 @@ export async function PersonPanel({ id }: { id: string }) {
   const wa = waNumber(p.phone);
   const now = requestTime();
   const mins = waitingMinutes(p, now);
-  const channels = replyChannels(p, identityChannels);
+  const channels = replyChannels(p, identities);
   const waLast = whatsappLastMessageAt(lastInboundOn(messages, "whatsapp"), whatsappIdentityTimes);
   const summary = str(consultation?.ai_summary);
   const pausedReason = str(consultation?.setter_paused_reason);

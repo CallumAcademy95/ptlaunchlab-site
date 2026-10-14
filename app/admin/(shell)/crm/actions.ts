@@ -177,6 +177,8 @@ export async function sendOwnerMessage(input: {
       headers: { "content-type": "application/json", "x-crm-key": target.secret },
       body: JSON.stringify(v.body),
       cache: "no-store",
+      // A redirect would mean the URL is wrong; never follow it with the key attached.
+      redirect: "error",
       signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
     });
     result = interpretSendResponse(res.status, await res.text());

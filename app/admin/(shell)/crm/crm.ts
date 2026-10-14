@@ -774,22 +774,45 @@ export const TEMPLATE_NOT_APPROVED = "WhatsApp template not approved yet. Messag
 export const SEND_UNREACHABLE = "Couldn't reach Leads Central — nothing was sent";
 export const SEND_UNCONFIRMED = "Couldn't confirm — check the conversation before resending";
 
+/** A lead_identities row, as much of it as the reply box needs. Server side only. */
+export interface ReplyIdentity {
+  channel: string;
+  external_id: string | null;
+  consent_state?: string | null;
+  created_at?: string | null;
+}
+
 /**
- * Which channels the reply box offers, in picker order.
- *
- * WhatsApp when they have a WhatsApp identity or a usable phone number. Email
- * when the stored address is a real one: Leads Central stores
- * "whatsapp:<id>"-style placeholders in consultations.email for people who
- * never gave one. Messenger/Instagram are not offered (yet).
+ * The identity Leads Central sends to on a channel: the newest one with a
+ * non-empty external_id (pickIdentity in pt-app lib/setter/owner-send.ts).
  */
-export function replyChannels(
-  p: { email: string | null; phone: string | null },
-  identityChannels: readonly string[] = [],
-): ReplyChannel[] {
+export function pickReplyIdentity(identities: readonly ReplyIdentity[], channel: ReplyChannel): ReplyIdentity | null {
+  const rows = identities.filter((i) => i.channel === channel && typeof i.external_id === "string" && i.external_id.trim() !== "");
+  return rows.length ? [...rows].sort((a, b) => String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")))[0] : null;
+}
+
+/** pt-app's isRealEmail: an address, not a "whatsapp:<id>"-style placeholder. */
+export const isRealEmail = (v: unknown): v is string =>
+  typeof v === "string" && !v.includes(":") && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+/**
+ * Which channels the reply box offers, in picker order. The same rules
+ * Leads Central applies before sending, so nothing is offered that it would
+ * refuse as no_recipient / opted_out:
+ *
+ * - WhatsApp: the picked WhatsApp identity exists and hasn't opted out (a
+ *   phone number alone is not enough: Leads Central sends to the identity)
+ * - email: the picked email identity hasn't opted out, and there's a real
+ *   address on it or on the consultation
+ *
+ * Messenger/Instagram are not offered (yet).
+ */
+export function replyChannels(p: { email: string | null }, identities: readonly ReplyIdentity[] = []): ReplyChannel[] {
   const out: ReplyChannel[] = [];
-  if (identityChannels.includes("whatsapp") || waNumber(p.phone)) out.push("whatsapp");
-  const email = (p.email ?? "").trim();
-  if (email.includes("@") && !email.includes(":")) out.push("email");
+  const wa = pickReplyIdentity(identities, "whatsapp");
+  if (wa && wa.consent_state !== "opted_out") out.push("whatsapp");
+  const em = pickReplyIdentity(identities, "email");
+  if (em?.consent_state !== "opted_out" && (isRealEmail(em?.external_id) || isRealEmail(p.email))) out.push("email");
   return out;
 }
 
@@ -855,12 +878,96 @@ export function templateText(text: string): string {
   return text.replace(/[\n\t\r]+/g, " ").replace(/ {2,}/g, " ").trim();
 }
 
-/** What the counter counts, and against which cap. */
-export function replyCount(text: string, template: boolean): { length: number; max: number; over: boolean } {
-  const length = template ? templateText(text).length : text.trim().length;
-  const max = template ? TEMPLATE_TEXT_MAX : REPLY_MAX;
-  return { length, max, over: length > max };
+/**
+ * How the reply will probably go out:
+ * - "free": free text (email, or WhatsApp inside the window)
+ * - "template": the template, for certain
+ * - "maybe_template": the template by an estimate only; Leads Central decides
+ */
+export type ReplyForm = "free" | "template" | "maybe_template";
+
+/**
+ * What the counter counts, and against which cap. A certain template is held
+ * to 900 (its one-line text). When it's only probably a template the 2000 cap
+ * applies, and `willCut` says Leads Central would shorten it to 900 if it
+ * does go as one.
+ */
+export function replyCount(text: string, form: ReplyForm): { length: number; max: number; over: boolean; willCut: boolean } {
+  if (form === "template") {
+    const length = templateText(text).length;
+    return { length, max: TEMPLATE_TEXT_MAX, over: length > TEMPLATE_TEXT_MAX, willCut: false };
+  }
+  const length = text.trim().length;
+  return {
+    length,
+    max: REPLY_MAX,
+    over: length > REPLY_MAX,
+    willCut: form === "maybe_template" && templateText(text).length > TEMPLATE_TEXT_MAX,
+  };
 }
+
+export const TEMPLATE_CUT_WARNING = `If it goes as a template it'll be cut to ${TEMPLATE_TEXT_MAX} characters.`;
+
+/** How a reply will go out, from the channel and the window estimate. */
+export function replyForm(channel: ReplyChannel | null, templateLikely: boolean, windowExact: boolean): ReplyForm {
+  if (channel !== "whatsapp" || !templateLikely) return "free";
+  return windowExact ? "template" : "maybe_template";
+}
+
+// ─── Send attempts (idempotency in the reply box) ───────────────────────
+
+/** What a send attempt was: its requestId, what it sent, and how it ended. */
+export interface LastAttempt {
+  id: string;
+  /** replyKey of the channel + text it sent. */
+  key: string;
+  /** The same id may be sent again for the same message (Leads Central dedupes it). */
+  reusable: boolean;
+  /** It may have gone out. */
+  uncertain: boolean;
+}
+
+export function replyKey(channel: ReplyChannel, text: string): string {
+  return `${channel}\u0000${text.trim()}`;
+}
+
+/**
+ * The requestId for the next send, and whether the user must first confirm
+ * RESEND_WARNING.
+ *
+ * - retrying the same message after a maybe-sent attempt reuses its id, so
+ *   it can never go twice
+ * - anything else after a maybe-sent attempt (edited text, other channel, or
+ *   an id that can't be reused, as after unknown_outcome) is a new message:
+ *   new id, and only after an explicit confirm
+ * - otherwise a new id, no extra confirm
+ */
+export function planAttempt(last: LastAttempt | null, key: string, newId: () => string): { requestId: string; confirmResend: boolean } {
+  if (last && last.reusable && last.key === key) return { requestId: last.id, confirmResend: false };
+  return { requestId: newId(), confirmResend: !!last?.uncertain };
+}
+
+/** What to remember about an attempt once Leads Central has answered. */
+export function attemptAfter(res: SendResult, id: string, key: string): LastAttempt | null {
+  if (res.ok) return null;
+  if (!res.retrySameId && !res.uncertain) return null;
+  return { id, key, reusable: res.retrySameId, uncertain: res.uncertain === true };
+}
+
+/** The line shown after a successful send. */
+export function sentNotice(
+  res: { template: boolean; truncated: boolean; duplicate: boolean; tookOver: boolean },
+  channel: ReplyChannel,
+): string {
+  if (res.duplicate) return "Already sent: an earlier attempt went through, so nothing new went out.";
+  const what = res.truncated
+    ? `Sent (shortened to ${TEMPLATE_TEXT_MAX} characters for the template).`
+    : res.template
+      ? "Sent as the WhatsApp template."
+      : `Sent by ${channelLabel(channel)}.`;
+  return res.tookOver ? `${what} You've taken over: the setter stays silent until you hand back.` : what;
+}
+export const RESEND_WARNING = "The last message may already have gone — send this as a new message?";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function isUuidV4(v: unknown): v is string {
@@ -963,6 +1070,12 @@ export type SendResult =
        * same id makes a retry idempotent. False after a definite answer.
        */
       retrySameId: boolean;
+      /**
+       * The last attempt may have gone out. Sending anything else (edited
+       * text, another channel, or after unknown_outcome) needs an explicit
+       * "send as a new message?" first.
+       */
+      uncertain?: boolean;
     };
 
 export const SEND_IN_PROGRESS = "Still sending — wait a moment";
@@ -990,8 +1103,9 @@ export function interpretSendResponse(status: number, raw: string): SendResult {
   }
 
   if (!body) {
-    // A gateway timeout means the function may still have sent.
-    if (status === 504 || status === 502) return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
+    // A 5xx that isn't Leads Central's own JSON (a crash, a gateway timeout)
+    // may have come after the send. A 4xx page means the route never ran.
+    if (status >= 500) return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true, uncertain: true };
     return { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
   }
 
@@ -1009,29 +1123,32 @@ export function interpretSendResponse(status: number, raw: string): SendResult {
   }
   if (status >= 200 && status < 300) {
     // 2xx without ok:true is not a confirmed send, and not a refusal either.
-    return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
+    return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true, uncertain: true };
   }
 
   const code = typeof body.code === "string" ? body.code : undefined;
   const said = typeof body.error === "string" && body.error.trim() ? clip(body.error) : null;
   const tookOver = body.tookOver === true;
-  const out = (error: string, extra: { conflict?: boolean; refresh?: boolean; retrySameId?: boolean } = {}): SendResult => ({
+  const out = (error: string, extra: { conflict?: boolean; refresh?: boolean; retrySameId?: boolean; uncertain?: boolean } = {}): SendResult => ({
     ok: false,
     error,
     ...(code ? { code } : {}),
     ...(extra.conflict ? { conflict: true } : {}),
     ...(extra.refresh || extra.conflict || tookOver ? { refresh: true } : {}),
     retrySameId: extra.retrySameId ?? false,
+    ...(extra.uncertain ? { uncertain: true } : {}),
   });
 
-  if (code === "in_progress") return out(SEND_IN_PROGRESS, { retrySameId: true });
+  if (code === "in_progress") return out(SEND_IN_PROGRESS, { retrySameId: true, uncertain: true });
   // Also "This send id was already used for a different message": either way a fresh id.
   if (code === "conflict") return out(said ?? "Changed elsewhere, refresh.", { conflict: true });
   // An earlier claim for this id never resolved. Show it and refresh; the next
   // click on Send is the confirmation to resend, and carries a new id.
-  if (code === "unknown_outcome") return out(said ?? SEND_UNCONFIRMED, { refresh: true });
+  if (code === "unknown_outcome") return out(said ?? SEND_UNCONFIRMED, { refresh: true, uncertain: true });
   if (status === 409) return out(said ?? "Leads Central refused the send.", { refresh: !code || STALE_CODES.includes(code) });
   if (code === "template_not_approved") return out(said ?? TEMPLATE_NOT_APPROVED);
+  // A definite WhatsApp refusal of the template: no retry, a new id next time.
+  if (code === "template_problem") return out(said ?? "Template problem. Message them from your phone.");
   if (status === 401 || code === "unauthorized") {
     return out(`${said ?? "Unauthorized."} Check CRM_SEND_SECRET matches on both projects. Nothing was sent.`);
   }
@@ -1039,11 +1156,21 @@ export function interpretSendResponse(status: number, raw: string): SendResult {
   return out(said ?? `Leads Central couldn't send (HTTP ${status}).`);
 }
 
-/** A fetch that threw: timed out (may have sent) or never connected. */
+/** Error codes that mean the connection never opened, so nothing can have been sent. */
+const NEVER_CONNECTED = ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "ERR_INVALID_URL", "UND_ERR_CONNECT_TIMEOUT"];
+
+/**
+ * A fetch that threw. Only a failure to connect at all (DNS, refused) is
+ * "nothing was sent"; a timeout, a reset, a redirect or anything unrecognised
+ * may have come after Leads Central sent, so it's "couldn't confirm".
+ */
 export function interpretSendError(e: unknown): SendResult {
-  const name = e && typeof e === "object" && "name" in e ? String((e as { name: unknown }).name) : "";
-  if (name === "TimeoutError" || name === "AbortError") return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true };
-  return { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
+  const codeOf = (x: unknown): string =>
+    x && typeof x === "object" && "code" in x ? String((x as { code: unknown }).code) : "";
+  const cause = e && typeof e === "object" && "cause" in e ? (e as { cause: unknown }).cause : null;
+  const code = codeOf(cause) || codeOf(e);
+  if (NEVER_CONNECTED.includes(code)) return { ok: false, error: SEND_UNREACHABLE, retrySameId: true };
+  return { ok: false, error: SEND_UNCONFIRMED, retrySameId: true, uncertain: true };
 }
 
 // ─── The WhatsApp window, as Leads Central decides it ───────────────────
