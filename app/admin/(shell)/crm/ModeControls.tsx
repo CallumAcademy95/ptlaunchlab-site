@@ -21,7 +21,7 @@ const MODE_SKIN: Record<CrmMode, string> = {
 const EXPLAIN: Record<CrmMode, string> = {
   ai: "The setter replies and follows up on its own, as it does today.",
   reply_only: "The setter answers when they write, but sends nothing first: no nudges, re-engagement or scheduled chases.",
-  human: "The setter goes silent. You reply yourself, from Gmail or WhatsApp.",
+  human: "The setter goes silent. You reply yourself, from the reply box here, Gmail or WhatsApp.",
   dnc: "Nothing is sent on any channel: no replies, openers, nudges or re-engagement.",
 };
 

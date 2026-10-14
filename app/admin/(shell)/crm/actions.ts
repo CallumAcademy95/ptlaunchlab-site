@@ -4,7 +4,18 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "@/app/lib/admin-auth";
-import { planModeChange, validateSavedView, validateQualifiedInput, mergeQualified, viewIdOf } from "./crm";
+import {
+  planModeChange,
+  validateSavedView,
+  validateQualifiedInput,
+  mergeQualified,
+  viewIdOf,
+  validateSendInput,
+  ownerSendEndpoint,
+  interpretSendResponse,
+  interpretSendError,
+  type SendResult,
+} from "./crm";
 
 // The CRM's writes.
 //
@@ -12,8 +23,9 @@ import { planModeChange, validateSavedView, validateQualifiedInput, mergeQualifi
 //   signed cookie itself so a matcher change can't open these up.
 // - Service role, server side only.
 // - Inputs are validated against fixed enums (crm.ts) before anything is written.
-// - Nothing here sends a message. Changing a mode only changes what the setter
-//   is allowed to do next.
+// - Only sendOwnerMessage sends anything, and it does so through Leads Central
+//   (which owns the WhatsApp/Gmail senders and records the message). Changing a
+//   mode only changes what the setter is allowed to do next.
 
 /** Who did it. One login today; stored on every write so a second one can be told apart later. */
 const ACTOR = "callum";
@@ -25,7 +37,8 @@ async function isAdmin(): Promise<boolean> {
   return verifyAuthCookieValue(jar.get(ADMIN_AUTH_COOKIE)?.value).catch(() => false);
 }
 
-const DENIED: ActionResult = { ok: false, error: "Not signed in. Sign in at /admin/login." };
+const NOT_SIGNED_IN = "Not signed in. Sign in at /admin/login.";
+const DENIED: ActionResult = { ok: false, error: NOT_SIGNED_IN };
 
 function done(id?: string) {
   revalidatePath("/admin/crm");
@@ -126,6 +139,56 @@ export async function setQualified(input: { id: unknown; value: unknown }): Prom
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Could not save." };
   }
+}
+
+/** How long to wait for Leads Central before saying the send can't be confirmed. */
+const SEND_TIMEOUT_MS = 15_000;
+
+/**
+ * Callum's reply from the person panel, sent by Leads Central.
+ *
+ * Leads Central re-reads the conversation, refuses Do not contact /
+ * unsubscribed, takes over if the setter is in charge (only if the status is
+ * still `expectStatus`), picks free text or the template by the 24h rule,
+ * sends, and records the message and the activity. `requestId` comes from the
+ * reply box and is reused on a retry, so a double click or a retry after a
+ * timeout never sends twice.
+ *
+ * The secret and the URL are server env only; nothing about them reaches the
+ * browser.
+ */
+export async function sendOwnerMessage(input: {
+  consultationId: unknown;
+  channel: unknown;
+  text: unknown;
+  expectStatus: unknown;
+  requestId: unknown;
+}): Promise<SendResult> {
+  if (!(await isAdmin())) return { ok: false, error: NOT_SIGNED_IN, retrySameId: false };
+  const v = validateSendInput(input);
+  if (!v.ok) return { ok: false, error: v.error, retrySameId: false };
+  const target = ownerSendEndpoint(process.env.LEADS_CENTRAL_URL, process.env.CRM_SEND_SECRET);
+  if (!target.ok) return { ok: false, error: target.error, retrySameId: false };
+
+  let result: SendResult;
+  try {
+    const res = await fetch(target.url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-crm-key": target.secret },
+      body: JSON.stringify(v.body),
+      cache: "no-store",
+      // A redirect would mean the URL is wrong; never follow it with the key attached.
+      redirect: "error",
+      signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
+    });
+    result = interpretSendResponse(res.status, await res.text());
+  } catch (e) {
+    result = interpretSendError(e);
+  }
+  // Refresh on success, and on a conflict or an unconfirmed send too: the
+  // conversation may have changed (taken over, or the message did go out).
+  if (result.ok || result.conflict || result.retrySameId) done(v.body.consultationId);
+  return result;
 }
 
 /** Save the current filters as a named view (replacing one with the same name). */
