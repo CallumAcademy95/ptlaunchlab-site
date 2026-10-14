@@ -679,6 +679,28 @@ test("error mapping: Leads Central's refusals, by code", () => {
     error: "Changed elsewhere — refresh.",
     retrySameId: false,
   });
+  // conflict from a reused id with different text/channel: also a fresh id.
+  const reused = fail(409, { ok: false, code: "conflict", error: "This send id was already used for a different message" });
+  assert.equal(reused?.retrySameId, false);
+  assert.equal(reused?.error, "This send id was already used for a different message");
+  // unknown_outcome: shown as-is, refresh, and the next Send (the user's
+  // confirmation to resend) carries a new id.
+  const unknown = fail(409, {
+    ok: false,
+    code: "unknown_outcome",
+    error: "Couldn't confirm whether that went — check the conversation on your phone before resending",
+  });
+  assert.deepEqual(unknown, {
+    ok: false,
+    code: "unknown_outcome",
+    refresh: true,
+    error: "Couldn't confirm whether that went — check the conversation on your phone before resending",
+    retrySameId: false,
+  });
+  // `detail` never reaches the browser: only the error is passed on.
+  const withDetail = fail(502, { ok: false, code: "send_failed", error: "Gmail said no", detail: { stack: "secret internals" } });
+  assert.equal("detail" in (withDetail ?? {}), false);
+  assert.equal(JSON.stringify(withDetail).includes("secret internals"), false);
   // in_progress: the same id is still being sent, so keep it.
   const busy = fail(409, { ok: false, code: "in_progress", error: "whatever" });
   assert.equal(busy?.error, SEND_IN_PROGRESS);

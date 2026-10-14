@@ -975,7 +975,8 @@ const clip = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 /**
  * Leads Central's answer (status + raw body) as what the reply box shows.
  *
- * Its `error` is plain text written for Callum and is shown as-is. Anything
+ * Its `error` is plain text written for Callum and is shown as-is; nothing
+ * else from the body (`detail` in particular) is passed to the browser. Anything
  * that isn't a JSON answer is treated as "couldn't reach" (or, for a gateway
  * timeout, "couldn't confirm"), and the same requestId is kept for a retry.
  */
@@ -1024,7 +1025,11 @@ export function interpretSendResponse(status: number, raw: string): SendResult {
   });
 
   if (code === "in_progress") return out(SEND_IN_PROGRESS, { retrySameId: true });
+  // Also "This send id was already used for a different message": either way a fresh id.
   if (code === "conflict") return out(said ?? "Changed elsewhere, refresh.", { conflict: true });
+  // An earlier claim for this id never resolved. Show it and refresh; the next
+  // click on Send is the confirmation to resend, and carries a new id.
+  if (code === "unknown_outcome") return out(said ?? SEND_UNCONFIRMED, { refresh: true });
   if (status === 409) return out(said ?? "Leads Central refused the send.", { refresh: !code || STALE_CODES.includes(code) });
   if (code === "template_not_approved") return out(said ?? TEMPLATE_NOT_APPROVED);
   if (status === 401 || code === "unauthorized") {
