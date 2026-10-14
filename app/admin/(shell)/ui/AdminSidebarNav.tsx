@@ -11,8 +11,9 @@ import {
   Inbox,
   MessageSquare,
   Send,
+  Users,
 } from "lucide-react";
-import { ADMIN_NAV, isActiveNav } from "../nav";
+import { ADMIN_NAV, isActiveItem } from "../nav";
 
 // The rail's links. Client-side only because it needs the current path to
 // know what to highlight — everything else about the shell is server-rendered.
@@ -28,6 +29,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   help: HelpCircle,
   send: Send,
   inbox: Inbox,
+  users: Users,
 };
 
 /**
@@ -53,7 +55,7 @@ export function AdminSidebarNav({
           <div className="space-y-0.5">
             {group.items.map((item) => {
               const Icon = ICONS[item.icon] ?? Circle;
-              const on = isActiveNav(item.href, pathname);
+              const on = isActiveItem(item, pathname);
               return (
                 <Link
                   key={item.href}

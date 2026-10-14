@@ -34,7 +34,7 @@ export default async function SiteLeadPage({ params }: { params: Promise<{ id: s
   if (error) {
     return (
       <AdminPage>
-        <PageHeader title="Site lead" backHref="/admin/site-leads" backLabel="Site leads" />
+        <PageHeader title="Site lead" backHref="/admin/crm" backLabel="CRM" />
         <Notice tone="rose" title="Could not read this lead">{error.message}</Notice>
       </AdminPage>
     );
@@ -52,8 +52,8 @@ export default async function SiteLeadPage({ params }: { params: Promise<{ id: s
       <PageHeader
         title={l.name || "Unnamed"}
         subtitle={when(l.created_at)}
-        backHref="/admin/site-leads"
-        backLabel="Site leads"
+        backHref="/admin/crm"
+        backLabel="CRM"
         badge={
           <>
             {l.is_test && <Badge tone="amber">test</Badge>}

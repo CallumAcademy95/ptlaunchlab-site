@@ -14,6 +14,8 @@ export interface AdminNavItem {
   icon: string;
   /** Shown under the label in the sidebar on wide screens. */
   hint?: string;
+  /** Other path prefixes that belong to this entry (e.g. pages it replaced). */
+  alsoActiveOn?: string[];
 }
 
 export interface AdminNavGroup {
@@ -33,8 +35,14 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: "Marketing",
     items: [
-      { href: "/admin/leads", label: "Leads", icon: "inbox", hint: "Every conversation the setter is having" },
-      { href: "/admin/site-leads", label: "Site leads", icon: "inbox", hint: "Website enquiries, with a call button" },
+      {
+        href: "/admin/crm",
+        label: "CRM",
+        icon: "users",
+        hint: "Every lead and conversation, and who's in charge of it",
+        // The old Leads and Site leads screens now live inside the CRM.
+        alsoActiveOn: ["/admin/leads", "/admin/site-leads"],
+      },
       { href: "/admin/ads", label: "Ad performance", icon: "chart" },
       { href: "/admin/whatsapp", label: "WhatsApp inbox", icon: "message" },
       { href: "/admin/live-questions", label: "Audience questions", icon: "help" },
@@ -55,4 +63,9 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV.flatMap((g) => g.items)
 export function isActiveNav(href: string, pathname: string): boolean {
   if (pathname === href) return true;
   return pathname.startsWith(`${href}/`);
+}
+
+/** isActiveNav for a whole entry, including the paths it took over. */
+export function isActiveItem(item: AdminNavItem, pathname: string): boolean {
+  return [item.href, ...(item.alsoActiveOn ?? [])].some((href) => isActiveNav(href, pathname));
 }
