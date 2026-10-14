@@ -47,6 +47,15 @@ export const muscleMakersAcademy: GymConfig = {
     "Personal inductions for new members, so you see good coaching from someone's very first session",
   ],
 
+  // Krystina asked for the 3DBA badge on the page (14 Oct 2026). The gym is the
+  // association's home, per its own site. Kept out of the hero on purpose.
+  affiliation: {
+    logoUrl: "/gym-logos/muscle-makers-3dba.png",
+    alt: "3DBA, Three Decades of Bodybuilding Association",
+    caption: "Home of the 3DBA",
+    detail: "Muscle Makers Gym is home to the Three Decades of Bodybuilding Association.",
+  },
+
   metaTitle: "Muscle Makers PT Academy Rotherham | Become a Qualified Personal Trainer",
   metaDescription:
     "Train, qualify and earn at Muscle Makers Gym, Rotherham. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",

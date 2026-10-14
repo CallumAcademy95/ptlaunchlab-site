@@ -53,6 +53,15 @@ export interface GymConfig {
   // ── Why this gym (bullet list)
   gymHighlights: string[];
 
+  // ── Optional affiliation badge, shown under the highlights (e.g. an
+  //    association the gym hosts). Never in the hero: that is the gym's own logo.
+  affiliation?: {
+    logoUrl: string;   // square, transparent outside the badge
+    alt: string;
+    caption: string;   // one line, e.g. "Home of the 3DBA"
+    detail?: string;   // optional second line
+  };
+
   // ── SEO
   metaTitle: string;
   metaDescription: string;
