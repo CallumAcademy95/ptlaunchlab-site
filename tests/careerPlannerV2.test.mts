@@ -83,5 +83,6 @@ test("UK mobile check", () => {
 });
 
 test("consent text is exact", () => {
-  assert.equal(CONSENT_TEXT, "OK for PT Launch Lab to WhatsApp, text or call me about my plan. I can reply STOP any time.");
+  // Must name email: planner leads receive the 14-day email sequence.
+  assert.equal(CONSENT_TEXT, "OK for PT Launch Lab to email, WhatsApp, text or call me about my plan and the course. I can unsubscribe or reply STOP any time.");
 });

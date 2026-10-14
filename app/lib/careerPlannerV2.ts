@@ -26,7 +26,10 @@ export interface PlannerAnswers {
   hours: Hours; training: Training; region: string; town: string; payment: Payment;
 }
 
-export const CONSENT_TEXT = "OK for PT Launch Lab to WhatsApp, text or call me about my plan. I can reply STOP any time.";
+// Planner leads get the 14-day email sequence and the nurture, so the box must
+// say email as well as WhatsApp/text/call. Saved with each lead as the consent
+// record, so a change here applies to new leads only (14 Oct 2026).
+export const CONSENT_TEXT = "OK for PT Launch Lab to email, WhatsApp, text or call me about my plan and the course. I can unsubscribe or reply STOP any time.";
 
 // Illustrative £/session by region (carried over from v1). Shown only as a labelled range.
 const REGION_RATES: Record<string, number> = {

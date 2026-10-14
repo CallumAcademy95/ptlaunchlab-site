@@ -466,7 +466,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
                 </button>
 
                 <p className="text-faint text-xs text-center pt-1">
-                  We&apos;ll only use this to send your result and support options. No spam, ever.
+                  We&apos;ll send your result, then useful emails about becoming a PT. Unsubscribe any time.
                 </p>
               </form>
             </div>
@@ -543,7 +543,7 @@ export default function QuizApp({ embedded = false, avatar: avatarProp }: QuizAp
                 </button>
 
                 <p className="text-faint text-xs text-center pt-1">
-                  No spam. Just your personalised PT pathway and next steps.
+                  We&apos;ll email your PT pathway, then useful tips and course news. Unsubscribe any time.
                 </p>
               </form>
             </div>

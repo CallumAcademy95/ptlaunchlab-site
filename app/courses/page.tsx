@@ -375,6 +375,55 @@ export default function CoursesPage() {
           </div>
         </section>
 
+        {/* WHO IT'S NOT FOR: saying plainly who should not buy makes the
+            "yes, this is for you" believable. Every line must stay true:
+            fully online, video-assessed practicals, an introduction not a job. */}
+        <section className="bg-base py-14 md:py-20 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Is it right for you?</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-12">
+              Who it&apos;s for, <span className="text-gold">and who it isn&apos;t.</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="bg-card border border-gold/30 rounded-2xl p-7">
+                <h3 className="text-white font-bold text-lg mb-4">It&apos;s a good fit if…</h3>
+                <ul className="space-y-3">
+                  {[
+                    "You want a recognised NCFE Level 2 & 3 qualification without quitting your job.",
+                    "You'd rather study online at your own pace, with a tutor checking in.",
+                    "You're happy to film your practical sessions at a gym for assessment.",
+                    "You want help with the business side, not just the certificate.",
+                  ].map((t) => (
+                    <li key={t} style={{ color: "rgba(255,255,255,0.88)" }} className="flex items-start gap-2.5 text-sm md:text-base leading-snug">
+                      <CheckIcon />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                <h3 className="text-white font-bold text-lg mb-4">It&apos;s not for you if…</h3>
+                <ul className="space-y-3">
+                  {[
+                    "You want classroom teaching. The course is fully online, with no in-person sessions.",
+                    "You want a certificate without the work. Every unit is assessed to NCFE standards, and not everyone passes first time.",
+                    "You need a guaranteed job. We introduce you to a gym when you qualify; whether they take you on is their decision.",
+                    "You can't set aside regular time each week. Most learners finish in 8–16 weeks because they keep a steady pace.",
+                  ].map((t) => (
+                    <li key={t} style={{ color: "rgba(255,255,255,0.78)" }} className="flex items-start gap-2.5 text-sm md:text-base leading-snug">
+                      <span className="text-white/40 font-bold shrink-0 mt-0.5">✕</span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <p className="text-center text-soft/60 text-sm mt-8">
+              Not sure which side you&apos;re on? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a> and we&apos;ll tell you honestly.
+            </p>
+          </div>
+        </section>
+
         {/* PRICING */}
         <section className="bg-surface py-14 md:py-24 px-6">
           <div className="max-w-6xl mx-auto">
