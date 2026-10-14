@@ -31,9 +31,11 @@ export const gymPartners = [
   { name: "Gym n Go",              src: "/gym-logos/gym-n-go.png",        dark: false, lightTile: false, mono: "/logos/mono/gym-n-go.png", monoSize: [258, 108] },
   { name: "Xcelerate Gyms",        src: "/gym-logos/xcelerate.png",       dark: false, lightTile: false, mono: "/logos/mono/xcelerate.png", monoSize: [514, 108] },
   { name: "ATP Fitness Felixstowe", src: "/logos/atp-fitness.png",        dark: true, lightTile: false, mono: "/logos/mono/atp-fitness.png", monoSize: [105, 108] },
-  // Dark ink (black bodybuilder) on transparent, so a light tile. The mono copy
-  // keys only the black ink, which leaves the lettering as white outlines.
-  { name: "Muscle Makers Gym",     src: "/logos/muscle-makers.png",       dark: false, lightTile: true, mono: "/logos/mono/muscle-makers.png", monoSize: [113, 108] },
+  // Their logo is black ink + yellow lettering, and nothing here actually draws
+  // a light tile, so the black bodybuilder vanished on navy. `src` is a recolour
+  // for dark backgrounds: black ink turned white, yellow kept. The mono copy keys
+  // only the black ink, which leaves the lettering as white outlines.
+  { name: "Muscle Makers Gym",     src: "/logos/muscle-makers-dark.png",  dark: true, lightTile: false, mono: "/logos/mono/muscle-makers.png", monoSize: [113, 108] },
   // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
   // and still missing here, because no logo file exists anywhere in the repo.
   // Drop one at public/logos/superflex.png and add the row.
