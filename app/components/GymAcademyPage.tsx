@@ -235,6 +235,22 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 </li>
               ))}
             </ul>
+
+            {c.affiliation && (
+              <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 text-center sm:text-left">
+                <Image
+                  src={c.affiliation.logoUrl}
+                  alt={c.affiliation.alt}
+                  width={112}
+                  height={112}
+                  className="rounded-full shrink-0"
+                />
+                <div>
+                  <p className="font-black uppercase text-lg" style={{ color: dark }}>{c.affiliation.caption}</p>
+                  {c.affiliation.detail && <p className="text-white/60 text-sm mt-1 max-w-sm">{c.affiliation.detail}</p>}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
