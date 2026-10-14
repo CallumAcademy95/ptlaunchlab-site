@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "@/app/lib/admin-auth";
-import { validateModeChange, validateSavedView, mergeQualified, modeOf, isUuid, KNOWN_STATUSES } from "./crm";
+import { planModeChange, validateSavedView, validateQualifiedInput, mergeQualified, viewIdOf } from "./crm";
 
 // The CRM's writes.
 //
@@ -63,46 +63,33 @@ export async function changeMode(input: {
   note?: unknown;
 }): Promise<ActionResult> {
   if (!(await isAdmin())) return DENIED;
-  if (!isUuid(input.id)) return { ok: false, error: "Unknown person." };
-  const expected = typeof input.expected === "string" ? input.expected : null;
-  if (!expected || !(KNOWN_STATUSES as readonly string[]).includes(expected)) {
-    return { ok: false, error: "This person has no conversation to control." };
-  }
+  // Cheap checks first, so a malformed request never reaches the database.
+  const pre = planModeChange(input, { setter_status: input.expected, unsubscribed: false }, "", ACTOR);
+  if (!pre.ok) return pre;
 
   try {
     const db = getSupabaseAdmin();
-    const cur = await db.from("consultations").select("id, setter_status, unsubscribed").eq("id", input.id).maybeSingle();
+    const id = input.id as string;
+    const cur = await db.from("consultations").select("id, setter_status, unsubscribed").eq("id", id).maybeSingle();
     if (cur.error) return { ok: false, error: cur.error.message };
-    if (!cur.data) return { ok: false, error: "Unknown person." };
-    if (cur.data.setter_status !== expected) {
-      return { ok: false, conflict: true, error: "Changed elsewhere, refresh." };
-    }
 
-    const v = validateModeChange({
-      current: expected,
-      target: input.target,
-      reason: input.reason,
-      note: input.note,
-      unsubscribed: cur.data.unsubscribed === true,
-    });
-    if (!v.ok) return v;
+    const plan = planModeChange(input, cur.data, new Date().toISOString(), ACTOR);
+    if (!plan.ok) return plan;
 
-    const now = new Date().toISOString();
+    // Conditional on the status the panel showed: a stale panel can't stomp a newer change.
     const { data, error } = await db
       .from("consultations")
-      .update({ setter_status: v.status, dnc_reason: v.dncReason, mode_changed_at: now, mode_changed_by: ACTOR })
-      .eq("id", input.id)
-      .eq("setter_status", expected)
+      .update(plan.update)
+      .eq("id", id)
+      .eq("setter_status", input.expected as string)
       .select("id");
-    if (error) return { ok: false, error: error.message };
+    // Before the CRM migration is applied this is where it fails (reply_only is
+    // not in the CHECK yet, dnc_reason/mode_changed_* don't exist): say so plainly.
+    if (error) return { ok: false, error: `The database refused the change: ${error.message}` };
     if (!data || data.length === 0) return { ok: false, conflict: true, error: "Changed elsewhere, refresh." };
 
-    const warning = await logActivity({
-      consultation_id: input.id,
-      action: "mode_changed",
-      detail: { from: expected, to: v.status, from_mode: modeOf(expected), to_mode: input.target, dnc_reason: v.dncReason },
-    });
-    done(input.id);
+    const warning = await logActivity({ consultation_id: id, action: "mode_changed", detail: plan.activity });
+    done(id);
     return { ok: true, warning };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Could not change the mode." };
@@ -118,23 +105,23 @@ export async function changeMode(input: {
  */
 export async function setQualified(input: { id: unknown; value: unknown }): Promise<ActionResult> {
   if (!(await isAdmin())) return DENIED;
-  if (!isUuid(input.id)) return { ok: false, error: "Unknown person." };
-  if (typeof input.value !== "boolean") return { ok: false, error: "Invalid value." };
+  const q = validateQualifiedInput(input);
+  if (!q.ok) return q;
 
   try {
     const db = getSupabaseAdmin();
-    const cur = await db.from("consultations").select("ai_profile").eq("id", input.id).maybeSingle();
+    const cur = await db.from("consultations").select("ai_profile").eq("id", q.id).maybeSingle();
     if (cur.error) return { ok: false, error: cur.error.message };
     if (!cur.data) return { ok: false, error: "Unknown person." };
-    const merged = mergeQualified(cur.data.ai_profile, input.value);
-    const { error } = await db.from("consultations").update({ ai_profile: merged }).eq("id", input.id);
+    const merged = mergeQualified(cur.data.ai_profile, q.value);
+    const { error } = await db.from("consultations").update({ ai_profile: merged }).eq("id", q.id);
     if (error) return { ok: false, error: error.message };
     const warning = await logActivity({
-      consultation_id: input.id,
+      consultation_id: q.id,
       action: "qualified_set",
-      detail: { already_qualified: input.value },
+      detail: { already_qualified: q.value },
     });
-    done(input.id);
+    done(q.id);
     return { ok: true, warning };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Could not save." };
@@ -160,10 +147,8 @@ export async function saveView(input: { name: unknown; query: unknown }): Promis
 
 export async function deleteView(input: { id: unknown }): Promise<ActionResult> {
   if (!(await isAdmin())) return DENIED;
-  const viewId = typeof input.id === "number" ? String(input.id) : input.id;
-  if (!isUuid(viewId) && !(typeof viewId === "string" && /^\d{1,18}$/.test(viewId))) {
-    return { ok: false, error: "Unknown view." };
-  }
+  const viewId = viewIdOf(input.id);
+  if (!viewId) return { ok: false, error: "Unknown view." };
   try {
     const { error } = await getSupabaseAdmin().from("crm_saved_views").delete().eq("id", viewId).eq("actor", ACTOR);
     if (error) return { ok: false, error: error.message };

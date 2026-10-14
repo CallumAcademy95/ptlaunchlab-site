@@ -27,6 +27,7 @@ import {
   tileCounts,
   isUuid,
   isWaiting,
+  isHandling,
   waitingMinutes,
   waitBand,
   WAIT_DOT,
@@ -103,6 +104,13 @@ function Mode({ p }: { p: CrmPerson }) {
 }
 
 function Wait({ p, now }: { p: CrmPerson; now: number }) {
+  if (isHandling(p)) {
+    return (
+      <span className="whitespace-nowrap text-xs font-semibold text-amber-800" title="Human mode: you reply outside the CRM">
+        👤 You&apos;re handling
+      </span>
+    );
+  }
   const m = waitingMinutes(p, now);
   if (m === null) return null;
   return (
@@ -157,7 +165,7 @@ export default async function CrmPage({
   const openId = isUuid(openRaw) ? openRaw : null;
   const canonical = serialiseCrmQuery(query);
 
-  const [{ people, problem, fallback }, saved] = await Promise.all([loadPeople(), loadSavedViews(ACTOR)]);
+  const [{ people, problem, fallback, incomplete }, saved] = await Promise.all([loadPeople(), loadSavedViews(ACTOR)]);
   const now = requestTime();
   const rows = filterPeople(people, query, now);
   const tiles = tileCounts(people, now);
@@ -198,6 +206,12 @@ export default async function CrmPage({
         </Notice>
       )}
 
+      {incomplete && (
+        <Notice tone="amber" title="List may be incomplete">
+          {incomplete}
+        </Notice>
+      )}
+
       {/* Headline tiles: each one is a filter. */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
         <StatTile href={crmHref({ view: "new" })} icon={<Sparkles className="h-5 w-5" />} value={tiles.newToday} label="New today" tone="sky" />
@@ -225,6 +239,7 @@ export default async function CrmPage({
           ))}
           <SaveViewForm query={canonical} />
         </div>
+        {saved.incomplete && <p className="text-xs text-amber-700">Saved views: {saved.incomplete}</p>}
         {saved.problem && <p className="text-xs text-slate-500">Custom views aren&apos;t available yet ({saved.problem}).</p>}
 
         {/* Search + filters: a plain GET form, so it works without JavaScript and the URL is the state. */}

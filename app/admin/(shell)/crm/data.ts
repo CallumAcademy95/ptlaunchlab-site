@@ -1,7 +1,7 @@
 import "server-only";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { parseMedia, signablePaths, LEAD_MEDIA_BUCKET } from "@/app/lib/message-media";
-import { normalisePerson, isUuid, type CrmPerson } from "./crm";
+import { normalisePerson, isUuid, incompleteNote, type CrmPerson } from "./crm";
 
 // Reads for the CRM. Service role, server only.
 //
@@ -26,6 +26,41 @@ export interface PeopleResult {
   problem: string | null;
   /** True when rows came from the consultations fallback, not crm_people. */
   fallback: boolean;
+  /** Set when not every row could be read, so counts may be low. */
+  incomplete: string | null;
+}
+
+/** PostgREST's default max rows per response; asking for more is silently capped to this. */
+const PAGE = 1000;
+const MAX_PAGES = 10;
+
+/**
+ * Every row of a table or view, a page at a time, with an exact count.
+ *
+ * A plain .limit() is capped server-side at 1000 rows with no error, which
+ * would undercount the tiles without anyone noticing. This pages until the
+ * count is reached and reports a shortfall instead of hiding it.
+ */
+async function readAll(
+  client: Db,
+  table: string,
+): Promise<{ rows: Record<string, unknown>[]; error: string | null; incomplete: string | null }> {
+  const rows: Record<string, unknown>[] = [];
+  let total: number | null = null;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data, error, count } = await client
+      .from(table)
+      .select("*", page === 0 ? { count: "exact" } : undefined)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true })
+      .range(page * PAGE, page * PAGE + PAGE - 1);
+    if (error) return { rows, error: error.message, incomplete: null };
+    if (page === 0) total = count ?? null;
+    const got = (data ?? []) as Record<string, unknown>[];
+    rows.push(...got);
+    if (got.length < PAGE || (total !== null && rows.length >= total)) break;
+  }
+  return { rows, error: null, incomplete: incompleteNote(rows.length, total) };
 }
 
 /**
@@ -37,30 +72,20 @@ export interface PeopleResult {
  */
 export async function loadPeople(): Promise<PeopleResult> {
   const { client, problem } = db();
-  if (!client) return { people: [], problem, fallback: false };
+  if (!client) return { people: [], problem, fallback: false, incomplete: null };
 
   try {
-    const { data, error } = await client
-      .from("crm_people")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5000);
-    if (!error) {
-      const people = (data ?? [])
-        .map((r) => normalisePerson(r as Record<string, unknown>))
-        .filter((p): p is CrmPerson => p !== null);
-      return { people, problem: null, fallback: false };
+    const view = await readAll(client, "crm_people");
+    if (!view.error) {
+      const people = view.rows.map(normalisePerson).filter((p): p is CrmPerson => p !== null);
+      return { people, problem: null, fallback: false, incomplete: view.incomplete };
     }
-    const viewError = error.message;
-    const fb = await client
-      .from("consultations")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5000);
-    if (fb.error) return { people: [], problem: `${viewError} (fallback also failed: ${fb.error.message})`, fallback: false };
-    const people = (fb.data ?? [])
-      .map((r) => {
-        const row = r as Record<string, unknown>;
+    const fb = await readAll(client, "consultations");
+    if (fb.error) {
+      return { people: [], problem: `${view.error} (fallback also failed: ${fb.error})`, fallback: false, incomplete: null };
+    }
+    const people = fb.rows
+      .map((row) => {
         const profile = (row.ai_profile ?? {}) as Record<string, unknown>;
         const planner = (profile.planner ?? {}) as Record<string, unknown>;
         return normalisePerson({
@@ -71,9 +96,9 @@ export async function loadPeople(): Promise<PeopleResult> {
         });
       })
       .filter((p): p is CrmPerson => p !== null);
-    return { people, problem: viewError, fallback: true };
+    return { people, problem: view.error, fallback: true, incomplete: fb.incomplete };
   } catch (e) {
-    return { people: [], problem: e instanceof Error ? e.message : "Could not read the CRM.", fallback: false };
+    return { people: [], problem: e instanceof Error ? e.message : "Could not read the CRM.", fallback: false, incomplete: null };
   }
 }
 
@@ -83,23 +108,28 @@ export interface SavedView {
   query: string;
 }
 
-export async function loadSavedViews(actor: string): Promise<{ views: SavedView[]; problem: string | null }> {
+const SAVED_VIEWS_CAP = 100;
+
+export async function loadSavedViews(actor: string): Promise<{ views: SavedView[]; problem: string | null; incomplete: string | null }> {
   const { client, problem } = db();
-  if (!client) return { views: [], problem };
+  if (!client) return { views: [], problem, incomplete: null };
   try {
-    const { data, error } = await client
+    const { data, error, count } = await client
       .from("crm_saved_views")
-      .select("id, name, query")
+      .select("id, name, query", { count: "exact" })
       .eq("actor", actor)
       .order("name", { ascending: true })
-      .limit(50);
-    if (error) return { views: [], problem: error.message };
+      .limit(SAVED_VIEWS_CAP);
+    if (error) return { views: [], problem: error.message, incomplete: null };
     const views = (data ?? []).map((r) => ({ id: String(r.id), name: String(r.name), query: String(r.query ?? "") }));
-    return { views, problem: null };
+    return { views, problem: null, incomplete: incompleteNote(views.length, count ?? null) };
   } catch (e) {
-    return { views: [], problem: e instanceof Error ? e.message : "Could not read saved views." };
+    return { views: [], problem: e instanceof Error ? e.message : "Could not read saved views.", incomplete: null };
   }
 }
+
+export const MESSAGE_CAP = 500;
+export const ACTIVITY_CAP = 50;
 
 // ─── One person ─────────────────────────────────────────────────────────
 
@@ -131,7 +161,11 @@ export interface PersonDetail {
   /** The matched website enquiry (leads row), if any. */
   siteLead: Record<string, unknown> | null;
   messages: Message[];
+  /** How many messages exist in all; more than messages.length when capped. */
+  messageTotal: number;
   activities: Activity[];
+  /** How many activity rows exist in all; more than activities.length when capped. */
+  activityTotal: number;
   /** Image URLs signed for this page, by storage path. */
   signed: Map<string, string>;
   problems: string[];
@@ -210,35 +244,41 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
     if (!person) return problems.length ? { problem: problems.join(" · ") } : null;
 
     let messages: Message[] = [];
+    let messageTotal = 0;
     let signed = new Map<string, string>();
     if (person.kind === "person") {
+      // Newest MESSAGE_CAP, then reversed: a long thread keeps its latest
+      // messages (the ones that need an answer), not its first.
       const mr = await client
         .from("lead_messages")
-        .select("id, channel, direction, body, ai_generated, status, created_at, media, meta")
+        .select("id, channel, direction, body, ai_generated, status, created_at, media, meta", { count: "exact" })
         .eq("consultation_id", id)
-        .order("created_at", { ascending: true })
-        .limit(500);
+        .order("created_at", { ascending: false })
+        .limit(MESSAGE_CAP);
       if (mr.error) problems.push(`messages: ${mr.error.message}`);
-      messages = (mr.data ?? []) as Message[];
+      messages = ((mr.data ?? []) as Message[]).reverse();
+      messageTotal = Math.max(mr.count ?? 0, messages.length);
       signed = await signImages(client, messages, id);
     }
 
     let activities: Activity[] = [];
+    let activityTotal = 0;
     const ors = [person.kind === "person" ? `consultation_id.eq.${id}` : null, siteLead?.id && isUuid(siteLead.id) ? `lead_id.eq.${siteLead.id}` : null]
       .filter(Boolean)
       .join(",");
     if (ors) {
       const ar = await client
         .from("crm_activities")
-        .select("id, actor, action, detail, created_at")
+        .select("id, actor, action, detail, created_at", { count: "exact" })
         .or(ors)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(ACTIVITY_CAP);
       if (ar.error) problems.push(`activity: ${ar.error.message}`);
       activities = (ar.data ?? []) as Activity[];
+      activityTotal = Math.max(ar.count ?? 0, activities.length);
     }
 
-    return { person, consultation, siteLead, messages, activities, signed, problems };
+    return { person, consultation, siteLead, messages, messageTotal, activities, activityTotal, signed, problems };
   } catch (e) {
     return { problem: e instanceof Error ? e.message : "Could not read this person." };
   }

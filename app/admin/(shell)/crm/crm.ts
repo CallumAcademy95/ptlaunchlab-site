@@ -180,6 +180,89 @@ export function validateModeChange(input: {
   return { ok: true, status: "closed", dncReason: note ? `${label}: ${note}` : label };
 }
 
+/** setter_paused_reason written when Callum takes over from the CRM. */
+export const TAKEOVER_REASON = "Taken over in CRM";
+/** Reasons that mean a person took over, not that the setter stood itself down. */
+export const MANUAL_TAKEOVER_REASONS = ["manual takeover", TAKEOVER_REASON] as const;
+
+export function isManualTakeover(reason: string | null | undefined): boolean {
+  return !!reason && (MANUAL_TAKEOVER_REASONS as readonly string[]).includes(reason.trim());
+}
+
+/**
+ * Exactly what a mode change writes to consultations.
+ *
+ * Mirrors Leads Central's PATCH side effects: handing back to the AI (active or
+ * reply-only) resets ai_unanswered_count and clears setter_paused_reason, so the
+ * re-engagement cron does not read a stale count; taking over records why the
+ * setter is silent. Every change stamps who and when.
+ */
+export function modeUpdatePayload(
+  change: { status: string; dncReason: string | null },
+  nowIso: string,
+  actor: string,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    setter_status: change.status,
+    dnc_reason: change.dncReason,
+    mode_changed_at: nowIso,
+    mode_changed_by: actor,
+  };
+  if (change.status === "auto" || change.status === "reply_only") {
+    out.ai_unanswered_count = 0;
+    out.setter_paused_reason = null;
+  }
+  if (change.status === "human") out.setter_paused_reason = TAKEOVER_REASON;
+  return out;
+}
+
+export type ModePlan =
+  | { ok: true; update: Record<string, unknown>; activity: Record<string, unknown> }
+  | { ok: false; error: string; conflict?: boolean };
+
+/**
+ * The whole of changeMode's decision, minus the I/O: given the request and the
+ * row as freshly read, either the exact update + activity entry, or why not.
+ * The action still makes the write conditional on `expected`, so a change that
+ * lands between this read and the write is caught too.
+ */
+export function planModeChange(
+  input: { id: unknown; expected: unknown; target: unknown; reason?: unknown; note?: unknown },
+  row: { setter_status: unknown; unsubscribed: unknown } | null,
+  nowIso: string,
+  actor: string,
+): ModePlan {
+  if (!isUuid(input.id)) return { ok: false, error: "Unknown person." };
+  const expected = typeof input.expected === "string" ? input.expected : null;
+  if (!expected || !(KNOWN_STATUSES as readonly string[]).includes(expected)) {
+    return { ok: false, error: "This person has no conversation to control." };
+  }
+  if (!row) return { ok: false, error: "Unknown person." };
+  if (row.setter_status !== expected) return { ok: false, conflict: true, error: "Changed elsewhere, refresh." };
+  const v = validateModeChange({
+    current: expected,
+    target: input.target,
+    reason: input.reason,
+    note: input.note,
+    unsubscribed: row.unsubscribed === true,
+  });
+  if (!v.ok) return v;
+  return { ok: true, update: modeUpdatePayload(v, nowIso, actor), activity: modeActivityDetail(expected, v) };
+}
+
+/** The confirm-dialog warning for a change, if it needs one. */
+export function modeChangeWarning(current: string | null, target: CrmMode): string | null {
+  if (current === "booked" && (target === "ai" || target === "reply_only")) {
+    return "They've booked a call — the setter may message them again.";
+  }
+  return null;
+}
+
+/** The activity-log entry for a mode change. */
+export function modeActivityDetail(from: string, change: { status: string; dncReason: string | null }): Record<string, unknown> {
+  return { from, to: change.status, from_mode: modeOf(from), to_mode: modeOf(change.status), dnc_reason: change.dncReason };
+}
+
 // ─── Qualified PT ───────────────────────────────────────────────────────
 
 /**
@@ -194,17 +277,42 @@ export function mergeQualified(stored: unknown, value: boolean): Record<string, 
   return { ...base, already_qualified: value, already_qualified_set_by: "coach" };
 }
 
+/** setQualified's input check: a person id and a real boolean, nothing else. */
+export function validateQualifiedInput(input: { id: unknown; value: unknown }): { ok: true; id: string; value: boolean } | { ok: false; error: string } {
+  if (!isUuid(input.id)) return { ok: false, error: "Unknown person." };
+  if (typeof input.value !== "boolean") return { ok: false, error: "Invalid value." };
+  return { ok: true, id: input.id, value: input.value };
+}
+
 // ─── Waiting ────────────────────────────────────────────────────────────
 
 export function isClosed(p: Pick<CrmPerson, "setter_status" | "unsubscribed">): boolean {
   return p.setter_status === "closed" || p.unsubscribed;
 }
 
-/** They wrote more recently than we did, and the conversation is still open. */
-export function isWaiting(p: CrmPerson): boolean {
+/** They wrote more recently than anything recorded going back. */
+function wroteLast(p: CrmPerson): boolean {
   if (p.kind !== "person" || isClosed(p) || !p.last_inbound_at) return false;
   if (!p.last_outbound_at) return true;
   return Date.parse(p.last_inbound_at) > Date.parse(p.last_outbound_at);
+}
+
+/**
+ * Waiting on us: they wrote last, the conversation is open, and the setter is
+ * the one meant to answer.
+ *
+ * Human-mode people are excluded. Callum replies from Gmail or his phone and
+ * those replies are not recorded, so "they wrote last" says nothing about
+ * whether he answered — counting them would keep a red timer on every
+ * conversation he took over.
+ */
+export function isWaiting(p: CrmPerson): boolean {
+  return wroteLast(p) && modeOf(p.setter_status) !== "human";
+}
+
+/** Human mode and they wrote last: Callum is handling it, outside anything recorded here. */
+export function isHandling(p: CrmPerson): boolean {
+  return wroteLast(p) && modeOf(p.setter_status) === "human";
 }
 
 export function waitingMinutes(p: CrmPerson, now: number): number | null {
@@ -237,13 +345,28 @@ export function lastActivity(p: CrmPerson): number {
 
 // ─── Search ─────────────────────────────────────────────────────────────
 
-/** UK phone digits in one spelling: +44 7700… and 07700… both become 07700…. */
-export function normalisePhone(raw: string | null | undefined): string {
+/** The UK rewrites shared by stored numbers and typed searches (see normalisePhone). */
+function ukDigits(raw: string | null | undefined): string {
   let d = String(raw ?? "").replace(/\D/g, "");
   if (d.startsWith("00")) d = d.slice(2);
-  if (d.startsWith("44")) d = `0${d.slice(2)}`;
+  if (d.startsWith("440")) d = `0${d.slice(3)}`;
+  else if (d.startsWith("44")) d = `0${d.slice(2)}`;
+  else if (d.length === 10 && d.startsWith("7")) d = `0${d}`;
   return d;
 }
+
+/**
+ * A stored phone in one UK spelling, matching the SQL crm_normalise_uk_phone
+ * the crm_people view joins on: digits only, leading 00 dropped, 44/440 → 0,
+ * ten digits starting 7 → 07…, and fewer than 9 digits is no number at all.
+ */
+export function normalisePhone(raw: string | null | undefined): string {
+  const d = ukDigits(raw);
+  return d.length < 9 ? "" : d;
+}
+
+/** Fewer digits than this and a search is not treated as a phone number. */
+export const MIN_PHONE_SEARCH_DIGITS = 6;
 
 export interface SearchTerm {
   text: string;
@@ -261,13 +384,16 @@ export function normaliseSearch(q: string | null | undefined): SearchTerm | null
   const text = String(q ?? "").replace(/\s+/g, " ").trim().toLowerCase().slice(0, 100);
   if (!text) return null;
   const digitCount = text.replace(/\D/g, "").length;
-  const phoneLike = digitCount >= 4 && /^[\d\s()+\-.]+$/.test(text);
-  return { text, digits: phoneLike ? normalisePhone(text) : null };
+  const phoneLike = digitCount >= MIN_PHONE_SEARCH_DIGITS && /^[\d\s()+\-.]+$/.test(text);
+  return { text, digits: phoneLike ? ukDigits(text) : null };
 }
 
 export function matchesSearch(p: CrmPerson, s: SearchTerm | null): boolean {
   if (!s) return true;
-  if (s.digits) return normalisePhone(p.phone).includes(s.digits);
+  if (s.digits) {
+    const phone = normalisePhone(p.phone);
+    return phone !== "" && phone.includes(s.digits);
+  }
   return [p.name, p.email].some((v) => (v ?? "").toLowerCase().includes(s.text));
 }
 
@@ -466,6 +592,15 @@ export function filterPeople(rows: CrmPerson[], q: CrmQuery, now: number): CrmPe
   return sortPeople(rows.filter((p) => matchesQuery(p, q, now)), now);
 }
 
+/**
+ * When a read stopped short of the rows that exist, the words for a Notice;
+ * null when everything was read (or the total is unknown).
+ */
+export function incompleteNote(got: number, total: number | null): string | null {
+  if (total === null || got >= total) return null;
+  return `Showing ${got} of ${total}: the list may be incomplete, so counts may be low.`;
+}
+
 // ─── Tiles and built-in views ───────────────────────────────────────────
 
 export interface Tiles {
@@ -525,10 +660,20 @@ export function validateSavedView(name: unknown, query: unknown): SavedViewInput
   return { ok: true, name: n, query: canonical };
 }
 
+/** A saved view's id as deleteView accepts it (uuid, or a positive integer id), else null. */
+export function viewIdOf(id: unknown): string | null {
+  const v = typeof id === "number" && Number.isSafeInteger(id) && id > 0 ? String(id) : id;
+  if (isUuid(v)) return v;
+  return typeof v === "string" && /^[1-9]\d{0,17}$/.test(v) ? v : null;
+}
+
 // ─── Messages ───────────────────────────────────────────────────────────
 
-/** meta.via values for messages sent from a fixed template or a scheduled nudge, not written by the setter or Callum. */
-export const TEMPLATE_VIAS = ["planner_template", "planner_nudge", "reengage_nudge", "intake"] as const;
+/**
+ * meta.via values for fixed WhatsApp templates: words nobody wrote for this
+ * person. (reengage_nudge and intake are model-written, so they are the AI.)
+ */
+export const TEMPLATE_VIAS = ["planner_template", "planner_nudge"] as const;
 
 export type Author = "lead" | "ai" | "template" | "human";
 
@@ -548,10 +693,10 @@ export function viaOf(meta: unknown): string | null {
 /**
  * Who wrote this message.
  *
- * Inbound is the lead. Outbound sent by a template or nudge is labelled as a
- * template whatever its ai_generated flag says (the planner opener and nudge
- * are stored ai_generated=false). Otherwise ai_generated decides: true is the
- * setter, false is a person — Callum.
+ * Inbound is the lead. The planner template opener and nudge are labelled as
+ * templates (they are stored ai_generated=false, but nobody typed them).
+ * Callum only when ai_generated is explicitly false; anything else outbound —
+ * true, or a missing flag — is the setter.
  */
 export function messageAuthor(m: { direction: string; ai_generated: boolean | null; meta: unknown }): Author {
   if (m.direction === "inbound") return "lead";

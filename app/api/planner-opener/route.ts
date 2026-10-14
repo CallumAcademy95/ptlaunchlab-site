@@ -25,6 +25,7 @@ import {
   compose,
   eligibility,
   intakeFromFields,
+  dncLookupOutcome,
   parseSubscribedAt,
   ukHour,
   MAX_PER_RUN,
@@ -255,12 +256,40 @@ async function run(req: NextRequest) {
     }
   }
 
+  // People marked Do not contact in the admin CRM (closed WITH a dnc_reason)
+  // never get the opener. If the lookup fails for any reason other than the
+  // column not existing yet, nothing is sent this run: an unsent opener is
+  // recoverable next run, an email to someone who asked us to stop is not.
+  let dnc = new Set<string>();
+  let dncOk = false;
+  if (sbUrl && sbKey) {
+    try {
+      const r = await fetch(
+        `${sbUrl}/rest/v1/consultations?select=email,setter_status,dnc_reason&setter_status=eq.closed&dnc_reason=not.is.null&limit=10000`,
+        { headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` } }
+      );
+      const outcome = dncLookupOutcome(r.status, await r.json().catch(() => null));
+      if (outcome.ok) {
+        dnc = outcome.emails;
+        dncOk = true;
+      } else {
+        console.error("[planner-opener] do-not-contact lookup failed", r.status);
+      }
+    } catch (err) {
+      console.error("[planner-opener] do-not-contact lookup threw", err);
+    }
+  }
+  if (send && !dncOk) {
+    return NextResponse.json({ ok: false, trigger, error: "do-not-contact lookup failed, so nothing was sent" }, { status: 502 });
+  }
+
   const eligible: PlannerLead[] = [];
   const rejected: Array<{ email: string; reason: string }> = [];
   for (const lead of leads) {
     const verdict = eligibility(lead, now);
-    if (verdict.ok) eligible.push(lead);
-    else rejected.push({ email: lead.email, reason: verdict.reason });
+    if (!verdict.ok) rejected.push({ email: lead.email, reason: verdict.reason });
+    else if (dnc.has(lead.email.trim().toLowerCase())) rejected.push({ email: lead.email, reason: "do not contact (CRM)" });
+    else eligible.push(lead);
   }
   // Oldest first, so nobody is left behind by a busy day.
   eligible.sort((a, b) => String(a.subscribedAt).localeCompare(String(b.subscribedAt)));

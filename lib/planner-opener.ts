@@ -223,3 +223,34 @@ export function compose(lead: PlannerLead): string {
   );
   return parts.join("\n");
 }
+
+/**
+ * Emails of people marked Do not contact in the CRM: a consultation that is
+ * `closed` WITH a dnc_reason. A plain `closed` (the setter finishing a chat)
+ * is not a stop instruction, so it does not block the opener on its own.
+ * Lowercased, for comparing against MailerLite addresses.
+ */
+export function doNotContactEmails(rows: unknown): Set<string> {
+  const out = new Set<string>();
+  if (!Array.isArray(rows)) return out;
+  for (const r of rows) {
+    if (!r || typeof r !== "object") continue;
+    const o = r as Record<string, unknown>;
+    const email = typeof o.email === "string" ? o.email.trim().toLowerCase() : "";
+    const reason = typeof o.dnc_reason === "string" ? o.dnc_reason.trim() : "";
+    if (email && o.setter_status === "closed" && reason) out.add(email);
+  }
+  return out;
+}
+
+/**
+ * How to read the DNC lookup's response. A missing dnc_reason column (the CRM
+ * migration not applied yet) means nobody can be marked DNC, so it is treated
+ * as "no DNC" rather than as a failure that stops every opener.
+ */
+export function dncLookupOutcome(status: number, body: unknown): { ok: true; emails: Set<string> } | { ok: false } {
+  if (status >= 200 && status < 300) return { ok: true, emails: doNotContactEmails(body) };
+  const msg = body && typeof body === "object" ? String((body as Record<string, unknown>).message ?? "") : "";
+  if (/dnc_reason/.test(msg) && /(does not exist|could not find|schema cache)/i.test(msg)) return { ok: true, emails: new Set() };
+  return { ok: false };
+}

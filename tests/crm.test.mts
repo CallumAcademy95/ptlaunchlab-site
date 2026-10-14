@@ -35,6 +35,15 @@ import {
   gmailUrl,
   latestThreadId,
   isUuid,
+  isHandling,
+  modeUpdatePayload,
+  planModeChange,
+  modeChangeWarning,
+  isManualTakeover,
+  incompleteNote,
+  validateQualifiedInput,
+  viewIdOf,
+  TAKEOVER_REASON,
   type CrmPerson,
 } from "../app/admin/(shell)/crm/crm.ts";
 
@@ -133,16 +142,27 @@ test("isUuid accepts only uuids", () => {
 
 // ─── search normalisation ───────────────────────────────────────────────
 
-test("phone numbers normalise to one UK spelling", () => {
+test("phone numbers normalise like the SQL crm_normalise_uk_phone", () => {
   assert.equal(normalisePhone("+44 7700 900123"), "07700900123");
+  assert.equal(normalisePhone("+44 (0)7700 900123"), "07700900123");
   assert.equal(normalisePhone("0044 7700 900123"), "07700900123");
   assert.equal(normalisePhone("07700-900-123"), "07700900123");
+  assert.equal(normalisePhone("7700 900123"), "07700900123");
+  assert.equal(normalisePhone("12345678"), "", "fewer than 9 digits is no number");
   assert.equal(normalisePhone(null), "");
+});
+
+test("phone search needs at least 6 digits, so short numbers don't match everyone", () => {
+  assert.equal(normaliseSearch("12345")?.digits, null);
+  assert.equal(normaliseSearch("123456")?.digits, "123456");
+  assert.equal(normaliseSearch("7700 900123")?.digits, "07700900123");
+  // A person with junk in the phone field never matches a phone search.
+  assert.equal(matchesSearch(person({ phone: "1234" }), normaliseSearch("123456")), false);
 });
 
 test("a phone-shaped search matches however the number was stored or typed", () => {
   const p = person({ phone: "+447700900123" });
-  for (const typed of ["07700 900123", "+44 7700 900123", "447700900123", "900123"]) {
+  for (const typed of ["07700 900123", "+44 7700 900123", "447700900123", "7700900123", "900123"]) {
     assert.ok(matchesSearch(p, normaliseSearch(typed)), typed);
   }
   assert.equal(matchesSearch(p, normaliseSearch("07700 111111")), false);
@@ -183,21 +203,36 @@ test("waiting only when they wrote last on an open conversation", () => {
   assert.equal(isWaiting(person({ kind: "site_only", setter_status: null, last_inbound_at: ago(45) })), false);
 });
 
-test("wait filter and tiles count from the same rule", () => {
+test("Human-mode people are never 'waiting on us': Callum's replies aren't recorded", () => {
+  for (const s of ["human", "paused", "booked"]) {
+    const p = person({ last_inbound_at: ago(800), last_outbound_at: ago(900), setter_status: s });
+    assert.equal(isWaiting(p), false, s);
+    assert.equal(waitingMinutes(p, NOW), null, s);
+    assert.equal(isHandling(p), true, s);
+  }
+  assert.equal(isHandling(person({ last_inbound_at: ago(10) })), false, "AI mode is waiting, not handling");
+  assert.equal(isHandling(person({ last_inbound_at: ago(90), last_outbound_at: ago(10), setter_status: "human" })), false);
+});
+
+test("wait filter, tiles, views and sort all use the corrected rule", () => {
   const rows = [
     person({ id: "a1111111-1111-4111-8111-111111111111", last_inbound_at: ago(10) }),
-    person({ id: "a2222222-1111-4111-8111-111111111111", last_inbound_at: ago(200) }),
+    person({ id: "a2222222-1111-4111-8111-111111111111", last_inbound_at: ago(200), setter_status: "reply_only" }),
     person({ id: "a3333333-1111-4111-8111-111111111111", last_inbound_at: ago(800), setter_status: "human" }),
   ];
-  assert.equal(filterPeople(rows, { wait: "2h" }, NOW).length, 2);
-  assert.equal(filterPeople(rows, { wait: "12h" }, NOW).length, 1);
+  assert.equal(filterPeople(rows, { wait: "2h" }, NOW).length, 1);
+  assert.equal(filterPeople(rows, { wait: "12h" }, NOW).length, 0);
+  assert.deepEqual(
+    filterPeople(rows, { view: "waiting" }, NOW).map((p) => p.id),
+    ["a2222222-1111-4111-8111-111111111111", "a1111111-1111-4111-8111-111111111111"],
+  );
   const t = tileCounts(rows, NOW);
-  assert.equal(t.waiting, 3);
-  assert.equal(t.oldestWaitMinutes, 800);
-  assert.equal(t.aiActive, 2);
+  assert.equal(t.waiting, 2);
+  assert.equal(t.oldestWaitMinutes, 200);
+  assert.equal(t.aiActive, 1);
   assert.equal(t.human, 1);
-  // Longest wait first.
-  assert.equal(filterPeople(rows, {}, NOW)[0].id, "a3333333-1111-4111-8111-111111111111");
+  // Longest real wait first; the human-mode person is not ranked as waiting.
+  assert.equal(filterPeople(rows, {}, NOW)[0].id, "a2222222-1111-4111-8111-111111111111");
 });
 
 test("band filters: qualified and gym owner come from their own columns", () => {
@@ -227,12 +262,16 @@ test("message author: lead, AI setter, template, Callum", () => {
   assert.equal(messageAuthor({ direction: "outbound", ai_generated: true, meta: {} }), "ai");
   assert.equal(messageAuthor({ direction: "outbound", ai_generated: false, meta: {} }), "human");
   assert.equal(messageAuthor({ direction: "outbound", ai_generated: false, meta: null }), "human");
-  // Templates and nudges are stored ai_generated=false but nobody typed them.
-  for (const via of ["planner_template", "planner_nudge", "reengage_nudge", "intake"]) {
+  // Callum only when ai_generated is explicitly false.
+  assert.equal(messageAuthor({ direction: "outbound", ai_generated: null, meta: {} }), "ai");
+  // The planner template opener and nudge are stored ai_generated=false but nobody typed them.
+  for (const via of ["planner_template", "planner_nudge"]) {
     assert.equal(messageAuthor({ direction: "outbound", ai_generated: false, meta: { via } }), "template", via);
-    assert.equal(messageAuthor({ direction: "outbound", ai_generated: true, meta: { via } }), "template", via);
   }
-  assert.equal(messageAuthor({ direction: "outbound", ai_generated: true, meta: { via: "comment_to_dm" } }), "ai");
+  // Re-engagement nudges and the intake email are model-written: the AI.
+  for (const via of ["reengage_nudge", "intake", "comment_to_dm"]) {
+    assert.equal(messageAuthor({ direction: "outbound", ai_generated: true, meta: { via } }), "ai", via);
+  }
 });
 
 // ─── mode transitions ───────────────────────────────────────────────────
@@ -354,4 +393,116 @@ test("Gmail link: thread when stored, else a search for the address", () => {
     ]),
     "bbb222",
   );
+});
+
+// ─── what changeMode writes ─────────────────────────────────────────────
+
+const ID = "11111111-1111-4111-8111-111111111111";
+const T = "2026-10-14T12:00:00.000Z";
+
+test("payload: hand back to AI active resets the unanswered count and clears the paused reason", () => {
+  assert.deepEqual(modeUpdatePayload({ status: "auto", dncReason: null }, T, "callum"), {
+    setter_status: "auto",
+    dnc_reason: null,
+    mode_changed_at: T,
+    mode_changed_by: "callum",
+    ai_unanswered_count: 0,
+    setter_paused_reason: null,
+  });
+});
+
+test("payload: Reply-only resets the same fields as AI active", () => {
+  assert.deepEqual(modeUpdatePayload({ status: "reply_only", dncReason: null }, T, "callum"), {
+    setter_status: "reply_only",
+    dnc_reason: null,
+    mode_changed_at: T,
+    mode_changed_by: "callum",
+    ai_unanswered_count: 0,
+    setter_paused_reason: null,
+  });
+});
+
+test("payload: take over records why the setter is silent", () => {
+  assert.deepEqual(modeUpdatePayload({ status: "human", dncReason: null }, T, "callum"), {
+    setter_status: "human",
+    dnc_reason: null,
+    mode_changed_at: T,
+    mode_changed_by: "callum",
+    setter_paused_reason: TAKEOVER_REASON,
+  });
+});
+
+test("payload: Do not contact writes closed + reason and nothing else", () => {
+  assert.deepEqual(modeUpdatePayload({ status: "closed", dncReason: "Spam" }, T, "callum"), {
+    setter_status: "closed",
+    dnc_reason: "Spam",
+    mode_changed_at: T,
+    mode_changed_by: "callum",
+  });
+});
+
+test("planModeChange: the full decision, end to end", () => {
+  const row = { setter_status: "auto", unsubscribed: false };
+  const ok = planModeChange({ id: ID, expected: "auto", target: "human" }, row, T, "callum");
+  assert.ok(ok.ok);
+  assert.equal(ok.update.setter_status, "human");
+  assert.equal(ok.update.setter_paused_reason, TAKEOVER_REASON);
+  assert.deepEqual(ok.activity, { from: "auto", to: "human", from_mode: "ai", to_mode: "human", dnc_reason: null });
+
+  const dnc = planModeChange({ id: ID, expected: "auto", target: "dnc", reason: "lost" }, row, T, "callum");
+  assert.ok(dnc.ok);
+  assert.equal(dnc.update.dnc_reason, "Lost");
+});
+
+test("planModeChange: stale panel → conflict; bad input refused before any write", () => {
+  const stale = planModeChange({ id: ID, expected: "auto", target: "human" }, { setter_status: "human", unsubscribed: false }, T, "c");
+  assert.deepEqual(stale, { ok: false, conflict: true, error: "Changed elsewhere, refresh." });
+  assert.equal(planModeChange({ id: "nope", expected: "auto", target: "human" }, null, T, "c").ok, false);
+  assert.equal(planModeChange({ id: ID, expected: "weird", target: "human" }, null, T, "c").ok, false);
+  assert.equal(planModeChange({ id: ID, expected: "auto", target: "human" }, null, T, "c").ok, false, "row not found");
+  assert.equal(planModeChange({ id: ID, expected: "auto", target: "dnc" }, { setter_status: "auto", unsubscribed: false }, T, "c").ok, false);
+  assert.equal(
+    planModeChange({ id: ID, expected: "closed", target: "ai" }, { setter_status: "closed", unsubscribed: true }, T, "c").ok,
+    false,
+    "unsubscribed comes from the fresh row",
+  );
+});
+
+test("booked → AI or Reply-only is allowed, with a warning", () => {
+  assert.equal(validateModeChange({ current: "booked", target: "ai" }).ok, true);
+  assert.match(String(modeChangeWarning("booked", "ai")), /booked a call/);
+  assert.match(String(modeChangeWarning("booked", "reply_only")), /booked a call/);
+  assert.equal(modeChangeWarning("booked", "dnc"), null);
+  assert.equal(modeChangeWarning("human", "ai"), null);
+});
+
+test("manual takeover reasons from either app are recognised", () => {
+  assert.equal(isManualTakeover("manual takeover"), true);
+  assert.equal(isManualTakeover(TAKEOVER_REASON), true);
+  assert.equal(isManualTakeover("Loop breaker: 3 replies with no answer"), false);
+  assert.equal(isManualTakeover(null), false);
+});
+
+// ─── other action inputs ────────────────────────────────────────────────
+
+test("qualified input: a uuid and a real boolean only", () => {
+  assert.deepEqual(validateQualifiedInput({ id: ID, value: true }), { ok: true, id: ID, value: true });
+  assert.equal(validateQualifiedInput({ id: ID, value: "true" }).ok, false);
+  assert.equal(validateQualifiedInput({ id: "x", value: false }).ok, false);
+});
+
+test("view ids: uuid or positive integer, nothing else", () => {
+  assert.equal(viewIdOf(ID), ID);
+  assert.equal(viewIdOf(42), "42");
+  assert.equal(viewIdOf("42"), "42");
+  assert.equal(viewIdOf("0"), null);
+  assert.equal(viewIdOf("1,2"), null);
+  assert.equal(viewIdOf(-1), null);
+  assert.equal(viewIdOf(undefined), null);
+});
+
+test("a capped read says so instead of undercounting", () => {
+  assert.equal(incompleteNote(76, 76), null);
+  assert.equal(incompleteNote(76, null), null);
+  assert.match(String(incompleteNote(1000, 1240)), /1000 of 1240/);
 });

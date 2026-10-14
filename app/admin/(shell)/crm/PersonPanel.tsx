@@ -15,6 +15,8 @@ import {
   latestThreadId,
   messageAuthor,
   modeOf,
+  isManualTakeover,
+  isHandling,
   waNumber,
   waitingMinutes,
   waitBand,
@@ -122,7 +124,7 @@ export async function PersonPanel({ id }: { id: string }) {
     );
   }
 
-  const { person: p, consultation, siteLead, messages, activities, signed, problems } = detail;
+  const { person: p, consultation, siteLead, messages, messageTotal, activities, activityTotal, signed, problems } = detail;
   const profile = consultation?.ai_profile;
   const planner = plannerRows(profile);
   const threadId = latestThreadId(messages);
@@ -158,6 +160,11 @@ export async function PersonPanel({ id }: { id: string }) {
             </a>
           )}
         </div>
+        {isHandling(p) && (
+          <p className="mt-1 text-sm font-medium text-amber-800">
+            👤 You&apos;re handling this. They wrote last; your own replies aren&apos;t recorded here.
+          </p>
+        )}
         {mins !== null && (
           <p className="mt-1 text-sm font-medium text-amber-800">
             {WAIT_DOT[waitBand(mins)]} Waiting on us for {formatWait(mins)}
@@ -182,7 +189,12 @@ export async function PersonPanel({ id }: { id: string }) {
           </p>
         )}
         {p.dnc_reason && mode === "dnc" && <p className="text-sm text-rose-800">Do not contact: {p.dnc_reason}</p>}
-        {pausedReason && <p className="text-sm text-slate-600">The setter paused itself: {pausedReason}</p>}
+        {pausedReason &&
+          (isManualTakeover(pausedReason) ? (
+            mode === "human" && <p className="text-sm text-slate-600">You took over. The setter stays silent until you hand back.</p>
+          ) : (
+            <p className="text-sm text-slate-600">The setter paused itself: {pausedReason}</p>
+          ))}
         {modeChangedAt && (
           <p className="text-xs text-slate-500">
             Mode last changed {stamp(modeChangedAt)}
@@ -211,7 +223,13 @@ export async function PersonPanel({ id }: { id: string }) {
       {/* Conversation */}
       {p.kind === "person" && (
         <Card className="p-4">
-          <SectionTitle hint={`${messages.length} message${messages.length === 1 ? "" : "s"}, all channels, oldest first.`}>
+          <SectionTitle
+            hint={
+              messageTotal > messages.length
+                ? `Showing the latest ${messages.length} of ${messageTotal} messages, all channels, oldest first.`
+                : `${messages.length} message${messages.length === 1 ? "" : "s"}, all channels, oldest first.`
+            }
+          >
             Conversation
           </SectionTitle>
           {messages.length === 0 ? (
@@ -253,7 +271,7 @@ export async function PersonPanel({ id }: { id: string }) {
         <SectionTitle>Details</SectionTitle>
         {p.kind === "person" && (
           <div className="mt-3 border-b border-slate-100 pb-3">
-            <QualifiedToggle id={p.id} value={p.already_qualified} />
+            <QualifiedToggle key={String(p.already_qualified)} id={p.id} value={p.already_qualified} />
           </div>
         )}
         {summary && (
@@ -310,7 +328,15 @@ export async function PersonPanel({ id }: { id: string }) {
       )}
 
       <Card className="p-4">
-        <SectionTitle hint="Changes made in the CRM, newest first.">Activity</SectionTitle>
+        <SectionTitle
+          hint={
+            activityTotal > activities.length
+              ? `Changes made in the CRM, newest first: the latest ${activities.length} of ${activityTotal}.`
+              : "Changes made in the CRM, newest first."
+          }
+        >
+          Activity
+        </SectionTitle>
         {activities.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500">Nothing yet.</p>
         ) : (

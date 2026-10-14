@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { changeMode } from "./actions";
-import { DNC_REASONS, DNC_REASON_LABEL, MODE_LABEL, modeOf, type CrmMode, type DncReason } from "./crm";
+import { DNC_REASONS, DNC_REASON_LABEL, MODE_LABEL, modeOf, modeChangeWarning, type CrmMode, type DncReason } from "./crm";
 
 // The control bar: who is in charge of this conversation.
 //
@@ -125,6 +125,11 @@ export function ModeControls({
               Change to {MODE_LABEL[target]}?
             </h2>
             <p className="mt-1 text-sm text-slate-600">{EXPLAIN[target]}</p>
+            {modeChangeWarning(setterStatus, target) && (
+              <p className="mt-2 rounded-lg bg-amber-50 p-2 text-sm font-medium text-amber-900">
+                ⚠️ {modeChangeWarning(setterStatus, target)}
+              </p>
+            )}
             <p className="mt-1 text-xs text-slate-500">Nothing is sent by this change.</p>
 
             {target === "dnc" && (

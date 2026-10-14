@@ -24,6 +24,8 @@ import {
   greetingName,
   isRefreshRoute,
   intakeFromFields,
+  doNotContactEmails,
+  dncLookupOutcome,
   ukHour,
   BLOCKED,
   MIN_AGE_MINUTES,
@@ -235,4 +237,26 @@ test("sweep intake defaults a missing blocker and payment", () => {
     plan_consent_at: "2026-10-06T09:00:00Z" }) as any;
   assert.equal(p.answers.blocker, "other");
   assert.equal(p.answers.payment, "unsure");
+});
+
+test("Do not contact: only closed WITH a reason blocks the opener, matched case-insensitively", () => {
+  const set = doNotContactEmails([
+    { email: "Stop@Example.com", setter_status: "closed", dnc_reason: "Asked to stop" },
+    { email: "done@example.com", setter_status: "closed", dnc_reason: null },
+    { email: "blank@example.com", setter_status: "closed", dnc_reason: "  " },
+    { email: "live@example.com", setter_status: "auto", dnc_reason: "stale" },
+    null,
+    "junk",
+  ]);
+  assert.deepEqual([...set], ["stop@example.com"]);
+  assert.equal(doNotContactEmails({ not: "an array" }).size, 0);
+});
+
+test("DNC lookup: a missing dnc_reason column means no DNC, other failures are failures", () => {
+  const ok = dncLookupOutcome(200, [{ email: "a@b.com", setter_status: "closed", dnc_reason: "Spam" }]);
+  assert.ok(ok.ok && ok.emails.has("a@b.com"));
+  const missing = dncLookupOutcome(400, { code: "42703", message: "column consultations.dnc_reason does not exist" });
+  assert.ok(missing.ok && missing.emails.size === 0);
+  assert.equal(dncLookupOutcome(500, { message: "boom" }).ok, false);
+  assert.equal(dncLookupOutcome(401, null).ok, false);
 });
