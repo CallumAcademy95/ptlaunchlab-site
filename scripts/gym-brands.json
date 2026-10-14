@@ -225,5 +225,25 @@
     "canonicalPath": "/hitio-orpington-academy",
     "logoHasAlpha": true,
     "placeId": "ChIJC2wHTd2t2EcRR7Yyxw9RBP4"
+  },
+  "muscle-makers": {
+    "gymName": "Muscle Makers Gym",
+    "primaryColor": "#A85800",
+    "darkAccent": "#F8951D",
+    "heroBg": "#000000",
+    "sectionBg": "#141414",
+    "logoUrl": "/gym-logos/muscle-makers.png",
+    "promoCode": null,
+    "location": "Rotherham, South Yorkshire",
+    "adTown": "Rotherham",
+    "siteUrl": "https://www.musclemakersgym.com",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "At Muscle Makers\\nGym"
+    ],
+    "canonicalPath": "/muscle-makers-academy",
+    "logoHasAlpha": false
   }
 }
