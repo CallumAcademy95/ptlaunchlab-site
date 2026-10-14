@@ -9,7 +9,7 @@ import { reviews } from "@/app/lib/reviewsData";
 import { gymPartners } from "@/app/lib/gymPartnersData";
 
 // Short reviews (~200 characters or less), shown in full, word for word.
-const ROTATING = ["Rachel Waldock", "Matthew Bell", "Jordan Wills"];
+const ROTATING = ["Alex Doyle", "Rachel Waldock", "Matthew Bell", "Jordan Wills"];
 const quotes = ROTATING.map((name) => {
   const r = reviews.find((x) => x.name === name);
   if (!r) throw new Error(`ProofStrip: review "${name}" not found in reviewsData`);
