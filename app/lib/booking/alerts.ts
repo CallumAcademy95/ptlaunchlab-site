@@ -18,9 +18,10 @@ export async function alertOwner(kind: "booked" | "moved" | "cancelled", b: Book
     await sendOwnerPush(getSupabaseAdmin() as unknown as OwnerPushDb, { title, body, url: "/admin/crm/calls", tag: `booking-${b.id}` });
   } catch (e) { console.error("[booking] push failed", e); }
   try {
-    await new Resend(process.env.RESEND_API_KEY).emails.send({
+    const { error } = await new Resend(process.env.RESEND_API_KEY).emails.send({
       from: "PT Launch Lab Alerts <info@ptlaunchlab.co.uk>", to: ADMIN_EMAIL, subject: title,
       html: `<p>${esc(body)}</p><p>${esc(b.email)}</p><p><a href="https://ptlaunchlab.co.uk/admin/crm/calls">Open Calls</a></p>`,
     });
+    if (error) console.error("[booking] alert email rejected", error);
   } catch (e) { console.error("[booking] alert email failed", e); }
 }

@@ -38,7 +38,11 @@ export async function loadBooked(fromMs: number, toMs: number): Promise<Interval
 
 type RpcResult = { ok: true; booking: BookingRow } | { ok: false; taken: boolean; error: string };
 function interpret(data: unknown, error: { message: string } | null): RpcResult {
-  if (error) return { ok: false, taken: /slot_taken|crm_bookings_one_live_per_start/.test(error.message), error: error.message };
+  if (error) {
+    const taken = /slot_taken|crm_bookings_one_live_per_start/.test(error.message);
+    if (!taken) console.error("[booking] rpc failed", error.message);
+    return { ok: false, taken, error: taken ? "That time's just gone." : "Something went wrong. Please try again." };
+  }
   return { ok: true, booking: data as BookingRow };
 }
 
