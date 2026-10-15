@@ -1,6 +1,7 @@
 import "server-only";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { parseMedia, signablePaths, LEAD_MEDIA_BUCKET } from "@/app/lib/message-media";
+import type { CallType } from "@/app/lib/booking/callTypes";
 import { normalisePerson, isUuid, incompleteNote, type CrmPerson, type ReplyIdentity } from "./crm";
 
 // Reads for the CRM. Service role, server only.
@@ -302,3 +303,30 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
   }
 }
 
+
+/**
+ * The next booked call for each person, keyed by consultation id.
+ * Degrades to an empty Map if the bookings table is missing or unreadable.
+ */
+export async function upcomingCallsByConsultation(): Promise<Map<string, { start_at: string; call_type: CallType }>> {
+  const out = new Map<string, { start_at: string; call_type: CallType }>();
+  try {
+    const { client } = db();
+    if (!client) return out;
+    const { data, error } = await client
+      .from("crm_bookings")
+      .select("consultation_id, start_at, call_type")
+      .eq("status", "booked")
+      .gte("start_at", new Date().toISOString())
+      .not("consultation_id", "is", null)
+      .order("start_at", { ascending: true })
+      .limit(1000);
+    if (error) return out;
+    for (const r of (data ?? []) as { consultation_id: string; start_at: string; call_type: CallType }[]) {
+      if (!out.has(r.consultation_id)) out.set(r.consultation_id, { start_at: r.start_at, call_type: r.call_type });
+    }
+  } catch {
+    /* degrade to empty */
+  }
+  return out;
+}

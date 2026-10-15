@@ -5,7 +5,9 @@ import { QUESTIONS } from "@/app/lib/careerPlannerV2";
 import { messageToDisplayText, originalForDisplay, looksLikeHtml } from "@/app/lib/message-display";
 import { parseMedia, mediaViews } from "@/app/lib/message-media";
 import { Card, SectionTitle, Badge, EmptyState, Notice, DefRow, type BadgeTone } from "../ui/praxel";
-import { loadPersonDetail, type Activity } from "./data";
+import { CALL_TYPES } from "@/app/lib/booking/callTypes";
+import { longLabel } from "@/app/lib/booking/london";
+import { loadPersonDetail, upcomingCallsByConsultation, type Activity } from "./data";
 import {
   AUTHOR_LABEL,
   BAND_LABEL,
@@ -123,7 +125,8 @@ const ACTION_BTN =
   "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold shadow-sm sm:flex-none md:min-h-9";
 
 export async function PersonPanel({ id }: { id: string }) {
-  const detail = await loadPersonDetail(id);
+  const [detail, upcoming] = await Promise.all([loadPersonDetail(id), upcomingCallsByConsultation()]);
+  const call = upcoming.get(id);
 
   if (!detail) {
     return <EmptyState title="Nobody with that id" hint="They may have been removed, or the link is wrong." />;
@@ -155,6 +158,22 @@ export async function PersonPanel({ id }: { id: string }) {
 
   return (
     <div className="space-y-4">
+      {call && (
+        <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 text-sm text-blue-900 shadow-sm">
+          <p className="font-semibold">Call booked: {CALL_TYPES[call.call_type].title}</p>
+          <p className="mt-0.5">{longLabel(Date.parse(call.start_at))}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            {p.phone && (
+              <a href={`tel:${p.phone}`} className="inline-flex min-h-9 items-center gap-1.5 font-medium text-blue-700 hover:underline">
+                <Phone className="h-4 w-4" /> {p.phone}
+              </a>
+            )}
+            <Link href="/admin/crm/calls" className="inline-flex min-h-9 items-center font-semibold text-blue-700 hover:underline">
+              Manage in Calls →
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="min-w-0">
         <h2 className="text-xl font-bold tracking-tight text-slate-900 [overflow-wrap:anywhere] sm:text-2xl">

@@ -18,7 +18,8 @@ import {
   TH,
   type BadgeTone,
 } from "../ui/praxel";
-import { loadPeople, loadSavedViews } from "./data";
+import { slotLabel } from "@/app/lib/booking/london";
+import { loadPeople, loadSavedViews, upcomingCallsByConsultation } from "./data";
 import {
   parseCrmQuery,
   serialiseCrmQuery,
@@ -87,6 +88,11 @@ function requestTime(): number {
 function intentText(p: CrmPerson): string | null {
   if (p.setter_intent !== null) return `intent ${p.setter_intent}`;
   return null;
+}
+
+function CallPill({ call }: { call: { start_at: string } | undefined }) {
+  if (!call) return null;
+  return <Badge tone="blue">Call {slotLabel(Date.parse(call.start_at))}</Badge>;
 }
 
 function BandChips({ p }: { p: CrmPerson }) {
@@ -165,7 +171,7 @@ export default async function CrmPage({
   const openId = isUuid(openRaw) ? openRaw : null;
   const canonical = serialiseCrmQuery(query);
 
-  const [{ people, problem, fallback, incomplete }, saved] = await Promise.all([loadPeople(), loadSavedViews(ACTOR)]);
+  const [{ people, problem, fallback, incomplete }, saved, calls] = await Promise.all([loadPeople(), loadSavedViews(ACTOR), upcomingCallsByConsultation()]);
   const now = requestTime();
   const rows = filterPeople(people, query, now);
   const tiles = tileCounts(people, now);
@@ -323,6 +329,7 @@ export default async function CrmPage({
                     <div className="mt-2 flex flex-wrap items-center gap-1">
                       <Mode p={p} />
                       <BandChips p={p} />
+                      <CallPill call={calls.get(p.id)} />
                     </div>
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
                       <span>{p.kind === "site_only" ? "Website" : channelLabel(p.primary_channel)}</span>
@@ -361,6 +368,7 @@ export default async function CrmPage({
                           {p.name || p.email || "Unnamed"}
                         </Link>
                         {p.name && p.email && <div className="max-w-[16rem] truncate text-xs text-slate-500">{p.email}</div>}
+                        <CallPill call={calls.get(p.id)} />
                       </td>
                       <td className={TD}>
                         <div className="flex flex-wrap gap-1">
