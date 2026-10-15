@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "@/app/lib/admin-auth";
 import { book, move, cancel, freeSlots } from "@/app/lib/booking/service";
-import { validateRules, validateBookingInput } from "@/app/lib/booking/validate";
+import { validateRules, validateBookingInput, markRefusal } from "@/app/lib/booking/validate";
 import { slotLabel } from "@/app/lib/booking/london";
 import type { BookingRow } from "@/app/lib/booking/data";
 import type { CallType } from "@/app/lib/booking/callTypes";
@@ -28,8 +28,14 @@ const done = () => { revalidatePath("/admin/crm/calls"); revalidatePath("/admin/
 export async function markCall(id: unknown, status: unknown, notes?: unknown): Promise<R> {
   if (!(await isAdmin())) return DENIED;
   if (!isUuid(id) || (status !== "done" && status !== "no_show")) return { ok: false, error: "Bad request." };
+  const b = await row(id); if (!b) return { ok: false, error: "Call not found." };
+  const refusal = markRefusal(b.start_at, Date.now());
+  if (refusal) return { ok: false, error: refusal };
+  // Only overwrite notes when some were given; a no-show keeps what is there.
+  const patch: Record<string, unknown> = { status };
+  if (typeof notes === "string") patch.notes = notes.slice(0, 4000);
   const { error } = await getSupabaseAdmin().from("crm_bookings")
-    .update({ status, notes: typeof notes === "string" ? notes.slice(0, 4000) : null }).eq("id", id).eq("status", "booked");
+    .update(patch).eq("id", id).eq("status", "booked").lte("start_at", new Date().toISOString());
   if (error) return { ok: false, error: error.message };
   done(); return { ok: true };
 }

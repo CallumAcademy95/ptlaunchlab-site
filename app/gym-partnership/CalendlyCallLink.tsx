@@ -17,7 +17,7 @@ export default function CalendlyCallLink() {
       onClick={() => trackEvent("partnership_call_click")}
       className="text-gold hover:underline font-semibold"
     >
-      Book a 30-min partnership call →
+      {CRM ? "Book a 30-min partnership call →" : "Book a 15-min partnership call →"}
     </a>
   );
 }

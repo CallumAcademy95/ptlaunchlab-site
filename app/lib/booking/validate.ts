@@ -105,3 +105,10 @@ export function rulesFromRow(row: Record<string, unknown> | null): Rules {
   });
   return v.ok ? v.value : { ...DEFAULTS };
 }
+
+// Admin "Done" / "No-show": only once the call has started (a no-show sends the
+// lead a "sorry we missed each other" message, which must never go early).
+export function markRefusal(startIso: string, nowMs: number): string | null {
+  const start = Date.parse(startIso);
+  return Number.isFinite(start) && start <= nowMs ? null : "This call hasn't started yet.";
+}

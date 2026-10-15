@@ -7,7 +7,7 @@
 // - Callum's hours: HH:MM blocks, start before end, no midnight crossing.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { validateBookingInput, normaliseUkPhone, validateRules, rulesFromRow } from "../app/lib/booking/validate.ts";
+import { validateBookingInput, normaliseUkPhone, validateRules, rulesFromRow, markRefusal } from "../app/lib/booking/validate.ts";
 
 const good = {
   type: "consultation", startIso: "2026-10-21T13:30:00.000Z", name: "Mark Ryan", email: "Mark@Example.com",
@@ -67,4 +67,12 @@ test("hostile long email is rejected quickly (length checked before regex)", () 
 test("phone string longer than 40 characters is rejected", () => {
   assert.equal(validateBookingInput({ ...good, phone: "07700900123" + " ".repeat(31) + "x" }).ok, false);
   assert.equal(validateBookingInput({ ...good, phone: "0".repeat(41) }).ok, false);
+});
+
+test("markRefusal: a call can't be marked done/no-show before it starts", () => {
+  const start = "2026-10-21T13:30:00.000Z";
+  assert.equal(markRefusal(start, Date.parse(start) - 60_000), "This call hasn't started yet.");
+  assert.equal(markRefusal(start, Date.parse(start)), null);
+  assert.equal(markRefusal(start, Date.parse(start) + 3600_000), null);
+  assert.equal(markRefusal("not a date", Date.parse(start)), "This call hasn't started yet.");
 });

@@ -53,10 +53,10 @@ export default function CallsClient({ calls, past }: { calls: BookingRow[]; past
                 </div>
                 {c.status === "booked" && (
                   <div className="flex flex-wrap gap-2">
-                    <button disabled={pending} onClick={() => run(markCall(c.id, "done", prompt("Notes (optional)") ?? ""))} className={BTN}>Done</button>
-                    <button disabled={pending} onClick={() => run(markCall(c.id, "no_show"))} className={BTN}>No-show</button>
+                    <button disabled={pending} onClick={() => { const notes = prompt("Notes (optional)"); if (notes === null) return; run(markCall(c.id, "done", notes)); }} className={BTN}>Done</button>
+                    <button disabled={pending} onClick={() => { if (confirm(`Mark ${c.name} as a no-show? They'll get a 'sorry we missed each other' message.`)) run(markCall(c.id, "no_show")); }} className={BTN}>No-show</button>
                     <button disabled={pending} onClick={() => start(async () => { const r = await adminSlots(c.call_type); if (r.ok) setMoving({ id: c.id, slots: r.slots }); else setMsg(r.error); })} className={BTN}>Move</button>
-                    <button disabled={pending} onClick={() => { if (confirm(`Cancel ${c.name}'s call at ${longLabel(Date.parse(c.start_at))}? They'll be told.`)) run(cancelCall(c.id, prompt("Reason (optional)") ?? "")); }} className={BTN + " !text-red-700"}>Cancel</button>
+                    <button disabled={pending} onClick={() => { if (confirm(`Cancel ${c.name}'s call at ${longLabel(Date.parse(c.start_at))}? They'll be told.`)) { const reason = prompt("Reason (optional)"); if (reason === null) return; run(cancelCall(c.id, reason)); } }} className={BTN + " !text-red-700"}>Cancel</button>
                   </div>
                 )}
               </li>
