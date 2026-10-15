@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import { signLinkToken, verifyLinkToken, newManageToken, hashManageToken } from "../app/lib/booking/tokens.ts";
 import { londonWallToUtc, londonDate, addDays, weekdayOf, slotLabel, longLabel } from "../app/lib/booking/london.ts";
 import { callTypeFromSlug, CALL_TYPES } from "../app/lib/booking/callTypes.ts";
+import { icsFor } from "../app/lib/booking/ics.ts";
 
 const SECRET = "test-secret-0123456789abcdef0123456789";
 const VECTOR = "eyJsIjoiMTExMTExMTEtMTExMS00MTExLTgxMTEtMTExMTExMTExMTExIiwidCI6ImNvbnN1bHRhdGlvbiIsImUiOjE3OTAwMDAwMDAwMDB9.5YP424CrdzQRuLmYf97daIRXop89gcpWO0WFCvUYw9g";
@@ -46,6 +47,7 @@ test("London wall time maps to the right UTC instant either side of 25 Oct 2026"
   assert.equal(new Date(londonWallToUtc("2026-10-26", "09:00")).toISOString(), "2026-10-26T09:00:00.000Z"); // GMT
   assert.equal(londonDate(Date.parse("2026-10-25T23:30:00Z")), "2026-10-25");
   assert.equal(londonDate(Date.parse("2026-10-18T23:30:00Z")), "2026-10-19");
+  assert.equal(new Date(londonWallToUtc("2026-10-25", "09:00")).toISOString(), "2026-10-25T09:00:00.000Z"); // change day, after 01:00 UTC switch
 });
 test("date helpers", () => {
   assert.equal(addDays("2026-10-31", 1), "2026-11-01");
@@ -60,4 +62,19 @@ test("call types: slugs and Calendly questions", () => {
   assert.equal(callTypeFromSlug("gym_partner"), null);
   assert.equal(CALL_TYPES.consultation.minutes, 30);
   assert.equal(CALL_TYPES.gym_partner.questions[1].choices?.length, 3);
+});
+test("ics: escapes backslash, semicolon, comma and newline in text fields", () => {
+  const ics = icsFor({ id: "x", startMs: 0, endMs: 1, title: "t", description: "a\\b;c,d\ne" });
+  assert.ok(ics.split("\r\n").includes("DESCRIPTION:a\\\\b\\;c\\,d\\ne"));
+});
+test("ics: CRLF line endings, trailing CRLF", () => {
+  const ics = icsFor({ id: "x", startMs: 0, endMs: 1, title: "t", description: "d" });
+  assert.ok(ics.endsWith("\r\n"));
+  assert.equal(ics.split("\r\n").length, ics.split("\n").length);
+  assert.ok(!ics.replace(/\r\n/g, "").includes("\n"));
+});
+test("ics: UID and DTSTART in UTC basic format", () => {
+  const ics = icsFor({ id: "abc", startMs: Date.parse("2026-10-21T13:30:00Z"), endMs: Date.parse("2026-10-21T14:00:00Z"), title: "t", description: "d" });
+  assert.ok(ics.includes("DTSTART:20261021T133000Z"));
+  assert.ok(ics.includes("UID:abc@ptlaunchlab.co.uk"));
 });
