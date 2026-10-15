@@ -47,11 +47,12 @@ export function buildCareerPlanEmail(firstName: string, plan: CareerPlanV2): { s
     "",
     `SESSION RATES IN ${plan.rateRange.region.toUpperCase()}\nPTs typically charge £${plan.rateRange.low}–£${plan.rateRange.high} a session (PT Launch Lab estimate).`,
     "",
-    `Want to talk it through? Book a 15-minute call: ${CALL}`,
-    `See what the course covers: ${COURSE}`,
+    `Talk your plan through with Callum (15 min): ${CALL}`,
     "",
     "Callum",
     "PT Launch Lab",
+    "",
+    `P.S. Rather look around first? See what the course covers: ${COURSE}`,
   ].join("\n");
 
   const html = `<!doctype html><html><body style="margin:0;background:${NAVY_DEEP}">
@@ -65,9 +66,9 @@ ${section("Your timeline", `Start: ${esc(t.start)}<br>Qualify: ${esc(t.qualify)}
 ${section(`Your biggest concern: ${plan.concern.title}`, esc(plan.concern.answer))}
 ${section("What you get", `NCFE Level 2 and Level 3 (Ofqual regulated, CIMSPA recognised), studied online with a personal tutor.<br><br><b>Business mentorship included:</b><br>${MENTORSHIP.map((m) => `• ${esc(m)}`).join("<br>")}`)}
 ${section(`Session rates in ${plan.rateRange.region}`, `PTs typically charge £${plan.rateRange.low}–£${plan.rateRange.high} a session <span style="color:${SOFT}">(PT Launch Lab estimate)</span>`)}
-<tr><td style="padding:10px 20px"><a href="${CALL}" style="display:inline-block;background:${GOLD};color:${NAVY};font:700 15px Arial,sans-serif;padding:12px 20px;border-radius:6px;text-decoration:none">Book a 15-minute call</a>
-&nbsp; <a href="${COURSE}" style="color:#fff;font:15px Arial,sans-serif">See what the course covers</a></td></tr>
+<tr><td style="padding:10px 20px"><a href="${CALL}" style="display:inline-block;background:${GOLD};color:${NAVY};font:700 15px Arial,sans-serif;padding:12px 20px;border-radius:6px;text-decoration:none">Talk your plan through with Callum (15 min)</a></td></tr>
 <tr><td style="font:14px Arial,sans-serif;color:${SOFT};padding:18px 20px 0">Callum<br>PT Launch Lab</td></tr>
+<tr><td style="font:14px Arial,sans-serif;color:${SOFT};padding:14px 20px 0">P.S. Rather look around first? <a href="${COURSE}" style="color:#fff">See what the course covers</a>.</td></tr>
 </table></td></tr></table></body></html>`;
 
   return { subject, html, text };

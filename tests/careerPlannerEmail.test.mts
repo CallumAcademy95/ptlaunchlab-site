@@ -29,6 +29,20 @@ test("contains the plan and both links", () => {
   assert.ok(e.html.includes("https://ptlaunchlab.co.uk/book-call") && e.html.includes("https://ptlaunchlab.co.uk/courses"));
 });
 
+test("one main button (the call); the course link is a P.S. after the sign-off", () => {
+  const e = buildCareerPlanEmail("Sarah", plan);
+  // Only one styled button: two competing asks dilute the click.
+  assert.equal((e.html.match(/display:inline-block/g) ?? []).length, 1);
+  const btn = e.html.match(/<a href="([^"]+)"[^>]*display:inline-block[^>]*>([^<]+)<\/a>/);
+  assert.ok(btn && btn[1].startsWith("https://ptlaunchlab.co.uk/book-call"));
+  assert.match(btn[2], /talk your plan through/i);
+  for (const body of [e.html, e.text]) {
+    const ps = body.indexOf("P.S.");
+    assert.ok(ps > body.indexOf("Callum"), "P.S. comes after the sign-off");
+    assert.ok(body.indexOf("https://ptlaunchlab.co.uk/courses") > ps, "course link sits in the P.S.");
+  }
+});
+
 test("escapes HTML in the name", () => {
   assert.ok(!buildCareerPlanEmail("<b>x</b>", plan).html.includes("<b>x</b>"));
 });
