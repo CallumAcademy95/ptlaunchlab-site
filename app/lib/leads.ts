@@ -5,6 +5,7 @@
 // Nothing after the insert can lose the lead or block the response.
 // No `@/` imports so node --test can load it.
 import { validateAnyPhone } from "./security/phone.ts";
+import { withCleanStage } from "./leadStage.ts";
 
 export const LEAD_INTENTS = ["call", "prospectus", "quiz", "career_planner", "gym_callback", "whatsapp", "live", "salary", "checkout_start", "contact", "gym_partnership"] as const;
 export type LeadIntent = (typeof LEAD_INTENTS)[number];
@@ -79,7 +80,7 @@ export function validateLead(raw: unknown): { ok: true; lead: CleanLead } | { ok
   const phoneMsg = partner ? "Enter a valid phone number." : "Enter a UK phone number.";
   if (intent !== "checkout_start" && !phone) return { ok: false, field: "phone", message: phoneMsg };
   if (intent === "checkout_start" && phoneRaw && !phone) return { ok: false, field: "phone", message: phoneMsg };
-  const extra = obj(r.extra);
+  const extra = withCleanStage(obj(r.extra));
   // /api/gym-partnership required the gym's name (gymPartnershipSchema, min 2).
   if (partner && str(extra.gymName, 200).length < 2) return { ok: false, field: "gymName", message: "Enter your gym's name." };
   const source = str(r.source, 80) || intent;
