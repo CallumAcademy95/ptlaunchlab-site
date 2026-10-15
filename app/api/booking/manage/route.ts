@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { logSec } from "@/app/lib/security/log";
 import { hashManageToken } from "@/app/lib/booking/tokens";
 import { findByManageHash } from "@/app/lib/booking/data";
 import { move, cancel } from "@/app/lib/booking/service";
@@ -6,6 +8,16 @@ import { CALL_TYPES } from "@/app/lib/booking/callTypes";
 import { longLabel, slotLabel } from "@/app/lib/booking/london";
 
 export const dynamic = "force-dynamic";
+const ENDPOINT = "/api/booking/manage";
+const readLimiter = createRateLimiter(30, 60_000);  // 30 views/min per IP
+const writeLimiter = createRateLimiter(10, 60_000); // 10 move/cancel attempts/min per IP
+
+function limited(req: Request, allow: (ip: string) => boolean) {
+  const ip = getIP(req);
+  if (allow(ip)) return null;
+  logSec({ level: "security", endpoint: ENDPOINT, outcome: "blocked-user", signals: ["rate-limit"], ip });
+  return NextResponse.json({ ok: false, error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
+}
 
 async function load(token: unknown) {
   if (typeof token !== "string" || token.length < 20 || token.length > 100) return null;
@@ -13,6 +25,8 @@ async function load(token: unknown) {
 }
 
 export async function GET(req: Request) {
+  const tooMany = limited(req, readLimiter);
+  if (tooMany) return tooMany;
   const b = await load(new URL(req.url).searchParams.get("token"));
   if (!b) return NextResponse.json({ ok: false, error: "Booking not found." }, { status: 404 });
   return NextResponse.json({ ok: true, booking: {
@@ -22,6 +36,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const tooMany = limited(req, writeLimiter);
+  if (tooMany) return tooMany;
   const body = (await req.json().catch(() => null)) as { token?: unknown; action?: unknown; startIso?: unknown } | null;
   const b = await load(body?.token);
   if (!b) return NextResponse.json({ ok: false, error: "Booking not found." }, { status: 404 });

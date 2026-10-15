@@ -6,6 +6,7 @@ import type { BookingInput } from "./validate";
 import { loadSettings, loadBooked, rpcBook, rpcMove, setGoogle, markGoogleHealth, findRecentDuplicate, type BookingRow } from "./data";
 import { getBusy, createEvent, updateEvent, deleteEvent } from "./google";
 import { alertOwner } from "./alerts";
+import { createBusyCache, createHealthGate } from "./busyCache";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 
 const MIN = 60_000;
@@ -25,6 +26,11 @@ function unexpected(where: string, e: unknown): Fail {
   return { ok: false, error: GENERIC };
 }
 
+// Page loads share a 60s free/busy cache and only touch the health row on a
+// change or once a minute (per instance). recheck() below always asks Google fresh.
+const busyCache = createBusyCache(60_000);
+const healthGate = createHealthGate(60_000);
+
 /** Free starts for a call type. Never offers times it could not check against Google. */
 export async function freeSlots(callType: CallType, nowMs: number) {
   try {
@@ -33,12 +39,17 @@ export async function freeSlots(callType: CallType, nowMs: number) {
     const to = nowMs + (rules.horizonDays + 1) * 24 * 60 * MIN;
     let busy;
     try {
-      busy = await getBusy(nowMs, to);
+      const r = await busyCache.get(nowMs, to, nowMs, getBusy);
+      busy = r.busy;
+      if (r.fresh && healthGate.shouldWrite(true, nowMs)) {
+        await markGoogleHealth(true).catch((e) => console.error("[booking] markGoogleHealth failed", e));
+      }
     } catch (e) {
-      await markGoogleHealth(false, e instanceof Error ? e.message : String(e)).catch(() => {});
+      if (healthGate.shouldWrite(false, nowMs)) {
+        await markGoogleHealth(false, e instanceof Error ? e.message : String(e)).catch(() => {});
+      }
       return { ok: false as const, reason: "calendar_unavailable" as const };
     }
-    await markGoogleHealth(true).catch((e) => console.error("[booking] markGoogleHealth failed", e));
     const booked = await loadBooked(nowMs, to);
     return { ok: true as const, slots: computeSlots(rules, busy, booked, nowMs, CALL_TYPES[callType].minutes) };
   } catch (e) {

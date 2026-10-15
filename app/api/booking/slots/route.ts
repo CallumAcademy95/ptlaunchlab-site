@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
+import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { logSec } from "@/app/lib/security/log";
 import { freeSlots } from "@/app/lib/booking/service";
 import { slotLabel } from "@/app/lib/booking/london";
 
 export const dynamic = "force-dynamic";
+const ENDPOINT = "/api/booking/slots";
+const rateLimiter = createRateLimiter(30, 60_000); // 30 page loads/min per IP
 
 export async function GET(req: Request) {
+  const ip = getIP(req);
+  if (!rateLimiter(ip)) {
+    logSec({ level: "security", endpoint: ENDPOINT, outcome: "blocked-user", signals: ["rate-limit"], ip });
+    return NextResponse.json({ ok: false, reason: "rate_limited" }, { status: 429, headers: { "Cache-Control": "no-store" } });
+  }
   const url = new URL(req.url);
   const type = url.searchParams.get("type");
   if (type !== "consultation" && type !== "gym_partner") return NextResponse.json({ ok: false, reason: "bad_type" }, { status: 400 });
