@@ -11,7 +11,7 @@ export default async function ManagePage({ params }: { params: Promise<{ token: 
   return (
     <>
       <Nav />
-      <main className="bg-base min-h-screen px-4 py-10 md:py-16"><div className="max-w-xl mx-auto"><ManageBooking token={token} /></div></main>
+      <main className="bg-base min-h-screen px-4 pt-[112px] pb-10 md:pb-16"><div className="max-w-xl mx-auto"><ManageBooking token={token} /></div></main>
       <Footer />
     </>
   );
