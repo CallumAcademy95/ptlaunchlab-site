@@ -468,6 +468,33 @@ export async function countSettledMonthlyPayments(subscriptionId: string): Promi
 }
 
 /**
+ * "How did you hear about us?" — a required dropdown on Stripe's page, so a
+ * sale with no gym and no ad tag still records where the buyer came from (it
+ * lands on the session as custom_fields[key=heardabout]). The two live Payment
+ * Links carry the identical field (set via the API on 16 Oct 2026); keep them
+ * in step if this changes. Stripe accepts only alphanumeric option values.
+ * Gym checkouts don't ask: gym_slug and the partner portal already attribute them.
+ */
+export const HEARD_ABOUT_FIELD = {
+  key: "heardabout",
+  label: { type: "custom", custom: "How did you hear about us?" },
+  type: "dropdown",
+  optional: false,
+  dropdown: {
+    options: [
+      { value: "partnergym", label: "A partner gym" },
+      { value: "instagram", label: "Instagram" },
+      { value: "facebook", label: "Facebook" },
+      { value: "tiktok", label: "TikTok" },
+      { value: "google", label: "Google search" },
+      { value: "youtubepodcast", label: "YouTube or the podcast" },
+      { value: "friend", label: "A friend or family member" },
+      { value: "other", label: "Somewhere else" },
+    ],
+  },
+} as const;
+
+/**
  * The Checkout Session parameters, as a plain object.
  *
  * Extracted from createCheckoutSession so the money rules can be tested without
@@ -558,6 +585,11 @@ export function buildSessionParams(
     // subscriptions already invoice every payment, and Stripe rejects a
     // subscription session carrying invoice_creation.
     ...(!recurring && { invoice_creation: { enabled: true } }),
+    // Ask non-gym buyers where they heard about us (see HEARD_ABOUT_FIELD).
+    // Allowed in both payment and subscription mode.
+    ...(!input.gymSlug && {
+      custom_fields: [HEARD_ABOUT_FIELD as unknown as Record<string, unknown>],
+    }),
     success_url: ENROL_SUCCESS_URL,
     cancel_url: `${SITE_URL}${opts.cancelPath}`,
     // Prefills the email on Stripe's page, same as the old ?prefilled_email=
