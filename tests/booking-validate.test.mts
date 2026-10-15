@@ -54,3 +54,17 @@ test("rulesFromRow gives safe defaults", () => {
   const r = rulesFromRow(null);
   assert.deepEqual(r, { weeklyHours: {}, daysOff: [], minNoticeMinutes: 240, horizonDays: 14, bufferMinutes: 15, maxPerDay: null });
 });
+test("UK phone with (0) trunk prefix after +44 normalises to dialable E.164", () => {
+  assert.equal(normaliseUkPhone("+44 (0)7700 900123"), "+447700900123");
+});
+test("hostile long email is rejected quickly (length checked before regex)", () => {
+  const started = performance.now();
+  const r = validateBookingInput({ ...good, email: "a@" + ".".repeat(50000) });
+  const elapsed = performance.now() - started;
+  assert.equal(r.ok, false);
+  assert.ok(elapsed < 200, `took ${elapsed.toFixed(1)} ms`);
+});
+test("phone string longer than 40 characters is rejected", () => {
+  assert.equal(validateBookingInput({ ...good, phone: "07700900123" + " ".repeat(31) + "x" }).ok, false);
+  assert.equal(validateBookingInput({ ...good, phone: "0".repeat(41) }).ok, false);
+});

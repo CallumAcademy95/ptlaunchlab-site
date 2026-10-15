@@ -18,7 +18,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const fail = (error: string) => ({ ok: false as const, error });
 
 export function normaliseUkPhone(s: string): string | null {
-  const d = String(s ?? "").replace(/[^\d]/g, "");
+  const d = String(s ?? "").replace(/[^\d]/g, "").replace(/^440/, "44");
   if (/^07\d{9}$/.test(d)) return `+44${d.slice(1)}`;
   if (/^447\d{9}$/.test(d)) return `+${d}`;
   if (/^\d{10,15}$/.test(d) && String(s).trim().startsWith("+")) return `+${d}`;
@@ -35,8 +35,11 @@ export function validateBookingInput(raw: unknown): { ok: true; value: BookingIn
   const name = typeof r.name === "string" ? r.name.trim() : "";
   if (name.length < 2 || name.length > 120) return fail("Please enter your name.");
   const email = typeof r.email === "string" ? r.email.trim().toLowerCase() : "";
-  if (!EMAIL.test(email) || email.length > 200) return fail("Please enter a valid email address.");
-  const phone = normaliseUkPhone(typeof r.phone === "string" ? r.phone : "");
+  // Length first: the regex must never see an unbounded public input.
+  if (email.length > 200 || !EMAIL.test(email)) return fail("Please enter a valid email address.");
+  const rawPhone = typeof r.phone === "string" ? r.phone : "";
+  if (rawPhone.length > 40) return fail("Please enter a mobile number we can ring.");
+  const phone = normaliseUkPhone(rawPhone);
   if (!phone) return fail("Please enter a mobile number we can ring.");
   const given = (r.answers && typeof r.answers === "object" ? r.answers : {}) as Record<string, unknown>;
   const answers: Record<string, string | string[]> = {};
