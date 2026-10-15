@@ -196,6 +196,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // ─── Booking pages ───────────────────────────────────────────────
+        // /book/manage/<token> carries a secret move/cancel token in the
+        // path, and /book/<type>?t= a signed lead token. With the site-wide
+        // strict-origin-when-cross-origin, clicking the Nav from these pages
+        // would hand the full URL to the next page's analytics as its
+        // referrer. Listed last so it overrides the site-wide value.
+        source: "/book/:path*",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
     ];
   },
 };
