@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   if (!r.ok) {
     if ("existing" in r && r.existing) {
       const ms = Date.parse(r.existing.start_at);
-      return NextResponse.json({ ok: true, duplicate: true, startIso: r.existing.start_at, label: longLabel(ms), phone: r.existing.phone, manageUrl: null });
+      return NextResponse.json({ ok: true, duplicate: true, startIso: r.existing.start_at, label: longLabel(ms), phone: v.value.phone, manageUrl: null });
     }
     return NextResponse.json({
       ok: false, error: r.error, taken: r.taken ?? false,
