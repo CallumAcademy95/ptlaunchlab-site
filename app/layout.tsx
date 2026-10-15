@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins, Barlow_Condensed } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 import Chatbot from "./components/ChatbotLazy";
 import Tracking from "./components/Tracking";
+import SiteAnalytics from "./components/SiteAnalytics";
 import { CallModalProvider } from "./components/cta/CallModal";
 import { siteSchema } from "@/app/lib/siteSchema";
 import "./globals.css";
@@ -103,7 +103,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
         <CallModalProvider>{children}</CallModalProvider>
         <Tracking />
         <Chatbot />
-        <Analytics />
+        <SiteAnalytics />
         {/* 3. Google Analytics 4 — gtag.js (~180 KB, ~0.8 s of main thread on
             a mid phone) loads only after window load + an idle slot, so it
             stays out of the LCP render. Nothing is lost meanwhile: the consent
@@ -117,13 +117,26 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             config command, so a CTA click before window.load would otherwise
             be lost (verified with Playwright on a slow load).
             A plain inline <script> (not next/script) so it runs during HTML
-            parse and never gets a preload hint. */}
+            parse and never gets a preload hint.
+            Not on /book/*: booking URLs carry secrets (?t=, the manage token)
+            and booking conversions are reported server-side by the setter. On
+            a /book page the config is never queued, gtag.js never loads, and
+            the ga-disable flag is set; Tracking.tsx flips the flag on route
+            changes and calls __ptllStartGa once the visitor leaves /book. */}
         <script dangerouslySetInnerHTML={{ __html: `
 (function(){
   window.dataLayer=window.dataLayer||[];
   var g=window.gtag||function(){window.dataLayer.push(arguments);};
-  g('js',new Date());
-  g('config','G-90W2KGSL55',{anonymize_ip:true});
+  function onBook(){var p=location.pathname;return p==='/book'||p.indexOf('/book/')===0;}
+  var off=onBook();
+  window['ga-disable-G-90W2KGSL55']=off;
+  window.__ptllStartGa=function(){
+    if(window.__ptllGaStarted) return; window.__ptllGaStarted=true;
+    g('js',new Date());
+    g('config','G-90W2KGSL55',{anonymize_ip:true});
+    if(document.readyState==='complete') whenIdle();
+    else window.addEventListener('load',whenIdle,{once:true});
+  };
   function loadGa(){
     if(window.__ptllGaLoaded) return; window.__ptllGaLoaded=true;
     var s=document.createElement('script');s.async=true;
@@ -134,8 +147,7 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
     if('requestIdleCallback' in window) window.requestIdleCallback(loadGa,{timeout:2000});
     else setTimeout(loadGa,2000);
   }
-  if(document.readyState==='complete') whenIdle();
-  else window.addEventListener('load',whenIdle,{once:true});
+  if(!off) window.__ptllStartGa();
 })();
         `}} />
         {/* 4. Microsoft Clarity — loads ONLY after CookieYes analytics consent
@@ -153,7 +165,9 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
               })(window, document, "clarity", "script", "w0qwj7lviw");
             }
+            function onBook(){var p=location.pathname;return p==='/book'||p.indexOf('/book/')===0;}
             window.__ptllLoadClarity=function(){
+              if(onBook()) return;
               if(window.__ptllClarityLoaded) return; window.__ptllClarityLoaded=true;
               if(document.readyState==='complete') inject();
               else window.addEventListener('load',inject,{once:true});
@@ -163,7 +177,10 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             document.addEventListener('cookieyes_banner_load',function(){
               try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadClarity(); }catch(_){}
             });
-            try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadClarity(); }catch(_){}
+            window.__ptllRecheckClarity=function(){
+              try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadClarity(); }catch(_){}
+            };
+            window.__ptllRecheckClarity();
           })();
         `}</Script>
         {/* 5. Meta Pixel — loads ONLY after CookieYes advertisement consent
@@ -171,7 +188,9 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             throw. Tracking.tsx owns PageView (mount + route changes): while
             fbq is the no-op it sets window.__ptllPvPending, and the loader
             fires one PageView on load only if that flag is set, so the
-            first page is never counted twice. */}
+            first page is never counted twice. Clarity (above) and the Pixel
+            never load on /book/* (secrets in the URL); Tracking.tsx re-runs the
+            consent check via __ptllRecheck* when the visitor leaves /book. */}
         <Script id="meta-pixel" strategy="afterInteractive">{`
           (function(){
             var noop=function(){}; noop.__ptllNoop=true;
@@ -179,7 +198,9 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             function ok(c){ if(!c||typeof c!=='object') return false;
               if(c.categories&&c.categories.advertisement===true) return true;
               return Array.isArray(c.accepted)&&c.accepted.indexOf('advertisement')>-1; }
+            function onBook(){var p=location.pathname;return p==='/book'||p.indexOf('/book/')===0;}
             window.__ptllLoadPixel=function(){
+              if(onBook()) return;
               if(window.__ptllPixelLoaded) return; window.__ptllPixelLoaded=true;
               if(window.fbq&&window.fbq.__ptllNoop) delete window.fbq;
               !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -195,7 +216,10 @@ gtag('set','ads_data_redaction',true);gtag('set','url_passthrough',true);
             document.addEventListener('cookieyes_banner_load',function(){
               try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadPixel(); }catch(_){}
             });
-            try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadPixel(); }catch(_){}
+            window.__ptllRecheckPixel=function(){
+              try{ if(ok(window.getCkyConsent&&window.getCkyConsent())) window.__ptllLoadPixel(); }catch(_){}
+            };
+            window.__ptllRecheckPixel();
           })();
         `}</Script>
       </body>

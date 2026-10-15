@@ -28,6 +28,14 @@ export default function BookingFlow({ callType, questions, prefill, token }: { c
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void load(); }, []);
+  // The signed ?t= link token stays in props/state for the POST, but leaves the
+  // address bar (and so any later copy/share, history entry or analytics read).
+  useEffect(() => {
+    const u = new URL(window.location.href);
+    if (!u.searchParams.has("t")) return;
+    u.searchParams.delete("t");
+    window.history.replaceState(null, "", u.pathname + u.search + u.hash);
+  }, []);
 
   const days = useMemo(() => [...new Set((slots ?? []).map((s) => dayKey(s.iso)))], [slots]);
 
