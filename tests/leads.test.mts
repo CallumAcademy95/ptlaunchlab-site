@@ -306,3 +306,19 @@ test("push badge colours match the real push_status values", () => {
   assert.equal(pushTone("skipped"), "neutral");
   assert.equal(pushTone(null), "neutral");
 });
+
+test("extra.stage: the 3 known codes are kept, anything else is dropped, absent is fine", () => {
+  for (const code of ["curious", "training_others", "ready_3m"]) {
+    const r = validateLead({ ...GOOD, intent: "prospectus", extra: { stage: code, fastSubmit: true } });
+    assert.equal(r.ok, true);
+    if (r.ok) assert.deepEqual(r.lead.extra, { stage: code, fastSubmit: true });
+  }
+  for (const bad of ["Curious", "ready", "", 3, null, ["curious"], { a: 1 }]) {
+    const r = validateLead({ ...GOOD, intent: "prospectus", extra: { stage: bad, keep: 1 } });
+    assert.equal(r.ok, true);
+    if (r.ok) assert.deepEqual(r.lead.extra, { keep: 1 });
+  }
+  const none = validateLead({ ...GOOD, intent: "prospectus" });
+  assert.equal(none.ok, true);
+  if (none.ok) assert.deepEqual(none.lead.extra, {});
+});

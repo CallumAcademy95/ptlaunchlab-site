@@ -4,6 +4,7 @@ import { useId, useRef, useState, type CSSProperties, type FormEvent, type React
 import { submitLead, type SubmitLeadResult } from "@/app/lib/submitLead";
 import { useFormSecurity } from "@/app/lib/security/client";
 import type { LeadIntent } from "@/app/lib/leads";
+import { LEAD_STAGES } from "@/app/lib/leadStage";
 
 // The one lead form. Posts to /api/lead via submitLead, which saves first and
 // fires the Meta Pixel Lead only after the lead is saved.
@@ -17,6 +18,8 @@ export type LeadFormProps = {
   /** Optional extra field: a <select> when `options` is given, else a <textarea>. */
   question?: { label: string; options?: string[]; required?: boolean };
   extra?: Record<string, unknown>;
+  /** Adds the optional "Where are you now?" dropdown; the answer is sent as extra.stage. */
+  stageQuestion?: boolean;
   successMessage?: string | ((firstName: string) => string);
   onSuccess?: (result: Extract<SubmitLeadResult, { ok: true }>, values: { name: string; phone: string; email: string; question: string }) => void;
   /** "dark" for navy host surfaces (bg-deep fields, white text). Default "light". */
@@ -66,6 +69,7 @@ export default function LeadForm({
   gymSlug,
   question,
   extra,
+  stageQuestion,
   successMessage,
   onSuccess,
   variant = "inline",
@@ -82,6 +86,7 @@ export default function LeadForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [answer, setAnswer] = useState("");
+  const [stage, setStage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldError, setFieldError] = useState("");
@@ -107,7 +112,10 @@ export default function LeadForm({
         source,
         gymSlug,
         // Informational only: we never drop a lead on a heuristic.
-        extra: Date.now() - mountedAt.current < 1500 ? { ...extra, fastSubmit: true } : extra,
+        extra: (() => {
+          const e = stageQuestion && stage ? { ...extra, stage } : extra;
+          return Date.now() - mountedAt.current < 1500 ? { ...e, fastSubmit: true } : e;
+        })(),
         _sec: sec.payload(),
       });
       if (result.ok) {
@@ -172,6 +180,17 @@ export default function LeadForm({
               <textarea id={`${uid}-question`} name="question" rows={3} className={FIELD} required={question.required}
                 aria-invalid={invalid("question")} aria-describedby={described} value={answer} onChange={(e) => setAnswer(e.target.value)} />
             )}
+          </div>
+        )}
+        {stageQuestion && (
+          <div>
+            <label htmlFor={`${uid}-stage`} className={LABEL}>Where are you now? (optional)</label>
+            <select id={`${uid}-stage`} name="stage" className={FIELD} value={stage} onChange={(e) => setStage(e.target.value)}>
+              <option value="">Select one</option>
+              {LEAD_STAGES.map((o) => (
+                <option key={o.code} value={o.code}>{o.label}</option>
+              ))}
+            </select>
           </div>
         )}
         <sec.Honeypot />

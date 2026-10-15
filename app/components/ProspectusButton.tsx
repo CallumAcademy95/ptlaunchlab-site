@@ -48,7 +48,8 @@ export default function ProspectusButton() {
               intent="prospectus"
               source="prospectus_button"
               tone="dark"
-              submitLabel="Download Prospectus →"
+              stageQuestion
+              submitLabel="Yes, send me the prospectus →"
               successMessage="Thanks, opening the prospectus…"
               footnote="We'll also send you useful emails about the course and becoming a PT. Unsubscribe any time."
               onSuccess={handleSuccess}
