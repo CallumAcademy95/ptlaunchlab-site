@@ -22,7 +22,7 @@ export default function BookingFlow({ callType, questions, prefill, token }: { c
 
   async function load() {
     const r = await fetch(`/api/booking/slots?type=${callType}`, { cache: "no-store" }).then((x) => x.json()).catch(() => null);
-    if (!r?.ok || r.slots.length === 0) { setUnavailable(true); return; }
+    if (!r?.ok || !Array.isArray(r.slots) || r.slots.length === 0) { setUnavailable(true); return; }
     setSlots(r.slots);
     setDay(dayKey(r.slots[0].iso));
   }
@@ -34,6 +34,8 @@ export default function BookingFlow({ callType, questions, prefill, token }: { c
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!pick) return;
+    const missingQ = questions.find((q) => q.kind === "multi" && q.required && !((answers[q.key] as string[] | undefined)?.length));
+    if (missingQ) { setError(`Please answer "${missingQ.label}".`); return; }
     setBusy(true); setError(null);
     const r = await fetch("/api/booking", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -57,7 +59,7 @@ export default function BookingFlow({ callType, questions, prefill, token }: { c
     return (
       <div className="bg-card border border-gold/40 rounded-2xl p-6">
         <h2 className="text-white font-bold text-xl mb-2">Booked</h2>
-        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label}.</p>
+        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label} (UK time).</p>
         {done.manageUrl && (
           <div className="flex flex-col gap-2 text-sm">
             <a className="text-gold underline" href={`/api/booking/ics?token=${done.manageUrl.split("/").pop()}`}>Add to my calendar</a>

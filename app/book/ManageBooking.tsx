@@ -25,7 +25,7 @@ export default function ManageBooking({ token }: { token: string }) {
     const r = await fetch("/api/booking/manage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token, ...body }) })
       .then((x) => x.json()).catch(() => ({ ok: false, error: "Something went wrong." }));
     setBusy(false);
-    if (r.ok) { setSlots(null); setMsg(body.action === "cancel" ? "Cancelled. Thanks for letting us know." : `Moved to ${r.label}.`); await load(); }
+    if (r.ok) { setSlots(null); setMsg(body.action === "cancel" ? "Cancelled. Thanks for letting us know." : `Moved to ${r.label} (UK time).`); await load(); }
     else { setMsg(r.error); if (Array.isArray(r.nearest) && r.nearest.length) setSlots(r.nearest); }
   }
 
@@ -41,7 +41,7 @@ export default function ManageBooking({ token }: { token: string }) {
   return (
     <div className="bg-card border border-white/10 rounded-2xl p-6">
       <h1 className="text-white font-bold text-2xl mb-2">{b.title}</h1>
-      <p className="text-soft/80 mb-4">{b.status === "cancelled" ? "This call is cancelled." : `Callum will ring you on ${b.phone} at ${b.label}.`}</p>
+      <p className="text-soft/80 mb-4">{b.status === "cancelled" ? "This call is cancelled." : `Callum will ring you on ${b.phone} at ${b.label} (UK time).`}</p>
       {msg && <p className="text-gold text-sm mb-4">{msg}</p>}
       {live && !slots && (
         <div className="flex gap-3">
