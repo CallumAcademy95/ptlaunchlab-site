@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: "How PT Launch Lab collects, uses and protects your personal data.",
 };
 
+const CRM = process.env.NEXT_PUBLIC_BOOKING_PROVIDER === "crm";
+
 const p = (text: string) => <p>{text}</p>;
 const ul = (items: string[]) => (
   <ul className="space-y-2 mt-2">
@@ -119,7 +121,14 @@ export default function PrivacyPage() {
                 "Google Analytics — website and conversion analytics. Receives event data about how this site is used, including purchase events sent from our server.",
                 "Meta (Facebook and Instagram) — advertising measurement. When you submit a form on this site or complete a purchase, we send Meta a hashed (scrambled) version of details such as your email address, phone number, name, postcode and country, so we can measure how our adverts perform. Hashing means Meta does not receive these details in readable form.",
                 "Anthropic — provider of the AI assistant in our website chat. Messages you type into the chat are sent to Anthropic in order to generate a reply. Please do not enter sensitive personal information into the chat.",
-                "Calendly — appointment booking. If you book a call with us, Calendly receives your name, email address and the details of your booking.",
+                ...(CRM
+                  ? [
+                      "Google (Google Calendar) — scheduling. If you book a call with us, Google Calendar receives your name, email address and the details of your booking, to schedule calls you book with us.",
+                      "Calendly, for calls booked before we moved to our own booking page. Calendly received your name, email address and the details of your booking.",
+                    ]
+                  : [
+                      "Calendly — appointment booking. If you book a call with us, Calendly receives your name, email address and the details of your booking.",
+                    ]),
                 "Vercel — our website hosting provider. Processes web requests and API calls.",
                 "CookieYes — our cookie consent management platform. Stores your cookie preferences to ensure we only set non-essential cookies with your consent. CookieYes processes consent logs in accordance with GDPR.",
               ])}

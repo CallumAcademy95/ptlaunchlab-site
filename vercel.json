@@ -15,6 +15,10 @@
     {
       "path": "/api/checkout-followup",
       "schedule": "20 8 * * *"
+    },
+    {
+      "path": "/api/booking/google-retry",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

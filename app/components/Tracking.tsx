@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
+import { isBookingPath } from "@/app/lib/booking/privacy";
 
 declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
     fbq?: (...args: unknown[]) => void;
     __ptllPvPending?: boolean;
+    __ptllStartGa?: () => void;
+    __ptllRecheckPixel?: () => void;
+    __ptllRecheckClarity?: () => void;
+    "ga-disable-G-90W2KGSL55"?: boolean;
   }
 }
 
@@ -131,6 +136,22 @@ function ctaLocationFrom(el: HTMLElement): string {
 export default function Tracking() {
   const pathname = usePathname();
 
+  // No third-party tags on /book/*: booking URLs carry secrets (?t=, the
+  // manage token) and booking conversions are reported server-side by the
+  // setter. app/layout.tsx keeps GA config, the Pixel and Clarity off a /book
+  // page loaded directly; this keeps it that way across client-side route
+  // changes (GA's own opt-out flag, checked on every hit) and starts the tags
+  // (consent-gated as before) once the visitor is on any other page. Layout
+  // effect so the flag flips before the page's own effects push anything.
+  useLayoutEffect(() => {
+    const off = isBookingPath(pathname);
+    window["ga-disable-G-90W2KGSL55"] = off;
+    if (off) return;
+    window.__ptllStartGa?.();
+    window.__ptllRecheckPixel?.();
+    window.__ptllRecheckClarity?.();
+  }, [pathname]);
+
   // Meta Pixel PageView on every pathname change. The Pixel snippet in
   // app/layout.tsx no longer fires its own PageView — we own it here so the
   // first hard load AND every Next.js <Link> SPA navigation get tracked.
@@ -144,6 +165,7 @@ export default function Tracking() {
   // PageView barely fired at all. Retry briefly until fbq is available.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (isBookingPath(pathname)) return;
     let tries = 0;
     let timer: ReturnType<typeof setTimeout>;
     const firePageView = () => {

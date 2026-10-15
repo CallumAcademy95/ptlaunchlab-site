@@ -2,20 +2,22 @@
 
 import { trackEvent } from "@/app/lib/gtag";
 
-// The "prefer to talk first?" Calendly link on /gym-partnership. A click is not
+// The "prefer to talk first?" link on /gym-partnership. A click is not
 // a lead, so it no longer fires a Pixel Lead (that over-counted the gym
 // campaign's optimisation event). It is recorded as a GA4 event only. For real
-// booking attribution, add a Calendly webhook → CAPI. Opens in a new tab.
+// booking attribution, add a Calendly webhook → CAPI. Goes to our own booking
+// page once NEXT_PUBLIC_BOOKING_PROVIDER=crm; otherwise opens Calendly in a new tab.
+const CRM = process.env.NEXT_PUBLIC_BOOKING_PROVIDER === "crm";
+
 export default function CalendlyCallLink() {
   return (
     <a
-      href="https://calendly.com/ptlaunchlab-info/information-call"
-      target="_blank"
-      rel="noopener noreferrer"
+      href={CRM ? "/book/gym-partner" : "https://calendly.com/ptlaunchlab-info/information-call"}
+      {...(CRM ? {} : { target: "_blank", rel: "noopener noreferrer" })}
       onClick={() => trackEvent("partnership_call_click")}
       className="text-gold hover:underline font-semibold"
     >
-      Book a 15-min partnership call →
+      {CRM ? "Book a 30-min partnership call →" : "Book a 15-min partnership call →"}
     </a>
   );
 }

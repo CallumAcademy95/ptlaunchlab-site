@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Inbox,
   MessageSquare,
+  Phone,
   Send,
   Users,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   send: Send,
   inbox: Inbox,
   users: Users,
+  phone: Phone,
 };
 
 /**

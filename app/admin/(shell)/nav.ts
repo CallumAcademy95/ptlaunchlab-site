@@ -16,6 +16,8 @@ export interface AdminNavItem {
   hint?: string;
   /** Other path prefixes that belong to this entry (e.g. pages it replaced). */
   alsoActiveOn?: string[];
+  /** Sub-paths that have their own entry, so this one must not light up for them. */
+  excludeOn?: string[];
 }
 
 export interface AdminNavGroup {
@@ -42,7 +44,9 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         hint: "Every lead and conversation, and who's in charge of it",
         // The old Leads and Site leads screens now live inside the CRM.
         alsoActiveOn: ["/admin/leads", "/admin/site-leads"],
+        excludeOn: ["/admin/crm/calls"],
       },
+      { href: "/admin/crm/calls", label: "Calls", icon: "phone", hint: "Booked calls, your hours, and who you're ringing next" },
       { href: "/admin/ads", label: "Ad performance", icon: "chart" },
       { href: "/admin/whatsapp", label: "WhatsApp inbox", icon: "message" },
       { href: "/admin/live-questions", label: "Audience questions", icon: "help" },
@@ -67,5 +71,6 @@ export function isActiveNav(href: string, pathname: string): boolean {
 
 /** isActiveNav for a whole entry, including the paths it took over. */
 export function isActiveItem(item: AdminNavItem, pathname: string): boolean {
+  if ((item.excludeOn ?? []).some((href) => isActiveNav(href, pathname))) return false;
   return [item.href, ...(item.alsoActiveOn ?? [])].some((href) => isActiveNav(href, pathname));
 }
