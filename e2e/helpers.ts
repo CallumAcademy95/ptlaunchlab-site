@@ -154,6 +154,20 @@ export async function payWithTestCard(page: Page, cardholder: string) {
   }
 
   await cardNumber.waitFor({ state: "visible", timeout: 30_000 });
+
+  // Non-gym checkouts carry a required "How did you hear about us?" dropdown
+  // (HEARD_ABOUT_FIELD in app/lib/stripeCheckout.ts). Stripe won't take
+  // payment until it's answered, so answer any custom dropdown with its first
+  // real option. The billing-country select is handled separately below.
+  const customSelects = page.locator('select:not(#billingCountry)');
+  for (let i = 0; i < (await customSelects.count()); i++) {
+    const sel = customSelects.nth(i);
+    const firstReal = await sel.evaluate((el) =>
+      Array.from((el as HTMLSelectElement).options).find((o) => o.value)?.value ?? null,
+    );
+    if (firstReal) await sel.selectOption(firstReal).catch(() => { /* not a required custom field */ });
+  }
+
   await page.locator("input#cardNumber").fill("4242424242424242");
   await page.locator("input#cardExpiry").fill("12/34");
   await page.locator("input#cardCvc").fill("123");
