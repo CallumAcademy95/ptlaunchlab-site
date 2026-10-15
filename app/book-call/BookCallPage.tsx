@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import { ContentCard } from "./components/ContentCard";
@@ -53,10 +54,13 @@ function StarIcon() {
   );
 }
 
+const CRM = process.env.NEXT_PUBLIC_BOOKING_PROVIDER === "crm";
+
 export default function BookCallPage() {
   const [tab, setTab] = useState<"phone" | "video">("phone");
 
   useEffect(() => {
+    if (CRM) return;
     if (tab !== "video") return;
     const existing = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
     if (existing) return;
@@ -201,17 +205,33 @@ export default function BookCallPage() {
                 <p className="text-center text-soft italic">No pressure. No obligation. Just a clear conversation.</p>
               </div>
 
-              <div className="bg-card border border-white/10 rounded-2xl p-4">
-                <div
-                  key="calendly-widget"
-                  className="calendly-inline-widget rounded-xl overflow-hidden bg-white"
-                  data-url="https://calendly.com/ptlaunchlab-info/free-consultation"
-                  style={{ minWidth: "320px", height: "700px" }}
-                />
-              </div>
+              {CRM ? (
+                <div className="bg-card border border-white/10 rounded-2xl p-6 md:p-10 text-center">
+                  <h3 className="font-display font-extrabold text-xl md:text-2xl text-white leading-tight tracking-tight mb-5">
+                    Pick a time that suits you
+                  </h3>
+                  <Link
+                    href="/book/consultation"
+                    className="inline-block bg-gold text-deep font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity"
+                  >
+                    Choose a time →
+                  </Link>
+                </div>
+              ) : (
+                <div className="bg-card border border-white/10 rounded-2xl p-4">
+                  <div
+                    key="calendly-widget"
+                    className="calendly-inline-widget rounded-xl overflow-hidden bg-white"
+                    data-url="https://calendly.com/ptlaunchlab-info/free-consultation"
+                    style={{ minWidth: "320px", height: "700px" }}
+                  />
+                </div>
+              )}
 
               <p className="text-center text-soft text-sm mt-6">
-                If you need to, you can easily reschedule your call via Calendly.
+                {CRM
+                  ? "If you need to, you can move or cancel using the link in your confirmation."
+                  : "If you need to, you can easily reschedule your call via Calendly."}
               </p>
             </>
           )}
