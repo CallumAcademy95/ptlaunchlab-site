@@ -15,7 +15,7 @@ const UPDATED = "2026-07-27";
 export const metadata: Metadata = {
   title: "Is 35, 40 or 50 Too Old to Become a Personal Trainer? | PT Launch Lab",
   description:
-    "No, age isn't the blocker. Career-changer PTs in their 40s and 50s consistently outperform 22-year-olds. Real stories from Gemma, Jack, Maria and Marcus — plus the realistic 40+ income timeline.",
+    "No, age isn't the blocker. Career-changers in their 40s and 50s bring real advantages. Real stories from Gemma, Jack, Maria and Marcus, plus a realistic timeline.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "article",
@@ -56,7 +56,7 @@ const faqSchema = {
     {
       "@type": "Question",
       name: "Is 35 too old to become a personal trainer in the UK?",
-      acceptedAnswer: { "@type": "Answer", text: "No. There is no upper age limit on NCFE Level 2 or Level 3 PT qualifications, no insurance loading, and UK gyms cannot lawfully filter CVs by age. PT Launch Lab has qualified learners from 18 to 58, and the 40+ cohort tend to fill their books faster than under-25s because of life experience and existing networks." },
+      acceptedAnswer: { "@type": "Answer", text: "No. There is no upper age limit on NCFE Level 2 or Level 3 PT qualifications, no insurance loading, and UK gyms cannot lawfully filter CVs by age. PT Launch Lab has qualified learners from 18 to 58. Older learners often bring life experience and existing networks that help when finding clients." },
     },
     {
       "@type": "Question",
@@ -66,7 +66,7 @@ const faqSchema = {
     {
       "@type": "Question",
       name: "How long does it take to become a PT at 40+?",
-      acceptedAnswer: { "@type": "Answer", text: "8–16 weeks to qualify (NCFE Level 2 + Level 3, fully online with video-assessed practical units), studying 6–10 hours per week around a full-time job. First paying clients in months 4–6. £35k+ self-employed by month 12–18 if you build a business properly." },
+      acceptedAnswer: { "@type": "Answer", text: "8–16 weeks to qualify (NCFE Level 2 + Level 3, fully online with video-assessed practical units), studying 6–10 hours per week around a full-time job. How quickly you then earn depends on your route, your area and the hours you put in." },
     },
   ],
 };
@@ -92,7 +92,7 @@ export default function TooOldPage() {
               <strong className="text-white">No. Age is not the blocker.</strong> Career-changer PTs in their 40s and 50s consistently outperform 22-year-olds in the first 12 months because they bring three things a young PT can&apos;t fake: real life experience, a settled adult conversation manner, and a network of paying-age peers who already trust them.
             </p>
             <p className="text-lg text-soft/70 leading-relaxed mb-8">
-              The actual blockers are physical fitness, willingness to study while working, and comfort talking to strangers in a gym. PT Launch Lab has qualified learners aged from <strong className="text-white">18 to 58</strong> — and the 40+ cohort tend to fill their books faster, not slower.
+              The actual blockers are physical fitness, willingness to study while working, and comfort talking to strangers in a gym. PT Launch Lab has qualified learners aged from <strong className="text-white">18 to 58</strong>.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/quiz" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Take the 60-Second Quiz →</Link>
@@ -130,7 +130,7 @@ export default function TooOldPage() {
                 <p>A 22-year-old PT walks onto a gym floor with deep biomechanical knowledge from a recent qualification, six-pack abs, and absolutely no idea how to talk to a 47-year-old woman whose back is killing her after three pregnancies. A 42-year-old career-changer walks on with an okay-but-improving physique, average knowledge, and an instinctive ability to read that client because they <em>are</em> that client.</p>
                 <p>The selling experience gap is the biggest. Ryan Robinson — co-founder of PT Launch Lab and EP6 guest who built a £500K online PT business — talked about it: <strong className="text-white">&quot;I love how many different roads it can lead you down… you&apos;ve got to build the foundations, especially when you&apos;re stepping into a market of hundreds of thousands of PTs.&quot;</strong> Building those foundations is overwhelmingly easier when you&apos;ve spent 15 years in a job that involved customers, deadlines, and difficult conversations.</p>
                 <p>Miles, the gym-owner and 30-year industry veteran on EP16, was direct about what gym owners actually want: &quot;When they get their qualifications, they aren&apos;t somebody who&apos;s hopefully or just fancy being a PT… 20–30 years ago that&apos;s how we were taught — and that has been lost in the industry, whereas now people rely on social media too much, rather than walking up to people on a gym floor: how&apos;s it going, how&apos;s your training?&quot; That walk-up-and-talk skill is the thing that separates a 22-year-old who can quote Mike Israetel from a 47-year-old who can actually book the client.</p>
-                <p>The other compound advantage is your existing network. Most 22-year-olds have to build a client list from scratch. Most 42-year-olds already know 100+ adults with disposable income, dodgy backs, and stressful jobs — exactly the demographic that pays £35–£60 per session. <strong className="text-white">Your first 5 clients are almost always people you already know.</strong></p>
+                <p>The other compound advantage is your existing network. Most 22-year-olds have to build a client list from scratch. Most 42-year-olds already know 100+ adults with disposable income, dodgy backs, and stressful jobs — exactly the demographic that pays £35–£60 per session. <strong className="text-white">Your first clients are often people you already know.</strong></p>
               </div>
             </section>
 
@@ -169,7 +169,7 @@ export default function TooOldPage() {
                 <p><strong className="text-white">1. The customer base is ageing.</strong> The fastest-growing PT-buying demographic in the UK is women aged 40–60 (peri-menopausal training, post-natal recovery, bone density work) and men aged 45–65 (recomposition, hypertrophy in midlife, &quot;longevity&quot; training). These clients overwhelmingly prefer PTs closer to their own age. A 50-year-old client paying £45/hour does not, on the whole, feel best understood by a 23-year-old TikTok bodybuilder.</p>
                 <p><strong className="text-white">2. The NHS Couch-to-PT pipeline is real.</strong> The NHS now actively refers patients into supervised exercise — and the gyms running those schemes want PTs who can hold a 20-minute conversation about cardiac rehab, GLP-1 medication, and arthritis without freezing. As Jack Atkinson noted on EP24, even GLP-1 drugs (&quot;a fantastic kickstart, but people don&apos;t fix any problems because a lot of muscle mass is lost&quot;) are part of the conversation modern PTs need to navigate. Older PTs do this naturally.</p>
                 <p><strong className="text-white">3. The &quot;AI-proof&quot; argument favours older PTs.</strong> Sohail Rashid&apos;s whole EP32 thesis was that in-person PT becomes <em>more</em> valuable as AI takes over programming and nutrition templates. His framing: &quot;What it doesn&apos;t do is when a client has some emotional and psychological barriers… this is where you come in, where AI can&apos;t, because you are the emotional stronghold to that client.&quot; Older PTs are usually better at the emotional-stronghold part because they&apos;ve lived through more of life. Sohail&apos;s clients have been with him 8–10 years — that retention is the whole game.</p>
-                <p>The thing nobody tells you: at PT Launch Lab, learners over 35 have <strong className="text-white">higher completion rates</strong> on the Level 3 course than under-25s. They&apos;re better at scheduling study around real life because they&apos;ve had to do that for years.</p>
+                <p>The thing nobody tells you: older learners are often <strong className="text-white">better at fitting study around real life</strong>, because they&apos;ve had to do that for years.</p>
               </div>
             </section>
 
@@ -179,10 +179,10 @@ export default function TooOldPage() {
               <div className="space-y-4">
                 {[
                   { stage: "Months 0–4", title: "Qualifying (Level 2 + Level 3)", body: "Fully online with video-assessed practical units. Most learners qualify in 8–16 weeks while still in their full-time role. Personal tutor response within 24 hours. The £500 Mentorship Hub is included in the fee." },
-                  { stage: "Months 4–6", title: "First paying clients", body: "Warm introduction to a partner gym across Yorkshire and the UK mean you walk into your first conversation with a foot already in the door. Most learners pick up 3–6 paying clients in this window." },
-                  { stage: "Months 6–12", title: "Replace day-job income", body: "Self-employed PTs in this stage typically hit £1,500–£3,000/month. Most career-changers leave their corporate role somewhere in months 9–12." },
-                  { stage: "Months 12–18", title: "£35k+ self-employed", body: "With a settled book of 15–25 weekly sessions plus referrals from your existing professional network, this is where most 40+ career changers land.", highlight: true },
-                  { stage: "Year 2+", title: "£50k–£80k+", body: "If you've added small group, online, or specialist niche income." },
+                  { stage: "Months 4–6", title: "First paying clients", body: "We introduce you to a partner gym when you qualify, so you walk into your first conversation with a foot already in the door. How quickly clients follow depends on your area and the hours you give it." },
+                  { stage: "Months 6–12", title: "Building your diary", body: "Many career-changers keep their day job until their PT diary can replace it. Typical UK session rates are in our salary guide; what you earn depends on your rates, your area and how many sessions you fill." },
+                  { stage: "Months 12–18", title: "A settled book", body: "Regular weekly clients plus referrals from your existing professional network. This is where a PT business starts to feel stable.", highlight: true },
+                  { stage: "Year 2+", title: "More income streams", body: "Many established PTs add small group, online, or a specialist niche." },
                 ].map((s) => (
                   <div key={s.stage} className={`rounded-2xl border p-5 ${s.highlight ? "border-gold/40 bg-gold/[0.04]" : "border-white/[0.07] bg-card"}`}>
                     <div className="flex flex-col md:flex-row md:items-baseline md:gap-4 mb-2">
