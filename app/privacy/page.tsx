@@ -124,7 +124,6 @@ export default function PrivacyPage() {
                 ...(CRM
                   ? [
                       "Google (Google Calendar) — scheduling. If you book a call with us, Google Calendar receives your name, email address and the details of your booking, to schedule calls you book with us.",
-                      "Calendly, for calls booked before we moved to our own booking page. Calendly received your name, email address and the details of your booking.",
                     ]
                   : [
                       "Calendly — appointment booking. If you book a call with us, Calendly receives your name, email address and the details of your booking.",

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     title: "Personal Trainer Salary UK 2026: The Real Numbers",
-    description: "Honest UK PT income breakdown: employed vs self-employed, postcode rates, what kills 80% of new PTs.",
+    description: "Honest UK PT income breakdown: employed vs self-employed, postcode rates, why so many new PTs quit.",
     url: PAGE_URL,
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function SalaryPage() {
               <span className="text-gold">the honest 2026 numbers.</span>
             </h1>
             <p className="text-xl text-soft/80 leading-relaxed mb-6">
-              A newly qualified personal trainer in the UK earns <strong className="text-white">£20,000–£28,000</strong> in their first year as an employed PT at a commercial chain. Self-employed PTs renting space hit <strong className="text-white">£35,000–£50,000+</strong> within 18 months. The top end — multi-stream PTs combining gym floor, online programmes, and group sessions — sits at <strong className="text-white">£80,000+</strong>.
+              A newly qualified personal trainer in the UK typically earns <strong className="text-white">£20,000–£28,000</strong> in their first year as an employed PT at a commercial chain. Self-employed PTs renting space can reach <strong className="text-white">£35,000–£50,000+</strong> once their diary is full. The top end — multi-stream PTs combining gym floor, online programmes, and group sessions — sits at <strong className="text-white">£80,000+</strong>.
             </p>
             <p className="text-lg text-soft/70 leading-relaxed mb-8">
-              Geography decides the ceiling more than anything else. Below: real numbers from PT Launch Lab podcast guests who&apos;ve actually built six-figure businesses, hired hundreds of trainers, and run gyms across Yorkshire and the UK.
+              These are industry estimates, not figures for PT Launch Lab learners or a promise of what you&apos;ll earn: income depends on your area, your rates and how many hours you fill. Geography decides the ceiling more than anything else. Below: real numbers from PT Launch Lab podcast guests who&apos;ve actually built six-figure businesses, hired hundreds of trainers, and run gyms across Yorkshire and the UK.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/pt-salary-calculator" className="px-7 py-3.5 rounded-full bg-gold text-deep font-bold text-sm hover:brightness-110 transition-all">Calculate Your PT Salary →</Link>
@@ -97,7 +97,7 @@ export default function SalaryPage() {
                 </div>
                 <div className="rounded-2xl border border-white/[0.07] bg-card p-6">
                   <h3 className="text-white font-bold text-xl mb-2">Tier 2: Self-employed PT renting gym space <span className="text-gold">— £30k–£60k</span></h3>
-                  <p className="text-soft/80 text-base leading-relaxed">You pay rent to a gym (typically £25–£200 per week depending on location), and every session you book is yours. Ryan Robinson — co-founder of PT Launch Lab and the guest of EP6 — described his first rental setup: &quot;My rent at the time were £25 a week and I had to work 30 unpaid hours… I were doing £10 a session. Five sessions for 50 quid.&quot; That was 13 years ago. Today, the same self-employed model with a full book at £35–£40 per session lands you £40k–£55k take-home in year two or three.</p>
+                  <p className="text-soft/80 text-base leading-relaxed">You pay rent to a gym (typically £25–£200 per week depending on location), and every session you book is yours. Ryan Robinson — co-founder of PT Launch Lab and the guest of EP6 — described his first rental setup: &quot;My rent at the time were £25 a week and I had to work 30 unpaid hours… I were doing £10 a session. Five sessions for 50 quid.&quot; That was 13 years ago. Today, the same self-employed model with a full book at £35–£40 per session can land £40k–£55k take-home by year two or three.</p>
                 </div>
                 <div className="rounded-2xl border border-white/[0.07] bg-card p-6">
                   <h3 className="text-white font-bold text-xl mb-2">Tier 3: Online PT <span className="text-gold">— £0–£250k, wildly variable</span></h3>
@@ -178,16 +178,16 @@ export default function SalaryPage() {
 
             <section>
               <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">
-                What kills PT income (why 80% quit in 12 months).
+                What kills PT income (why so many quit in year one).
               </h2>
-              <p className="text-soft/80 text-lg leading-relaxed mb-6">Sohail Rashid stated it cleanly on EP32: <strong className="text-white">&quot;The average lifespan of a PT — particularly under 90 days, 12 months — means that not enough PTs get there. They never give themselves a chance.&quot;</strong> The industry quit-rate for newly qualified PTs is around 80% within 12–18 months. Five income-killers:</p>
+              <p className="text-soft/80 text-lg leading-relaxed mb-6">Sohail Rashid stated it cleanly on EP32: <strong className="text-white">&quot;The average lifespan of a PT — particularly under 90 days, 12 months — means that not enough PTs get there. They never give themselves a chance.&quot;</strong> Many newly qualified PTs leave the industry within their first year or two. Five income-killers:</p>
               <ol className="space-y-5">
                 {[
                   { title: "Undercharging", body: "Mac Livock (EP8): \"I charged really low when I started because how I had the wrong mentality… X amount of money, cheap price was better than nothing.\" £15/session leaves you working 50 hours to gross £750. The realistic UK base rate in 2026 is £25–£30/hour." },
                   { title: "No business systems", body: "EP10 (Ryan's £500K shutdown): \"The business skills is massive. As you move along and you get more clients, you have to get new skills.\" PTs without invoicing, contracts, no-show policies, or cashflow tracking burn out by month six." },
                   { title: "Gym-floor-only thinking", body: "Mac on EP8: \"The gym is where most PTs pick up their first clients.\" If you don't post, don't email, don't run group sessions, you're capped at the foot traffic in your one gym." },
                   { title: "No client follow-up", body: "Ryan on EP6: \"Each time you do that opens another door, opens another window of opportunity to get more clients.\" PTs who ghost ex-clients lose 40–60% of their potential income from re-engagement and referrals." },
-                  { title: "Saturation panic", body: "Callum on EP7: \"As of 2022, there is currently 69,000 registered PTs in the UK… every single industry is oversaturated.\" The 80% who quit blame saturation. The 20% who stay simply build a niche and a CV." },
+                  { title: "Saturation panic", body: "Callum on EP7: \"As of 2022, there is currently 69,000 registered PTs in the UK… every single industry is oversaturated.\" The ones who quit tend to blame saturation. The ones who stay build a niche and a CV." },
                 ].map((k, i) => (
                   <li key={k.title} className="flex gap-4">
                     <span className="font-display font-extrabold text-gold text-3xl leading-none shrink-0 w-10">{i + 1}.</span>
