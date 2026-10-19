@@ -245,5 +245,25 @@
     ],
     "canonicalPath": "/muscle-makers-academy",
     "logoHasAlpha": false
+  },
+  "imperium-strength": {
+    "gymName": "Imperium Strength",
+    "primaryColor": "#836B33",
+    "darkAccent": "#BFA25F",
+    "heroBg": "#13100B",
+    "sectionBg": "#1F1A14",
+    "logoUrl": "/gym-logos/imperium-strength.png",
+    "promoCode": null,
+    "location": "Chichester, West Sussex",
+    "adTown": "Chichester",
+    "siteUrl": "https://imperium-strength.com",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "At Imperium\\nStrength"
+    ],
+    "canonicalPath": "/imperium-strength-academy",
+    "logoHasAlpha": true
   }
 }

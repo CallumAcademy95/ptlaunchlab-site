@@ -25,6 +25,7 @@ import { atpFelixstoweAcademy } from "./atp-felixstowe-academy.ts";
 import { eborFitness } from "./ebor-fitness.ts";
 import { gymNGoAcademy } from "./gym-n-go-academy.ts";
 import { hitioOrpingtonAcademy } from "./hitio-orpington-academy.ts";
+import { imperiumStrengthAcademy } from "./imperium-strength-academy.ts";
 import { ironwolfGym } from "./ironwolf-gym.ts";
 import { mofGym } from "./mof-gym.ts";
 import { muscleBoundAcademy } from "./muscle-bound-academy.ts";
@@ -39,6 +40,7 @@ export const GYMS: Record<string, GymConfig> = {
   "ebor-fitness": eborFitness,
   "gym-n-go-academy": gymNGoAcademy,
   "hitio-orpington-academy": hitioOrpingtonAcademy,
+  "imperium-strength-academy": imperiumStrengthAcademy,
   "ironwolf-gym": ironwolfGym,
   "mof-gym": mofGym,
   "muscle-bound-academy": muscleBoundAcademy,

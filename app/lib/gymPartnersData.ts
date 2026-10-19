@@ -36,6 +36,9 @@ export const gymPartners = [
   // for dark backgrounds: black ink turned white, yellow kept. The mono copy keys
   // only the black ink, which leaves the lettering as white outlines.
   { name: "Muscle Makers Gym",     src: "/logos/muscle-makers-dark.png",  dark: true, lightTile: false, mono: "/logos/mono/muscle-makers.png", monoSize: [113, 108] },
+  // Gold on transparent, cut out of their og:image; reads on navy as it is
+  // (6.9:1). The mono copy is the same alpha in white.
+  { name: "Imperium Strength",     src: "/logos/imperium-strength.png",   dark: true, lightTile: false, mono: "/logos/mono/imperium-strength.png", monoSize: [117, 108] },
   // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
   // and still missing here, because no logo file exists anywhere in the repo.
   // Drop one at public/logos/superflex.png and add the row.

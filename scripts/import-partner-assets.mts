@@ -40,6 +40,7 @@ const FOLDER_TO_SLUG: Record<string, string> = {
   "ebor": "ebor",
   "gym n go": "gym-n-go",
   "hitio-orpington": "hitio-orpington",
+  "imperium-strength": "imperium-strength",
   "iron wolf": "ironwolf",
   "ministry of fitness": "mof",
   "musclebound": "muscle-bound",
