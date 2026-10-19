@@ -83,7 +83,7 @@ test("the source file yields the expected number of fenced blocks", () => {
 });
 
 test("every fenced copy block, for every real gym, clears the claim gate", () => {
-  assert.ok(REAL.length === 11, `expected 11 real gyms in gym-brands.json, found ${REAL.length}`);
+  assert.ok(REAL.length === 12, `expected 12 real gyms in gym-brands.json, found ${REAL.length}`);
 
   for (const [slug, brand] of REAL) {
     const tokens = tokensForGym(brand, "https://ptlaunchlab.co.uk");

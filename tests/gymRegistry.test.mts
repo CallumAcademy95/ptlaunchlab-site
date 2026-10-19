@@ -106,6 +106,7 @@ const GYM_SLUG_BY_ROUTE: Record<string, string> = {
   "ebor-fitness": "ebor",
   "gym-n-go-academy": "gym-n-go",
   "hitio-orpington-academy": "hitio-orpington",
+  "imperium-strength-academy": "imperium-strength",
   "ironwolf-gym": "ironwolf",
   "mof-gym": "mof",
   "muscle-bound-academy": "muscle-bound",

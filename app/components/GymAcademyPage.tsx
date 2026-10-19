@@ -14,6 +14,7 @@ import GymCallbackForm from "@/app/components/GymCallbackForm";
 import GymCtaLink from "@/app/components/GymCtaLink";
 import StickyCtaBar from "@/app/components/cta/StickyCtaBar";
 import NapLine from "@/app/components/NapLine";
+import { readableOn } from "@/app/lib/readableOn";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
 /** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
@@ -34,6 +35,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
   const bg = c.heroBg ?? "#000000";
   const sectionBg = c.sectionBg ?? c.primaryColor;
   const dark = c.darkAccent ?? c.primaryColor;
+  // Type on an accent-filled pill: white only where white actually reads.
+  // Ebor's accent IS white, and several others are bright yellow/orange/gold.
+  const onDark = readableOn(dark, ["#FFFFFF", bg]);
   const enrolPath = `${c.canonicalPath}/enrol`;
   // Prices come from app/lib/pricing.ts and are the same on every gym's page
   // as everywhere else: £999.99 in full or 10 × £99.99 a month. No "was"
@@ -91,11 +95,11 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
                 <span className="text-white text-sm font-bold">Save {ATP_CODE_SAVING} with your ATP member code</span>
               </div>
             ) : (
-              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-5 py-2.5 mb-5 md:mb-8" style={{ backgroundColor: dark }}>
-                <span className="text-white font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
-                <span className="text-white/80 text-sm">Everything included · Flexible ways to pay at checkout</span>
+              <div className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl px-5 py-2.5 mb-5 md:mb-8" style={{ backgroundColor: dark, color: onDark }}>
+                <span className="font-black text-xl uppercase tracking-wide">{COURSE_PRICE_LABEL}</span>
+                <span className="text-sm opacity-90">Everything included · Flexible ways to pay at checkout</span>
                 {memberPriceLabel && (
-                  <span className="text-white text-sm font-bold">· Member price {memberPriceLabel} in full</span>
+                  <span className="text-sm font-bold">· Member price {memberPriceLabel} in full</span>
                 )}
               </div>
             )}
