@@ -4,6 +4,7 @@ import Footer from "@/app/components/Footer";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
 import CalendlyCallLink from "./CalendlyCallLink";
+import PartnerGymsStrip from "./PartnerGymsStrip";
 import { PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "@/app/lib/pricing";
 import {
   LADDER_MONTHLY_COMMISSION_PENCE,
@@ -186,6 +187,9 @@ export default function GymPartnershipPage() {
             </div>
           </div>
         </section>
+
+        {/* ── PARTNER GYMS ──────────────────────────── */}
+        <PartnerGymsStrip />
 
         {/* ── PROBLEM / SOLUTION ────────────────────── */}
         <section className="bg-surface py-20 md:py-28">
