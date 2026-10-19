@@ -61,9 +61,13 @@ export const TEMPLATES = [
   "start-your-own-personal-training-business",
 ];
 
-/** Templates that also have a real page at the bare path; those bare paths stay live. */
+/**
+ * Templates that also have a real page at the bare path; those bare paths stay live.
+ * best-personal-trainer-course-uk had one until Oct 2026; its bare path now
+ * 308s to /online-personal-trainer-course-uk (a rule in next.config.ts that
+ * sits before these).
+ */
 export const TEMPLATES_WITH_OWN_PAGE = [
-  "best-personal-trainer-course-uk",
   "personal-trainer-course-with-business-support",
 ];
 

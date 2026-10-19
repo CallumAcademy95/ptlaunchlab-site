@@ -12,16 +12,18 @@ const PAGE_URL = "https://ptlaunchlab.co.uk/online-personal-trainer-course-uk";
 // Static dates. Previously computed with new Date() at build time, which told
 // Google the article was published and modified afresh on every deploy.
 const PUBLISHED = "2026-05-05";
-const UPDATED = "2026-07-27";
+const UPDATED = "2026-10-19";
 
+// Also the target for "best pt course uk": /best-personal-trainer-course-uk
+// 308s here since the Oct 2026 audit, so the title carries "Best".
 export const metadata: Metadata = {
-  title: "Online Personal Trainer Course UK 2026: Level 3 Buyer's Guide",
+  title: "Best Online Personal Trainer Course UK 2026: Level 3 Compared",
   description:
     "The complete UK guide to online personal trainer courses. Compare 10 providers (HFE, Train Fitness, OriGym, PT Launch Lab and more) on price, accreditation, mentorship and earnings. Written by gym owners who've hired 500+ PTs.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "article",
-    title: "Online Personal Trainer Course UK 2026: Honest Buyer's Guide",
+    title: "Best Online Personal Trainer Course UK 2026: 10 Compared",
     description:
       "Compare 10 UK online PT courses on price, accreditation, mentorship and earnings. Written by gym owners who've hired 500+ PTs.",
     url: PAGE_URL,
@@ -68,7 +70,7 @@ const faqs = [
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "Online Personal Trainer Course UK 2026: Honest Buyer's Guide",
+  headline: "Best Online Personal Trainer Course UK 2026: 10 Providers Compared",
   description:
     "Comprehensive guide to UK online personal trainer courses. Compares 10 providers on price, accreditation, mentorship and earnings — from a UK gym-owner perspective.",
   url: PAGE_URL,
@@ -139,7 +141,7 @@ export default function OnlinePtCourseUkPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <Breadcrumbs trail={[{ name: "Online Personal Trainer Course UK", url: PAGE_URL }]} />
+      <Breadcrumbs trail={[{ name: "Best Online Personal Trainer Course UK", url: PAGE_URL }]} />
 
       <Nav />
       <main className="pt-[72px]">
@@ -153,8 +155,8 @@ export default function OnlinePtCourseUkPage() {
               The Honest Buyer's Guide · Updated 2026
             </p>
             <h1 className="font-display font-extrabold text-4xl md:text-6xl text-white leading-none tracking-tight mb-6">
-              Online Personal Trainer Course UK:{" "}
-              <span className="text-gold">the honest 2026 guide.</span>
+              The best online personal trainer course in the UK:{" "}
+              <span className="text-gold">10 compared, honestly.</span>
             </h1>
             <p className="text-xl text-soft/80 leading-relaxed mb-6">
               An online personal trainer course in the UK is an Ofqual-regulated Level 3 qualification — usually awarded by NCFE or Focus Awards — that you can complete 100% online in 8 to 16 weeks. It bundles the Level 2 Gym Instructor and Level 3 Personal Trainer units, lets you legally take paying clients, and gets you onto the CIMSPA register.

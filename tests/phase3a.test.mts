@@ -78,7 +78,7 @@ test("ConversionSection keeps the base band colour; home keeps surface", () => {
 });
 
 test("guide pages use the two new hero buttons", () => {
-  for (const d of ["best-personal-trainer-course-uk", "personal-trainer-course-near-me", "personal-trainer-course-with-business-support", "personal-trainer-mentorship-uk", "self-employed-personal-trainer-uk"]) {
+  for (const d of ["personal-trainer-course-near-me", "personal-trainer-course-with-business-support", "personal-trainer-mentorship-uk", "self-employed-personal-trainer-uk"]) {
     const s = src(`app/${d}/page.tsx`);
     assert.match(s, /<TwoWayCTA source="guide-hero" \/>/, d);
     assert.doesNotMatch(s, /Discover Your Pathway|Start Today/, d);

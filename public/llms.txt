@@ -1,6 +1,6 @@
 # PT Launch Lab
 
-> PT Launch Lab is a UK-based personal trainer academy founded by gym owners Callum Brown, Miles, and Ryan. We offer NCFE Level 2 & 3 Personal Trainer qualifications — 100% online, Ofqual regulated, CIMSPA recognised — with business mentorship, personal tutors, and guaranteed gym interviews built in. Based in Pontefract, West Yorkshire.
+> PT Launch Lab is a UK-based personal trainer academy founded by gym owners Callum Brown, Miles, and Ryan. We offer NCFE Level 2 & 3 Personal Trainer qualifications — 100% online, Ofqual regulated, CIMSPA recognised — with business mentorship, personal tutors, and a guaranteed gym introduction built in. Based in Pontefract, West Yorkshire.
 
 ## Key Pages
 
@@ -10,6 +10,27 @@
 - [Book a Call](https://ptlaunchlab.co.uk/book-call): Free 15-minute consultation with the founders
 - [About](https://ptlaunchlab.co.uk/about): Our story, founders' backgrounds, values, and podcast
 - [Quiz](https://ptlaunchlab.co.uk/quiz): Skills assessment to see if PT is right for you
+- [Reviews](https://ptlaunchlab.co.uk/reviews): Learner reviews of the course, quoted in full from our Google profile
+- [Graduates](https://ptlaunchlab.co.uk/graduates): People who qualified with us and what they do now
+
+## Guides
+
+- [How to become a personal trainer in the UK](https://ptlaunchlab.co.uk/how-to-become-a-personal-trainer-uk): The 5-step route from deciding to your first paying clients, with costs and timelines
+- [Best online personal trainer course UK](https://ptlaunchlab.co.uk/online-personal-trainer-course-uk): 10 UK PT course providers compared on price, awarding body, support and who each suits
+- [Personal trainer course near me](https://ptlaunchlab.co.uk/personal-trainer-course-near-me): How an online course works wherever you live, including video-assessed practicals
+- [Are online PT qualifications recognised by UK gyms?](https://ptlaunchlab.co.uk/are-online-pt-qualifications-recognised-by-uk-gyms): What employers, CIMSPA and insurers accept
+- [Personal trainer salary UK](https://ptlaunchlab.co.uk/personal-trainer-salary-uk): What PTs earn, employed vs self-employed, and why many quit early
+- [PT salary calculator](https://ptlaunchlab.co.uk/pt-salary-calculator): Estimate earnings by region, hours and rate
+- [Self-employed personal trainer UK](https://ptlaunchlab.co.uk/self-employed-personal-trainer-uk): Rates, insurance and building a client base
+- [Too old to become a personal trainer?](https://ptlaunchlab.co.uk/too-old-to-become-a-personal-trainer): Starting as a PT in your 30s, 40s or 50s
+- [Personal trainer mentorship UK](https://ptlaunchlab.co.uk/personal-trainer-mentorship-uk): The Mentorship Hub included with the course
+- [Personal trainer course in Pontefract](https://ptlaunchlab.co.uk/personal-trainer-course-pontefract) and [West Yorkshire](https://ptlaunchlab.co.uk/personal-trainer-course-west-yorkshire): Our home area
+- [All guides](https://ptlaunchlab.co.uk/hub)
+
+## For Gym Owners
+
+- [Gym Partnership](https://ptlaunchlab.co.uk/gym-partnership): A white-label PT academy under a gym's own brand. We teach, assess and certify; the gym pays nothing to join and is paid per learner. One partner gym per area
+- [How to add a PT academy to your gym](https://ptlaunchlab.co.uk/how-to-add-a-pt-academy-to-your-gym): Approved centre vs licence vs partnership, compared for UK gym owners
 
 ## Podcast
 
@@ -31,12 +52,13 @@ The complete episode list is in the sitemap: https://ptlaunchlab.co.uk/sitemap.x
 ## Key Facts
 
 - Qualification: NCFE Level 2 & 3 Personal Trainer Certificate (Ofqual regulated, CIMSPA recognised)
-- Duration: 4–8 weeks (self-paced, fully online)
+- Duration: most learners finish in 8–16 weeks (self-paced, fully online; practical units assessed by video)
 - Price: £999.99 paid in full, or 10 monthly payments of £99.99 with no interest (first payment at checkout, £999.90 in total). No discounts or promo codes. Rolling enrolment: start any day
 - The £500 Mentorship Hub is included in the fee at no extra cost
 - Founders have hired 500+ personal trainers across their gym businesses
 - 5.0★ Google rating
-- Guaranteed gym interviews with partner gyms on qualification
+- A guaranteed gym introduction on qualification: we approach at least one gym for the learner, from our partner network or local to them. Whether the gym interviews and hires is the gym's decision
+- Who it suits best: career changers who want help getting their first clients, not just the certificate
 - Personal tutor assigned throughout the course
 - Business training included as a core module (not optional)
 - Based in Pontefract, West Yorkshire, UK
