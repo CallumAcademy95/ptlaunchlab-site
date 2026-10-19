@@ -5,6 +5,8 @@ import Breadcrumbs from "@/app/components/Breadcrumbs";
 import PartnershipForm from "./PartnershipForm";
 import CalendlyCallLink from "./CalendlyCallLink";
 import PartnerGymsStrip from "./PartnerGymsStrip";
+import { GYM_PARTNER_FAQ, gymPartnerFaqSchema } from "./faq";
+import Link from "next/link";
 import { PARTNER_FEE_RELEASE_PAYMENT, formatPence } from "@/app/lib/pricing";
 import {
   LADDER_MONTHLY_COMMISSION_PENCE,
@@ -25,15 +27,19 @@ const MONTHLY_FEE_VOLUME = formatPence(LADDER_MONTHLY_COMMISSION_PENCE + VOLUME_
 const PARTNER_FEE_LABEL = `up to ${PIF_FEE_VOLUME}`;
 const RELEASE_ORDINAL = `${PARTNER_FEE_RELEASE_PAYMENT}th`;
 
+// Title and description lead with the phrases gym owners actually search
+// ("gym partnership", "PT academy", "personal trainer course") rather than the
+// brand line. Search Console, Oct 2026: partner enquiries arrive from Google on
+// this page, but almost only from brand searches.
 export const metadata: Metadata = {
-  title: "Gym Partnership Programme | PT Launch Lab — A New Revenue Stream at Zero Cost",
+  title: "Gym Partnership: Add a PT Academy to Your Gym | PT Launch Lab",
   description:
-    `A new revenue stream for your gym at zero cost, and a home-grown pipeline of trainers. Run your own white-label PT academy and earn ${PARTNER_FEE_LABEL} (inc. VAT) per learner. We do the teaching and admin.`,
+    `Add a white-label personal trainer academy to your gym at zero cost. NCFE Level 2 & 3 PT course, taught and assessed by us. Earn ${PARTNER_FEE_LABEL} (inc. VAT) per learner. One partner gym per area.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/gym-partnership",
   },
   openGraph: {
-    title: "Gym Partnership Programme | PT Launch Lab",
+    title: "Gym Partnership: Add a PT Academy to Your Gym | PT Launch Lab",
     description:
       `A new revenue stream for your gym at zero cost. Up to ${PIF_FEE_VOLUME} (inc. VAT) per learner who enrols through your academy, and trainers grown from your own members. We handle education, compliance & mentorship.`,
     url: "https://ptlaunchlab.co.uk/gym-partnership",
@@ -119,6 +125,10 @@ export default function GymPartnershipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(partnershipSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(gymPartnerFaqSchema) }}
+      />
       <Breadcrumbs trail={[{ name: "Gym Partnership", url: "https://ptlaunchlab.co.uk/gym-partnership" }]} />
       <Nav />
       <main className="pt-[72px]">
@@ -140,13 +150,13 @@ export default function GymPartnershipPage() {
               </div>
 
               <h1 className="font-display font-extrabold text-5xl sm:text-6xl md:text-7xl text-white leading-none tracking-tight mb-6">
-                Add a New<br />
-                <span className="text-gold">Revenue Stream</span><br />
+                Add a<br />
+                <span className="text-gold">PT Academy</span><br />
                 <span className="text-white">to Your Gym.</span>
               </h1>
 
               <p className="text-xl text-soft/70 leading-relaxed mb-10 max-w-xl">
-                We build, run, and manage a fully white-label PT academy inside your gym.
+                A new revenue stream at zero cost. We build, run, and manage a fully white-label PT academy inside your gym.
                 <strong className="text-white"> {PARTNER_FEE_LABEL} per learner (inc. VAT)</strong>, and a home-grown pipeline of trainers who already know your gym.
                 Zero teaching. Zero admin. Zero cost to you.
               </p>
@@ -437,6 +447,31 @@ export default function GymPartnershipPage() {
               They have a <span className="text-gold">pipeline problem.</span>
             </p>
             <p className="text-soft/60 text-lg">Grow your own trainers instead of waiting for the right one to apply.</p>
+          </div>
+        </section>
+
+        {/* ── FAQ ───────────────────────────────────── */}
+        <section className="bg-base py-20 md:py-28">
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="text-center mb-12">
+              <p className="text-faint text-xs font-bold tracking-widest uppercase mb-3">Questions</p>
+              <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-3">Gym owner FAQs</h2>
+              <p className="text-soft/60">
+                Weighing up your options? Read{" "}
+                <Link href="/how-to-add-a-pt-academy-to-your-gym" className="text-gold hover:underline font-semibold">how to add a PT academy to your gym</Link>.
+              </p>
+            </div>
+            <div className="space-y-3">
+              {GYM_PARTNER_FAQ.map(({ q, a }) => (
+                <details key={q} className="group bg-card rounded-2xl border border-white/[0.07] p-6 open:border-gold/25">
+                  <summary className="cursor-pointer list-none flex items-start justify-between gap-4">
+                    <h3 className="text-white font-bold text-base">{q}</h3>
+                    <span className="text-gold text-xl leading-none shrink-0 transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="text-soft/70 text-sm leading-relaxed mt-4">{a}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
