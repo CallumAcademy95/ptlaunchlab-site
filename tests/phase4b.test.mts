@@ -368,11 +368,21 @@ test("the [location] templates are gone; the module lists all 31 of them", async
   const left = walk(join(ROOT, "app")).filter((f) => /[\\/]\[location\][\\/]/.test(f));
   assert.deepEqual(left, [], "no [location] route remains");
   for (const t of TEMPLATES) assert.ok(!existsSync(join(ROOT, "app", t, "[location]")), t);
-  // Only two templates ever had a root page; they stay.
-  for (const t of ["best-personal-trainer-course-uk", "personal-trainer-course-with-business-support"]) {
-    assert.ok(TEMPLATES.includes(t), t);
-    assert.ok(pageExists(`/${t}`), t);
-  }
+  // Only two templates ever had a root page. One stays; the other was merged
+  // into the online guide in the Oct 2026 SEO audit and 308s there.
+  assert.ok(TEMPLATES.includes("personal-trainer-course-with-business-support"));
+  assert.ok(pageExists("/personal-trainer-course-with-business-support"));
+  assert.ok(TEMPLATES.includes("best-personal-trainer-course-uk"));
+  assert.ok(!pageExists("/best-personal-trainer-course-uk"));
+});
+
+test("the old best-course page 308s to the online guide, which is a real page", async () => {
+  const rules = await configRedirects();
+  const r = resolve(rules, "/best-personal-trainer-course-uk");
+  assert.equal(r?.destination, "/online-personal-trainer-course-uk");
+  assert.equal(r?.permanent, true);
+  assert.ok(pageExists("/online-personal-trainer-course-uk"));
+  assert.equal(resolve(rules, "/online-personal-trainer-course-uk"), null);
 });
 
 test("4. every location slug in the data maps to Pontefract, West Yorkshire or /courses, by region", async () => {
@@ -423,6 +433,7 @@ test("4. bare template paths go to /courses unless the template has its own page
   for (const t of TEMPLATES) {
     const r = resolve(rules, `/${t}`);
     if (pageExists(`/${t}`)) assert.equal(r, null, `/${t} is a real page`);
+    else if (t === "best-personal-trainer-course-uk") continue; // merged into the online guide; tested above
     else {
       assert.equal(r?.destination, "/courses", `/${t}`);
       assert.equal(r?.permanent, true);

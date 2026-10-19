@@ -10,6 +10,20 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
+// Site-wide links to the guides. Oct 2026 audit: nothing on the home page or
+// footer linked to them, and Google had left the main guides "crawled -
+// currently not indexed". A link from every page tells Google they matter.
+const guideLinks = [
+  { label: "How to become a PT in the UK", href: "/how-to-become-a-personal-trainer-uk" },
+  { label: "Best online PT courses compared", href: "/online-personal-trainer-course-uk" },
+  { label: "PT salary UK", href: "/personal-trainer-salary-uk" },
+  { label: "PT course near me", href: "/personal-trainer-course-near-me" },
+  { label: "Too old to become a PT?", href: "/too-old-to-become-a-personal-trainer" },
+  { label: "Reviews", href: "/reviews" },
+  { label: "For gym owners", href: "/gym-partnership" },
+  { label: "All guides", href: "/hub" },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-deep border-t border-white/[0.06] py-12">
@@ -72,6 +86,19 @@ export default function Footer() {
             </a>
           </div>
         </div>
+
+        {/* Guides row */}
+        <nav aria-label="Guides" className="flex flex-wrap justify-center gap-x-5 gap-y-2 mb-8">
+          {guideLinks.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-soft/40 hover:text-white text-xs transition-colors"
+            >
+              {l.label}
+            </a>
+          ))}
+        </nav>
 
         {/* Bottom row */}
         <div className="border-t border-white/[0.05] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-faint text-xs">

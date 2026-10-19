@@ -111,6 +111,15 @@ const nextConfig: NextConfig = {
         destination: "https://www.ptlaunchlab.co.uk/",
         permanent: true,
       },
+      // Oct 2026 SEO audit: this page and the online guide split "best pt
+      // course uk" between them and neither ranked (both ~position 45). The
+      // online guide is the real 10-provider comparison, so it takes both.
+      // Before the location rules so the bare path wins.
+      {
+        source: "/best-personal-trainer-course-uk",
+        destination: "/online-personal-trainer-course-uk",
+        permanent: true,
+      },
       // The pruned [location] templates: one permanent hop to the nearest
       // real page, generated from the location data (app/lib/locationRedirects.ts).
       ...locationRedirects(),

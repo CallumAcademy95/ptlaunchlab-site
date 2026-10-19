@@ -171,7 +171,6 @@ test("every footer renders the NAP line", () => {
 const TITLE_PAGES = [
   "app/page.tsx",
   "app/courses/page.tsx",
-  "app/best-personal-trainer-course-uk/page.tsx",
   "app/online-personal-trainer-course-uk/page.tsx",
   "app/how-to-become-a-personal-trainer-uk/page.tsx",
   "app/personal-trainer-course-near-me/page.tsx",

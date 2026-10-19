@@ -48,7 +48,6 @@ export const HUB_ENTRIES: HubEntry[] = [
   // Start here
   { href: "/how-to-become-a-personal-trainer-uk", title: "How to become a personal trainer in the UK", blurb: "The full step-by-step route: qualifications, cost, and timeline.", cluster: "start", kind: "guide" },
   { href: "/become-a-personal-trainer-uk", title: "Become a personal trainer", blurb: "Where to start if the gym's already your happy place.", cluster: "start", kind: "guide" },
-  { href: "/best-personal-trainer-course-uk", title: "Best personal trainer course in the UK", blurb: "How to tell a real qualification from a £29 weekend cert.", cluster: "start", kind: "guide" },
   { href: "/personal-trainer-course-near-me", title: "Personal trainer courses near you", blurb: "Study online from anywhere in the UK, assess at any gym.", cluster: "start", kind: "guide" },
 
   // Qualifications & recognition
@@ -75,6 +74,7 @@ export const HUB_ENTRIES: HubEntry[] = [
   { href: "/quiz", title: "60-second PT fit quiz", blurb: "See whether PT is a realistic next step for your situation.", cluster: "tools", kind: "tool" },
 
   // Proof & people
+  { href: "/reviews", title: "PT Launch Lab reviews", blurb: "What learners say about the course, quoted in full from Google.", cluster: "proof", kind: "proof" },
   { href: "/graduates", title: "Our graduates", blurb: "Real people who qualified and built coaching careers with us.", cluster: "proof", kind: "proof" },
   { href: "/podcast", title: "The podcast", blurb: "Honest conversations on the industry, from people who hire PTs.", cluster: "proof", kind: "page" },
   { href: "/about", title: "About PT Launch Lab", blurb: "Gym owners who've hired 500+ trainers — and why we built this.", cluster: "proof", kind: "page" },
