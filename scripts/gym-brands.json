@@ -265,5 +265,25 @@
     ],
     "canonicalPath": "/imperium-strength-academy",
     "logoHasAlpha": true
+  },
+  "mclub": {
+    "gymName": "M Club",
+    "primaryColor": "#004B47",
+    "darkAccent": "#C9B383",
+    "heroBg": "#002F2C",
+    "sectionBg": "#003D3A",
+    "logoUrl": "/gym-logos/mclub.png",
+    "promoCode": null,
+    "location": "Stoke-on-Trent, Staffordshire",
+    "adTown": "Stoke-on-Trent",
+    "siteUrl": "https://mclubspaandfitness.co.uk",
+    "heroSubline": "Train. Qualify. Earn.",
+    "heroHeadline": [
+      "Become a Qualified",
+      "Personal Trainer",
+      "At M Club"
+    ],
+    "canonicalPath": "/mclub-academy",
+    "logoHasAlpha": true
   }
 }

@@ -108,6 +108,7 @@ const GYM_SLUG_BY_ROUTE: Record<string, string> = {
   "hitio-orpington-academy": "hitio-orpington",
   "imperium-strength-academy": "imperium-strength",
   "ironwolf-gym": "ironwolf",
+  "mclub-academy": "mclub",
   "mof-gym": "mof",
   "muscle-bound-academy": "muscle-bound",
   "muscle-makers-academy": "muscle-makers",
