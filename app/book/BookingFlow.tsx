@@ -9,7 +9,7 @@ type Prefill = { name: string | null; email: string | null; phone: string | null
 const dayKey = (iso: string) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", weekday: "short", day: "numeric", month: "short" }).format(new Date(iso));
 const timeOnly = (label: string) => label.split(", ").pop() ?? label;
 
-export default function BookingFlow({ callType, questions, prefill, token }: { callType: CallType; questions: Question[]; prefill: Prefill; token: string | null }) {
+export default function BookingFlow({ callType, questions, prefill, token, onBooked }: { callType: CallType; questions: Question[]; prefill: Prefill; token: string | null; onBooked?: (r: { label: string }) => void }) {
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [day, setDay] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export default function BookingFlow({ callType, questions, prefill, token }: { c
       body: JSON.stringify({ type: callType, startIso: pick.iso, ...form, answers, t: token }),
     }).then((x) => x.json()).catch(() => ({ ok: false, error: "Something went wrong. Please try again." }));
     setBusy(false);
-    if (r.ok) { setDone({ label: r.label, phone: r.phone, manageUrl: r.manageUrl }); return; }
+    if (r.ok) { setDone({ label: r.label, phone: r.phone, manageUrl: r.manageUrl }); onBooked?.({ label: r.label }); return; }
     setError(r.error ?? "Something went wrong.");
     if (r.taken) {
       setPick(null);
