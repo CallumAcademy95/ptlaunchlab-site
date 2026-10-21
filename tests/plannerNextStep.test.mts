@@ -1,3 +1,4 @@
+import { signNextToken, verifyNextToken, nextTokenSecret, NEXT_TOKEN_TTL_MS } from "../app/lib/plannerNextToken.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -90,4 +91,26 @@ test("commitment card shows for Prime and Strong only", () => {
   assert.equal(showCommitmentCard("prime"), true);
   assert.equal(showCommitmentCard("strong"), true);
   assert.equal(showCommitmentCard("nurture"), false);
+});
+
+test("next token round-trips, and rejects tamper, expiry, wrong secret and junk", () => {
+  const now = 1_800_000_000_000;
+  const t = signNextToken("lead-123", now + NEXT_TOKEN_TTL_MS, "s3cret");
+  assert.equal(verifyNextToken(t, "s3cret", now), "lead-123");
+  assert.equal(verifyNextToken(t, "other", now), null);
+  assert.equal(verifyNextToken(t, "s3cret", now + NEXT_TOKEN_TTL_MS + 1), null);
+  const [p, s] = t.split(".");
+  const forged = Buffer.from(JSON.stringify({ l: "lead-999", e: now + 1e9 })).toString("base64url");
+  assert.equal(verifyNextToken(`${forged}.${s}`, "s3cret", now), null);
+  assert.equal(verifyNextToken(`${p}.${s}.x`, "s3cret", now), null);
+  assert.equal(verifyNextToken(42, "s3cret", now), null);
+  assert.equal(verifyNextToken(t, "", now), null);
+});
+
+test("next token secret is derived from the service role key, and empty without it", () => {
+  assert.equal(nextTokenSecret({}), "");
+  const a = nextTokenSecret({ SUPABASE_SERVICE_ROLE_KEY: "k" });
+  assert.equal(a.length, 64);
+  assert.notEqual(a, "k");
+  assert.equal(a, nextTokenSecret({ SUPABASE_SERVICE_ROLE_KEY: "k" }));
 });

@@ -12,6 +12,7 @@ import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { sendOwnerPush, type OwnerPushDb } from "@/app/lib/owner-push";
 import { newLeadPush, pushStatus, type LeadRow } from "@/app/lib/leads";
 import { insertDirect, plannerLead, plannerPushNeeded } from "@/app/lib/directLeads";
+import { signNextToken, nextTokenSecret, NEXT_TOKEN_TTL_MS } from "@/app/lib/plannerNextToken";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/career-planner (v2)
@@ -77,7 +78,11 @@ export async function POST(request: NextRequest) {
     const leadId = "id" in saved ? saved.id : null;
 
     // 2. Respond. Everything else is background and non-fatal.
-    const response = NextResponse.json({ success: true, lead: true, plan });
+    // nextToken lets the result page record its next step against THIS row only.
+    // No row (save failed) or no secret: null, and the page still works, it just doesn't record.
+    const secret = nextTokenSecret();
+    const nextToken = leadId && secret ? signNextToken(leadId, Date.now() + NEXT_TOKEN_TTL_MS, secret) : null;
+    const response = NextResponse.json({ success: true, lead: true, plan, nextToken });
     logSec({ level: "security", endpoint: ENDPOINT, outcome: "accepted", signals: [], ip, email_domain: d.email.split("@")[1] });
 
     const userData = {
