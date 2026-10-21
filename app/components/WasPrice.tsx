@@ -20,8 +20,11 @@ export default function WasPrice({ note = false, className = "", reserve = false
   const placeholder = state === "pending";
   return (
     <span className={`inline-flex flex-col leading-tight ${placeholder ? "invisible" : ""} ${className}`} aria-hidden={placeholder || undefined}>
-      <span className="line-through opacity-60 text-[0.85em] font-semibold" aria-label={`was ${WAS_PRICE_LABEL}`}>
-        {WAS_PRICE_LABEL}
+      {/* "Was" is real text, not just a strikethrough or aria-label: anything reading the page as
+          text (AI assistants, search snippets) otherwise sees two prices side by side. */}
+      <span className="opacity-60 text-[0.85em] font-semibold">
+        <span className="font-normal">Was </span>
+        <del>{WAS_PRICE_LABEL}</del>
       </span>
       {note && <span className="text-xs font-normal opacity-80 not-italic">{PRICE_DROP_NOTE}</span>}
     </span>
