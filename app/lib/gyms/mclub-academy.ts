@@ -1,16 +1,15 @@
 import type { GymConfig } from "@/app/lib/gymPartnerConfig";
 
 // Built 20 Oct 2026 ahead of signing, from their public site, so it can go
-// live the day the agreement comes back. Their own marketing material may
-// replace the copy and photos then.
+// live the day the agreement comes back. Logo and photos replaced with the
+// originals M Club sent on 21 Oct.
 export const mclubAcademy: GymConfig = {
   gymName: "M Club",
   gymSlug: "mclub",     // commission join key — must match the enrol page; never change
   memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
-  // White "m" roundel and "Club." wordmark on transparent, from their site
-  // header (245px wide), upscaled to 1225px with hardened alpha edges. Drawn
-  // for dark surfaces, which is every surface it sits on here. Wide (2.4:1).
-  // Ask them for the original artwork before anything is printed large.
+  // White "m" roundel and "Club." wordmark on transparent: the logo file M Club
+  // sent on 21 Oct 2026, trimmed to its edges and doubled (1398×504). Drawn
+  // for dark surfaces, which is every surface it sits on here. Wide (2.8:1).
   logoUrl: "/gym-logos/mclub.png",
   logoAlt: "M Club",
 

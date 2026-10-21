@@ -29,7 +29,7 @@ export default function MClubEnrolPage() {
             <img
               src="/gym-logos/mclub.png"
               alt="M Club"
-              width={76}
+              width={89}
               height={32}
             />
             <div>
