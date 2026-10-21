@@ -33,6 +33,7 @@ export type MetaCapiEventName =
   | "ViewContent"
   | "Lead"
   | "Schedule"
+  | "Contact"
   | "InitiateCheckout"
   | "Purchase"
   | "CompleteRegistration"
