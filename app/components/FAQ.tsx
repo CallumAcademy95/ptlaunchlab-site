@@ -8,6 +8,10 @@ const faqs = [
     a: "Yes. The qualification is delivered through NCFE, regulated by Ofqual under reference 603/4388/6 (Ofqual is the same body that oversees GCSEs and A-Levels), and carries CIMSPA recognition. Ofqual publishes the qualification on its own register, so you can check it yourself rather than take our word for it. That is the difference between a regulated qualification and a self-branded certificate.",
   },
   {
+    q: "It's fully online, so how is the practical side assessed?",
+    a: "By video. You practise in a gym you already use, coaching a friend or family member through real sessions: inductions, programmes, technique. You film it, and your tutor watches the footage and either signs it off or tells you what to fix. NCFE accepts video-assessed practical work, and gyms hire PTs assessed this way.",
+  },
+  {
     q: "What exactly is the \"guaranteed gym introduction\"? That sounds too good to be true.",
     a: "It's a fair challenge, so here is exactly what it means. Once you qualify, we approach at least one gym on your behalf: either one in our partner network, or one local to you. It is a warm introduction rather than a job-board listing or a generic CV drop. Our founders have spent years on the hiring side, so they know who to put you in front of. What we cannot guarantee is the interview or the job — both are the gym's decision. Making the introduction is ours.",
   },
