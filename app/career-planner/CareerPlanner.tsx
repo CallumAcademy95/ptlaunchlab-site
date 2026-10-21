@@ -4,6 +4,7 @@
 import { useRef, useState } from "react";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import NextStep from "./NextStep";
 import ObjectionCapture from "../components/ObjectionCapture";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { trackEvent } from "@/app/lib/gtag";
@@ -41,6 +42,7 @@ export default function CareerPlanner() {
   const [draft, setDraft] = useState<Draft>({ blockerNote: null });
   const [lead, setLead] = useState({ firstName: "", surname: "", email: "", phone: "", consent: false });
   const [plan, setPlan] = useState<CareerPlanV2 | null>(null);
+  const [nextToken, setNextToken] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const started = useRef(false);
@@ -92,7 +94,7 @@ export default function CareerPlanner() {
       if (!j.lead || !j.plan) { setError("Something went wrong. Please try again."); return; }
       try { if (typeof window.fbq === "function") window.fbq("track", "Lead", { content_name: "career_planner", currency: "GBP", value: 0 }, { eventID: eventId }); } catch {}
       trackEvent("career_planner_complete", { version: 2, band: j.plan.band });
-      setPlan(j.plan); setPhase("results");
+      setPlan(j.plan); setNextToken(j.nextToken ?? null); setPhase("results");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError("Couldn't send that. Check your connection and try again.");
@@ -175,7 +177,12 @@ export default function CareerPlanner() {
               </div>
             </form>
           )}
-          {phase === "results" && plan && <Results plan={plan} name={lead.firstName.trim()} />}
+          {phase === "results" && plan && (
+            <Results plan={plan} name={lead.firstName.trim()}
+              next={<NextStep plan={plan} answers={draft}
+                lead={{ name: `${lead.firstName.trim()} ${lead.surname.trim()}`.trim(), email: lead.email.trim().toLowerCase(), phone: lead.phone.trim() }}
+                nextToken={nextToken} />} />
+          )}
         </div>
       </main>
       <Footer />
@@ -217,7 +224,7 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Results({ plan, name }: { plan: CareerPlanV2; name: string }) {
+function Results({ plan, name, next }: { plan: CareerPlanV2; name: string; next: React.ReactNode }) {
   const t = plan.timeline;
   return (
     <div className="grid gap-4">
@@ -239,14 +246,7 @@ function Results({ plan, name }: { plan: CareerPlanV2; name: string }) {
       </Block>
       <p className="text-soft">{plan.paymentLine}</p>
       <div className="mt-2"><FunnelPricingBlock /></div>
-      <div className="grid sm:grid-cols-3 gap-3 mt-2">
-        {plan.buttons.map((b, i) => (
-          <a key={b.href + b.label} href={b.href} onClick={() => trackEvent("career_planner_cta", { href: b.href, position: i, band: plan.band })}
-            className={`${i === 0 ? "bg-gold text-deep font-bold" : "border border-white/25 text-white font-semibold"} rounded-full px-4 py-3 text-center text-sm ${FOCUS}`}>
-            {b.label}
-          </a>
-        ))}
-      </div>
+      {next}
       <div className="mt-2">
         <ObjectionCapture
           context="career_planner_result"
