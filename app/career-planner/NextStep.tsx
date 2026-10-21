@@ -3,7 +3,7 @@
 // questions, then everyone chooses book / WhatsApp / start. Each answer is recorded
 // on the lead via /api/career-planner/next-step (keepalive, so a tap that navigates
 // away still lands). Leads Central reads the choice to decide its follow-up.
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import BookingFlow from "@/app/book/BookingFlow";
 import { CALL_TYPES } from "@/app/lib/booking/callTypes";
 import { WHATSAPP_LINK } from "@/app/lib/contactDetails";
@@ -38,18 +38,47 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
   // The endpoint reads, merges, then writes the lead row, so overlapping saves can
   // lose an answer. Send them one after another.
   const queue = useRef<Promise<unknown>>(Promise.resolve());
+  const contactSent = useRef(false);
+  const scheduleSent = useRef(false);
+  const lastStep = useRef<NextStepChoice | null>(null);
+  const bookingRef = useRef<HTMLDivElement>(null);
 
-  function record(body: Body) {
-    if (!nextToken) return;
-    queue.current = queue.current
-      .then(() => fetch("/api/career-planner/next-step", {
-        method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
-        body: JSON.stringify({ token: nextToken, ...body }),
-      }))
-      .catch(() => {});
+  useEffect(() => {
+    if (booking) bookingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [booking]);
+
+  // Every save carries the lead's current answers plus the new value, so each write
+  // stands alone. `nextStep` is only passed when the choice itself is recorded, so a
+  // price or month tap never bumps stepAt.
+  function payload(over: Body): Body {
+    const body: Body = {};
+    const pf = over.priceFit ?? priceFit;
+    const sm = over.startMonth ?? startMonth;
+    if (pf) body.priceFit = pf;
+    if (sm) body.startMonth = sm;
+    return { ...body, ...over };
   }
-  function track(step: string) {
-    trackEvent("career_planner_next_step", { step, band: plan.band, price_fit: priceFit ?? "", start_month: startMonth ?? "" });
+  function send(body: Body) {
+    return fetch("/api/career-planner/next-step", {
+      method: "POST", headers: { "Content-Type": "application/json" }, keepalive: true,
+      body: JSON.stringify({ token: nextToken, ...body }),
+    });
+  }
+  function record(over: Body) {
+    if (!nextToken) return;
+    const body = payload(over);
+    queue.current = queue.current.then(() => send(body)).catch(() => {});
+  }
+  // Start and WhatsApp hand the lead off to another page or app, so they go straight out.
+  function recordNow(over: Body) {
+    if (!nextToken) return;
+    send(payload(over)).catch(() => {});
+  }
+  function track(step: string, vals: { priceFit?: PriceFit | null; startMonth?: string | null } = {}) {
+    trackEvent("career_planner_next_step", {
+      step, band: plan.band,
+      price_fit: (vals.priceFit ?? priceFit) ?? "", start_month: (vals.startMonth ?? startMonth) ?? "",
+    });
   }
 
   const monthLabel = months.find((m) => m.value === startMonth)?.label ?? null;
@@ -64,7 +93,7 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
           <div className="grid sm:grid-cols-3 gap-2 mb-5">
             {PRICE_OPTIONS.map(([v, label]) => (
               <button key={v} type="button" id={`ns-price-${v}`} aria-pressed={priceFit === v}
-                onClick={() => { setPriceFit(v); record({ priceFit: v }); track(`price_${v}`); }}
+                onClick={() => { setPriceFit(v); record({ priceFit: v }); track(`price_${v}`, { priceFit: v }); }}
                 className={`rounded-xl px-4 py-3 border text-sm font-semibold ${FOCUS} ${priceFit === v ? "border-gold bg-gold/10 text-white" : "border-white/10 text-soft hover:border-gold/40"}`}>
                 {label}
               </button>
@@ -74,7 +103,7 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[...months, { value: "not_sure", label: "Not sure" }].map((m) => (
               <button key={m.value} type="button" id={`ns-month-${m.value}`} aria-pressed={startMonth === m.value}
-                onClick={() => { setStartMonth(m.value); record({ startMonth: m.value }); track("start_month"); }}
+                onClick={() => { setStartMonth(m.value); record({ startMonth: m.value }); track("start_month", { startMonth: m.value }); }}
                 className={`rounded-xl px-3 py-3 border text-sm font-semibold ${FOCUS} ${startMonth === m.value ? "border-gold bg-gold/10 text-white" : "border-white/10 text-soft hover:border-gold/40"}`}>
                 {m.label}
               </button>
@@ -87,38 +116,51 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
         <h3 id="ns-choose" className="font-display font-extrabold text-xl text-white mb-4">How would you like to take this forward?</h3>
         <div className="grid sm:grid-cols-3 gap-3">
           <button type="button" id="ns-book"
-            onClick={() => { setBooking(true); record({ nextStep: "book" }); track("book_open"); }}
+            aria-expanded={booking} aria-controls="ns-booking"
+            onClick={() => {
+              setBooking(true);
+              if (lastStep.current !== "book") { lastStep.current = "book"; record({ nextStep: "book" }); track("book_open"); }
+            }}
             className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm text-left ${FOCUS}`}>
-            📅 Book a {minutes}-minute call<span className="block text-soft font-normal mt-1">Pick a time that suits you.</span>
+            <span aria-hidden="true">📅</span> Book a {minutes}-minute call<span className="block text-soft font-normal mt-1">Pick a time that suits you.</span>
           </button>
           <a id="ns-whatsapp" href={waHref} target="_blank" rel="noopener noreferrer"
             onClick={() => {
+              if (contactSent.current) return; // the link still opens; nothing is re-recorded
+              contactSent.current = true;
+              lastStep.current = "whatsapp";
               const eventId = newEventId("contact");
-              record({ nextStep: "whatsapp", eventId });
-              try { if (typeof window.fbq === "function") window.fbq("track", "Contact", { content_name: "career_planner" }, { eventID: eventId }); } catch {}
+              recordNow({ nextStep: "whatsapp", eventId });
+              try { if (typeof window.fbq === "function") window.fbq("track", "Contact", { content_name: "career_planner", content_category: plan.band }, { eventID: eventId }); } catch {}
               track("whatsapp");
             }}
             className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm ${FOCUS}`}>
-            💬 Chat on WhatsApp<span className="block text-soft font-normal mt-1">Message us; we reply in person.</span>
+            <span aria-hidden="true">💬</span> Chat on WhatsApp<span className="block text-soft font-normal mt-1">Send us a message and we&apos;ll reply on WhatsApp.</span>
           </a>
-          <a id="ns-start" href="/enrol"
-            onClick={() => { record({ nextStep: "start" }); track("start"); }}
-            className={`rounded-xl px-4 py-4 bg-gold text-deep font-bold text-sm ${FOCUS}`}>
-            🚀 I&apos;m ready to start<span className="block font-normal mt-1">Enrol online now.</span>
+          <a id="ns-start" href="/enrol?source=career_planner"
+            onClick={() => {
+              if (lastStep.current !== "start") { lastStep.current = "start"; recordNow({ nextStep: "start" }); }
+              track("start");
+            }}
+            className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm ${FOCUS}`}>
+            <span aria-hidden="true">🚀</span> I&apos;m ready to start<span className="block text-soft font-normal mt-1">Enrol online now.</span>
           </a>
         </div>
 
         {booking && (
-          <div className="mt-5" id="ns-booking">
+          <div className="mt-5" id="ns-booking" ref={bookingRef}>
             <BookingFlow
               callType="consultation"
               questions={CALL_TYPES.consultation.questions}
               prefill={bookingPrefill({ name: lead.name, email: lead.email, phone: lead.phone, why: answers.why ?? null, blocker: answers.blocker ?? null })}
               token={null}
               onBooked={() => {
+                if (scheduleSent.current) return;
+                scheduleSent.current = true;
                 const eventId = newEventId("schedule");
+                lastStep.current = "book";
                 record({ nextStep: "book", booked: true, eventId });
-                try { if (typeof window.fbq === "function") window.fbq("track", "Schedule", { content_name: "career_planner" }, { eventID: eventId }); } catch {}
+                try { if (typeof window.fbq === "function") window.fbq("track", "Schedule", { content_name: "career_planner", content_category: plan.band }, { eventID: eventId }); } catch {}
                 track("booked");
               }}
             />

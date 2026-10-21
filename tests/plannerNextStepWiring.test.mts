@@ -40,7 +40,7 @@ test("NextStep wiring: commitment card gated by band, inline booking, WhatsApp l
   assert.match(n, /showCommitmentCard\(plan\.band\)/);
   assert.match(n, /<BookingFlow[^>]*callType="consultation"[^>]*onBooked=/);
   assert.match(n, /whatsappHref\(WHATSAPP_LINK, /);
-  assert.match(n, /href="\/enrol"/);
+  assert.match(n, /href="\/enrol\?source=career_planner"/);
   assert.match(n, /\/api\/career-planner\/next-step/);
   assert.match(n, /keepalive: true/);
   assert.match(n, /CALL_TYPES\.consultation\.minutes/);
@@ -55,4 +55,33 @@ test("NextStep copy rules: prices from pricing.ts, no £500, no 'free', no urgen
   assert.doesNotMatch(n, /limited|hurry|ends (soon|today)|only \d+ (places|spots)/i);
   assert.doesNotMatch(n, /£\d+k|earn(ing)?s? up to|\d+% of/i);
   assert.doesNotMatch(n, /15-minute|15 minute/i, "call length comes from CALL_TYPES");
+});
+
+test("route: a repeat booked does not fire CAPI Schedule again", () => {
+  const r = src("app/api/career-planner/next-step/route.ts");
+  assert.match(r, /prevBooked/);
+  assert.match(r, /v\.value\.booked && prevBooked \? null : capiEventFor\(v\.value\)/);
+  assert.ok(r.indexOf("const prevBooked") < r.indexOf("mergeNextStep("), "prev booked read before the merge");
+});
+
+test("NextStep: neutral WhatsApp copy, dedupe refs, a11y, equal options, immediate start/whatsapp saves", () => {
+  const n = src("app/career-planner/NextStep.tsx");
+  assert.doesNotMatch(n, /in person|real person|human/i);
+  assert.match(n, /Send us a message and we&apos;ll reply on WhatsApp\./);
+  assert.match(n, /contactSent = useRef\(false\)/);
+  assert.match(n, /if \(contactSent\.current\) return/);
+  assert.match(n, /lastStep = useRef/);
+  assert.match(n, /scheduleSent = useRef/);
+  assert.match(n, /aria-expanded=\{booking\}/);
+  assert.match(n, /aria-controls="ns-booking"/);
+  assert.match(n, /<span aria-hidden="true">/);
+  assert.match(n, /scrollIntoView\(\{ behavior: "smooth", block: "start" \}\)/);
+  assert.match(n, /content_category: plan\.band/);
+  assert.doesNotMatch(n, /bg-gold text-deep/, "start link has the same weight as the others");
+  assert.doesNotMatch(n, /bg-gold(?!\/)/, "no gold fill on any option");
+  assert.match(n, /recordNow\(\{ nextStep: "start" \}\)/);
+  assert.match(n, /recordNow\(\{ nextStep: "whatsapp"/);
+  assert.match(n, /record\(\{ priceFit: v \}\)/, "price taps carry no nextStep");
+  assert.match(n, /track\(`price_\$\{v\}`, \{ priceFit: v \}\)/);
+  assert.match(n, /track\("start_month", \{ startMonth: m\.value \}\)/);
 });

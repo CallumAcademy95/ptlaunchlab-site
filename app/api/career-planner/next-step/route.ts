@@ -31,11 +31,12 @@ export async function POST(request: NextRequest) {
     if (readErr) throw readErr;
     if (!row) return NextResponse.json({ ok: false, error: "not found" }, { status: 404 });
 
+    const prevBooked = (row.extra as { nextStep?: { booked?: unknown } } | null)?.nextStep?.booked === true;
     const extra = mergeNextStep(row.extra, v.value, now.toISOString());
     const { error: upErr } = await db.from("leads").update({ extra }).eq("id", leadId);
     if (upErr) throw upErr;
 
-    const eventName = capiEventFor(v.value);
+    const eventName = v.value.booked && prevBooked ? null : capiEventFor(v.value); // a repeat booked must not fire Schedule again
     if (eventName) {
       after(async () => {
         try {
