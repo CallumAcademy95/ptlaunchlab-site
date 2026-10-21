@@ -71,6 +71,14 @@ const faqSchema = {
     },
     {
       "@type": "Question",
+      name: "It's fully online, so how is the practical side assessed?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "By video. You practise in a gym you already use, coaching a friend or family member through real sessions: inductions, programmes, technique. You film it, and your tutor watches the footage and either signs it off or tells you what to fix. NCFE accepts video-assessed practical work, and gyms hire PTs assessed this way.",
+      },
+    },
+    {
+      "@type": "Question",
       name: "What is the guaranteed gym introduction?",
       acceptedAnswer: {
         "@type": "Answer",
