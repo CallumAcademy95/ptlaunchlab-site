@@ -63,7 +63,7 @@ const steps = [
     id: "step-5",
     title: "Build to your first 10 paying clients",
     summary:
-      "The bit that kills careers. 80% of newly-qualified UK PTs quit inside 18 months — almost always because they qualified but couldn't get clients. Here's the system that works.",
+      "The bit that kills careers. Plenty of newly qualified PTs leave the industry early, and the usual story is that they qualified but couldn't get clients. Here's the system that works.",
   },
 ];
 
@@ -389,7 +389,7 @@ export default function HowToBecomePtUkPage() {
               Build your first 10 paying clients.
             </h2>
             <p className="text-soft/80 text-lg leading-relaxed mb-5">
-              This is the step that kills careers. Industry estimates put first-year PT drop-out at around 80% in the UK — and almost every exit interview says the same thing: <span className="text-white font-semibold">they qualified but couldn&apos;t get clients.</span>
+              This is the step that kills careers. Plenty of new PTs drop out in their first year or two, and the story we hear most often is the same: <span className="text-white font-semibold">they qualified but couldn&apos;t get clients.</span>
             </p>
             <p className="text-soft/80 text-base leading-relaxed mb-5">
               The pattern is depressingly consistent. Newly-qualified PT spends £1,500 on a course. Course ends. Tutor disappears. PT now stands on a gym floor with a polo shirt and no clue how to approach a member, how to price, how to follow up, or what to post. Three months later they&apos;re back in their old job telling everyone &quot;PT didn&apos;t work out.&quot;

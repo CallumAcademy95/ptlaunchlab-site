@@ -18,8 +18,8 @@ import Footer from "@/app/components/Footer";
 import HeroSlideshow from "@/app/components/HeroSlideshow";
 
 export const metadata = {
-  title: "Personal Trainer Mentorship UK | PT Launch Lab — £500 Mentorship Hub Included Free",
-  description: "PT Launch Lab includes our £500 Mentorship Hub at no extra cost with the NCFE Level 3 course. It is included in the fee rather than sold on afterwards. We bundle it.",
+  title: "Personal Trainer Mentorship UK | PT Launch Lab — Mentorship Hub Included",
+  description: "PT Launch Lab includes our Mentorship Hub at no extra cost with the NCFE Level 3 course. It is included in the fee rather than sold on afterwards. We bundle it.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/personal-trainer-mentorship-uk",
   },
@@ -44,7 +44,7 @@ export default function Page() {
                   <span className="text-[#F5C518]">Bundled, not bolted on.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white font-semibold leading-snug mb-4">
-                  Every PT Launch Lab student gets our £500 Mentorship Hub — built around one job: walking you from qualifying to your first paying client. Direct access to mentors who&apos;ve built real careers in fitness, not tutors who&apos;ve only ever taught.
+                  Every PT Launch Lab student gets our Mentorship Hub — built around one job: walking you from qualifying to your first paying client. Direct access to mentors who&apos;ve built real careers in fitness, not tutors who&apos;ve only ever taught.
                 </p>
                 <p className="text-base text-blue-100/80 leading-relaxed mb-8">
                   Most UK PT academies charge £500–£3,000 separately for ongoing mentorship — or skip it entirely. We bundle it into the {COURSE_PRICE_LABEL} course fee. From your first lesson through to your first paying client, we&apos;re with you every step.
@@ -54,7 +54,7 @@ export default function Page() {
                 </div>
                 <div className="flex flex-wrap gap-3 text-blue-200/70 text-xs">
                   <span>⭐ 5-Star Rated</span><span className="opacity-40">·</span>
-                  <span>£500 Mentorship Included</span><span className="opacity-40">·</span>
+                  <span>Mentorship Hub Included</span><span className="opacity-40">·</span>
                   <span>500+ PTs Hired</span><span className="opacity-40">·</span>
                   <span>NCFE & Ofqual Regulated</span>
                 </div>

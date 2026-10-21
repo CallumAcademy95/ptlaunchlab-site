@@ -22,3 +22,13 @@ test("the was-price says 'Was' in its text, not only in styling", async () => {
   assert.match(w, />Was <\/span>\s*<del>\{WAS_PRICE_LABEL\}<\/del>/);
   assert.doesNotMatch(w, /aria-label=\{`was/);
 });
+
+test("no '£500' value or 'free' claim on the Mentorship Hub, and no '80%' quit statistic", async () => {
+  // The Hub has never been sold on its own, so a £500 value is not a genuine price, and calling
+  // a component of a paid bundle "free" is misleading (CAP Code). The 80% figure had no source.
+  const { execSync } = await import("node:child_process");
+  const grep = (re: string) => { try { return execSync(`git grep -nE "${re}" -- app public ":!app/podcast/transcripts"`, { encoding: "utf8" }); } catch { return ""; } };
+  assert.equal(grep("£500 ([Bb]usiness )?[Mm]entorship|£500 PT Launch Lab Mentorship|£500 product"), "");
+  assert.equal(grep("(bundled|included) free|Included Free|free with your course"), "");
+  assert.equal(grep("80 ?% of (newly|new|UK|PTs|qualified)"), "");
+});

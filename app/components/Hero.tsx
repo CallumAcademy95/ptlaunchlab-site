@@ -71,7 +71,7 @@ export default async function Hero() {
 
             {/* Sub */}
             <p className="text-[15px] text-soft/80 leading-relaxed mb-8 animate-fade-in-up animate-delay-100">
-              An 8–16 week online Level 3 qualification with business training and our <span className="text-white font-semibold">£500 Mentorship Hub, included in the fee</span> rather than sold on afterwards.
+              An 8–16 week online Level 3 qualification with business training and our <span className="text-white font-semibold">Mentorship Hub, included in the fee</span> rather than sold on afterwards.
             </p>
 
             {/* CTA buttons */}
@@ -99,7 +99,7 @@ export default async function Hero() {
             <div className="flex flex-wrap gap-3 md:gap-5 text-soft/60 text-xs animate-fade-in-up animate-delay-300">
               <span>✓ NCFE &amp; Ofqual Regulated</span>
               <span className="hidden sm:inline opacity-30">·</span>
-              <span>✓ £500 Mentorship Included Free</span>
+              <span>✓ Mentorship Hub Included</span>
               <span className="hidden sm:inline opacity-30">·</span>
               <span>✓ Guaranteed Gym Introduction</span>
               <span className="hidden sm:inline opacity-30">·</span>

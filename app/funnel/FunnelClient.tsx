@@ -315,7 +315,7 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[#F5C518] text-xs font-semibold tracking-widest uppercase text-center mb-4">Hear it from us</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center leading-tight mb-3">
-            Why 80% of PTs fail —
+            Why so many new PTs don't last —
             <br />
             <span className="text-[#F5C518]">and exactly how we fix it.</span>
           </h2>
@@ -333,7 +333,7 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
             {[
-              { quote: "80% of PTs leave the industry within their first year.", highlight: true },
+              { quote: "Getting qualified and getting clients are two different skills.", highlight: true },
               { quote: "We've hired over 500 PTs. We know exactly what gyms want.", highlight: false },
               { quote: "We give you the playbook — not just the qualification.", highlight: false },
             ].map((q) => (

@@ -61,7 +61,7 @@ const included = [
   "NCFE Level 2 Gym Instructor",
   "NCFE Level 3 Personal Trainer",
   "Business & marketing mentorship",
-  "£500 Mentorship Hub",
+  "The Mentorship Hub",
   "Direct access to the founders",
   "Career & hiring-partner support",
   "Client & programme templates",
@@ -135,7 +135,7 @@ export default function CareerBlueprintPage() {
               <span className="text-gold">then quietly quit.</span>
             </h2>
             <p className="text-soft/85 text-lg leading-relaxed mb-5">
-              Roughly <span className="text-white font-semibold">80% of newly-qualified UK PTs leave the industry within 18 months.</span> Not because they failed the exams. Because nobody taught them the part that actually matters — how to get clients, price their time, and build a business.
+              Plenty of <span className="text-white font-semibold">newly qualified PTs leave the industry within their first couple of years.</span> Not because they failed the exams. Because nobody taught them the part that actually matters — how to get clients, price their time, and build a business.
             </p>
             <p className="text-soft/85 text-lg leading-relaxed">
               A certificate on its own leaves the hardest part undone. You leave qualified, but with no plan, no clients, and no idea what to do on Monday morning. <span className="text-white font-semibold">A qualification is a door. It isn&apos;t a career.</span>

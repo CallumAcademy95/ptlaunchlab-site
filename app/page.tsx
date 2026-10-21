@@ -50,7 +50,7 @@ const faqSchema = {
       name: "How much does the PT Launch Lab course cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: `The course costs ${COURSE_PRICE_LABEL} paid in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest (the first is taken at checkout). That is the total cost. It includes our £500 Mentorship Hub, your personal tutor, the full NCFE Level 3 qualification, and the guaranteed gym introduction you get on qualifying. Nothing is bolted on as a paid upgrade.`,
+        text: `The course costs ${COURSE_PRICE_LABEL} paid in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest (the first is taken at checkout). That is the total cost. It includes our Mentorship Hub, your personal tutor, the full NCFE Level 3 qualification, and the guaranteed gym introduction you get on qualifying. Nothing is bolted on as a paid upgrade.`,
       },
     },
     {
@@ -58,7 +58,7 @@ const faqSchema = {
       name: `What's included in the ${COURSE_PRICE_LABEL} course fee?`,
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The full NCFE Level 2 & 3 Personal Trainer qualification (Ofqual regulated, CIMSPA recognised), a personal tutor assigned within 24 hours of enrolment, our £500 Mentorship Hub at no extra cost, business training built into the curriculum, and guaranteed warm introductions to gyms to UK gym employers in our network. Most UK PT academies charge £1,200–£2,800 for the qualification alone and price mentorship as a separate £500–£3,000 product. We bundle the lot.",
+        text: "The full NCFE Level 2 & 3 Personal Trainer qualification (Ofqual regulated, CIMSPA recognised), a personal tutor assigned within 24 hours of enrolment, our Mentorship Hub at no extra cost, business training built into the curriculum, and guaranteed warm introductions to gyms to UK gym employers in our network. Most UK PT academies charge £1,200–£2,800 for the qualification alone and price mentorship as a separate £500–£3,000 product. We bundle the lot.",
       },
     },
     {

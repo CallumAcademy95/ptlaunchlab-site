@@ -129,12 +129,12 @@ const starter: VslContent = {
   },
   comparison: {
     heading: { lead: "Most PT courses", gold: "stop at the certificate." },
-    intro: "That's why 80% of UK PTs quit inside 18 months. They qualified. They just didn't learn the rest of the job.",
+    intro: "That's why so many new PTs don't last. They qualified. They just didn't learn the rest of the job.",
     rows: [
       { other: "Just a certificate, and the rest to figure out yourself", us: "Certificate + personal tutor + business mentorship" },
       { other: "No help getting hired", us: "Warm intros into our partner gym network" },
       { other: "Run by lecturers, not practitioners", us: "Run by gym owners who've hired 500+ PTs" },
-      { other: "No business training", us: "£500 Mentorship Hub bundled free" },
+      { other: "No business training", us: "Mentorship Hub, included in the fee" },
       { other: "Help-desk ticket if you get stuck", us: "Your tutor's a message away, with answers in hours rather than days" },
       { other: "Surprise upsell fees post-enrolment", us: `${COURSE_PRICE_LABEL} total. Nothing sold as a paid upgrade later` },
     ],
@@ -161,7 +161,7 @@ const starter: VslContent = {
       },
       {
         q: "Won't the industry just spit me out? Isn't it saturated?",
-        a: "The UK has 11.5 million gym members across 7,200+ gyms. There's no shortage of clients. There's a shortage of PTs who know how to find them, which is why 80% of newly-qualified UK PTs quit inside 18 months. That's the gap the £500 Mentorship Hub (free with your course) is built to close. You don't compete with the cert-only PTs. You out-position them.",
+        a: "The UK has 11.5 million gym members across 7,200+ gyms. There's no shortage of clients. There's a shortage of PTs who know how to find them, which is why so many newly qualified PTs leave the industry early. That's the gap the Mentorship Hub (included in your course fee) is built to close. You don't compete with the cert-only PTs. You out-position them.",
       },
       {
         q: "Am I really qualified enough? I haven't got abs / a degree / a sport science background.",
@@ -183,11 +183,11 @@ const starter: VslContent = {
       { n: 3, title: "Move into Level 3: Personal Trainer", body: "Programming, nutrition, business planning. Video-assessed practicals: film yourself coaching real movements at any gym and your tutor reviews the footage." },
       { n: 4, title: "Qualify: NCFE, Ofqual regulated", body: "The qualification UK gym managers ask for by default. Register with CIMSPA, get insured (~£60/year), become a legally practising UK PT." },
       { n: 5, title: "Get your warm introduction to a gym", body: "We've personally hired 500+ PTs across our partner gym network. A warm introduction rather than a cold CV drop." },
-      { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The £500 PT Launch Lab Mentorship Hub is bundled free: your dashboard from 'qualified' to 'fully booked.'" },
+      { n: 6, title: "Build your client base via the Mentorship Hub", body: "Niche, pricing, marketing, first 10 clients. The PT Launch Lab Mentorship Hub is included in the fee: your dashboard from 'qualified' to 'fully booked.'" },
     ],
   },
   learnerStripLabel: "Real learners · Real careers",
-  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the £500 Mentorship Hub, and a warm introduction to our gym network. ${MONTHLY_FACT}`,
+  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the Mentorship Hub, and a warm introduction to our gym network. ${MONTHLY_FACT}`,
   proofHeading: "People who started right where you are",
   faqHeading: "Quick-fire questions.",
   faqs: [
@@ -273,7 +273,7 @@ const switcher: VslContent = {
     rows: [
       { other: "Built for school-leavers in classrooms", us: "Built for working adults: online and self-paced" },
       { other: "Quit your job to study full-time", us: "Study evenings + weekends while you keep earning" },
-      { other: "Just a certificate, and clients to figure out alone", us: "£500 Mentorship Hub bundled free" },
+      { other: "Just a certificate, and clients to figure out alone", us: "Mentorship Hub, included in the fee" },
       { other: "Lecturer telling you the theory", us: "Gym owners who've personally hired 500+ PTs" },
       { other: "Cold CV drops once you qualify", us: "Warm intros to salaried roles in our network" },
       { other: "Surprise upsell fees post-enrolment", us: `${COURSE_PRICE_LABEL} total. Nothing sold as a paid upgrade later` },
@@ -301,7 +301,7 @@ const switcher: VslContent = {
       },
       {
         q: "Isn't the PT industry saturated? Will there even be space for me?",
-        a: "The industry is saturated with PTs who never learned how to get clients. Roughly 80% of newly-qualified UK PTs quit inside 18 months. They didn't fail at training. They failed at marketing, pricing and client retention, which is the bit nobody taught them. Our £500 Mentorship Hub is built specifically to close that gap, bundled free with your course. You don't compete with the cert-only PTs. You skip past them.",
+        a: "The industry is saturated with PTs who never learned how to get clients. Plenty of newly qualified PTs leave the industry early, and it's rarely the training that beats them. It's marketing, pricing and client retention, which is the bit nobody taught them. Our Mentorship Hub is built specifically to close that gap, included in your course fee. You don't compete with the cert-only PTs. You skip past them.",
       },
       {
         q: "I'm not 'salesy.' Will I have to do the cringe gym-floor pitch?",
@@ -327,7 +327,7 @@ const switcher: VslContent = {
     ],
   },
   learnerStripLabel: "Real career-changers · Real PT careers",
-  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the £500 Mentorship Hub, and warm gym intros. ${MONTHLY_FACT}`,
+  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the Mentorship Hub, and warm gym intros. ${MONTHLY_FACT}`,
   proofHeading: "Career-changers who were exactly where you are",
   faqHeading: "Working-adult questions, answered.",
   faqs: [
@@ -335,7 +335,7 @@ const switcher: VslContent = {
     { q: "Is it too late to change careers in my 30s or 40s?", a: "No, and the UK PT market actively rewards career-changers in this age bracket. Life experience, professional sales instinct from your existing job, and the maturity to actually run a business are advantages younger PTs haven't built. Clients in their 30s–50s consistently prefer a PT who relates to them. We've put learners through in their late 50s and they're working." },
     { q: "How much can I realistically earn as a PT in year one?", a: "Employed at a commercial gym: £20K–£28K base in year one, plus session commission. Self-employed on a rent-a-space deal: £25K–£45K in year one if you actively market. Established self-employed PTs after 2–3 years regularly earn £35K–£50K+. The Mentorship Hub is built specifically to compress that timeline by teaching the business side from day one." },
     { q: "What if I don't want to be self-employed?", a: "Employed-first is a real route. We approach at least one gym on your behalf when you qualify: either with a gym in our partner network, or with a gym local to you that we approach on your behalf. Plenty of career-changers stay salaried for 12–18 months, then either stay or transition. There's no requirement to go solo." },
-    { q: "What does the £500 Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts and contracts. Bundled free with your course, in the fee rather than sold on afterwards." },
+    { q: "What does the Mentorship Hub include?", a: "Your private dashboard built around one job: walking you from qualified to fully booked. Modules on niche, offer design, pricing, sales conversations, marketing, social media, and client retention. Templates, scripts and contracts. Included in your course fee rather than sold on afterwards." },
     { q: "When can I start?", a: "Immediately. The moment you enrol, your course access opens and your tutor introduces themselves within 24 hours. No cohort start dates. Most career-changers start the evening they sign up and have their first unit done by the weekend." },
   ],
   close: {
@@ -413,7 +413,7 @@ const returner: VslContent = {
     rows: [
       { other: "Built for 18-year-olds with no kids", us: "Built for parents and returners, fully online" },
       { other: "Classroom hours that don't fit family life", us: "Self-paced from home: school hours, bedtimes, weekends" },
-      { other: "No business support, so you fend for yourself", us: "£500 Mentorship Hub bundled free" },
+      { other: "No business support, so you fend for yourself", us: "Mentorship Hub, included in the fee" },
       { other: "Bro-energy, hyper-aggressive branding", us: "Supportive, kind, built for confidence rebuilding" },
       { other: "'Become an Instagram influencer' marketing", us: "Local, referral-based, sustainable PT practice" },
       { other: "Help-desk ticket if you fall behind", us: "A real tutor who knows your name and your goals" },
@@ -449,7 +449,7 @@ const returner: VslContent = {
       },
       {
         q: "Do I have to become an Instagram influencer to make this work?",
-        a: "No, and please don't try. The most sustainable returner-PT businesses are built locally on referrals, school-gate trust, and word-of-mouth. The £500 Mentorship Hub (free with your course) teaches you how to build a small, profitable, niched client base in women's strength, postnatal recovery, midlife fitness or beginner confidence, without ever doing a transition reel. You're not building a brand. You're building a practice.",
+        a: "No, and please don't try. The most sustainable returner-PT businesses are built locally on referrals, school-gate trust, and word-of-mouth. The Mentorship Hub (included in your course fee) teaches you how to build a small, profitable, niched client base in women's strength, postnatal recovery, midlife fitness or beginner confidence, without ever doing a transition reel. You're not building a brand. You're building a practice.",
       },
     ],
   },
@@ -467,7 +467,7 @@ const returner: VslContent = {
     ],
   },
   learnerStripLabel: "Real returners · Real PT careers",
-  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the £500 Mentorship Hub, and the introduction we make when you qualify. ${MONTHLY_FACT}`,
+  pricingIntro: `${COURSE_PRICE_LABEL}, everything included: Level 2, Level 3, your tutor, the Mentorship Hub, and the introduction we make when you qualify. ${MONTHLY_FACT}`,
   proofHeading: "People who came back to fitness, just like you",
   faqHeading: "The questions returners ask.",
   faqs: [
@@ -477,7 +477,7 @@ const returner: VslContent = {
     { q: "Can I do this without ever going to a college or classroom?", a: "Yes, 100%. Theory is delivered online. Practical units are video-based: you film yourself coaching a real session at any local gym, and your tutor reviews the footage remotely. NCFE, Focus Awards, and Active IQ all accept video assessment. You never need to step into a classroom." },
     { q: "I want to coach women specifically. Is that realistic?", a: "It's one of the strongest niches in the UK market. Women-only training, postnatal recovery, midlife strength, perimenopausal fitness, and beginner confidence are all undersupplied and growing. Many female returner-PTs we work with build their entire client base on referrals from one school-gate network. The Mentorship Hub has a dedicated track on niching down." },
     { q: "What's the realistic income for a returner-PT in year one?", a: "Part-time around school hours, year one: £12K–£25K. Full-time self-employed after 2–3 years: £35K–£50K+. Group sessions (4–8 people) push hourly rates significantly higher, which is common with school-hall classes and postnatal groups. The Mentorship Hub teaches pricing, packaging, and how to fill a small but profitable client base rather than chasing volume." },
-    { q: "When can I start, and what's the total cost?", a: `Start the moment you enrol. Full access opens immediately and your tutor introduces themselves within 24 hours. ${COURSE_PRICE_LABEL} covers NCFE Level 2 + Level 3, your tutor, the £500 Mentorship Hub, and our gym pipeline. You can pay it in full, or as ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest.` },
+    { q: "When can I start, and what's the total cost?", a: `Start the moment you enrol. Full access opens immediately and your tutor introduces themselves within 24 hours. ${COURSE_PRICE_LABEL} covers NCFE Level 2 + Level 3, your tutor, the Mentorship Hub, and our gym pipeline. You can pay it in full, or as ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest.` },
   ],
   close: {
     eyebrow: "Two ways back",

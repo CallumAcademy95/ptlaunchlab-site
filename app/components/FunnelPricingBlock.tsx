@@ -37,14 +37,15 @@ type StackRow = { label: string; sub?: string; rrp: string };
 //  - Level 2 standalone at Active IQ / Focus Awards providers: £400–600
 //  - Level 3 standalone at OriGym / HFE: £800–1,200
 //  - Tutor support 6–12 weeks: £300–600 (mentorship hourly rates £30–60)
-//  - Mentorship Hub: actually sold standalone at £500
+//  - Mentorship Hub: never sold standalone, so it carries no price (CAP Code:
+//    a value claim needs a genuine price it was sold at). Shown as "Included".
 //  - Warm gym intros: unique — not sold elsewhere, marked "priceless"
 //  - Free resubmissions: most providers charge £50–100 per resubmission
 const VALUE_STACK: StackRow[] = [
   { label: "NCFE Level 2 Gym Instructor",        sub: "Ofqual regulated · the legal prerequisite", rrp: "£499" },
   { label: "NCFE Level 3 Personal Trainer",      sub: "Ofqual ref 603/4388/6 · gym-manager default", rrp: "£1,099" },
   { label: "Personal tutor — introduced in 24h", sub: "Reviews every unit you submit, passes it or sends it back", rrp: "£499" },
-  { label: "PT Launch Lab Mentorship Hub",       sub: "Walks you from qualified to first paying client", rrp: "£500" },
+  { label: "PT Launch Lab Mentorship Hub",       sub: "Walks you from qualified to first paying client", rrp: "Included" },
   { label: "Warm introduction to a gym",    sub: "A partner gym, or a local gym we approach for you", rrp: "Priceless" },
   { label: "Free resubmissions — no cap",        sub: "Resubmit until your tutor says it's a pass",   rrp: "£199" },
 ];
@@ -103,7 +104,7 @@ export default function FunnelPricingBlock({
                 </div>
                 <span
                   className="text-xs font-bold tabular-nums shrink-0 ml-2"
-                  style={{ color: row.rrp === "Priceless" ? accent : "rgba(255,255,255,0.5)" }}
+                  style={{ color: row.rrp === "Priceless" || row.rrp === "Included" ? accent : "rgba(255,255,255,0.5)" }}
                 >
                   {row.rrp}
                 </span>

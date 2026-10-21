@@ -272,7 +272,7 @@ export function buildProspectusHtml(): string {
       <dt>Qualification</dt><dd>NCFE Level 2 &amp; 3. Ofqual regulated, CIMSPA recognised.</dd>
       <dt>Where</dt><dd>Online, on Praxel, our learning platform. Practicals are filmed at any gym.</dd>
       <dt>Support</dt><dd>A personal tutor, assigned within 24 hours.</dd>
-      <dt>After you qualify</dt><dd>The £500 Mentorship Hub, and a guaranteed introduction to a gym.</dd>
+      <dt>After you qualify</dt><dd>The Mentorship Hub, and a guaranteed introduction to a gym.</dd>
       <dt>Rated</dt><dd>5.0★ Google rating.</dd>
     </dl>
   </div>
@@ -340,7 +340,7 @@ export function buildProspectusHtml(): string {
       gyms look for and we prepare you for it.</p></div></div>
     <div class="step"><div class="n">04</div><div>
       <div class="tag">Build</div>
-      <h3>The £500 Mentorship Hub</h3>
+      <h3>The Mentorship Hub</h3>
       <p>Included in the fee. A private dashboard built to walk you from qualifying to your first paying
       client, with Callum, Miles and Ryan a message away when you're stuck.</p></div></div>
   </div>
@@ -450,7 +450,7 @@ export function buildProspectusHtml(): string {
     <li>The full course online, on Praxel</li>
     <li>A personal tutor, assigned within 24 hours</li>
     <li>Video-assessed practicals, filmed at any gym</li>
-    <li>The £500 Mentorship Hub</li>
+    <li>The Mentorship Hub</li>
     <li>A guaranteed warm introduction to a gym</li>
     <li>Direct access to Callum, Miles and Ryan</li>
   </ul>
