@@ -57,7 +57,7 @@ export const HUB_ENTRIES: HubEntry[] = [
   // How you study
   { href: "/online-personal-trainer-course-uk", title: "Online personal trainer course", blurb: "Fully online, self-paced, video-assessed — no fixed class times.", cluster: "study", kind: "guide" },
   { href: "/personal-trainer-course-with-business-support", title: "PT course with business support", blurb: "Why the qualification alone isn't enough — and what closes the gap.", cluster: "study", kind: "guide" },
-  { href: "/personal-trainer-mentorship-uk", title: "Personal trainer mentorship", blurb: "The £500 Mentorship Hub that teaches you to get clients.", cluster: "study", kind: "guide" },
+  { href: "/personal-trainer-mentorship-uk", title: "Personal trainer mentorship", blurb: "The Mentorship Hub that teaches you to get clients.", cluster: "study", kind: "guide" },
 
   // Career & earnings
   { href: "/personal-trainer-salary-uk", title: "Personal trainer salary in the UK", blurb: "What PTs really earn — employed, self-employed and online.", cluster: "career", kind: "guide" },

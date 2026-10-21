@@ -56,7 +56,9 @@ test("FunnelPricingBlock: value stack, RRPs, You pay and risk reversal stay", ()
   const f = src("app/components/FunnelPricingBlock.tsx");
   assert.match(f, /You pay/);
   assert.match(f, /const VALUE_STACK/);
-  for (const rrp of ['"£499"', '"£1,099"', '"£500"', '"Priceless"', '"£199"']) assert.ok(f.includes(rrp), rrp);
+  for (const rrp of ['"£499"', '"£1,099"', '"Priceless"', '"£199"']) assert.ok(f.includes(rrp), rrp);
+  // The Hub has never been sold on its own, so it carries no price (CAP Code value claims).
+  assert.match(f, /Mentorship Hub",\s+sub: "[^"]*", rrp: "Included"/);
   for (const g of ["Tutor in 24 hours", "7-day cancellation", "Free resubmissions", "Pass support guarantee"]) assert.ok(f.includes(g), g);
   assert.match(f, /showValueStack/);
   assert.match(f, /variant/);

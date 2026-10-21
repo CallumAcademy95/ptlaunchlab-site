@@ -48,7 +48,7 @@ const FAQ = [
   },
   {
     q: "How much does it cost?",
-    a: `${COURSE_PRICE_LABEL} paid in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. That includes the qualification, a personal tutor, the £500 Mentorship Hub and a guaranteed gym introduction.`,
+    a: `${COURSE_PRICE_LABEL} paid in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL} with no interest. That includes the qualification, a personal tutor, the Mentorship Hub and a guaranteed gym introduction.`,
   },
 ];
 

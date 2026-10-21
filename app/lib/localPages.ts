@@ -143,7 +143,7 @@ function faqs({ withNap = true }: { withNap?: boolean } = {}): FaqItem[] {
     },
     {
       q: "How much does it cost?",
-      a: `${COURSE_PRICE_LABEL}, everything included: the NCFE Level 3 qualification, your own personal tutor, £500 business mentorship, business training and a guaranteed gym introduction. Flexible ways to pay at checkout.`,
+      a: `${COURSE_PRICE_LABEL}, everything included: the NCFE Level 3 qualification, your own personal tutor, business mentorship, business training and a guaranteed gym introduction. Flexible ways to pay at checkout.`,
     },
     {
       q: "How long does it take?",

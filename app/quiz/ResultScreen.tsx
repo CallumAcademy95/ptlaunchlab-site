@@ -280,10 +280,10 @@ export default function ResultScreen({ name, resultKey, avatar, onStartOver }: P
 
       {/* WHY MOST PTS FAIL — contrast positioning (Priority 6) */}
       <div className="mb-10 bg-card rounded-2xl p-6 border border-white/[0.07]">
-        <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">Why most newly-qualified PTs never make it</p>
+        <p className="text-gold text-[11px] font-bold tracking-widest uppercase mb-3">Why so many newly-qualified PTs don't last</p>
         <p className="text-white/85 text-base leading-relaxed mb-4">
           Most PT courses hand you a certificate and walk away. That&apos;s why{' '}
-          <span className="text-white font-semibold">80% of newly-qualified UK PTs quit inside 18 months</span> —
+          <span className="text-white font-semibold">so many newly qualified PTs leave the industry early</span> —
           not because they couldn&apos;t train people, but because nobody taught them how to:
         </p>
         <ul className="space-y-2 mb-4">

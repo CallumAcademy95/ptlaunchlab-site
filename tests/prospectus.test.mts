@@ -62,7 +62,7 @@ test("contains the price, payment line, platform, mentorship label, rating and c
     COURSE_PRICE_LABEL,
     "Flexible ways to pay at checkout",
     "Praxel",
-    "£500 Mentorship Hub",
+    "The Mentorship Hub",
     "5.0",
     COURSE_CREDENTIAL,
   ]) {

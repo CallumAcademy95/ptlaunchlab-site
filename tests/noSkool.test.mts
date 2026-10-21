@@ -1,7 +1,7 @@
 // tests/noSkool.test.mts
 //
 // As of 13 Oct 2026 the course no longer includes Skool or any learner
-// "community". The £500 Mentorship Hub is still included and keeps its label.
+// "community". The Mentorship Hub is still included and keeps its label.
 // No page, metadata, JSON-LD or chatbot prompt may promise Skool or a
 // "mentorship community".
 //

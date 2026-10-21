@@ -13,7 +13,7 @@ const HOME_SOURCE = "home-pricing";
 const VALUE_STACK = [
   { title: "NCFE Level 3 PT Qualification", detail: "Ofqual-regulated, CIMSPA-recognised" },
   { title: "Your Own Personal Tutor", detail: "Assigned within 24 hours of enrolling" },
-  { title: "£500 Business Mentorship, Included", detail: "In the fee, not sold as an upgrade" },
+  { title: "Business Mentorship, Included", detail: "In the fee, not sold as an upgrade" },
   { title: "Business Training", detail: "Finding and keeping paying clients" },
   { title: "Guaranteed Gym Introduction", detail: "A warm introduction when you qualify" },
 ];
