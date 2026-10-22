@@ -39,6 +39,9 @@ export const gymPartners = [
   // Gold on transparent, cut out of their og:image; reads on navy as it is
   // (6.9:1). The mono copy is the same alpha in white.
   { name: "Imperium Strength",     src: "/logos/imperium-strength.png",   dark: true, lightTile: false, mono: "/logos/mono/imperium-strength.png", monoSize: [117, 108] },
+  // Added 2026-10-22 on signing. Their own logo file is already white on
+  // transparent, so src and mono are the same artwork at two sizes.
+  { name: "M Club",                src: "/logos/mclub.png",               dark: true, lightTile: false, mono: "/logos/mono/mclub.png", monoSize: [300, 108] },
   // ⚠️ Superflex 2.0 Gym is also a partner in pp_partners (promo SUPERFLEXPT)
   // and still missing here, because no logo file exists anywhere in the repo.
   // Drop one at public/logos/superflex.png and add the row.
