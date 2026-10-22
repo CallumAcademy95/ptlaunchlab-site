@@ -3,9 +3,11 @@
  * Stoke-on-Trent: Hanley/Waterworld and Newcastle/Parklands). Prepared on
  * 20 Oct 2026 BEFORE the agreement was signed.
  *
- * ⚠ NOT SIGNED YET. --apply refuses to run until AGREEMENT_SIGNED_AT,
- * AGREEMENT_REF, CONTACT_NAME and CONTACT_EMAIL below are filled in from the
- * signed v4.2 PDF. A partner row must not exist before the agreement does.
+ * Signed v4.2 on 22 Oct 2026, ref PTA-8349248, by Debbie Evans (Director).
+ * No member saving elected. ⚠ The signed PDF names the party as "Director
+ * Ltd", Company No "Director": the signer typed her title into the company
+ * fields. Correct it in writing; it does not change anything written here.
+ * --apply still refuses if any of the four constants below is cleared.
  *
  *   npx tsx scripts/onboard-mclub.mts            # dry run — shows the plan
  *   npx tsx scripts/onboard-mclub.mts --apply    # write it (after signing)
@@ -41,10 +43,10 @@ const H = { apikey: K, Authorization: `Bearer ${K}`, "Content-Type": "applicatio
 const SLUG = "mclub";
 
 // ── Fill these in from the signed agreement before --apply ──────────────────
-const AGREEMENT_SIGNED_AT: string | null = null; // e.g. "2026-10-27T00:00:00+00:00" (date on the PDF, midnight UK)
-const AGREEMENT_REF: string | null = null;       // e.g. "PTA-1234567"
-const CONTACT_NAME: string | null = null;        // the signatory
-const CONTACT_EMAIL: string | null = null;       // the agreement notice address
+const AGREEMENT_SIGNED_AT: string | null = "2026-10-22T00:00:00+01:00"; // date on the PDF, midnight UK (BST)
+const AGREEMENT_REF: string | null = "PTA-8349248";
+const CONTACT_NAME: string | null = "Debbie Evans"; // the signatory, Director
+const CONTACT_EMAIL: string | null = "debbie@mclubspaandfitness.com"; // the agreement notice address (cl. 18.3)
 // ─────────────────────────────────────────────────────────────────────────────
 const SIGNED = Boolean(AGREEMENT_SIGNED_AT && AGREEMENT_REF && CONTACT_NAME && CONTACT_EMAIL);
 
