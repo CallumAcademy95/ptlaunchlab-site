@@ -94,6 +94,7 @@ export async function loadPeople(): Promise<PeopleResult> {
           kind: "person",
           planner_band: planner.band,
           already_qualified: profile.already_qualified === true,
+          reactivated: profile.reactivation != null && typeof profile.reactivation === "object",
         });
       })
       .filter((p): p is CrmPerson => p !== null);
@@ -224,6 +225,7 @@ export async function loadPersonDetail(id: string): Promise<PersonDetail | { pro
         kind: "person",
         planner_band: planner.band,
         already_qualified: profile.already_qualified === true,
+        reactivated: profile.reactivation != null && typeof profile.reactivation === "object",
       });
     }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Clock, Bot, UserRound, Flame, GraduationCap, Sparkles, X, Search } from "lucide-react";
+import { Clock, Bot, UserRound, Flame, GraduationCap, RefreshCw, Sparkles, X, Search } from "lucide-react";
 import {
   AdminPage,
   PageHeader,
@@ -100,6 +100,7 @@ function BandChips({ p }: { p: CrmPerson }) {
     <>
       {p.planner_band && <Badge tone={BAND_TONE[p.planner_band]}>{BAND_LABEL[p.planner_band]}</Badge>}
       {p.already_qualified && <Badge tone="violet">Qualified PT</Badge>}
+      {p.reactivated && <Badge tone="amber">Reactivated</Badge>}
       {p.setter_profile_id && <Badge tone="orange">Gym owner</Badge>}
     </>
   );
@@ -219,7 +220,7 @@ export default async function CrmPage({
       )}
 
       {/* Headline tiles: each one is a filter. */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-7">
         <StatTile href={crmHref({ view: "new" })} icon={<Sparkles className="h-5 w-5" />} value={tiles.newToday} label="New today" tone="sky" />
         <StatTile
           href={crmHref({ view: "waiting" })}
@@ -233,6 +234,7 @@ export default async function CrmPage({
         <StatTile href={crmHref({ mode: "human" })} icon={<UserRound className="h-5 w-5" />} value={tiles.human} label="Human" tone={tiles.human ? "rose" : "slate"} />
         <StatTile href={crmHref({ view: "prime7d" })} icon={<Flame className="h-5 w-5" />} value={tiles.hot7d} label="Prime/Strong (7d)" tone="green" />
         <StatTile href={crmHref({ band: "qualified" })} icon={<GraduationCap className="h-5 w-5" />} value={tiles.qualified} label="Qualified PTs" tone="violet" />
+        <StatTile href={crmHref({ band: "reactivated" })} icon={<RefreshCw className="h-5 w-5" />} value={tiles.reactivated} label="Reactivated" tone="amber" />
       </div>
 
       <Card className="space-y-4 p-4 sm:p-5">
