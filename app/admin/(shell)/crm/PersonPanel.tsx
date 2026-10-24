@@ -113,6 +113,7 @@ function PersonBadges({ p }: { p: CrmPerson }) {
     <div className="flex flex-wrap items-center gap-1.5">
       {p.planner_band && <Badge tone={BAND_TONE[p.planner_band]}>{BAND_LABEL[p.planner_band]}</Badge>}
       {p.already_qualified && <Badge tone="violet">Qualified PT</Badge>}
+      {p.reactivated && <Badge tone="amber">Reactivated</Badge>}
       {p.setter_profile_id && <Badge tone="orange">Gym owner</Badge>}
       {p.utm_content && <Badge tone="neutral">Ad: {p.utm_content}</Badge>}
       {p.kind === "site_only" ? <Badge tone="neutral">Website enquiry</Badge> : <ModeChip status={p.setter_status} />}

@@ -25,6 +25,7 @@ export interface CrmPerson {
   setter_intent: number | null;
   planner_band: PlannerBand | null;
   already_qualified: boolean;
+  reactivated: boolean;
   setter_profile_id: string | null;
   utm_source: string | null;
   utm_campaign: string | null;
@@ -70,6 +71,7 @@ export function normalisePerson(raw: Record<string, unknown>): CrmPerson | null 
     setter_intent: num(raw.setter_intent),
     planner_band: band === "prime" || band === "strong" || band === "nurture" ? band : null,
     already_qualified: raw.already_qualified === true,
+    reactivated: raw.reactivated === true,
     setter_profile_id: str(raw.setter_profile_id),
     utm_source: str(raw.utm_source),
     utm_campaign: str(raw.utm_campaign),
@@ -400,7 +402,7 @@ export function matchesSearch(p: CrmPerson, s: SearchTerm | null): boolean {
 // ─── The URL ────────────────────────────────────────────────────────────
 
 export const MODE_FILTERS = ["ai", "reply_only", "human", "dnc"] as const;
-export const BAND_FILTERS = ["prime", "strong", "nurture", "qualified", "gym"] as const;
+export const BAND_FILTERS = ["prime", "strong", "nurture", "qualified", "gym", "reactivated"] as const;
 export const CHANNEL_FILTERS = ["email", "whatsapp", "messenger", "instagram", "web", "lead_ads", "site"] as const;
 export const WAIT_FILTERS = ["30m", "2h", "12h"] as const;
 export const VIEW_FILTERS = ["new", "waiting", "hot", "quiet", "prime7d"] as const;
@@ -411,6 +413,7 @@ export const BAND_LABEL: Record<(typeof BAND_FILTERS)[number], string> = {
   nurture: "Nurture",
   qualified: "Qualified PT",
   gym: "Gym owner",
+  reactivated: "Reactivated",
 };
 export const CHANNEL_LABEL: Record<string, string> = {
   email: "Email",
@@ -550,6 +553,7 @@ function matchesBand(p: CrmPerson, band: CrmQuery["band"]): boolean {
   if (!band) return true;
   if (band === "qualified") return p.already_qualified;
   if (band === "gym") return p.setter_profile_id !== null;
+  if (band === "reactivated") return p.reactivated;
   return p.planner_band === band;
 }
 
@@ -611,6 +615,7 @@ export interface Tiles {
   human: number;
   hot7d: number;
   qualified: number;
+  reactivated: number;
 }
 
 export function tileCounts(rows: CrmPerson[], now: number): Tiles {
@@ -623,6 +628,7 @@ export function tileCounts(rows: CrmPerson[], now: number): Tiles {
     human: rows.filter((p) => modeOf(p.setter_status) === "human").length,
     hot7d: rows.filter((p) => matchesView(p, "prime7d", now)).length,
     qualified: rows.filter((p) => p.already_qualified).length,
+    reactivated: rows.filter((p) => p.reactivated).length,
   };
 }
 
@@ -630,6 +636,7 @@ export const BUILT_IN_VIEWS: { name: string; query: CrmQuery }[] = [
   { name: "Waiting on us", query: { view: "waiting" } },
   { name: "Hot", query: { view: "hot" } },
   { name: "Qualified PTs", query: { band: "qualified" } },
+  { name: "Reactivated", query: { band: "reactivated" } },
   { name: "Gone quiet", query: { view: "quiet" } },
   { name: "Human-controlled", query: { mode: "human" } },
 ];

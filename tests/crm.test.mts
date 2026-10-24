@@ -33,6 +33,8 @@ import {
   normalisePerson,
   filterPeople,
   tileCounts,
+  BAND_FILTERS,
+  BUILT_IN_VIEWS,
   modeOf,
   waNumber,
   gmailUrl,
@@ -273,6 +275,28 @@ test("band filters: qualified and gym owner come from their own columns", () => 
   assert.equal(filterPeople(rows, { band: "prime" }, NOW).length, 1);
   assert.equal(filterPeople(rows, { band: "qualified" }, NOW)[0].id, "b2222222-1111-4111-8111-111111111111");
   assert.equal(filterPeople(rows, { band: "gym" }, NOW)[0].id, "b3333333-1111-4111-8111-111111111111");
+});
+
+test("reactivated: normalised from the view column, false when absent, filterable and counted", () => {
+  assert.equal(normalisePerson({ id: "d1111111-1111-4111-8111-111111111111", reactivated: true })?.reactivated, true);
+  assert.equal(normalisePerson({ id: "d1111111-1111-4111-8111-111111111111" })?.reactivated, false);
+  assert.equal(normalisePerson({ id: "d1111111-1111-4111-8111-111111111111", reactivated: "true" })?.reactivated, false);
+  const rows = [
+    person({ id: "d1111111-1111-4111-8111-111111111111", reactivated: true }),
+    person({ id: "d2222222-1111-4111-8111-111111111111" }),
+    person({ id: "d3333333-1111-4111-8111-111111111111", reactivated: true, already_qualified: true }),
+  ];
+  assert.deepEqual(
+    filterPeople(rows, { band: "reactivated" }, NOW).map((p) => p.id).sort(),
+    ["d1111111-1111-4111-8111-111111111111", "d3333333-1111-4111-8111-111111111111"],
+  );
+  assert.equal(tileCounts(rows, NOW).reactivated, 2);
+  assert.ok((BAND_FILTERS as readonly string[]).includes("reactivated"));
+  assert.equal(parseCrmQuery({ band: "reactivated" }).band, "reactivated");
+  assert.equal(crmHref({ band: "reactivated" }), "/admin/crm?band=reactivated");
+  assert.deepEqual(BUILT_IN_VIEWS.find((v) => v.name === "Reactivated")?.query, { band: "reactivated" });
+  const names = BUILT_IN_VIEWS.map((v) => v.name);
+  assert.equal(names.indexOf("Reactivated"), names.indexOf("Qualified PTs") + 1);
 });
 
 test("a row with missing columns still normalises", () => {
