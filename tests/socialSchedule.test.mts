@@ -13,7 +13,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   groupOpusTasks, carouselItem, weekDays, londonDay, runway, carouselEnds, opusEnd,
-  isPtllOpusTask, type OpusTask, type CarouselRow,
+  isPtllOpusTask, streamLabel, type OpusTask, type CarouselRow,
 } from "../app/lib/socialSchedule.ts";
 
 const task = (over: Partial<OpusTask>): OpusTask => ({
@@ -88,6 +88,18 @@ test("runway matches the reminder email: 7 days or fewer warns, nothing left is 
   assert.equal(runway("objections-50", "2026-12-15T20:00:00Z", now).warn, true);
   assert.equal(runway("opus", "2027-01-09T18:00:00Z", now).warn, false);
   assert.equal(runway("opus", null, now).daysLeft, -1);
+});
+
+test("a follow-on batch continues its stream, so batch 1 ending isn't a false 'running out'", () => {
+  assert.deepEqual(
+    carouselEnds([
+      { series: "objections-50", scheduled_at: "2026-12-15T10:00:00Z" },
+      { series: "objections-50-b2", scheduled_at: "2027-02-03T10:00:00Z" },
+    ]),
+    { "objections-50": "2027-02-03T10:00:00Z" },
+  );
+  assert.equal(streamLabel("objections-50-b2"), "Objection carousels (batch 2)");
+  assert.equal(streamLabel("objections-50"), "Objection carousels");
 });
 
 test("ends are the last still-to-post item per stream", () => {

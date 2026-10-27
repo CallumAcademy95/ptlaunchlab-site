@@ -35,7 +35,12 @@ export const STREAM_LABEL: Record<string, string> = {
   "objections-50": "Objection carousels",
   "ptll-podcast-50": "Podcast carousels",
 };
-export const streamLabel = (s: string) => STREAM_LABEL[s] ?? `Carousels: ${s}`;
+export const streamLabel = (s: string) => {
+  const batch = s.match(/-b(\d+)$/)?.[1];
+  const base = STREAM_LABEL[s.replace(/-b\d+$/, "")];
+  if (base) return batch ? `${base} (batch ${batch})` : base;
+  return `Carousels: ${s}`;
+};
 
 /** A stream with this many days or fewer left gets flagged, as in the reminder email. */
 export const RUNWAY_WARN_DAYS = 7;
@@ -230,10 +235,19 @@ export function runway(stream: string, end: string | null, now: number): Runway 
   return { stream, label: streamLabel(stream), end, daysLeft, warn: daysLeft <= RUNWAY_WARN_DAYS };
 }
 
-/** Last still-to-post time per carousel series. */
+/** "objections-50-b2" continues "objections-50": one stream, one runway. */
+export const streamOf = (series: string) => series.replace(/-b\d+$/, "");
+
+/**
+ * Last still-to-post time per carousel stream. Follow-on batches fold into their
+ * stream, so batch 1 ending isn't flagged as running out while batch 2 is queued.
+ */
 export function carouselEnds(rows: { series: string; scheduled_at: string }[]): Record<string, string> {
   const ends: Record<string, string> = {};
-  for (const r of rows) if (!ends[r.series] || r.scheduled_at > ends[r.series]) ends[r.series] = r.scheduled_at;
+  for (const r of rows) {
+    const s = streamOf(r.series);
+    if (!ends[s] || r.scheduled_at > ends[s]) ends[s] = r.scheduled_at;
+  }
   return ends;
 }
 
