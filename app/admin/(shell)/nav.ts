@@ -47,6 +47,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         excludeOn: ["/admin/crm/calls"],
       },
       { href: "/admin/crm/calls", label: "Calls", icon: "phone", hint: "Booked calls, your hours, and who you're ringing next" },
+      { href: "/admin/social", label: "Social calendar", icon: "calendar", hint: "Reels and carousels going out, and days of content left" },
       { href: "/admin/ads", label: "Ad performance", icon: "chart" },
       { href: "/admin/whatsapp", label: "WhatsApp inbox", icon: "message" },
       { href: "/admin/live-questions", label: "Audience questions", icon: "help" },

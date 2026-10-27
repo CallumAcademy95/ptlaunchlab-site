@@ -63,6 +63,7 @@ test("exactly one entry is highlighted on any admin page", () => {
     "/admin/leads",
     "/admin/leads/abc-123",
     "/admin/site-leads/abc-123",
+    "/admin/social",
     "/admin/ads",
     "/admin/ads/create",
     "/admin/whatsapp",
