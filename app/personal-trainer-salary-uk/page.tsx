@@ -16,7 +16,7 @@ const UPDATED = "2026-07-27";
 export const metadata: Metadata = {
   title: "Personal Trainer Salary UK 2026: The Real Numbers | PT Launch Lab",
   description:
-    "What UK personal trainers actually earn in 2026. Employed PTs £20-28k, self-employed £35-50k+, top end £80k+. Real rates by postcode from PureGym hiring managers and £500K PT business builders.",
+    "What UK personal trainers actually earn in 2026. Employed PTs £20-28k, self-employed £35-50k+, top end £80k+. Real rates by postcode from PureGym hiring managers and PTs who built their own businesses.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "article",
@@ -101,7 +101,7 @@ export default function SalaryPage() {
                 </div>
                 <div className="rounded-2xl border border-white/[0.07] bg-card p-6">
                   <h3 className="text-white font-bold text-xl mb-2">Tier 3: Online PT <span className="text-gold">— £0–£250k, wildly variable</span></h3>
-                  <p className="text-soft/80 text-base leading-relaxed">This is where the Instagram-PT promises live. Ryan built his online PT business to <strong className="text-white">£500K</strong> annual turnover, the topic of EP6&apos;s full episode title — but the floor is usually £0 because most online PTs never get a single paying client. As Ryan said on EP10: &quot;When you&apos;re self-employed, all the hours are your hours to work because you have this prickling anxiety of if I&apos;m not working, what&apos;s the point of doing this?&quot; Six-figure online PT is real but requires 2–4 years of consistent content and a tested offer.</p>
+                  <p className="text-soft/80 text-base leading-relaxed">This is where the Instagram-PT promises live. On EP6, Ryan explains how his online business grew out of a <strong className="text-white">£30-a-head weight-loss challenge</strong> he ran to fill his PT diary — but the floor is usually £0 because most online PTs never get a single paying client. As Ryan said on EP10: &quot;When you&apos;re self-employed, all the hours are your hours to work because you have this prickling anxiety of if I&apos;m not working, what&apos;s the point of doing this?&quot; Six-figure online PT is real but requires 2–4 years of consistent content and a tested offer.</p>
                 </div>
                 <div className="rounded-2xl border border-gold/40 bg-gold/[0.04] p-6">
                   <h3 className="text-white font-bold text-xl mb-2">Tier 4: Multi-stream PT <span className="text-gold">— £60k–£120k+</span></h3>
@@ -156,13 +156,13 @@ export default function SalaryPage() {
 
             <section>
               <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white leading-none tracking-tight mb-6">
-                The £500K stories: what top PTs really earn.
+                The outlier stories: what top PTs really earn.
               </h2>
               <div className="space-y-5 text-soft/80 text-base leading-relaxed">
                 <p>The upper end of UK PT income is built from compounding — not single hourly rates. Three patterns from the podcast:</p>
                 <div className="rounded-2xl border-l-2 border-gold pl-5 py-2">
-                  <p className="font-semibold text-white mb-2">Pattern 1: The £500K online PT.</p>
-                  <p>Ryan Robinson built his online powerlifting and weight-loss coaching business to <strong>half a million pounds a year</strong> before stepping back. EP6 covers the full build; EP10 covers why he wound it down. The mechanic: a tested four-week programme, evergreen Instagram content (he posted client wins daily for years), a Facebook ads funnel, and a high-ticket continuation offer.</p>
+                  <p className="font-semibold text-white mb-2">Pattern 1: The challenge that went online.</p>
+                  <p>Ryan Robinson started with a four-week weight-loss competition at £30 a head to fill his PT diary. It grew until there were queues out of the gym, and when lockdown hit he took it online and <strong>sold over a thousand places worldwide overnight</strong>. EP6 covers the full build; on EP10 he explains why he is closing the Shred challenges after 10 years to focus on boxing and PT Launch Lab.</p>
                 </div>
                 <div className="rounded-2xl border-l-2 border-gold pl-5 py-2">
                   <p className="font-semibold text-white mb-2">Pattern 2: The multi-gym owner.</p>
@@ -184,7 +184,7 @@ export default function SalaryPage() {
               <ol className="space-y-5">
                 {[
                   { title: "Undercharging", body: "Mac Livock (EP8): \"I charged really low when I started because how I had the wrong mentality… X amount of money, cheap price was better than nothing.\" £15/session leaves you working 50 hours to gross £750. The realistic UK base rate in 2026 is £25–£30/hour." },
-                  { title: "No business systems", body: "EP10 (Ryan's £500K shutdown): \"The business skills is massive. As you move along and you get more clients, you have to get new skills.\" PTs without invoicing, contracts, no-show policies, or cashflow tracking burn out by month six." },
+                  { title: "No business systems", body: "EP10: \"The business skills is massive. As you move along and you get more clients, you have to get new skills.\" PTs without invoicing, contracts, no-show policies, or cashflow tracking burn out by month six." },
                   { title: "Gym-floor-only thinking", body: "Mac on EP8: \"The gym is where most PTs pick up their first clients.\" If you don't post, don't email, don't run group sessions, you're capped at the foot traffic in your one gym." },
                   { title: "No client follow-up", body: "Ryan on EP6: \"Each time you do that opens another door, opens another window of opportunity to get more clients.\" PTs who ghost ex-clients lose 40–60% of their potential income from re-engagement and referrals." },
                   { title: "Saturation panic", body: "Callum on EP7: \"As of 2022, there is currently 69,000 registered PTs in the UK… every single industry is oversaturated.\" The ones who quit tend to blame saturation. The ones who stay build a niche and a CV." },
@@ -211,7 +211,7 @@ export default function SalaryPage() {
                   { stage: "Months 3–6 (building base)", income: "£500–£1,500/mo", body: "First paying clients via gym floor or warm introductions. Realistic load: 4–8 sessions per week at £25–£35." },
                   { stage: "Months 6–12 (book filling)", income: "£1,500–£3,000/mo", body: "12–20 sessions/week. You've found your niche (women 35+, post-natal, strength, hybrid runners) and your social posts are converting. Most PTs hit a plateau here — the ones who push past it add small group or online." },
                   { stage: "Months 12–24 (established)", income: "£3,000–£5,000+/mo", body: "20–30 sessions/week, possibly with a small group offer added. Average UK self-employed PT take-home at this stage is £40k–£55k." },
-                  { stage: "Year 3+", income: "£60k–£120k+", body: "If you've layered streams. Year 5+: the £500K Ryan-style scale becomes possible — but it's the 1-in-200 outcome, not the median.", highlight: true },
+                  { stage: "Year 3+", income: "£60k–£120k+", body: "If you've layered streams. Year 5+: a scaled online offer becomes possible — but it's the exception, not the median.", highlight: true },
                 ].map((s) => (
                   <div key={s.stage} className={`rounded-2xl border p-5 ${s.highlight ? "border-gold/40 bg-gold/[0.04]" : "border-white/[0.07] bg-card"}`}>
                     <div className="flex flex-col md:flex-row md:items-baseline md:gap-4 mb-2">

@@ -61,9 +61,9 @@ an episode they appear on — they just need asking, and a ready-made link.
 | 22 | Sam Hincks | British Powerlifting Champion | /podcast/british-powerlifting-champion-to-bodybuilding-burnout-sam-hincks |
 | 21 | Kim Tomlin | Movement specialist | /podcast/what-most-pts-get-wrong-about-movement-kim-tomlin |
 | 20 | Max Clark | Opened a boxing gym at 18 | /podcast/how-max-clark-opened-his-own-boxing-gym-at-18 |
-| 19 | Kiel | Super League debut to heart surgery | /podcast/super-league-debut-to-heart-surgery-kiels-story |
+| 19 | Keal | Super League debut to open-heart surgery | /podcast/from-super-league-debut-to-open-heart-surgery-keals-story |
 | 14 | Luke McCarthy | | /podcast/3-things-i-wish-i-knew-before-becoming-a-personal-trainer-luke-mccarthy |
-| 13 | Zak Meakin | Racing driver | /podcast/how-personal-training-made-me-a-better-racing-driver-zak-meakin |
+| 13 | Zac Meakin | Racing driver | /podcast/from-go-karts-to-british-gt4-champion-zac-meakin |
 | 11 | Matty Bell | Running / addiction recovery | /podcast/how-running-saved-me-from-addiction-matty-bell |
 | 8 | Mac Livock | **PureGym** hiring manager — brand-name link | /podcast/what-puregym-looks-for-when-hiring-personal-trainers-mac-livock |
 | 28 | Maria | ICU nurse → fitness business | /podcast/from-icu-nurse-to-fitness-business-marias-career-change |

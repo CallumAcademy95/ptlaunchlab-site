@@ -189,7 +189,7 @@ const episodes: Episode[] = [
   },
   {
     id: "gfA-LCPXpBM",
-    slug: "super-league-debut-to-heart-surgery-kiels-story",
+    slug: "from-super-league-debut-to-open-heart-surgery-keals-story",
     ep: 19,
     title: "From Super League Debut to Open-Heart Surgery — Keal's Story",
     desc: "Keal made his Super League debut at 17 with Bradford Bulls, then a mid-game collapse revealed a heart valve problem that led to open-heart surgery. He opens up about coming back, building his own business after full-time rugby, and the pancreatic tumour diagnosed at 35. A story of resilience.",
@@ -225,7 +225,7 @@ const episodes: Episode[] = [
   },
   {
     id: "IDkRUIeXU4E",
-    slug: "how-personal-training-made-me-a-better-racing-driver-zak-meakin",
+    slug: "from-go-karts-to-british-gt4-champion-zac-meakin",
     ep: 13,
     title: "From Go-Karts to British GT4 Champion — Zac Meakin's Story",
     desc: "Zac Meakin, the racing driver Ryan has trained for around five years, on going from go-karts in Pontefract to winning the British GT4 Championship with McLaren, and why he's working through his Level 3 personal training qualification alongside racing.",
@@ -252,7 +252,7 @@ const episodes: Episode[] = [
   },
   {
     id: "S9zcs6P5mn8",
-    slug: "why-i-shut-down-my-500k-online-pt-business-the-honest-story",
+    slug: "why-personal-trainers-quit-in-the-first-two-years",
     ep: 10,
     title: "Why Personal Trainers Quit in the First Two Years",
     desc: "Why do so many personal trainers quit within their first two years? Callum and Ryan break down the reasons, from inconsistent income and tax surprises to underpricing and burnout, and how to go self-employed without losing your safety net. Plus why Ryan is closing the Shred fat-loss challenges after 10 years.",
@@ -288,7 +288,7 @@ const episodes: Episode[] = [
   },
   {
     id: "1HK7woXEWhI",
-    slug: "how-i-built-an-online-pt-business-to-500k-ryans-full-story",
+    slug: "how-ryan-built-an-online-fitness-business-from-a-weight-loss-challenge",
     ep: 6,
     title: "How Ryan Built an Online Fitness Business From a Weight Loss Challenge",
     desc: "Ryan goes back to where his online business began: a £30-a-head weight loss challenge that went online in lockdown and sold over a thousand places overnight. Then practical advice on building an online PT business, from answering price questions to why you should never discount.",
