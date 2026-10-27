@@ -69,3 +69,37 @@ single biggest gap on the profile.
 
 `exterior-signage.jpg`, `interior-training-floor.jpg`, `team-callum.jpg`,
 `post-live-event-jul26.png` — lowercase, hyphenated, descriptive.
+
+## Automated posting: two pools
+
+`app/api/gbp-cron` posts from one of two lists. They rotate separately, so the
+podcast never pushes course posts out of the Tue/Fri slots.
+
+| Pool | List | Cron (UTC) | Steps |
+|---|---|---|---|
+| default | `lib/gbp/posts.json` | Tue + Fri 09:30, `/api/gbp-cron` | one post per day since 1970, mod list length |
+| podcast | `lib/gbp/podcast-posts.json` | Wed 09:30, `/api/gbp-cron?pool=podcast` | one post per week since Wed 4 Nov 2026, mod list length |
+
+Podcast post images live in `gbp/podcast/<youtube-id>.jpg`: 1200x900, the
+episode thumbnail full width on brand navy (#070D1B, sampled from the
+thumbnails), with "THE PT LAUNCH LAB PODCAST" above and "WATCH THE FULL
+EPISODE" below in Barlow Condensed ExtraBold. That framing stops Google cropping
+the 16:9 thumbnail.
+
+**Podcast order.** The week counter starts at `PODCAST_EPOCH_MS` in
+`lib/gbp/rotation.ts` (Wed 4 Nov 2026), so that Wednesday sends item 0 of
+`podcast-posts.json`, the next sends item 1, and after the last item it wraps
+round. Before that date the podcast cron sends nothing. The list is ordered
+best-first: personal-story episodes, then guest business episodes, then the
+hosts' discussion episodes.
+
+- To change what goes out next, reorder the list. Week N always sends item
+  `N % length`, so inserting or removing an item shifts everything after it.
+- To restart the rotation from item 0 on a given Wednesday, set
+  `PODCAST_EPOCH_MS` to that Wednesday at 00:00 UTC.
+- A new episode joins the rotation when you add a post to the list, plus its
+  image here. Add it near the front if it should go out soon.
+- Preview any post with `?pool=podcast&dry=1&index=N`. The route checks that the
+  button URL and the image both return 200 before sending, and sends nothing if
+  either fails. A new image therefore only passes once the deploy carrying it is
+  live.
