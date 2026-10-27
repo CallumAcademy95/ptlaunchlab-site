@@ -13,18 +13,23 @@
 // file — they would rotate back around after the date has passed. Send those
 // manually with scripts/gbp-post.mjs.
 //
+// Podcast episodes have their own pool (lib/gbp/podcast-posts.json, ?pool=podcast)
+// so they don't dilute the course rotation. That pool steps once a week, not once
+// a day; see lib/gbp/rotation.ts for the start date and ordering.
+//
 // Env required: CRON_SECRET, GBP_MAKE_WEBHOOK_URL
-// Manual use:   /api/gbp-cron?dry=1        preview today's post, sends nothing
-//               /api/gbp-cron?index=4      force a specific post
+// Manual use:   /api/gbp-cron?dry=1                 preview today's post, sends nothing
+//               /api/gbp-cron?index=4               force a specific post
+//               /api/gbp-cron?pool=podcast&dry=1    same, for the podcast pool
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { NextRequest, NextResponse } from "next/server";
-import posts from "@/lib/gbp/posts.json";
+import coursePosts from "@/lib/gbp/posts.json";
+import podcastPosts from "@/lib/gbp/podcast-posts.json";
+import { parsePool, pickIndex } from "@/lib/gbp/rotation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const DAY_MS = 86_400_000;
 
 async function resolves(url: string, expectImage = false) {
   try {
@@ -50,11 +55,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "GBP_MAKE_WEBHOOK_URL not set" }, { status: 500 });
   }
 
-  const override = req.nextUrl.searchParams.get("index");
-  const index =
-    override !== null
-      ? Number(override) % posts.length
-      : Math.floor(Date.now() / DAY_MS) % posts.length;
+  const pool = parsePool(req.nextUrl.searchParams.get("pool"));
+  if (!pool) {
+    return NextResponse.json({ error: "unknown pool" }, { status: 400 });
+  }
+  const posts = pool === "podcast" ? podcastPosts : coursePosts;
+
+  const index = pickIndex(pool, posts.length, Date.now(), req.nextUrl.searchParams.get("index"));
+  if (index === null) {
+    return NextResponse.json({ skipped: "podcast pool has not started yet", pool });
+  }
 
   const post = posts[index];
   if (!post) {
