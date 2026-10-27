@@ -370,7 +370,7 @@ export default function HowToBecomePtUkPage() {
                   Coach clients remotely via Trainerize, TrueCoach, or your own platform. Programme delivery, weekly check-ins, video feedback. £80-£250 per month per client. Stacks well — 30 online clients at £150/month = £54,000/year working from home.
                 </p>
                 <p className="text-soft/70 text-sm leading-relaxed">
-                  <span className="text-white font-semibold">Best for:</span> people with existing social media presence, a clear niche (postpartum, runners, busy parents, etc.), and the willingness to spend the first 6-12 months building an audience. <Link href="/podcast/how-i-built-an-online-pt-business-to-500k-ryans-full-story" className="text-gold hover:underline">Ryan&apos;s full story on how he built to £500K online</Link> is the honest version of how long this actually takes.
+                  <span className="text-white font-semibold">Best for:</span> people with existing social media presence, a clear niche (postpartum, runners, busy parents, etc.), and the willingness to spend the first 6-12 months building an audience. <Link href="/podcast/how-ryan-built-an-online-fitness-business-from-a-weight-loss-challenge" className="text-gold hover:underline">Ryan&apos;s story of building an online business from a weight-loss challenge</Link> is the honest version of how long this actually takes.
                 </p>
               </div>
             </div>
@@ -498,7 +498,7 @@ export default function HowToBecomePtUkPage() {
                 { myth: "Being under 30.", reality: "Career-changer PTs in their 40s and 50s often outperform 22-year-olds because they bring life experience. See our case for older learners." },
                 { myth: "A perfect physique.", reality: "Clients hire trust and competence, not aesthetics. Some of the best PTs we know don&apos;t look like the Instagram version. They look like normal people who know what they're doing." },
                 { myth: "Quitting your day job first.", reality: "Almost every working PT we&apos;ve hired qualified while still in their previous job. The course is designed to be done around full-time work." },
-                { myth: "A massive social media following before you start.", reality: "Useful if you go fully online, optional if you go employed or rent-a-space. The £500K PT we know best built his presence after he started, not before." },
+                { myth: "A massive social media following before you start.", reality: "Useful if you go fully online, optional if you go employed or rent-a-space. Ryan's online business started as a weight-loss challenge he ran in the gym to fill his PT diary, not from a big following." },
                 { myth: "A separate Level 4 specialism before you can start.", reality: "Level 3 is the legal threshold. Level 4 (older adults, low back pain, etc.) is bonus — earned after you&apos;re working, not before." },
               ].map((m) => (
                 <li key={m.myth} className="rounded-2xl border border-white/[0.07] bg-card p-5">

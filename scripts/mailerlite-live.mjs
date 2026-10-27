@@ -210,7 +210,7 @@ Callum` },
     subject: '3 episodes worth your commute',
     body: `{$name|"there"}, if you've got a drive or a session ahead, start here:
 
-🎧 How I built an online PT business to £500K — Ryan's full story
+🎧 How Ryan built an online fitness business from a weight-loss challenge
 🎧 Is becoming a personal trainer still worth it? The honest answer
 🎧 Will AI replace personal trainers? The honest answer
 
@@ -265,13 +265,13 @@ That's it. Try it this week.
 
 Callum` },
   { name: 'LIVE Nurture — W1 Fri — Ryan £500k (pod)',
-    subject: 'How Ryan built an online PT business to £500K',
+    subject: 'How Ryan built an online fitness business from a weight-loss challenge',
     preview: 'The full story — what worked and what he\'d never do again.',
     body: `{$name|"there"}, if you ever wonder what's actually possible as a coach, listen to this one.
 
-Ryan built an online PT business to £500K — then tells the honest version: what worked, what nearly broke him, and what he'd do differently from day one.
+Ryan's online business started as a £30-a-head weight-loss challenge he ran to fill his PT diary. In lockdown he took it online and sold over a thousand places worldwide overnight — then a split with a business partner forced him to start again. This is the honest version, plus what he'd tell any PT building online.
 
-🎧 ${POD_EP('how-i-built-an-online-pt-business-to-500k-ryans-full-story')}
+🎧 ${POD_EP('how-ryan-built-an-online-fitness-business-from-a-weight-loss-challenge')}
 
 Not a highlight reel. The real thing.
 
@@ -337,13 +337,13 @@ We go deep on this with coaches who've done it on the live sessions — you're a
 
 Callum` },
   { name: 'LIVE Nurture — W3 Fri — Shut down £500k (pod)',
-    subject: 'Why I shut down my £500K online PT business',
-    preview: 'The honest story behind walking away.',
+    subject: 'Why personal trainers quit in the first two years',
+    preview: 'Why most PTs leave within two years, and how not to.',
     body: `{$name|"there"}, success isn't always what it looks like from the outside.
 
-This episode is the honest story of building an online PT business to £500K — and choosing to shut it down. The lessons in here will save you years.
+Around 80% of personal trainers leave the industry within their first two years. Ryan and I break down why — inconsistent income, tax surprises, underpriced clients, burnout — and Ryan explains why he's closing the Shred challenges after 10 years to focus on boxing and PT Launch Lab. The lessons in here will save you years.
 
-🎧 ${POD_EP('why-i-shut-down-my-500k-online-pt-business-the-honest-story')}
+🎧 ${POD_EP('why-personal-trainers-quit-in-the-first-two-years')}
 
 Callum` },
 

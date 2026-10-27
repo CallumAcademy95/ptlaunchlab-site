@@ -145,7 +145,7 @@ export default function SalaryCalculatorClient() {
             <Link href="/personal-trainer-salary-uk" className="text-gold underline hover:no-underline">
               UK Personal Trainer Salary 2026 guide
             </Link>{" "}
-            — Mac Livock (PureGym manager, EP8), Ryan Robinson (£500K PT, EP6), and 30+ podcast hours of real industry numbers.
+            — Mac Livock (PureGym manager, EP8), Ryan Robinson (online challenge business, EP6), and 30+ podcast hours of real industry numbers.
           </p>
         </div>
       </section>

@@ -120,6 +120,19 @@ const nextConfig: NextConfig = {
         destination: "/online-personal-trainer-course-uk",
         permanent: true,
       },
+      // Oct 2026: four podcast slugs carried text the episodes don't support
+      // (an unsupported "£500K" claim) or misspelt guest names. Renamed to
+      // match the current titles; the old URLs keep working via one hop.
+      ...[
+        ["how-i-built-an-online-pt-business-to-500k-ryans-full-story", "how-ryan-built-an-online-fitness-business-from-a-weight-loss-challenge"],
+        ["why-i-shut-down-my-500k-online-pt-business-the-honest-story", "why-personal-trainers-quit-in-the-first-two-years"],
+        ["how-personal-training-made-me-a-better-racing-driver-zak-meakin", "from-go-karts-to-british-gt4-champion-zac-meakin"],
+        ["super-league-debut-to-heart-surgery-kiels-story", "from-super-league-debut-to-open-heart-surgery-keals-story"],
+      ].map(([from, to]) => ({
+        source: `/podcast/${from}`,
+        destination: `/podcast/${to}`,
+        permanent: true,
+      })),
       // The pruned [location] templates: one permanent hop to the nearest
       // real page, generated from the location data (app/lib/locationRedirects.ts).
       ...locationRedirects(),

@@ -167,7 +167,7 @@ export const episodesIndex: EpisodeIndex[] = [
   },
   {
     "id": "gfA-LCPXpBM",
-    "slug": "super-league-debut-to-heart-surgery-kiels-story",
+    "slug": "from-super-league-debut-to-open-heart-surgery-keals-story",
     "ep": 19,
     "title": "From Super League Debut to Open-Heart Surgery — Keal's Story",
     "date": "2025-11-10",
@@ -203,7 +203,7 @@ export const episodesIndex: EpisodeIndex[] = [
   },
   {
     "id": "IDkRUIeXU4E",
-    "slug": "how-personal-training-made-me-a-better-racing-driver-zak-meakin",
+    "slug": "from-go-karts-to-british-gt4-champion-zac-meakin",
     "ep": 13,
     "title": "From Go-Karts to British GT4 Champion — Zac Meakin's Story",
     "date": "2025-09-24",
@@ -230,7 +230,7 @@ export const episodesIndex: EpisodeIndex[] = [
   },
   {
     "id": "S9zcs6P5mn8",
-    "slug": "why-i-shut-down-my-500k-online-pt-business-the-honest-story",
+    "slug": "why-personal-trainers-quit-in-the-first-two-years",
     "ep": 10,
     "title": "Why Personal Trainers Quit in the First Two Years",
     "date": "2025-08-29",
@@ -266,7 +266,7 @@ export const episodesIndex: EpisodeIndex[] = [
   },
   {
     "id": "1HK7woXEWhI",
-    "slug": "how-i-built-an-online-pt-business-to-500k-ryans-full-story",
+    "slug": "how-ryan-built-an-online-fitness-business-from-a-weight-loss-challenge",
     "ep": 6,
     "title": "How Ryan Built an Online Fitness Business From a Weight Loss Challenge",
     "date": "2025-07-25",
