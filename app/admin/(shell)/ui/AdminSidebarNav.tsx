@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Building2,
+  CalendarDays,
   Circle,
   Gift,
   HelpCircle,
@@ -24,6 +25,7 @@ import { ADMIN_NAV, isActiveItem } from "../nav";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   building: Building2,
+  calendar: CalendarDays,
   gift: Gift,
   chart: BarChart3,
   message: MessageSquare,
