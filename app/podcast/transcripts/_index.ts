@@ -34,7 +34,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "pekkJVhEY8w",
     "slug": "ai-glp-1s-and-the-death-of-the-20-personal-trainer",
     "ep": 34,
-    "title": "AI, GLP-1s and the Death of the £20 Personal Trainer — PT Launch Lab LIVE",
+    "title": "AI, GLP-1s and the Death of the £20 Personal Trainer",
     "date": "2026-08-04",
     "category": "industry",
     "wordCount": 15522
@@ -52,7 +52,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "-ZHxWBvBYrw",
     "slug": "why-in-person-personal-training-will-be-ai-proof-sohail-rashid",
     "ep": 32,
-    "title": "Why In-Person Personal Training Will Be AI-Proof — Sohail Rashid",
+    "title": "Why In-Person Personal Training Is AI-Proof — Sohail Rashid, Brawn",
     "date": "2026-04-30",
     "category": "business",
     "wordCount": 14835
@@ -70,7 +70,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "vnsAYYOpshg",
     "slug": "from-council-estate-to-stage-with-dizzee-rascal-now-im-a-personal-trainer",
     "ep": 30,
-    "title": "From Council Estate to Stage with Dizzee Rascal — Now I'm a Personal Trainer",
+    "title": "From the Army to Dizzee Rascal's Stage to Personal Trainer — Kav",
     "date": "2026-04-14",
     "category": "transformation",
     "wordCount": 10547
@@ -79,7 +79,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "n4h2p1eE_Qw",
     "slug": "what-90-of-blood-tests-reveal-even-when-you-feel-fine",
     "ep": 29,
-    "title": "What 90% of Blood Tests Reveal (Even When You Feel Fine)",
+    "title": "What Can a Blood Test Reveal When You Feel Fine?",
     "date": "2026-04-13",
     "category": "industry",
     "wordCount": 10258
@@ -97,7 +97,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "bpESntFMy0w",
     "slug": "from-addiction-to-full-time-boxing-coach-pembos-story",
     "ep": 27,
-    "title": "From Addiction to Full-Time Boxing Coach: Pembo's Story",
+    "title": "How Pembo Got Sober and Became a Full-Time Boxing Coach",
     "date": "2026-02-10",
     "category": "transformation",
     "wordCount": 7368
@@ -106,7 +106,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "tgDP_hoObwM",
     "slug": "building-a-martial-arts-gym-from-scratch-ty-harrison",
     "ep": 26,
-    "title": "Building a Martial Arts Gym from Scratch — Ty Harrison",
+    "title": "How to Open a Martial Arts School: Ty Harrison's Story",
     "date": "2026-01-28",
     "category": "industry",
     "wordCount": 10039
@@ -115,7 +115,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "C8t9nC2HxOM",
     "slug": "world-class-dancer-to-yoga-studio-owner-lauras-story",
     "ep": 25,
-    "title": "World-Class Dancer to Yoga Studio Owner: Laura's Story",
+    "title": "From Competitive Dancer to Opening a Yoga Studio — Laura's Story",
     "date": "2026-01-21",
     "category": "transformation",
     "wordCount": 9762
@@ -133,7 +133,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "70EkHHRizj8",
     "slug": "the-reality-of-running-multiple-fitness-businesses",
     "ep": 23,
-    "title": "The Reality of Running Multiple Fitness Businesses",
+    "title": "New Year Fitness Goals and How to Start the Gym Without Burning Out",
     "date": "2026-01-01",
     "category": "business",
     "wordCount": 7308
@@ -142,7 +142,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "4jITjBvGXXU",
     "slug": "british-powerlifting-champion-to-bodybuilding-burnout-sam-hincks",
     "ep": 22,
-    "title": "British Powerlifting Champion to Bodybuilding Burnout — Sam Hincks",
+    "title": "Powerlifter to Bodybuilder: The Prep That Broke Sam Hincks",
     "date": "2025-12-15",
     "category": "industry",
     "wordCount": 12025
@@ -151,7 +151,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "NrV3eqA3S5Q",
     "slug": "what-most-pts-get-wrong-about-movement-kim-tomlin",
     "ep": 21,
-    "title": "What Most PTs Get Wrong About Movement — Kim Tomlin",
+    "title": "Biomechanics for Personal Trainers — Kim Tomlin on Primal Flows",
     "date": "2025-12-08",
     "category": "industry",
     "wordCount": 9004
@@ -169,7 +169,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "gfA-LCPXpBM",
     "slug": "super-league-debut-to-heart-surgery-kiels-story",
     "ep": 19,
-    "title": "Super League Debut to Heart Surgery — Kiel's Story",
+    "title": "From Super League Debut to Open-Heart Surgery — Keal's Story",
     "date": "2025-11-10",
     "category": "transformation",
     "wordCount": 12187
@@ -187,7 +187,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "4r_4ZegftMY",
     "slug": "from-addiction-to-personal-trainer-marcus-mean-and-clean",
     "ep": 15,
-    "title": "From Addiction to Personal Trainer — Marcus, Mean and Clean",
+    "title": "From Addiction to Fitness: How Marcus Built Mean and Clean",
     "date": "2025-10-21",
     "category": "transformation",
     "wordCount": 8486
@@ -205,7 +205,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "IDkRUIeXU4E",
     "slug": "how-personal-training-made-me-a-better-racing-driver-zak-meakin",
     "ep": 13,
-    "title": "How Personal Training Made Me a Better Racing Driver — Zak Meakin",
+    "title": "From Go-Karts to British GT4 Champion — Zac Meakin's Story",
     "date": "2025-09-24",
     "category": "industry",
     "wordCount": 7862
@@ -232,7 +232,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "S9zcs6P5mn8",
     "slug": "why-i-shut-down-my-500k-online-pt-business-the-honest-story",
     "ep": 10,
-    "title": "Why I Shut Down My £500K Online PT Business — The Honest Story",
+    "title": "Why Personal Trainers Quit in the First Two Years",
     "date": "2025-08-29",
     "category": "business",
     "wordCount": 4621
@@ -241,7 +241,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "I1Yrhd9GZZU",
     "slug": "how-we-scaled-pt-launch-lab-courses-with-sam-merve-edtech",
     "ep": 9,
-    "title": "How We Scaled PT Launch Lab Courses — with Sam, Merve EdTech",
+    "title": "Mistakes to Avoid When Starting a Business — Sam, Merve EdTech",
     "date": "2025-08-13",
     "category": "business",
     "wordCount": 8455
@@ -259,7 +259,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "brMSj4dfdBE",
     "slug": "is-becoming-a-personal-trainer-still-worth-it-the-honest-answer",
     "ep": 7,
-    "title": "Is Becoming a Personal Trainer Still Worth It? The Honest Answer",
+    "title": "Is Becoming a Personal Trainer Worth It? Is the UK Market Saturated?",
     "date": "2025-08-02",
     "category": "business",
     "wordCount": 5225
@@ -268,7 +268,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "1HK7woXEWhI",
     "slug": "how-i-built-an-online-pt-business-to-500k-ryans-full-story",
     "ep": 6,
-    "title": "How I Built an Online PT Business to £500K — Ryan's Full Story",
+    "title": "How Ryan Built an Online Fitness Business From a Weight Loss Challenge",
     "date": "2025-07-25",
     "category": "business",
     "wordCount": 6955
@@ -277,7 +277,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "0rhp9fkBFsU",
     "slug": "sick-of-the-9-5-how-to-build-a-fitness-career-you-actually-want",
     "ep": null,
-    "title": "Sick of the 9–5? How to Build a Fitness Career You Actually Want",
+    "title": "How to Become a Personal Trainer in the UK — Our Online Course",
     "date": "2025-10-17",
     "category": "business",
     "wordCount": 842
@@ -286,7 +286,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "CDR39D_Esg8",
     "slug": "good-clients-vs-nightmare-clients-what-every-pt-needs-to-know",
     "ep": null,
-    "title": "Good Clients vs Nightmare Clients — What Every PT Needs to Know",
+    "title": "Good vs Bad Personal Training Clients: The Red Flags Every PT Meets",
     "date": "2025-07-05",
     "category": "business",
     "wordCount": 5301
@@ -304,7 +304,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "LlPK2PzCrRA",
     "slug": "the-brutal-reality-of-a-personal-trainers-working-hours",
     "ep": null,
-    "title": "The Brutal Reality of a Personal Trainer's Working Hours",
+    "title": "PT's Brutal Hours: Real Talk on the Grind in the Fitness Industry",
     "date": "2025-07-19",
     "category": "business",
     "wordCount": 175
@@ -313,7 +313,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "id": "of0Zf6Jscgo",
     "slug": "why-most-fitness-influencers-are-lying-to-you",
     "ep": null,
-    "title": "Why Most Fitness Influencers Are Lying to You",
+    "title": "Are Fitness Influencers Good Role Models for New Personal Trainers?",
     "date": "2025-07-19",
     "category": "industry",
     "wordCount": 6514
