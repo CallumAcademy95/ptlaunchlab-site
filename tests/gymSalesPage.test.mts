@@ -55,7 +55,17 @@ test("quotes are verbatim from the gym's reviews fixture", () => {
     const f = QUOTE_FIXTURES[g.gymSlug];
     assert.ok(f, `${g.gymSlug}: add its reviews fixture to QUOTE_FIXTURES`);
     const text = readFileSync(new URL(f, ROOT), "utf8");
-    for (const q of g.salesPage!.quotes) assert.ok(text.includes(q.text), `${g.gymSlug}: not verbatim: ${q.text.slice(0, 50)}`);
+    for (const q of g.salesPage!.quotes) {
+      assert.ok(q.text.trim().length >= 20, `${g.gymSlug}: quote too short`);
+      assert.ok(text.includes(q.text),`${g.gymSlug}: not verbatim: ${q.text.slice(0, 50)}`);
+    }
+  }
+});
+
+test("salesPage gyms use a 6-digit hex heroBg (the hero overlay appends alpha to it)", () => {
+  for (const g of withSales) {
+    const bg = g.heroBg ?? "#000000";
+    assert.match(bg, /^#[0-9a-f]{6}$/i, g.gymSlug);
   }
 });
 

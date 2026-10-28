@@ -100,7 +100,7 @@ export const atpFelixstoweAcademy: GymConfig = {
     path: {
       heading: "What becoming a coach here looks like",
       steps: [
-        "Qualify online in 8–16 weeks, around your job.",
+        "Qualify online, typically in 8–16 weeks, around your job.",
         "Practise in the gym you train in.",
         "When you qualify, ATP gets the first introduction to you.",
         "Coach your own clients.",

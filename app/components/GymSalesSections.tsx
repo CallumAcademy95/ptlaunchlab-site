@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { GymSalesPage } from "@/app/lib/gymPartnerConfig";
+import { readableOn } from "@/app/lib/readableOn";
 
 // Sales-page sections for a gym academy page (spec 2026-10-28). Rendered by
 // GymAcademyPage only when the gym's config has a salesPage block. Copy and
@@ -54,6 +55,7 @@ export function MemberQuotes({ s, accent }: { s: GymSalesPage; accent: string })
 }
 
 export function CoachPath({ s, accent, gymName }: { s: GymSalesPage; accent: string; gymName: string }) {
+  const numberColor = readableOn(accent, ["#FFFFFF", "#000000"]);
   return (
     <section className="bg-gray-50 py-16 md:py-24">
       <div className="max-w-3xl mx-auto px-6">
@@ -61,7 +63,7 @@ export function CoachPath({ s, accent, gymName }: { s: GymSalesPage; accent: str
         <ol className="space-y-4">
           {s.path.steps.map((step, i) => (
             <li key={step} className="flex items-start gap-4 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-              <span className="w-9 h-9 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0" style={{ backgroundColor: accent }}>{i + 1}</span>
+              <span className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm shrink-0" style={{ backgroundColor: accent, color: numberColor }}>{i + 1}</span>
               <span className="text-black font-bold text-base pt-1.5">{step}</span>
             </li>
           ))}
@@ -78,7 +80,8 @@ export function CommunityBand({ s, accent }: { s: GymSalesPage; accent: string }
   return (
     <section className="relative overflow-hidden bg-black">
       <div className="absolute inset-0">
-        <Image src={s.community.image} alt={s.community.imageAlt} fill sizes="100vw" className="object-cover opacity-50" />
+        <Image src={s.community.image} alt={s.community.imageAlt} fill sizes="100vw" className="object-cover opacity-40" />
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 70%)" }} />
       </div>
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 md:py-32 text-center">
         <p className="text-3xl md:text-5xl font-black text-white uppercase leading-tight">
