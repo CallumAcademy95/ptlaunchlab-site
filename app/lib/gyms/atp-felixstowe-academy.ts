@@ -49,6 +49,70 @@ export const atpFelixstoweAcademy: GymConfig = {
     "A community gym that is open to everyone, which is exactly the client base a new PT builds on",
   ],
 
+  // Sales page (28 Oct 2026 pilot). Voice and claims come from ATP's own
+  // Instagram (@atpfitnessfelixstowe) and website: George describes coaching
+  // as talking the session through, watching technique and building
+  // confidence. Written for people who have only SEEN ATP as well as members.
+  // Photos are from atpfitnessfelixstowe.com (agreement cl. 6.3: show George).
+  salesPage: {
+    heroImage: "/gym-photos/atp-felixstowe/hero.jpg",
+    heroImageAlt: "ATP Fitness coaches watching a member's squat",
+    heroHeadline: ["Become the coach", "you'd want to train with."],
+    heroSubline:
+      "You've seen how ATP coaches: talking people through every session, watching technique, building confidence. Now learn to do it yourself. Qualify as a personal trainer through ATP Fitness Felixstowe.",
+    coaching: {
+      heading: "The coaching ATP is known for. That's the job.",
+      intro: "Good coaching. Good people. Good energy. Here is what that looks like on the gym floor.",
+      cards: [
+        {
+          image: "/gym-photos/atp-felixstowe/talk.jpg",
+          imageAlt: "An ATP coach talking members through the session",
+          title: "Talk it through",
+          body: "Explain the session and why you're doing it. People train harder for a coach they understand.",
+        },
+        {
+          image: "/gym-photos/atp-felixstowe/watch.jpg",
+          imageAlt: "An ATP coach spotting a bench press",
+          title: "Watch the movement",
+          body: "Demonstrate it, watch the technique, reinforce good patterns. Seeing what's off and fixing it is the core of the job.",
+        },
+        {
+          image: "/gym-photos/atp-felixstowe/confidence.jpg",
+          imageAlt: "An ATP coach and a member sharing a laugh mid-session",
+          title: "Build confidence",
+          body: "Adjust, give feedback, keep it fun. People stay with the coach who makes them feel capable.",
+        },
+      ],
+      closingLine: "This course teaches you how to do all three, properly.",
+    },
+    quotesHeading: "What people say about coaching at ATP",
+    quotes: [
+      {
+        text: "A great gym, great coaching and great community. I would highly recommend it to everyone, any ability!",
+        attribution: "ATP Fitness member",
+      },
+      {
+        text: "The loveliest, friendliest gym. I love that we follow a programme in a small coaching environment, it takes the confusion out of training. Such a fab group of people and I always come away from class smiling and feeling like I've achieved.",
+        attribution: "ATP Fitness member",
+      },
+    ],
+    quotesSource: "https://www.atpfitnessfelixstowe.com/reviews",
+    path: {
+      heading: "What becoming a coach here looks like",
+      steps: [
+        "Qualify online in 8–16 weeks, around your job.",
+        "Practise in the gym you train in.",
+        "When you qualify, ATP gets the first introduction to you.",
+        "Coach your own clients.",
+      ],
+    },
+    community: {
+      image: "/gym-photos/atp-felixstowe/community.jpg",
+      imageAlt: "ATP Fitness members and coaches together in front of the ATP sign",
+      line: "Different people. Different goals. One community.",
+    },
+  },
+
   metaTitle: "ATP PT Academy Felixstowe | Become a Qualified Personal Trainer",
   metaDescription:
     "Train, qualify and earn at ATP Fitness Felixstowe. Get your Level 2 & 3 PT qualification here, paid in full or monthly. Mentorship included.",
