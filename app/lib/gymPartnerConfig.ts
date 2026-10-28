@@ -62,8 +62,32 @@ export interface GymConfig {
     detail?: string;   // optional second line
   };
 
+  // ── Optional sales-page block (spec 2026-10-28). When set, the hero becomes
+  //    a photo with this copy and the generic HOOK/POSITIONING sections are
+  //    replaced by the gym's own coaching story, member quotes and path.
+  //    Gyms without it render exactly as before.
+  salesPage?: GymSalesPage;
+
   // ── SEO
   metaTitle: string;
   metaDescription: string;
   canonicalPath: string;     // e.g. "/6fit-academy"
+}
+
+export interface GymSalesPage {
+  heroImage: string;            // /public path, landscape
+  heroImageAlt: string;
+  heroHeadline: string[];       // h1 lines; the last line takes darkAccent
+  heroSubline: string;          // sentence case, replaces heroSubline in the hero
+  coaching: {
+    heading: string;
+    intro: string;
+    cards: { image: string; imageAlt: string; title: string; body: string }[]; // exactly 3
+    closingLine: string;
+  };
+  quotesHeading: string;
+  quotes: { text: string; attribution: string }[];   // verbatim from the gym's reviews, 1–3
+  quotesSource: string;         // URL the quotes are copied from
+  path: { heading: string; steps: string[] };       // 3–5 steps
+  community: { image: string; imageAlt: string; line: string };
 }

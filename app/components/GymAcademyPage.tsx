@@ -15,6 +15,7 @@ import GymCtaLink from "@/app/components/GymCtaLink";
 import StickyCtaBar from "@/app/components/cta/StickyCtaBar";
 import NapLine from "@/app/components/NapLine";
 import { readableOn } from "@/app/lib/readableOn";
+import { CoachingStory, MemberQuotes, CoachPath, CommunityBand } from "@/app/components/GymSalesSections";
 
 const ATP_SIX_MONTH_TOTAL = formatPence(ATP_LADDER.sixMonth.contractPence); // £1,599
 /** What an ATP member code saves: £1,599 → £999.99 (£599.01), shown as £599 (never rounded up). */
@@ -50,6 +51,11 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
   const atp = isAtp(c.gymSlug);
   const savingPence = atp ? 0 : memberSavingForGym(c.gymSlug).savingPence;
   const memberPriceLabel = savingPence > 0 ? formatPence(memberPricePence(savingPence)) : null;
+  // Sales-page block (spec 2026-10-28): photo hero, the gym's own coaching
+  // story, quotes and path in place of the generic HOOK/POSITIONING. Absent →
+  // the page renders exactly as before.
+  const sales = c.salesPage;
+  const headline = sales ? sales.heroHeadline : c.heroHeadline;
 
   return (
     <>
@@ -57,8 +63,15 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
         {/* ── HERO ── */}
         <section className="relative overflow-hidden" style={{ backgroundColor: bg }}>
-          <div className="absolute inset-0 opacity-25 pointer-events-none"
-            style={{ background: `radial-gradient(ellipse at 80% 50%, ${dark}, transparent 55%)` }} />
+          {sales ? (
+            <div className="absolute inset-0 pointer-events-none">
+              <Image src={sales.heroImage} alt={sales.heroImageAlt} fill priority sizes="100vw" className="object-cover" />
+              <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${bg} 0%, ${bg}E6 45%, ${bg}99 100%)` }} />
+            </div>
+          ) : (
+            <div className="absolute inset-0 opacity-25 pointer-events-none"
+              style={{ background: `radial-gradient(ellipse at 80% 50%, ${dark}, transparent 55%)` }} />
+          )}
 
           <div className={atp ? "relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-24" : "relative z-10 max-w-5xl mx-auto px-6 pt-10 pb-14 md:py-24"}>
             <div className={atp ? "flex items-center gap-3 mb-8" : "flex items-center gap-3 mb-6 md:mb-8"}>
@@ -79,13 +92,15 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white uppercase leading-[1.0] mb-5">
-              {c.heroHeadline.slice(0, -1).map((line, i) => (
+              {headline.slice(0, -1).map((line, i) => (
                 <span key={i}>{line}<br /></span>
               ))}
-              <span style={{ color: dark }}>{c.heroHeadline[c.heroHeadline.length - 1]}</span>
+              <span style={{ color: dark }}>{headline[headline.length - 1]}</span>
             </h1>
 
-            {c.heroSubline && (
+            {sales ? (
+              <p className="text-white/85 text-lg md:text-xl leading-relaxed max-w-2xl mb-8">{sales.heroSubline}</p>
+            ) : c.heroSubline && (
               <p className={atp ? "text-white/60 text-lg font-semibold uppercase tracking-widest mb-8" : "text-white/60 text-lg font-semibold uppercase tracking-widest mb-5 md:mb-8"}>{c.heroSubline}</p>
             )}
 
@@ -141,6 +156,16 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
           </div>
         </section>
 
+        {sales && (
+          <>
+            <CoachingStory s={sales} accent={dark} />
+            <MemberQuotes s={sales} accent={dark} />
+            <CoachPath s={sales} accent={c.primaryColor} gymName={c.gymName} />
+          </>
+        )}
+
+        {!sales && (
+          <>
         {/* ── HOOK ── */}
         <section className="bg-white py-16 md:py-24">
           <div className="max-w-3xl mx-auto px-6">
@@ -185,6 +210,9 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
             </div>
           </div>
         </section>
+
+          </>
+        )}
 
         {/* ── WHAT YOU GET ── */}
         <section className="bg-white py-16 md:py-24">
@@ -391,6 +419,8 @@ export default function GymAcademyPage({ config: c }: { config: GymConfig }) {
 
         {/* ── RING ME ── */}
         <GymCallbackForm gymSlug={c.gymSlug} gymName={c.gymName} accent={c.primaryColor} />
+
+        {sales && <CommunityBand s={sales} accent={dark} />}
 
         {/* ── FINAL CTA ── */}
         <section className="py-16 md:py-20" style={{ backgroundColor: sectionBg }}>
