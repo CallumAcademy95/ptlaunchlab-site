@@ -358,8 +358,16 @@ function resolve(rules: Rule[], path: string): Rule | null {
   return null;
 }
 /** A real (static) page in app/ for this path. */
-const pageExists = (path: string) =>
-  existsSync(join(ROOT, "app", path === "/" ? "" : path.slice(1), "page.tsx"));
+// A podcast episode is a real page when app/podcast/[slug] would render it:
+// the slug is in the episode index and its transcript file exists.
+const episodeExists = (slug: string) =>
+  src("app/podcast/transcripts/_index.ts").includes(`"slug": "${slug}"`) &&
+  existsSync(join(ROOT, "app/podcast/transcripts", `${slug}.json`));
+const pageExists = (path: string) => {
+  const episode = path.match(/^\/podcast\/([a-z0-9-]+)$/);
+  if (episode) return episodeExists(episode[1]);
+  return existsSync(join(ROOT, "app", path === "/" ? "" : path.slice(1), "page.tsx"));
+};
 
 test("the [location] templates are gone; the module lists all 31 of them", async () => {
   const { TEMPLATES } = await loadRedirects();
