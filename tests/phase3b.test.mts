@@ -190,7 +190,7 @@ test("/courses: MoneyHero with the spec copy and image, sticky bar watching it",
   const c = src("app/courses/page.tsx");
   const h = heroOf(c);
   assert.ok(h.includes(EYEBROW), "eyebrow");
-  assert.ok(h.includes('headline="The online NCFE Level 2 & 3 PT course,"'), "headline");
+  assert.ok(h.includes('headline="The online Level 2 & 3 Personal Trainer Course,"'), "headline");
   assert.ok(h.includes('goldTail="around your job."'), "goldTail");
   assert.ok(h.includes('subline="Qualify in 8–16 weeks, with business training and a guaranteed gym introduction."'), "subline");
   assert.ok(h.includes('source="courses-hero"'), "source");

@@ -19,7 +19,7 @@ const UPDATED = "2026-10-21";
 export const metadata: Metadata = {
   title: "Best Online Personal Trainer Course UK 2026: Level 3 Compared",
   description:
-    "The complete UK guide to online personal trainer courses. Compare 10 providers (HFE, Train Fitness, OriGym, PT Launch Lab and more) on price, accreditation, mentorship and earnings. Written by gym owners who've hired 500+ PTs.",
+    "Compare 10 UK online personal trainer courses (HFE, OriGym, Train Fitness and more) on price, accreditation, mentorship and earnings.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: "article",

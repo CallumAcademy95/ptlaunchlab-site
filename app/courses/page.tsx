@@ -8,9 +8,11 @@ import StickyCtaBar from "../components/cta/StickyCtaBar";
 import { faqPageSchema } from "@/app/lib/faqSchema";
 import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, COURSE_PRICE_PENCE, formatPence } from "@/app/lib/pricing";
 
+// The title leads with the phrase people search ("personal trainer course",
+// 2,900 a month UK); the description stays under ~155 chars so Google shows it whole.
 export const metadata = {
-  title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
-  description: `The straightforward route from your current job into personal training. NCFE Level 2 & 3, Ofqual regulated, done around your job. ${COURSE_PRICE_LABEL} or ${MONTHLY_PLAN_LABEL} monthly, with our Mentorship Hub included.`,
+  title: "Personal Trainer Course Online | NCFE Level 2 & 3 | PT Launch Lab",
+  description: `Online NCFE Level 2 & 3 personal trainer course, Ofqual regulated. Qualify around your job in 8–16 weeks. ${COURSE_PRICE_LABEL}, everything included.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/courses",
   },
@@ -214,7 +216,7 @@ export default function CoursesPage() {
         {/* HERO: what it is, what it costs, how to start */}
         <MoneyHero
           eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"
-          headline="The online NCFE Level 2 & 3 PT course,"
+          headline="The online Level 2 & 3 Personal Trainer Course,"
           goldTail="around your job."
           subline="Qualify in 8–16 weeks, with business training and a guaranteed gym introduction."
           source="courses-hero"
