@@ -6,11 +6,13 @@ import MoneyHero from "../components/money/MoneyHero";
 import TwoWayCTA from "../components/cta/TwoWayCTA";
 import StickyCtaBar from "../components/cta/StickyCtaBar";
 import { faqPageSchema } from "@/app/lib/faqSchema";
-import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, COURSE_PRICE_PENCE, formatPence } from "@/app/lib/pricing";
+import { COURSE_PRICE_LABEL, MONTHLY_PRICE_LABEL, MONTHLY_PLAN_LABEL, MONTHLY_PAYMENTS, MONTHLY_PLAN_TOTAL_PENCE, COURSE_PRICE_PENCE, TYPICAL_COST_LABEL, formatPence } from "@/app/lib/pricing";
 
+// The title leads with the phrase people search ("personal trainer course",
+// 2,900 a month UK); the description stays under ~155 chars so Google shows it whole.
 export const metadata = {
-  title: "NCFE Level 2 & 3 Personal Trainer Courses Online | PT Launch Lab",
-  description: `The straightforward route from your current job into personal training. NCFE Level 2 & 3, Ofqual regulated, done around your job. ${COURSE_PRICE_LABEL} or ${MONTHLY_PLAN_LABEL} monthly, with our Mentorship Hub included.`,
+  title: "Personal Trainer Course Online | NCFE Level 2 & 3 | PT Launch Lab",
+  description: `Online NCFE Level 2 & 3 personal trainer course, Ofqual regulated. Qualify around your job in 8–16 weeks. ${COURSE_PRICE_LABEL}, everything included.`,
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/courses",
   },
@@ -21,7 +23,7 @@ const courseSchema = {
   "@type": "Course",
   name: "NCFE Level 2 & 3 Personal Trainer Qualification",
   description:
-    `100% online NCFE Level 2 & 3 PT qualification. ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. Includes our Mentorship Hub, a personal tutor, business training, and guaranteed warm introduction to a gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.`,
+    `100% online NCFE Level 2 & 3 PT qualification. ${COURSE_PRICE_LABEL} in full or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. Includes our Mentorship Hub, a personal tutor, business training, and a guaranteed warm introduction to gyms — all bundled, no paid upgrades. Qualify in 8–16 weeks.`,
   provider: {
     "@type": "Organization",
     name: "PT Launch Lab",
@@ -182,13 +184,116 @@ const compare = [
   { what: "A guaranteed gym introduction", typical: "On you to find them", us: "We introduce you" },
 ];
 
+// Level 2 vs Level 3. What each qualifies you to do, in plain terms. Matches
+// the wording on /online-personal-trainer-course-uk.
+const levels = [
+  {
+    level: "Level 2",
+    title: "Gym Instructor",
+    body: "The entry qualification. It lets you work on the gym floor: running inductions, showing members how to use equipment safely and supervising them while they train. On its own it does not make you a personal trainer, and it is not enough to take one-to-one paying clients.",
+  },
+  {
+    level: "Level 3",
+    title: "Personal Trainer",
+    body: "The qualification that lets you work one to one with paying clients. You learn to run a consultation, assess a new client, design and adapt programmes over weeks and months, give nutrition guidance within your scope, and train people with common health conditions safely.",
+  },
+];
+
+// How the fully online course runs, enrolment to sign-off. Practicals are
+// video-assessed; nothing here may suggest classroom or centre attendance.
+const studySteps = [
+  {
+    num: "01",
+    title: "Enrol and meet your tutor",
+    body: "You get access to the course as soon as you enrol, and your personal tutor is introduced within 24 hours. They are your point of contact for questions, feedback and keeping to a steady pace.",
+  },
+  {
+    num: "02",
+    title: "Study the theory online",
+    body: "Anatomy, nutrition, programme design and the rest are taught in online modules you work through at your own pace, on a laptop or phone. You complete written assignments as you go, and your tutor marks them and gives you feedback.",
+  },
+  {
+    num: "03",
+    title: "Film your practical sessions",
+    body: "The practical units are assessed by video. You coach a friend or family member through real sessions, such as an induction, a programme and technique work, at any gym you can train in. You film it and upload it. There is no training centre to travel to.",
+  },
+  {
+    num: "04",
+    title: "Get signed off",
+    body: "Your tutor watches the footage and either signs it off or tells you what to fix. Not everyone passes every unit first time, and that is normal: you resubmit using the feedback. Once every unit is passed, you are qualified.",
+  },
+];
+
+// Recognition. Claims here are about the qualification (NCFE, Ofqual,
+// CIMSPA), never about where it was studied.
+const recognition = [
+  {
+    title: "Ofqual regulated",
+    body: "Every legitimate Level 2 and Level 3 fitness qualification is on the Ofqual register. You can check ours yourself: Ofqual reference 603/4388/6.",
+  },
+  {
+    title: "CIMSPA recognised",
+    body: "CIMSPA is the professional body for the UK fitness sector. Once you qualify, you can join the CIMSPA register as a personal trainer.",
+  },
+  {
+    title: "Insurable",
+    body: "Insurers cover personal trainers on the qualification standard. An NCFE Level 3 studied online sits in the same insurance band as one studied in a classroom.",
+  },
+];
+
+// After qualifying. The gym introduction is an introduction only: the
+// interview and any job are the gym's decision.
+const afterSteps = [
+  {
+    num: "01",
+    title: "Register and get insured",
+    body: "Join the CIMSPA register and take out public liability insurance. Both are yours to arrange, and together they let you take paying clients. Many gyms also ask for a first aid certificate, so check what yours wants.",
+  },
+  {
+    num: "02",
+    title: "Your gym introduction",
+    body: "We introduce you to at least one gym: one in our partner network, or one local to you that we approach on your behalf. Whether they interview you and offer you work is their decision. We have hired 500+ PTs ourselves, so we help you prepare.",
+  },
+  {
+    num: "03",
+    title: "Keep going in the Mentorship Hub",
+    body: "The Mentorship Hub is included in your fee. It is built to walk you from qualifying to your first paying client, with Callum, Miles and Ryan a message away when you are stuck. Finding clients is still your work; the Hub shows you how to go about it.",
+  },
+  {
+    num: "04",
+    title: "Specialise when you are ready",
+    body: "With your Level 3 you can go on to Level 4 specialist courses, such as lower back pain or exercise for older adults. Your credits transfer, so you build on what you have rather than starting again.",
+  },
+];
+
+// What the fee covers, and the costs that sit outside it. Prices come from
+// app/lib/pricing.ts only.
+const included = [
+  "Level 2 Gym Instructor and Level 3 Personal Trainer, both in one NCFE course",
+  "Every module, online, from the day you enrol",
+  "A personal tutor from enrolment to sign-off, marking your work and reviewing your videos",
+  "The business module: pricing, sales, social media and systems",
+  "The Mentorship Hub after you qualify",
+  "A guaranteed introduction to a gym when you qualify",
+];
+
+const notIncluded = [
+  "Access to a gym to film your practical sessions (one you already use is fine)",
+  "CIMSPA membership, once you are qualified",
+  "Public liability insurance, once you take paying clients",
+  "A first aid certificate, if your gym asks for one",
+];
+
 const faqs = [
-  { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA and REPs — the gold standard for UK fitness professionals. NCFE is the qualification name UK gym managers ask for by default — PureGym, David Lloyd, Nuffield, JD Gyms, independents. Some UK academies use Focus Awards or self-branded certifications; NCFE is the one that doesn't need explaining on a CV." },
+  { q: "Is the qualification recognised by gyms and insurers?", a: "Yes. Your NCFE Level 2 & 3 is regulated by Ofqual and recognised by CIMSPA. NCFE is the qualification name UK gym managers ask for by default — PureGym, David Lloyd, Nuffield, JD Gyms, independents. Some UK academies use Focus Awards or self-branded certifications; NCFE is the one that doesn't need explaining on a CV." },
   { q: "Do I need any prior experience?", a: "None at all. Whether you're completely new to fitness or already coaching informally, the course is designed to take you from zero to qualified." },
   { q: "It's fully online, so how is the practical side assessed?", a: "By video. You practise in a gym you already use, coaching a friend or family member through real sessions: inductions, programmes, technique. You film it, and your tutor watches the footage and either signs it off or tells you what to fix. NCFE accepts video-assessed practical work, and gyms hire PTs assessed this way." },
   { q: "How long does it take?", a: "Most students complete in 8–16 weeks. Because it's fully online and self-paced, you fit it around your job, your family, your life." },
   { q: "What is the guaranteed gym introduction?", a: "Once you qualify, we approach at least one gym on your behalf: either one in our partner network, or one local to you. It is a warm introduction rather than a job-board listing. Whether they interview you, and whether you get the job, is their call. We've hired 500+ PTs ourselves, so we know what gyms look for and we prepare you for it." },
   { q: "Can I spread the cost?", a: `Yes. You can pay ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}, with no interest. The first is taken when you enrol, then one a month. Book a free call if you'd like to talk it through.` },
+  { q: "How much does a personal trainer course cost?", a: `Ours is ${COURSE_PRICE_LABEL} paid in full, or ${MONTHLY_PAYMENTS} monthly payments of ${MONTHLY_PRICE_LABEL}. That covers Level 2 and Level 3 together, your personal tutor and the Mentorship Hub. Across UK providers, a Level 2 and 3 qualification on its own typically costs ${TYPICAL_COST_LABEL}. When you compare, check whether Level 2, tutor support and mentorship are in the headline price or added later.` },
+  { q: "Do I need a Level 2 before I can do Level 3?", a: "Yes. Level 2 Gym Instructor comes before Level 3 Personal Trainer, and you need both to work as a personal trainer. Our course includes both, so you don't need to find or finish a separate Level 2 course first." },
+  { q: "Is this a CIMSPA personal trainer course?", a: "The qualification is awarded by NCFE, regulated by Ofqual and recognised by CIMSPA, the professional body for UK fitness. Once you qualify you can join the CIMSPA register as a personal trainer." },
 ];
 
 function CheckIcon() {
@@ -214,7 +319,7 @@ export default function CoursesPage() {
         {/* HERO: what it is, what it costs, how to start */}
         <MoneyHero
           eyebrow="NCFE LEVEL 2 & 3 · OFQUAL · CIMSPA"
-          headline="The online NCFE Level 2 & 3 PT course,"
+          headline="The online Level 2 & 3 Personal Trainer Course,"
           goldTail="around your job."
           subline="Qualify in 8–16 weeks, with business training and a guaranteed gym introduction."
           source="courses-hero"
@@ -290,6 +395,75 @@ export default function CoursesPage() {
           </div>
         </section>
 
+        {/* LEVEL 2 VS LEVEL 3: answers "level 2 gym instructor course" and
+            "level 3 personal trainer course" searches on this page. */}
+        <section className="bg-surface py-14 md:py-24 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Level 2 and Level 3</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              What Level 2 and Level 3<br /><span className="text-gold">each qualify you to do.</span>
+            </h2>
+            <p className="text-soft/60 text-center text-lg mb-12 max-w-2xl mx-auto">
+              Every UK personal trainer qualification is built on two levels. Our course covers both, Level 2 gym instructing and Level 3 personal training, in one NCFE course at one price.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+              {levels.map((l) => (
+                <div key={l.level} className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                  <p className="font-display font-extrabold text-3xl text-blue mb-2">{l.level}</p>
+                  <h3 className="text-white font-bold text-lg mb-3">{l.title}</h3>
+                  <p className="text-soft/70 leading-relaxed">{l.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="max-w-3xl mx-auto space-y-4 text-soft/70 text-base md:text-lg leading-relaxed">
+              <p>
+                <span className="text-white font-semibold">Why you need both.</span> Level 2 comes before Level 3, and you need the pair to work as a personal trainer, get insured and take paying clients. That is why a cheap &ldquo;Level 3 course&rdquo; is not always the full route: if a provider quotes a Level 3 price on its own, ask whether Level 2 is included or sold separately. With ours, both are in the fee.
+              </p>
+              <p>
+                For the whole route, from no experience to your first job in a gym, read our guide on{" "}
+                <a href="/how-to-become-a-personal-trainer-uk" className="text-gold hover:underline font-semibold">how to become a personal trainer in the UK</a>.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* HOW IT WORKS ONLINE + HOW LONG IT TAKES. Fully online: theory in
+            modules, practicals filmed at any gym and assessed by video. */}
+        <section className="bg-base py-14 md:py-24 px-6">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">How it works</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              How the online course works,<br /><span className="text-gold">and how long it really takes.</span>
+            </h2>
+            <p className="text-soft/60 text-center text-lg mb-14 max-w-2xl mx-auto">
+              The whole course is online, including the practical assessments. Here is what studying it actually looks like.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+              {studySteps.map((step) => (
+                <div key={step.num} className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                  <p className="font-display font-extrabold text-3xl text-blue mb-5">{step.num}</p>
+                  <h3 className="text-white font-bold text-lg mb-3">{step.title}</h3>
+                  <p className="text-soft/60 text-sm leading-relaxed">{step.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="max-w-3xl mx-auto bg-card border border-gold/30 rounded-2xl p-7 md:p-9">
+              <h3 className="text-white font-bold text-xl md:text-2xl mb-4">How long does a personal trainer course take?</h3>
+              <div className="space-y-4 text-soft/70 text-base leading-relaxed">
+                <p>
+                  The official figure for our course is 8 to 16 weeks, studying part-time around a job. Where you land in that range comes down to three things: how many hours a week you can give it, how soon you get your practical sessions filmed, and how much of your work needs resubmitting.
+                </p>
+                <p>
+                  A fixed weekly routine is what keeps people inside the range. Two evenings and a weekend morning, every week, beats a long weekend once a month. Book your filming sessions with your practice client early, because waiting on someone else&apos;s diary is an easy way to lose a fortnight.
+                </p>
+                <p>
+                  There are no intakes or start dates. Enrolment is rolling, so you start the day you enrol.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* WHY NCFE */}
         <section className="bg-surface py-14 md:py-24 px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -302,7 +476,7 @@ export default function CoursesPage() {
                 The awarding body matters. NCFE (founded 1848) is listed on the Ofqual Register — the official UK government standard for qualifications. It&apos;s the qualification name UK gym managers ask for by default on their job listings — not a self-branded cert, not Focus Awards, not an in-house badge. When a gym scans 50 CVs, they look for NCFE Level 3 first.
               </p>
               <ul className="space-y-3">
-                {["Listed on the Ofqual Register", "Recognised by CIMSPA and REPs", "Legal to work in any UK gym", "Credits transfer to Level 4 specialist courses"].map((item) => (
+                {["Listed on the Ofqual Register", "Recognised by CIMSPA", "Legal to work in any UK gym", "Credits transfer to Level 4 specialist courses"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-soft/70">
                     <span className="text-gold font-bold shrink-0">→</span>
                     {item}
@@ -320,6 +494,60 @@ export default function CoursesPage() {
                 <div key={stat.label} className="bg-card border border-white/[0.07] rounded-2xl p-6">
                   <p className="font-display font-extrabold text-gold text-4xl mb-2">{stat.value}</p>
                   <p className="text-soft/60 text-sm">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* IS AN ONLINE QUALIFICATION RECOGNISED? */}
+        <section className="bg-base py-14 md:py-24 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">Online vs classroom</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              Is an online personal trainer<br />qualification <span className="text-gold">recognised?</span>
+            </h2>
+            <p className="text-soft/60 text-center text-lg mb-12 max-w-2xl mx-auto">
+              Yes. Gyms and insurers look at the qualification, not at how you studied for it. An NCFE Level 3 earned online is the same regulated qualification as one earned in a classroom.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+              {recognition.map((r) => (
+                <div key={r.title} className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                  <h3 className="text-white font-bold text-lg mb-3">{r.title}</h3>
+                  <p className="text-soft/70 text-sm leading-relaxed">{r.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="max-w-3xl mx-auto space-y-4 text-soft/70 text-base md:text-lg leading-relaxed">
+              <p>
+                What to check is the qualification itself, not the delivery. A certificate that isn&apos;t on the Ofqual register, or a short course that skips Level 2, is the kind gyms turn away. When a gym manager reads your CV, they are looking for a regulated Level 3 from a recognised awarding body.
+              </p>
+              <p>
+                More detail:{" "}
+                <a href="/are-online-pt-qualifications-recognised-by-uk-gyms" className="text-gold hover:underline font-semibold">are online PT qualifications recognised by UK gyms?</a>{" "}
+                and our{" "}
+                <a href="/online-personal-trainer-course-uk" className="text-gold hover:underline font-semibold">comparison of 10 UK online personal trainer courses</a>, including how they are assessed and what they cost.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* AFTER YOU QUALIFY. Introduction only, never an interview or a job. */}
+        <section className="bg-surface py-14 md:py-24 px-6">
+          <div className="max-w-6xl mx-auto">
+            <p className="text-gold text-[11px] font-semibold tracking-widest uppercase text-center mb-4">After you qualify</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-5xl text-white text-center leading-none tracking-tight mb-4">
+              What happens <span className="text-gold">after you qualify.</span>
+            </h2>
+            <p className="text-soft/60 text-center text-lg mb-14 max-w-2xl mx-auto">
+              The certificate is the start. Once every unit is signed off, these are the next steps, and where we stay involved.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {afterSteps.map((step) => (
+                <div key={step.num} className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                  <p className="font-display font-extrabold text-3xl text-blue mb-5">{step.num}</p>
+                  <h3 className="text-white font-bold text-lg mb-3">{step.title}</h3>
+                  <p className="text-soft/60 text-sm leading-relaxed">{step.body}</p>
                 </div>
               ))}
             </div>
@@ -506,6 +734,40 @@ export default function CoursesPage() {
             <p className="text-center text-faint text-xs md:text-sm mt-10 max-w-2xl mx-auto leading-relaxed">
               Both plans include the same qualification, Mentorship Hub, personal tutor, and a guaranteed gym introduction. Want to talk it through first? <a href="/book-call" className="text-gold hover:underline">Book a free 15-min call</a>.
             </p>
+
+            {/* WHAT THE FEE COVERS, AND WHAT IT DOESN'T */}
+            <div className="max-w-4xl mx-auto mt-16">
+              <h3 className="font-display font-extrabold text-2xl md:text-3xl text-white text-center leading-none tracking-tight mb-3">
+                What {COURSE_PRICE_LABEL} covers, <span className="text-gold">and what it doesn&apos;t.</span>
+              </h3>
+              <p className="text-soft/60 text-center text-base mb-10 max-w-2xl mx-auto">
+                No paid upgrades or add-ons from us. The costs under &ldquo;Your own costs&rdquo; are paid to other people, so budget for them.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="bg-card border border-gold/30 rounded-2xl p-7">
+                  <h4 className="text-white font-bold text-lg mb-4">Included in the fee</h4>
+                  <ul className="space-y-3">
+                    {included.map((t) => (
+                      <li key={t} className="flex items-start gap-2.5 text-soft/70 text-sm md:text-base leading-snug">
+                        <CheckIcon />
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-card border border-white/[0.07] rounded-2xl p-7">
+                  <h4 className="text-white font-bold text-lg mb-4">Your own costs</h4>
+                  <ul className="space-y-3">
+                    {notIncluded.map((t) => (
+                      <li key={t} className="flex items-start gap-2.5 text-soft/70 text-sm md:text-base leading-snug">
+                        <span className="text-white/40 font-bold shrink-0">→</span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
