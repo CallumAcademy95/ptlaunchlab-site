@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { CallType, Question } from "@/app/lib/booking/callTypes";
+import { CALLER_LINE, type CallType, type Question } from "@/app/lib/booking/callTypes";
 import PhoneCallbackForm from "@/app/book-call/components/PhoneCallbackForm";
 
 type Slot = { iso: string; label: string };
@@ -67,7 +67,7 @@ export default function BookingFlow({ callType, questions, prefill, token, onBoo
     return (
       <div className="bg-card border border-gold/40 rounded-2xl p-6">
         <h2 className="text-white font-bold text-xl mb-2">Booked</h2>
-        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label} (UK time).</p>
+        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label} (UK time). {CALLER_LINE}</p>
         {done.manageUrl && (
           <div className="flex flex-col gap-2 text-sm">
             <a className="text-gold underline" href={`/api/booking/ics?token=${done.manageUrl.split("/").pop()}`}>Add to my calendar</a>
@@ -80,7 +80,7 @@ export default function BookingFlow({ callType, questions, prefill, token, onBoo
   if (unavailable) {
     return (
       <div>
-        <p className="text-soft/80 mb-4">Online booking isn&apos;t available right now. Leave your number and Callum will ring you.</p>
+        <p className="text-soft/80 mb-4">Online booking isn&apos;t available right now. Leave your number and Callum will ring you. {CALLER_LINE}</p>
         <PhoneCallbackForm />
       </div>
     );
