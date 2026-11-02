@@ -1,6 +1,12 @@
 // The two bookable calls. Questions are copied verbatim from the Calendly
 // event types they replace (checked 15 Oct 2026). Pure module.
 
+// Callum rings booked calls from his mobile, not the WhatsApp business number
+// leads chat with, so every booking page says which number to expect. Same
+// line as Leads Central's booking messages (lib/setter/caller.ts in pt-app).
+export const CALLER_NUMBER = "+44 7822 012186";
+export const CALLER_LINE = `The call will come from Callum on ${CALLER_NUMBER}.`;
+
 export type CallType = "consultation" | "gym_partner";
 
 export interface Question {
