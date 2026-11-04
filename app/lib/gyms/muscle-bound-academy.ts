@@ -4,7 +4,9 @@ export const muscleBoundAcademy: GymConfig = {
   gymName: "Muscle Bound Gym",
   gymSlug: "muscle-bound",       // commission join key — must match the enrol page; never change
   memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
-  logoUrl: "https://www.muscleboundgymuk.co.uk/images/red-logo-white-text.png",
+  logoUrl: "/gym-logos/muscle-bound.png",
+  logoWidth: 600,
+  logoHeight: 137,
   primaryColor: "#ca1413",
   heroBg: "#000000",
   heroHeadline: [

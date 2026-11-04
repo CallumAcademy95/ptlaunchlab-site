@@ -6,6 +6,8 @@ export const ironwolfGym: GymConfig = {
   gymSlug: "ironwolf",       // commission join key — must match the enrol page; never change
   memberSavingPence: 0,  // optional gym-funded saving on pay-in-full (0, 2500, 5000, 7500 or 10000)
   logoUrl: "/logos/iron-wolf-gym-white.png",
+  logoWidth: 937,
+  logoHeight: 267,
   logoAlt: "Iron Wolf Gym Goole",
 
   // ── Branding — Iron Wolf brand: Black, White, Vivid Orange #f15927
