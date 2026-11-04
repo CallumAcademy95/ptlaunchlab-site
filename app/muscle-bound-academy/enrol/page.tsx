@@ -23,11 +23,10 @@ export default function MuscleBoundEnrolPage() {
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://www.muscleboundgymuk.co.uk/images/red-logo-white-text.png"
+              src="/gym-logos/muscle-bound.png"
               alt="Muscle Bound Gym"
-              width={36}
-              height={36}
-              className="rounded-lg"
+              width={140}
+              height={32}
             />
             <div>
               <p className="text-white font-black text-sm uppercase leading-none">Muscle Bound PT Academy</p>

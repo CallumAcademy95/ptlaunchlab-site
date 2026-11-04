@@ -215,3 +215,17 @@ test("every member saving is 0 for now, and a missing coupon means no saving", (
   }
   assert.deepEqual(memberSavingForGym("nope", { STRIPE_MEMBER_SAVING_COUPON_5000: "c" }), { savingPence: 0, coupon: null });
 });
+
+// A wide logo with no logoWidth/logoHeight is forced into a square tile: the
+// /embed banner crops it (M Club showed "Cl") and the academy page shrinks it
+// to a sliver. Only local PNGs can be measured here, not externally hosted logos.
+test("a wide local logo declares its size, so it isn't cropped to a square", () => {
+  for (const [slug, c] of Object.entries(GYMS)) {
+    if (!c.logoUrl.startsWith("/") || !c.logoUrl.endsWith(".png")) continue;
+    const png = readFileSync(`public${c.logoUrl}`);
+    const ratio = png.readUInt32BE(16) / png.readUInt32BE(20);
+    if (ratio >= 1.3) {
+      assert.ok(c.logoWidth && c.logoHeight, `${slug}: logo is ${ratio.toFixed(1)}:1 but has no logoWidth/logoHeight`);
+    }
+  }
+});

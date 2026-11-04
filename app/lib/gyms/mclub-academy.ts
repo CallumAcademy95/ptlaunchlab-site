@@ -11,6 +11,8 @@ export const mclubAcademy: GymConfig = {
   // sent on 21 Oct 2026, trimmed to its edges and doubled (1398×504). Drawn
   // for dark surfaces, which is every surface it sits on here. Wide (2.8:1).
   logoUrl: "/gym-logos/mclub.png",
+  logoWidth: 1398,
+  logoHeight: 504,
   logoAlt: "M Club",
 
   // Their site's theme: teal --mc-primary #004B47 and sand --mc-secondary
