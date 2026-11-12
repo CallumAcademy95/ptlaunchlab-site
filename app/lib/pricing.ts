@@ -45,6 +45,17 @@ export const MONTHLY_PRICE_LABEL = formatPence(MONTHLY_PRICE_PENCE); // £99.99
  * qualification: £1,200 – £2,800"). Change it there and here together.
  */
 export const TYPICAL_COST_LABEL = "£1,200–£2,800";
+/**
+ * Partners whose learners can only pay in full (pp_partners.slug). Their enrol
+ * page shows no monthly plan and /api/checkout refuses one for them.
+ * PT Mentor Hub: pay-in-full is part of the mentor's own model (Nov 2026).
+ */
+export const PAY_IN_FULL_ONLY_PARTNERS: readonly string[] = ["pt-mentor-hub"];
+
+export function isPayInFullOnly(partnerSlug: string | null | undefined): boolean {
+  return !!partnerSlug && PAY_IN_FULL_ONLY_PARTNERS.includes(partnerSlug);
+}
+
 /** "10 × £99.99" */
 export const MONTHLY_PLAN_LABEL = `${MONTHLY_PAYMENTS} × ${MONTHLY_PRICE_LABEL}`;
 

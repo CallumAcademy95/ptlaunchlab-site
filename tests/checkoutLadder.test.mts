@@ -190,3 +190,18 @@ test("unknown plans are refused", () => {
     assert.deepEqual(resolveCheckout({ plan, gymSlug: "atp-felixstowe" }, 0, {}), { ok: false, reason: "unknown-plan" }, String(plan));
   }
 });
+
+// A pay-in-full-only partner (PT Mentor Hub): its enrol page hides monthly,
+// and the server refuses it even if the request is hand-edited.
+test("pay-in-full-only partner: monthly refused, pay in full sold", () => {
+  assert.deepEqual(
+    resolveCheckout({ plan: "monthly", gymSlug: "pt-mentor-hub" }, 0, {}),
+    { ok: false, reason: "unknown-plan" },
+  );
+  const pif = resolveCheckout({ plan: "pif", gymSlug: "pt-mentor-hub" }, 0, {});
+  assert.ok(pif.ok && pif.plan === "pif" && pif.rung === "pif");
+  // Everyone else still has monthly.
+  const other = resolveCheckout({ plan: "monthly", gymSlug: "mclub" }, 0, {});
+  assert.ok(other.ok && other.plan === "monthly");
+  assert.ok(resolveCheckout({ plan: "monthly" }, 0, {}).ok);
+});
