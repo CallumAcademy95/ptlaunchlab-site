@@ -14,6 +14,7 @@ import {
   MONTHLY_PAYMENTS,
   MONTHLY_PLAN_TOTAL_PENCE,
   formatPence,
+  isPayInFullOnly,
   type CoursePlanChoice,
 } from "@/app/lib/pricing";
 // Display-safe ATP figures only — the member codes never reach this bundle.
@@ -160,6 +161,9 @@ export default function EnrolmentFlow({
   const [memberCode, setMemberCode] = useState("");
   const [codeError, setCodeError] = useState("");
   const atpLadder = ladder === "atp";
+  // A pay-in-full-only partner: no monthly plan and no monthly terms. The
+  // server refuses monthly for them too; hiding it here is just the display.
+  const pifOnly = isPayInFullOnly(partner?.gymSlug);
   // Never on ATP's page (its rungs replace it), never negative, never over £100.
   const saving = atpLadder ? 0 : Math.max(0, Math.min(10_000, Math.round(memberSavingPence) || 0));
   const pifTodayPence = COURSE_PRICE_PENCE - saving;
@@ -462,7 +466,7 @@ export default function EnrolmentFlow({
 
             {/* The two ways to pay (not on ATP's page: its codes lead here) */}
             {!atpLadder && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 gap-4 ${pifOnly ? "max-w-sm mx-auto w-full" : "sm:grid-cols-2"}`}>
               {/* Pay in full */}
               <button onClick={() => pay("pif")} disabled={submitting} data-plan="pif"
                 className="bg-deep border-2 border-gold/50 hover:border-gold hover:bg-gold/5 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
@@ -482,6 +486,7 @@ export default function EnrolmentFlow({
               </button>
 
               {/* Pay monthly */}
+              {!pifOnly && (
               <button onClick={() => pay("monthly")} disabled={submitting} data-plan="monthly"
                 className="bg-deep border-2 border-white/10 hover:border-gold/40 rounded-2xl p-7 text-left transition-all group w-full disabled:opacity-60 disabled:cursor-not-allowed">
                 <p className="text-soft text-[10px] font-bold tracking-widest uppercase mb-3">Spread the cost</p>
@@ -498,6 +503,7 @@ export default function EnrolmentFlow({
                   {submitting ? "Taking you to checkout…" : `Pay ${MONTHLY_PRICE_LABEL} today →`}
                 </div>
               </button>
+              )}
             </div>
             )}
 
@@ -505,6 +511,7 @@ export default function EnrolmentFlow({
                 terms of what someone is buying, so they belong on the screen
                 where the purchase is agreed rather than only behind a link to
                 the T&Cs. */}
+            {!pifOnly && (
             <div className="bg-deep border border-gold/25 rounded-2xl p-6">
               <p className="text-white font-bold text-sm mb-3">
                 {atpLadder
@@ -555,6 +562,7 @@ export default function EnrolmentFlow({
                 <a href="/terms" className="text-gold hover:underline">terms and conditions</a>.
               </p>
             </div>
+            )}
 
             {/* Reassurance — what happens after payment */}
             <div className="bg-deep border border-white/10 rounded-2xl p-5 text-center">

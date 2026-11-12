@@ -33,6 +33,7 @@ import {
   MONTHLY_PRICE_PENCE,
   MONTHLY_PAYMENTS,
   MONTHLY_PLAN_TOTAL_PENCE,
+  isPayInFullOnly,
   type CoursePlanChoice,
 } from "./pricing.ts";
 import {
@@ -200,6 +201,7 @@ export type ResolvedCheckout =
  *   - pif / monthly — any page. Pay-in-full carries the gym's member saving
  *     when it set one and its coupon exists (`gymMemberSavingPence` is looked
  *     up by the caller from the gym config for THIS gymSlug). Monthly never does.
+ *   - monthly is refused for a pay-in-full-only partner (PAY_IN_FULL_ONLY_PARTNERS).
  *   - six_month / pif_1599 — ATP's page only; refused for any other gym.
  *   - an ATP member code — on ATP's two £1,599 plans only, it sells the
  *     standard plan instead: pif_1599 → pif (£999.99), six_month → monthly
@@ -213,6 +215,7 @@ export function resolveCheckout(
   env: Record<string, string | undefined>,
 ): ResolvedCheckout {
   const std = planFromChoice(req.plan);
+  if (std === "monthly" && isPayInFullOnly(req.gymSlug)) return { ok: false, reason: "unknown-plan" };
   if (std) {
     const config = COURSE_PLANS[std];
     if (std === "pif") {
