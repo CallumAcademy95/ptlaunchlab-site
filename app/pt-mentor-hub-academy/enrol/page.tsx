@@ -3,7 +3,7 @@ import EnrolmentFlow from "@/app/enrol/EnrolmentFlow";
 
 export const metadata: Metadata = {
   title: "Enrol | PT Mentor Hub Academy",
-  description: "Start your Level 2 & 3 PT qualification with PT Mentor Hub mentorship: pay in full or monthly.",
+  description: "Start your Level 2 & 3 PT qualification plus three months of PT Mentor Hub mentoring. One payment.",
   robots: { index: false },
 };
 

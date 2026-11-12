@@ -24,7 +24,7 @@ const ORANGE = "#DB4A2B";
 export const metadata: Metadata = {
   title: "PT Mentor Hub Academy | Level 2 & 3 PT Course + Mentorship",
   description:
-    "Qualify as a personal trainer with the NCFE Level 2 & 3, and get PT Mentor Hub's mentorship alongside it. One price, studied online around your job.",
+    "Qualify as a personal trainer with the NCFE Level 2 & 3, plus three months of business mentoring from PT Mentor Hub. One price, studied online around your job.",
   alternates: { canonical: PAGE_URL },
   robots: { index: false, follow: false },
 };
@@ -39,13 +39,13 @@ const COURSE = [
 const STEPS = [
   { title: "Enrol", body: "One payment, online. It takes a few minutes." },
   { title: "Start both", body: "Your tutor is in touch within 24 hours, and you join PT Mentor Hub." },
-  { title: "Qualify with a mentor", body: "Work through the course with mentorship alongside it, not after it." },
+  { title: "Get mentored", body: "Three months of practical business mentoring from PT Mentor Hub." },
   { title: "Start coaching", body: "Finish with the qualification and a plan for your first clients." },
 ];
 
 const FAQ = [
   { q: "Who delivers the qualification?", a: "PT Launch Lab, an NCFE Accredited Centre (No. 9002788). You get exactly the same NCFE Level 2 and Level 3 qualifications as any of our learners." },
-  { q: "Who does the mentoring?", a: "PT Mentor Hub. The mentorship runs alongside your course, so you're building the business side while you qualify." },
+  { q: "Who does the mentoring?", a: "PT Mentor Hub. You get three months of practical business mentoring, normally £499 on its own, so you have support to start building a business, not just a certificate." },
   { q: "Do I need any experience?", a: "No. The course starts at Level 2, the foundations, and builds to Level 3." },
   { q: "Can I do it around a full-time job?", a: "Yes. It's online and self-paced with no fixed class times. Most learners finish in 8–16 weeks." },
   { q: "What if I change my mind?", a: "You have a 14-day cooling-off period. Tell us within 14 days of paying and you get a full refund." },
@@ -89,11 +89,11 @@ export default function PtMentorHubAcademyPage() {
           <Image src="/gym-logos/pt-mentor-hub-long.png" alt="PT Mentor Hub" width={363} height={136} priority className="h-14 md:h-16 w-auto mb-10" />
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: ORANGE }}>PT Mentor Hub Academy</p>
           <h1 className="font-display font-extrabold text-4xl md:text-6xl leading-none tracking-tight mb-6 max-w-3xl">
-            Qualify as a personal trainer.{" "}
-            <span style={{ color: ORANGE }}>With a mentor from day one.</span>
+            Don&apos;t just become qualified.{" "}
+            <span style={{ color: ORANGE }}>Become a PT with the support to build a business.</span>
           </h1>
           <p className="text-lg md:text-xl text-white/75 leading-relaxed max-w-2xl mb-8">
-            The NCFE Level 2 &amp; 3 personal trainer qualification and PT Mentor Hub&apos;s mentorship, together, for one price. Learn to coach, and learn how to build a PT business while you do.
+            The NCFE Level 2 &amp; 3 personal trainer qualification, plus three months of practical business mentoring from PT Mentor Hub. Together, for one price.
           </p>
           <div className="flex flex-wrap items-center gap-4 mb-8">
             <EnrolButton />
@@ -115,7 +115,7 @@ export default function PtMentorHubAcademyPage() {
           </h2>
           <div className="space-y-4 text-lg text-black/75 leading-relaxed">
             <p>Most new PTs finish their course knowing how to write a programme, then get stuck on everything else: finding clients, what to charge, how to sell a session without feeling awkward.</p>
-            <p>That&apos;s the part PT Mentor Hub works on. So instead of qualifying first and working the business out on your own later, you get both at the same time.</p>
+            <p>That&apos;s the part PT Mentor Hub works on. Instead of qualifying and then working the business out on your own, you get three months of mentoring to help you start building it.</p>
           </div>
         </div>
       </section>
@@ -144,10 +144,10 @@ export default function PtMentorHubAcademyPage() {
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: ORANGE }}>The mentorship</p>
               <h3 className="font-display font-extrabold text-2xl mb-6">From PT Mentor Hub</h3>
               <p className="text-white/80 leading-relaxed mb-5">
-                Support with the side of personal training the course doesn&apos;t cover: getting your first clients, pricing, and building a business you can actually live on.
+                Three months of practical business mentoring, normally £499 when bought on its own. Support with the side of personal training the course doesn&apos;t cover: getting your first clients, pricing, and building a business you can actually live on.
               </p>
               <ToConfirm>
-                What the mentorship includes, in his words: calls, community, resources, and how long it runs. This is his middle package, normally £500.
+                How the mentoring runs, in his words: format, how often you&apos;re in contact, and when the three months start.
               </ToConfirm>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function PtMentorHubAcademyPage() {
             <p className="font-display font-extrabold text-6xl leading-none mb-5">{COURSE_PRICE_LABEL}</p>
             <ul className="space-y-2 text-sm font-medium">
               <li>✓ NCFE Level 2 &amp; Level 3 qualification</li>
-              <li>✓ PT Mentor Hub mentorship</li>
+              <li>✓ Three months of PT Mentor Hub mentoring</li>
               <li>✓ Personal tutor and a gym introduction</li>
               <li>✓ One payment, nothing further to pay</li>
             </ul>
