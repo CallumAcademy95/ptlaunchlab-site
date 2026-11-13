@@ -13,6 +13,24 @@ export interface EpisodeIndex {
 
 export const episodesIndex: EpisodeIndex[] = [
   {
+    "id": "evqyB-dGQ5s",
+    "slug": "personal-trainer-red-flags-what-bad-trainers-get-wrong",
+    "ep": 38,
+    "title": "Personal Trainer Red Flags: What Bad Trainers Get Wrong",
+    "date": "2026-11-13",
+    "category": "industry",
+    "wordCount": 10955
+  },
+  {
+    "id": "tbM7XvGeZRY",
+    "slug": "how-to-market-yourself-as-a-personal-trainer-without-going-viral",
+    "ep": 37,
+    "title": "How to Market Yourself as a Personal Trainer (Without Going Viral)",
+    "date": "2026-11-13",
+    "category": "business",
+    "wordCount": 12987
+  },
+  {
     "id": "oznEK8qJLEw",
     "slug": "what-every-new-personal-trainer-gets-wrong-about-money",
     "ep": 36,

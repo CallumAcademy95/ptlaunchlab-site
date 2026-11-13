@@ -35,6 +35,24 @@ export const metadata = {
 
 const episodes: Episode[] = [
   {
+    id: "evqyB-dGQ5s",
+    slug: "personal-trainer-red-flags-what-bad-trainers-get-wrong",
+    ep: 38,
+    title: "Personal Trainer Red Flags: What Bad Trainers Get Wrong",
+    desc: "Charles Townend had a stroke at 39, hired an online coach, and ended up a personal trainer with 10 years and 13,000 sessions behind him, now working the floor at Graft House in Leeds. He sits down with Miles and Callum for an honest conversation about the state of personal training: what a bad personal trainer actually looks like, why qualifying doesn't mean you should be on the gym floor, training older clients and menopausal women, keeping clients for years, what he would do if he started again from scratch, staying out of online arguments, and the honest pros and cons of online coaching.",
+    date: "2026-11",
+    category: "industry",
+  },
+  {
+    id: "tbM7XvGeZRY",
+    slug: "how-to-market-yourself-as-a-personal-trainer-without-going-viral",
+    ep: 37,
+    title: "How to Market Yourself as a Personal Trainer (Without Going Viral)",
+    desc: "Josh Clarke started out on the gym floor in Miles's own gym, was forced online in lockdown and now runs Axis Systems, helping personal trainers build their brand, systems and marketing. He joins Miles and Callum to lay out what newly qualified trainers should actually do first, and why going online straight away usually isn't the smart move. They get into niching on the problem rather than the person, telling people the next step, why bios shouldn't read like CVs, the fear of what other coaches think, why stories are where enquiries come from, how to use AI and automation without losing the human side, and how making the first move beats waiting to be found.",
+    date: "2026-11",
+    category: "business",
+  },
+  {
     id: "oznEK8qJLEw",
     slug: "what-every-new-personal-trainer-gets-wrong-about-money",
     ep: 36,
