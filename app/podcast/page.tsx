@@ -3,6 +3,7 @@ import Breadcrumbs from "../components/Breadcrumbs";
 
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
 const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
+const AMAZON_MUSIC_URL = "https://music.amazon.com/podcasts/8ec32c42-0196-43cf-add5-913eb851a3cb";
 // Canonical feed. The show moved from Buzzsprout to Riverside, and the old
 // Buzzsprout URL now 301s here. Apple, Spotify and Podchaser were all submitted
 // with the Buzzsprout address, so THAT REDIRECT MUST STAY ALIVE — letting the
@@ -16,7 +17,7 @@ const PODCHASER_URL = "https://www.podchaser.com/podcasts/pt-launch-lab-podcast-
 export const metadata = {
   title: "The PT Launch Lab Podcast — Real Stories from the Fitness Industry",
   description:
-    "Listen to the PT Launch Lab podcast on Spotify, YouTube and Apple Podcasts. Real stories from personal trainers, gym owners and career changers. New episode every week.",
+    "Listen to the PT Launch Lab podcast on Spotify, YouTube, Apple Podcasts and Amazon Music. Real stories from personal trainers, gym owners and career changers. New episode every week.",
   alternates: {
     canonical: "https://ptlaunchlab.co.uk/podcast",
     types: {
@@ -388,6 +389,7 @@ const podcastSeriesSchema = {
   sameAs: [
     SPOTIFY_SHOW_URL,
     APPLE_PODCAST_URL,
+    AMAZON_MUSIC_URL,
     YOUTUBE_CHANNEL_URL,
     PODCAST_INDEX_URL,
     PODCHASER_URL,
@@ -451,6 +453,7 @@ export default function Page() {
         episodes={episodes}
         spotifyUrl={SPOTIFY_SHOW_URL}
         appleUrl={APPLE_PODCAST_URL}
+        amazonUrl={AMAZON_MUSIC_URL}
         youtubeUrl={YOUTUBE_CHANNEL_URL}
         rssUrl={RSS_FEED_URL}
       />
