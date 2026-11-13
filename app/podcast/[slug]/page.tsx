@@ -12,6 +12,7 @@ import { episodesIndex, getEpisodeIndex } from "../transcripts/_index";
 const RSS_FEED_URL = "https://api.riverside.com/hosting/WXwoGTza.rss";
 const SPOTIFY_SHOW_URL = "https://open.spotify.com/show/48anYoBnXBDxlwfoSzXEBw";
 const APPLE_PODCAST_URL = "https://podcasts.apple.com/podcast/id1896293475";
+const AMAZON_MUSIC_URL = "https://music.amazon.com/podcasts/8ec32c42-0196-43cf-add5-913eb851a3cb";
 
 export const dynamicParams = false;
 
@@ -241,6 +242,15 @@ export default async function EpisodePage({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#822CEC] to-[#D444F1] text-white font-bold text-sm hover:brightness-110 transition-all"
               >
                 Apple Podcasts
+              </a>
+              <a
+                href={AMAZON_MUSIC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Listen on Amazon Music"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D1DA] text-deep font-bold text-sm hover:brightness-110 transition-all"
+              >
+                Amazon Music
               </a>
             </div>
           </div>
