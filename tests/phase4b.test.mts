@@ -358,8 +358,13 @@ function resolve(rules: Rule[], path: string): Rule | null {
   return null;
 }
 /** A real (static) page in app/ for this path. */
-const pageExists = (path: string) =>
-  existsSync(join(ROOT, "app", path === "/" ? "" : path.slice(1), "page.tsx"));
+// Podcast episodes are one dynamic route, app/podcast/[slug], built from
+// app/podcast/transcripts/<slug>.json, so they count as pages when that file exists.
+const pageExists = (path: string) => {
+  const ep = /^\/podcast\/([a-z0-9-]+)$/.exec(path);
+  if (ep) return existsSync(join(ROOT, "app", "podcast", "transcripts", `${ep[1]}.json`));
+  return existsSync(join(ROOT, "app", path === "/" ? "" : path.slice(1), "page.tsx"));
+};
 
 test("the [location] templates are gone; the module lists all 31 of them", async () => {
   const { TEMPLATES } = await loadRedirects();
