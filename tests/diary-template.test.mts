@@ -22,3 +22,7 @@ test("skips a block that already exists at that time", () => {
 test("rejects a monday that is not a Monday", () => {
   assert.throws(() => layoutWeek(T, "2026-11-17", []), /Monday/);
 });
+test("BST: a 09:00 London block is 08:00Z", () => {
+  const out = layoutWeek([{ day: 1, start: "09:00", end: "10:30", category: "Praxel", title: "Praxel marking" }], "2026-06-15", []);
+  assert.equal(new Date(out[0].start).toISOString(), "2026-06-15T08:00:00.000Z");
+});

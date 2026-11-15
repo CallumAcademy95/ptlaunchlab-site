@@ -20,7 +20,7 @@ export function planMoves(clashes: PlacedTask[], ctx: PlacementCtx, newEv: Inter
   for (const c of order) {
     const r = proposeSlot(c, { ...ctx, busy, taken, fromDate: ctx.fromDate || londonDate(ctx.nowMs) });
     if (r.ok) { out.push({ id: c.id, title: c.title, from: { start: c.start, end: c.end }, to: { start: r.start, end: r.end }, reason: null }); taken.push({ start: r.start, end: r.end }); }
-    else out.push({ id: c.id, title: c.title, from: { start: c.start, end: c.end }, to: null, reason: r.reason });
+    else { out.push({ id: c.id, title: c.title, from: { start: c.start, end: c.end }, to: null, reason: r.reason }); taken.push({ start: c.start, end: c.end }); }
   }
   return out;
 }
