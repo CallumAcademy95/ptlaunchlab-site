@@ -29,6 +29,8 @@ import {
   lastInboundOn,
   willUseTemplate,
   whatsappLastMessageAt,
+  whatsappTicks,
+  type WaTicks,
   type Author,
   type CrmMode,
   type CrmPerson,
@@ -285,6 +287,7 @@ export async function PersonPanel({ id }: { id: string }) {
                       <span className="text-slate-400">{stamp(m.created_at)}</span>
                       <span className="text-slate-400">{channelLabel(m.channel)}</span>
                       {m.status && m.status !== "sent" && m.status !== "received" && <Badge tone="amber">{m.status}</Badge>}
+                      <WaTicksMark ticks={whatsappTicks(m, stamp)} />
                     </div>
                     <MessageBody
                       text={shown.text}
@@ -402,5 +405,20 @@ export async function PersonPanel({ id }: { id: string }) {
         )}
       </Card>
     </div>
+  );
+}
+
+/** WhatsApp-style ticks: one grey (sent), two grey (delivered), two blue (read), red if it never arrived. */
+function WaTicksMark({ ticks }: { ticks: WaTicks | null }) {
+  if (!ticks) return null;
+  if (ticks.state === "failed") {
+    return <span title={ticks.title} className="font-semibold text-rose-600">✕ {ticks.label}</span>;
+  }
+  const colour = ticks.state === "read" ? "text-sky-500" : "text-slate-400";
+  return (
+    <span title={ticks.title} className={`inline-flex items-center gap-1 ${colour}`}>
+      <span aria-hidden className="tracking-[-0.35em] font-semibold">{ticks.state === "sent" ? "✓" : "✓✓"}</span>
+      <span className="ml-1">{ticks.label}</span>
+    </span>
   );
 }
