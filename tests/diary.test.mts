@@ -8,7 +8,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  checkDiaryAuth, isoWeek, diaryEventBody, isDiaryEvent, handleDiary, DIARY_TAG,
+  checkDiaryAuth, isoWeek, londonWeek, diaryEventBody, isDiaryEvent, handleDiary, DIARY_TAG,
   type DiaryDeps, type GEvent, type DiaryEventBody,
 } from "../app/lib/diary/diary-core.ts";
 
@@ -34,6 +34,17 @@ test("isoWeek matches ISO 8601", () => {
   assert.equal(isoWeek(new Date("2021-01-03T12:00:00Z")), "2020-W53");
 });
 
+test("week tag uses the London calendar date, not UTC", async () => {
+  // 00:30 BST on Monday 1 June 2026 is Sunday 31 May 23:30 UTC; it belongs to W23.
+  assert.equal(diaryEventBody({ summary: "x", start: "2026-06-01T00:30:00+01:00", end: "2026-06-01T01:00:00+01:00", kind: "task" }).extendedProperties.private.ptllWeek, "2026-W23");
+  assert.equal(londonWeek("2026-06-01T00:30:00+01:00"), "2026-W23");
+  // The move re-tag follows the same rule.
+  let patched: unknown;
+  const { deps } = fakeDeps([mine]);
+  deps.patch = async (_id, body) => { patched = body; };
+  await handleDiary({ action: "move", id: "mine", start: "2026-06-01T00:30:00+01:00", end: "2026-06-01T01:00:00+01:00" }, deps);
+  assert.equal((patched as DiaryEventBody).extendedProperties.private.ptllWeek, "2026-W23");
+});
 test("block and task are transparent, fixed is opaque, all tagged", () => {
   const base = { summary: "[Content] Batch", start: "2026-11-17T10:30:00Z", end: "2026-11-17T12:00:00Z" };
   for (const kind of ["block", "task"] as const) assert.equal(diaryEventBody({ ...base, kind }).transparency, "transparent");
@@ -111,6 +122,26 @@ test("delete-week removes only tagged events of that week", async () => {
   const r = await handleDiary({ action: "delete-week", week: "2026-W47" }, deps);
   assert.deepEqual(r.body, { ok: true, deleted: ["mine"] });
   assert.deepEqual(calls.filter((c) => c.startsWith("remove")), ["remove:mine"]);
+});
+test("delete-week with nothing to delete is 404 and removes nothing", async () => {
+  const otherWeek: GEvent = { ...mine, id: "w48", extendedProperties: { private: { [DIARY_TAG]: "1", ptllWeek: "2026-W48" } } };
+  const { deps, calls } = fakeDeps([theirs, otherWeek]);
+  const r = await handleDiary({ action: "delete-week", week: "2026-W47" }, deps);
+  assert.equal(r.status, 404);
+  assert.deepEqual(r.body, { ok: false, error: "Nothing to delete for week 2026-W47." });
+  assert.deepEqual(calls.filter((c) => c.startsWith("remove")), []);
+});
+test("delete-week stops on a remove failure and reports the ids already deleted", async () => {
+  const second: GEvent = { ...mine, id: "mine2" };
+  const { deps } = fakeDeps([mine, second]);
+  let removed = 0;
+  deps.remove = async (id) => { removed++; if (id === "mine2") throw new Error("Google delete failed"); };
+  const r = await handleDiary({ action: "delete-week", week: "2026-W47" }, deps);
+  assert.equal(r.status, 502);
+  assert.equal(r.body.ok, false);
+  assert.equal(r.body.error, "Google delete failed");
+  assert.deepEqual(r.body.deleted, ["mine"]);
+  assert.equal(removed, 2);
 });
 test("list returns only tagged events, summarised", async () => {
   const { deps } = fakeDeps([mine, theirs]);

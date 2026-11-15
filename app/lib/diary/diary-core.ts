@@ -59,6 +59,13 @@ export function isoWeek(d: Date): string {
   return `${t.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
+/** ISO week of the Europe/London calendar date of an offset date-time, e.g. "2026-W23". */
+export function londonWeek(iso: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(iso));
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return isoWeek(new Date(Date.UTC(get("year"), get("month") - 1, get("day"))));
+}
+
 export function diaryEventBody(i: DiaryEventInput): DiaryEventBody {
   return {
     summary: i.summary,
@@ -66,7 +73,7 @@ export function diaryEventBody(i: DiaryEventInput): DiaryEventBody {
     start: { dateTime: i.start, timeZone: TZ },
     end: { dateTime: i.end, timeZone: TZ },
     transparency: i.kind === "fixed" ? "opaque" : "transparent",
-    extendedProperties: { private: { [DIARY_TAG]: "1", ptllKind: i.kind, ptllWeek: isoWeek(new Date(i.start)) } },
+    extendedProperties: { private: { [DIARY_TAG]: "1", ptllKind: i.kind, ptllWeek: londonWeek(i.start) } },
   };
 }
 
@@ -134,7 +141,7 @@ export async function handleDiary(raw: unknown, deps: DiaryDeps): Promise<DiaryR
         await deps.patch(r.id, {
           start: { dateTime: r.start, timeZone: TZ },
           end: { dateTime: r.end, timeZone: TZ },
-          extendedProperties: { private: { ...(ev.extendedProperties?.private ?? {}), ptllWeek: isoWeek(new Date(r.start)) } },
+          extendedProperties: { private: { ...(ev.extendedProperties?.private ?? {}), ptllWeek: londonWeek(r.start) } },
         });
         return ok({ id: r.id });
       }
@@ -146,8 +153,16 @@ export async function handleDiary(raw: unknown, deps: DiaryDeps): Promise<DiaryR
       case "delete-week": {
         const evs = (await deps.listTagged(null, null, r.week))
           .filter((e) => isDiaryEvent(e) && e.extendedProperties?.private?.ptllWeek === r.week && e.id);
+        if (evs.length === 0) return fail(404, `Nothing to delete for week ${r.week}.`);
         const deleted: string[] = [];
-        for (const e of evs) { await deps.remove(e.id!); deleted.push(e.id!); }
+        for (const e of evs) {
+          try {
+            await deps.remove(e.id!);
+          } catch (err) {
+            return { status: 502, body: { ok: false, error: err instanceof Error ? err.message : String(err), deleted } };
+          }
+          deleted.push(e.id!);
+        }
         return ok({ deleted });
       }
       case "notify": {
