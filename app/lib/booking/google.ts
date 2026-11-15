@@ -23,6 +23,9 @@ function cal() {
   auth.setCredentials({ refresh_token: refresh });
   return google.calendar({ version: "v3", auth, timeout: TIMEOUT_MS });
 }
+// Shared with the PA diary (app/lib/diary/diary-google.ts). Same token, same calendar.
+export const calendarClient = cal;
+export const calendarId = CAL;
 
 export async function getBusy(fromMs: number, toMs: number): Promise<Interval[]> {
   const res = await limit(cal().freebusy.query({
