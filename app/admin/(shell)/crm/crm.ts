@@ -718,6 +718,30 @@ export function messageAuthor(m: { direction: string; ai_generated: boolean | nu
   return m.ai_generated === false ? "human" : "ai";
 }
 
+/**
+ * WhatsApp delivery ticks for a message we sent. Leads Central records Meta's
+ * receipts in meta.wa_status (+ wa_delivered_at / wa_read_at / wa_error).
+ * Null for inbound, non-WhatsApp, or a message sent before receipts existed
+ * (16 Nov 2026) — no ticks rather than a guess.
+ */
+export type WaTicks = { state: "sent" | "delivered" | "read" | "failed"; label: string; title: string };
+
+export function whatsappTicks(m: { direction: string; channel: string | null; status?: string | null; meta: unknown }, fmt: (iso: string) => string = (i) => i): WaTicks | null {
+  if (m.direction !== "outbound" || m.channel !== "whatsapp") return null;
+  const meta = (m.meta && typeof m.meta === "object" ? m.meta : {}) as Record<string, unknown>;
+  const str = (k: string) => (typeof meta[k] === "string" ? (meta[k] as string) : null);
+  const st = str("wa_status");
+  if (st === "failed") {
+    const err = meta.wa_error as { code?: unknown; title?: unknown } | undefined;
+    const why = err && typeof err.title === "string" ? err.title : "WhatsApp could not deliver it";
+    return { state: "failed", label: "Not delivered", title: `${why}${typeof err?.code === "number" ? ` (${err.code})` : ""}` };
+  }
+  if (st === "read") return { state: "read", label: "Read", title: `Read ${fmt(str("wa_read_at") ?? "")}`.trim() };
+  if (st === "delivered") return { state: "delivered", label: "Delivered", title: `Delivered ${fmt(str("wa_delivered_at") ?? "")}`.trim() };
+  if (st === "sent") return { state: "sent", label: "Sent", title: "Sent, not delivered yet" };
+  return null;
+}
+
 // ─── Reply links ────────────────────────────────────────────────────────
 
 export const GMAIL_ACCOUNT = "info@ptlaunchlab.co.uk";
