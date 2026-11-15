@@ -46,11 +46,20 @@ export async function handleTaskAction(raw: unknown, deps: TaskDeps): Promise<Re
       if (!k.success) return fail(400, "id must be a uuid; ref like T001");
       const f = TaskFields.safeParse(rest);
       if (!f.success) return fail(400, f.error.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; "));
+      // Mirror the table's row-level CHECKs so bad input is a 400, not a raw Postgres 502.
+      const hasS = "start_at" in f.data, hasE = "end_at" in f.data;
+      if (hasS !== hasE) return fail(400, "start_at and end_at must be set together.");
+      if (f.data.start_at && f.data.end_at && !(Date.parse(f.data.end_at) > Date.parse(f.data.start_at))) {
+        return fail(400, "end_at must be after start_at.");
+      }
       if (k.data.id || k.data.ref) {
         const row = await deps.update({ id: k.data.id, ref: k.data.ref }, f.data);
         return row ? { status: 200, body: { ok: true, task: row } } : fail(404, "No such task.");
       }
       if (!f.data.title || !f.data.category) return fail(400, "A new task needs title and category.");
+      if (f.data.estimate_min == null && (f.data.kind ?? "task") !== "fixed") {
+        return fail(400, "A task needs estimate_min (only fixed events can omit it).");
+      }
       return { status: 200, body: { ok: true, task: await deps.insert(f.data) } };
     }
     return fail(400, "Unknown task action.");

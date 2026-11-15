@@ -37,3 +37,22 @@ test("DB failure is 502, never ok", async () => {
   const r = await handleTaskAction({ action: "tasks" }, deps({ async list() { throw new Error("db down"); } }));
   assert.equal(r.status, 502); assert.equal(r.body.ok, false);
 });
+const A = "2026-11-20T09:00:00Z", B = "2026-11-20T10:00:00Z";
+test("insert needs estimate_min unless kind is fixed", async () => {
+  const base = { action: "task-save", title: "x", category: "SEO" };
+  assert.equal((await handleTaskAction(base, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, estimate_min: null }, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, kind: "fixed", start_at: A, end_at: B }, deps())).status, 200);
+});
+test("start_at and end_at are set together", async () => {
+  const base = { action: "task-save", ref: "T001" };
+  assert.equal((await handleTaskAction({ ...base, start_at: A }, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, end_at: null }, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, start_at: null, end_at: null }, deps())).status, 200);
+});
+test("end_at must be after start_at", async () => {
+  const base = { action: "task-save", ref: "T001" };
+  assert.equal((await handleTaskAction({ ...base, start_at: A, end_at: A }, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, start_at: B, end_at: A }, deps())).status, 400);
+  assert.equal((await handleTaskAction({ ...base, start_at: A, end_at: B }, deps())).status, 200);
+});
