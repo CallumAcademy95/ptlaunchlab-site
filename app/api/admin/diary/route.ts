@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { checkDiaryAuth, handleDiary } from "@/app/lib/diary/diary-core";
-import { googleDiaryDeps } from "@/app/lib/diary/diary-google";
+import { createGoogleDiaryDeps } from "@/app/lib/diary/diary-google";
 
 // POST /api/admin/diary — Callum's PA diary (spec 2026-11-15-pa-weekly-diary-design).
 // Not behind the admin cookie (/api/admin/* is not middleware-gated): it is
@@ -18,6 +18,6 @@ export async function POST(req: Request) {
   if (auth !== "ok") return json({ ok: false, error: "Unauthorised." }, 401);
   let raw: unknown;
   try { raw = await req.json(); } catch { return json({ ok: false, error: "Body must be JSON." }, 400); }
-  const r = await handleDiary(raw, googleDiaryDeps);
+  const r = await handleDiary(raw, createGoogleDiaryDeps());
   return json(r.body, r.status);
 }
