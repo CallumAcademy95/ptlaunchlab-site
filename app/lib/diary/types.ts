@@ -24,3 +24,6 @@ export function isRealDate(s: string): boolean {
   const dt = new Date(Date.UTC(y, mo - 1, d));
   return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
 }
+
+/** A proposed calendar slot (ISO strings) and its label for people. */
+export type Proposal = { start: string; end: string; label: string; blockTitle: string | null };
