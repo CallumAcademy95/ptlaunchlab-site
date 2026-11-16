@@ -3,15 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 
-// PT Mentor Hub: a mentor partner, not a gym (draft, Nov 2026). The same
+// PT Mentor Hub: a mentor partner, not a gym (Nov 2026). The same
 // Level 2 & 3 course as every partner, sold with PT Mentor Hub's mentorship,
 // pay in full ONLY (his model; see PAY_IN_FULL_ONLY_PARTNERS). Attribution is gymSlug "pt-mentor-hub" on the enrol
 // page, which is what puts a sale in the partner portal. Deliberately not the
 // gym academy template: that one is written around a gym floor.
 //
-// DRAFT until his agreement is signed. The mentoring, bio and results copy is
-// PT Mentor Hub's own (sent 14 Nov 2026), lightly edited; the client photos
-// are his. Not in the sitemap, noindex.
+// Live 16 Nov 2026. The mentoring, bio and results copy is PT Mentor Hub's own
+// (sent 14 Nov 2026), lightly edited; the client photos are his. His
+// Commitment links to its terms, which are Schedule 1 of his agreement
+// (COMMITMENT_TERMS in app/lib/mentorPackageAgreement.ts). A bio-link page,
+// not an SEO page: noindex and not in the sitemap.
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/pt-mentor-hub-academy";
 const ENROL = "/pt-mentor-hub-academy/enrol";
@@ -80,10 +82,6 @@ function EnrolButton({ label = "Enrol now" }: { label?: string }) {
 export default function PtMentorHubAcademyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="text-center text-xs font-semibold py-2 px-4 text-black" style={{ backgroundColor: ORANGE }}>
-        Draft preview for PT Mentor Hub. Not yet open for enrolments.
-      </div>
-
       {/* HERO */}
       <header className="px-6 pt-10 pb-16 md:pt-14 md:pb-24 relative overflow-hidden">
         <div
@@ -167,7 +165,7 @@ export default function PtMentorHubAcademyPage() {
         </div>
       </section>
 
-      {/* COMMITMENT: PT Mentor Hub's own; its terms are still being agreed */}
+      {/* COMMITMENT: PT Mentor Hub's own, on the terms in Schedule 1 of his agreement */}
       <section className="px-6 pb-16 md:pb-24">
         <div className="max-w-3xl mx-auto rounded-3xl p-8 md:p-10 text-black" style={{ backgroundColor: ORANGE }}>
           <p className="text-xs font-bold uppercase tracking-widest mb-3">Our commitment</p>
@@ -177,7 +175,10 @@ export default function PtMentorHubAcademyPage() {
           <p className="text-sm font-medium text-black/75">
             No guesswork. No being left to figure it all out alone. Just a clear plan, practical support and someone in your corner who understands what it takes to build a PT business.
           </p>
-          <p className="text-xs text-black/60 mt-4">Commitment given by PT Mentor Hub. Terms apply.</p>
+          <p className="text-xs text-black/70 mt-4">
+            Commitment given by PT Mentor Hub.{" "}
+            <Link href="/pt-mentor-hub-academy/commitment-terms" className="underline font-semibold">Terms apply</Link>.
+          </p>
         </div>
       </section>
 

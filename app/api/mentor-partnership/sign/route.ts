@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 import { generateMentorAgreementPDFServer } from "@/app/lib/server/generateMentorAgreementPDF.server";
-import {
-  MENTOR_AGREEMENT_VERSION,
-  MENTOR_AGREEMENT_SUMMARY,
-} from "@/app/lib/mentorPartnerAgreement";
+import { MENTOR_AGREEMENTS, parseMentorAgreementKind } from "@/app/lib/mentorAgreements";
 import { ADDRESS_ONE_LINE } from "@/app/lib/contactDetails";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -37,6 +34,9 @@ export async function POST(req: NextRequest) {
     const signature     = typeof body.signature === "string" ? body.signature.slice(0, 200_000) : "";
     const signedAt      = Number.isNaN(Date.parse(body.signedAt)) ? new Date().toISOString() : body.signedAt;
     const acknowledged  = body.acknowledgedKeyTerms === true;
+    // Which agreement was signed; the Axis page sends none (= mentorship).
+    const kind          = parseMentorAgreementKind(body.agreement);
+    const agreement     = MENTOR_AGREEMENTS[kind];
 
     if (!businessName || !address || !repName || !repEmail || !signature) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       businessName, companyNumber, address,
       repName, repPosition, repEmail,
       signature, signatureType,
-      signedAt,
+      signedAt, kind,
       acknowledgedKeyTerms: acknowledged,
     });
     const attachments = [{ filename: pdfFilename, content: pdfBuffer }];
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
 </body></html>`;
 
     const adminHtml = shell(
-      "Business Mentorship Partner Agreement Signed",
+      `${agreement.title} Signed`,
       `<table style="width:100%;border-collapse:collapse;">
         ${row("Business", businessName)}
         ${row("Company number", companyNumber || "Sole trader / not given")}
@@ -91,14 +91,14 @@ export async function POST(req: NextRequest) {
         ${row("Email", repEmail)}
         ${row("Method", signatureType === "drawn" ? "Drawn signature" : "Typed full name")}
         ${row("Date signed", signedDate)}
-        ${row("Version", `v${MENTOR_AGREEMENT_VERSION} — ${MENTOR_AGREEMENT_SUMMARY}`)}
+        ${row("Version", `v${agreement.version} — ${agreement.summary}`)}
         ${row("Key terms acknowledged", acknowledged ? "Yes — ticked before signing" : "NO")}
       </table>
       <p style="color:#8CA3BF;font-size:13px;margin:20px 0 0;">The signed PDF is attached. A copy has also been sent to ${esc(repEmail)}.</p>`
     );
 
     const signerHtml = shell(
-      "Business Mentorship Partner Agreement",
+      agreement.title,
       `<h2 style="color:#F5C518;font-size:22px;margin:0 0 8px;">Thanks, ${esc(repName.split(" ")[0])}.</h2>
       <p style="color:#8CA3BF;font-size:15px;line-height:1.6;margin:0 0 20px;">
         Your signed agreement with PT Launch Lab is attached. Please keep a copy for your records.
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
         ${row("Business", businessName)}
         ${row("Signed by", repName)}
         ${row("Date", signedDate)}
-        ${row("Version", `v${MENTOR_AGREEMENT_VERSION}`)}
+        ${row("Version", `v${agreement.version}`)}
       </table>
       <p style="color:#4A6280;font-size:13px;line-height:1.6;margin:20px 0 0;">
         Any questions, email <a href="mailto:info@ptlaunchlab.co.uk" style="color:#F5C518;">info@ptlaunchlab.co.uk</a>.
@@ -123,14 +123,14 @@ export async function POST(req: NextRequest) {
       resend.emails.send({
         from: "PT Launch Lab Partnerships <partnerships@ptlaunchlab.co.uk>",
         to: ADMIN_EMAIL,
-        subject: `Mentor Partner Agreement Signed: ${businessName} — ${repName}`,
+        subject: `${agreement.title} Signed: ${businessName} — ${repName}`,
         html: adminHtml,
         attachments,
       }),
       resend.emails.send({
         from: "PT Launch Lab <partnerships@ptlaunchlab.co.uk>",
         to: repEmail,
-        subject: "Your PT Launch Lab Mentor Partner Agreement",
+        subject: `Your PT Launch Lab ${agreement.title}`,
         html: signerHtml,
         attachments,
       }),

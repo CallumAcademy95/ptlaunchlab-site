@@ -1,14 +1,11 @@
 // Server-side only — runs in API routes, never in the browser
 //
 // This file is a RENDERER ONLY. Every word of clause text comes from
-// app/lib/mentorPartnerAgreement.ts, which is the same source the on-screen
-// agreement at /mentor-partnership/sign renders. Do not add clause text here.
+// the agreement's own module (see app/lib/mentorAgreements.ts), which is the same
+// source the on-screen agreement renders. Do not add clause text here.
 import PDFDocument from "pdfkit";
 import { CALLUM_SIGNATURE_B64 } from "../callumSignature";
-import {
-  buildMentorAgreementClauses,
-  MENTOR_AGREEMENT_VERSION,
-} from "../mentorPartnerAgreement";
+import { MENTOR_AGREEMENTS, type MentorAgreementKind } from "../mentorAgreements";
 
 // ── Colours ───────────────────────────────────────────────────────────────────
 const DARK   = "#072B4A";
@@ -35,11 +32,15 @@ export interface MentorAgreementPDFServerData {
   signedAt: string;
   /** Whether the signer ticked the key-terms acknowledgement on screen. */
   acknowledgedKeyTerms?: boolean;
+  /** Which agreement; defaults to the original mentorship agreement. */
+  kind?: MentorAgreementKind;
 }
 
 export function generateMentorAgreementPDFServer(
   data: MentorAgreementPDFServerData
 ): Promise<{ buffer: Buffer; filename: string }> {
+  const agreement = MENTOR_AGREEMENTS[data.kind ?? "mentorship"];
+  const MENTOR_AGREEMENT_VERSION = agreement.version;
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ size: "A4", margin: 0, autoFirstPage: true });
     const chunks: Buffer[] = [];
@@ -54,7 +55,7 @@ export function generateMentorAgreementPDFServer(
       day: "numeric", month: "long", year: "numeric",
     });
     const slug     = data.businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const filename = `ptll-mentor-partner-agreement-${slug}-${new Date(data.signedAt).toISOString().slice(0, 10)}.pdf`;
+    const filename = `${agreement.filenamePrefix}-${slug}-${new Date(data.signedAt).toISOString().slice(0, 10)}.pdf`;
 
     let y      = 0;
     let pageNum = 1;
@@ -130,7 +131,7 @@ export function generateMentorAgreementPDFServer(
     doc.fillColor(WHITE).font("Helvetica-Bold").fontSize(18)
        .text("PT LAUNCH LAB LTD", M, 18, { lineBreak: false });
     doc.fillColor(WHITE).font("Helvetica").fontSize(10)
-       .text("Business Mentorship Partner Agreement", M, 42, { lineBreak: false });
+       .text(agreement.title, M, 42, { lineBreak: false });
 
     doc.fillColor(MUTED).font("Helvetica").fontSize(8)
        .text(`Date: ${signedDate}`, M, 18, { width: CW, align: "right", lineBreak: false });
@@ -144,7 +145,7 @@ export function generateMentorAgreementPDFServer(
     y = 92;
 
     // ── Clauses — rendered from the shared source ─────────────────────────────
-    const clauses = buildMentorAgreementClauses({
+    const clauses = agreement.buildClauses({
       businessName: data.businessName,
       companyNumber: data.companyNumber,
       address: data.address,
@@ -244,7 +245,7 @@ export function generateMentorAgreementPDFServer(
     if (data.acknowledgedKeyTerms) {
       doc.fillColor(BODY).font("Helvetica").fontSize(7.5)
          .text(
-           `Before signing, ${data.repName} was shown a summary of the key terms — Clause 2 (call fee and pilot), Clause 3 (representing PT Launch Lab), Clause 4 (exclusivity) and Clause 5 (learner data) — was required to scroll to the end of the Agreement, and confirmed having read it and being authorised to sign.`,
+           `Before signing, ${data.repName} was shown a summary of the key terms — ${agreement.ackNote} — was required to scroll to the end of the Agreement, and confirmed having read it and being authorised to sign.`,
            M, y, { width: CW }
          );
       y = doc.y + 4;
