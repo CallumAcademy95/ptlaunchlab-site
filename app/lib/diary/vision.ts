@@ -12,8 +12,8 @@ Never guess a date or time that is not visible: use null and add a short questio
 If no year is shown, use the next occurrence on or after today. Times as 24h HH:MM.`;
 
 export async function readScreenshot(b64: string, mediaType: "image/jpeg" | "image/png" | "image/webp", todayLabel: string) {
-  const client = new Anthropic();
   try {
+    const client = new Anthropic();
     const res = await client.messages.create({
       model: "claude-opus-5-5",
       max_tokens: 4000,
@@ -29,6 +29,6 @@ export async function readScreenshot(b64: string, mediaType: "image/jpeg" | "ima
     return parseExtraction(text && text.type === "text" ? text.text : undefined);
   } catch (e) {
     if (e instanceof Anthropic.APIError) return { ok: false as const, error: `Screenshot reader unavailable (${e.status ?? "network"}). Type it instead.` };
-    throw e;
+    return { ok: false as const, error: "Screenshot reader unavailable. Type it instead." };
   }
 }

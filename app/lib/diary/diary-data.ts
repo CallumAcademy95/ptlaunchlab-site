@@ -31,6 +31,12 @@ export const dataTaskDeps: TaskDeps = {
   },
 };
 
+/** Rows marked placed that have no calendar event (a half-finished placement): shown so they can be sent back to the inbox. */
+export async function listPlacedWithoutEvent(): Promise<TaskRow[]> {
+  const r = await db().from("diary_tasks").select(TASK_COLS).eq("status", "placed").is("event_id", null).order("created_at").limit(100);
+  return must(r, "list orphaned tasks") as unknown as TaskRow[];
+}
+
 export async function getTask(id: string): Promise<TaskRow | null> {
   const r = await db().from("diary_tasks").select(TASK_COLS).eq("id", id).maybeSingle();
   if (r.error) throw new Error(`get task: ${r.error.message}`);

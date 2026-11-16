@@ -1,8 +1,8 @@
 // Task API for the skills (bearer route). Pure: deps injected.
 import { z } from "zod";
-import { AREAS, CATEGORIES, type TaskRow } from "./types.ts";
+import { AREAS, CATEGORIES, isRealDate, type TaskRow } from "./types.ts";
 
-const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isRealDate, "not a real date");
 const ts = z.string().refine((s) => /(Z|[+-]\d\d:\d\d)$/i.test(s) && !Number.isNaN(Date.parse(s)), "ISO with offset");
 export const TaskFields = z.object({
   title: z.string().trim().min(1).max(200),

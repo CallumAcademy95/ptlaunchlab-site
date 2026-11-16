@@ -62,11 +62,32 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
     .filter((t) => t.status === "placed" && t.start_at && londonDay(t.start_at) === data.today)
     .sort((a, b) => priorityOf(a.category) - priorityOf(b.category) || a.start_at!.localeCompare(b.start_at!)).slice(0, 3), [data]);
   const inbox = data.tasks.filter((t) => t.status === "inbox");
+  // A "placed" row with no calendar event is a half-finished placement: list it so it can be sent back to the inbox.
+  const orphaned = data.tasks.filter((t) => t.status === "placed" && !t.event_id);
   const claudeQueue = data.tasks.filter((t) => t.owner === "Claude" && (t.status === "inbox" || t.status === "placed"));
   const byDay = (d: string) => [
     ...data.events.filter((e) => londonDay(e.start) === d).map((e) => ({ key: e.id, start: e.start, end: e.end, label: e.summary, kind: e.kind as string, task: data.tasks.find((t) => t.event_id === e.id) })),
     ...data.calls.filter((c) => londonDay(c.start_at) === d).map((c) => ({ key: c.id, start: c.start_at, end: c.end_at, label: `Call: ${c.name}`, kind: "call", task: undefined })),
   ].sort((a, b) => a.start.localeCompare(b.start));
+
+  const dayCell = (d: string) => (
+      <div key={d} className={`min-w-0 ${d === data.today ? "rounded-lg bg-slate-50 p-2" : "p-2"}`}>
+        <p className="mb-1 text-xs font-semibold uppercase text-slate-500">{dayLabel(d)}</p>
+        {byDay(d).length === 0 ? <p className="text-xs text-slate-400">—</p> : byDay(d).map((x) => (
+          <div key={x.key} className={`mb-1 rounded-md px-2 py-1 text-xs [overflow-wrap:anywhere] ${x.kind === "block" ? "bg-slate-100 text-slate-500" : x.kind === "fixed" ? "bg-rose-50 text-rose-800" : x.kind === "call" ? "bg-blue-50 text-blue-800" : "bg-emerald-50 text-emerald-900"}`}>
+            <span className="font-medium">{hm(x.start)}</span> {x.label}
+            {x.task && x.task.status === "placed" && (
+              <span className="ml-1 inline-flex flex-wrap gap-2">
+                <button disabled={busy} className={link} onClick={() => act(markDone, x.task!.id, "Done.")}>Done</button>
+                <button disabled={busy} className={link} onClick={() => proposeMove(x.task!, x)}>Move</button>
+                <button disabled={busy} className={link} onClick={() => act(returnToInbox, x.task!.id, "Back in the inbox.")}>Inbox</button>
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+  );
+  const weekend = data.days.slice(5).filter((d) => byDay(d).length > 0);
 
   function submit() {
     run(async () => {
@@ -114,7 +135,7 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
       const r = await applyMoves(ok.map((m) => ({ id: m.id, start: new Date(m.to!.start).toISOString(), end: new Date(m.to!.end).toISOString() })));
       if (!r.ok) throw new Error(r.error);
       if (r.failed.length) setError(`Some moves failed: ${r.failed.join("; ")}`);
-      const failedIds = new Set(r.failed.map((f) => f.split(":")[0]));
+      const failedIds = new Set(r.failedIds);
       const appliedIds = new Set(ok.filter((m) => !failedIds.has(m.id)).map((m) => m.id));
       setInfo(`Moved ${r.moved} of ${ok.length}.`); setMoves((prev) => prev.filter((m) => !appliedIds.has(m.id))); router.refresh();
     });
@@ -218,24 +239,9 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-5">
-          {data.days.map((d) => (
-            <div key={d} className={`min-w-0 ${d === data.today ? "rounded-lg bg-slate-50 p-2" : "p-2"}`}>
-              <p className="mb-1 text-xs font-semibold uppercase text-slate-500">{dayLabel(d)}</p>
-              {byDay(d).length === 0 ? <p className="text-xs text-slate-400">—</p> : byDay(d).map((x) => (
-                <div key={x.key} className={`mb-1 rounded-md px-2 py-1 text-xs [overflow-wrap:anywhere] ${x.kind === "block" ? "bg-slate-100 text-slate-500" : x.kind === "fixed" ? "bg-rose-50 text-rose-800" : x.kind === "call" ? "bg-blue-50 text-blue-800" : "bg-emerald-50 text-emerald-900"}`}>
-                  <span className="font-medium">{hm(x.start)}</span> {x.label}
-                  {x.task && x.task.status === "placed" && (
-                    <span className="ml-1 inline-flex flex-wrap gap-2">
-                      <button disabled={busy} className={link} onClick={() => act(markDone, x.task!.id, "Done.")}>Done</button>
-                      <button disabled={busy} className={link} onClick={() => proposeMove(x.task!, x)}>Move</button>
-                      <button disabled={busy} className={link} onClick={() => act(returnToInbox, x.task!.id, "Back in the inbox.")}>Inbox</button>
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
+          {data.days.slice(0, 5).map(dayCell)}
         </div>
+        {weekend.length > 0 && <div className="mt-3 grid gap-3 md:grid-cols-5">{weekend.map(dayCell)}</div>}
         <div className="mt-3">
           {layout ? (
             <div className="text-sm">
@@ -254,14 +260,17 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
       <Card className="p-4">
         <SectionTitle>Inbox</SectionTitle>
         <div className="mt-2">
-          {inbox.length === 0 ? <EmptyState title="Inbox empty" /> : inbox.map((t) => (
+          {inbox.length + orphaned.length === 0 ? <EmptyState title="Inbox empty" /> : [...inbox, ...orphaned].map((t) => (
             <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 py-2 text-sm">
               <span className="min-w-0 [overflow-wrap:anywhere]"><Badge>{t.ref}</Badge> [{t.category}] {t.title} {t.deadline && <span className="text-slate-500">· due {dayLabel(t.deadline)}</span>}</span>
-              <span className="flex gap-3">
+              {t.status === "placed" ? (
+                <span className="flex items-center gap-3"><span className="text-xs text-amber-700">Placed but not in the calendar</span>
+                  <button disabled={busy} className={link} onClick={() => act(returnToInbox, t.id, "Back in the inbox.")}>Inbox</button></span>
+              ) : <span className="flex gap-3">
                 <button disabled={busy} className={link} onClick={() => run(async () => { const r = await moveTask(t.id); if (!r.ok) throw new Error(r.error); setAck(false); setPending({ task: t, proposal: r.proposal, reason: r.reason, questions: [] }); })}>Slot</button>
                 <button disabled={busy} className={link} onClick={() => act(markDone, t.id, "Done.")}>Done</button>
                 <button disabled={busy} className={link} onClick={() => act(dropTask, t.id, "Dropped.")}>Drop</button>
-              </span>
+              </span>}
             </div>
           ))}
         </div>
@@ -273,7 +282,7 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
           {claudeQueue.length === 0 ? <EmptyState title="Nothing waiting" /> : claudeQueue.map((t) => (
             <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 py-2 text-sm">
               <span className="min-w-0 [overflow-wrap:anywhere]"><Badge>{t.ref}</Badge> {t.title}</span>
-              <button disabled={busy} className={link} onClick={() => act(approveClaudeTask, t.id, `Approved ${t.ref}. Claude picks it up next session.`)}>Approve</button>
+              {t.status === "inbox" && <button disabled={busy} className={link} onClick={() => act(approveClaudeTask, t.id, `Approved ${t.ref}. Claude picks it up next session.`)}>Approve</button>}
             </div>
           ))}
         </div>

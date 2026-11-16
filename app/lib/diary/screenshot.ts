@@ -1,6 +1,6 @@
 // Screenshot → validated fields. Pure. The model's output is untrusted input.
 import { z } from "zod";
-import { AREAS, CATEGORIES } from "./types.ts";
+import { AREAS, CATEGORIES, isRealDate } from "./types.ts";
 
 export const EXTRACTION_SCHEMA = {
   type: "object",
@@ -38,8 +38,8 @@ export function privacyTitle(raw: string, kind: "fixed" | "task" | "info"): stri
   const words = raw
     .replace(/^\[Personal\]\s*/i, "")
     .replace(/\S+@\S+/g, " ").replace(/@\w+/g, " ")
-    .replace(/\d[\d\s]{2,}\d/g, " ").replace(/\b\d{3,}\b/g, " ")
-    .split(/\s+/).filter(Boolean).slice(0, 6);
+    .replace(/\+?\(?\d[\d\s().-]{4,}\d\)?/g, " ").replace(/\d{3,}/g, " ")
+    .split(/\s+/).filter((w) => /[\p{L}\p{N}]/u.test(w)).slice(0, 6);
   const t = words.join(" ").trim() || "Untitled";
   return kind === "fixed" ? `[Personal] ${t}` : t;
 }
@@ -52,6 +52,9 @@ export function parseExtraction(text: string | undefined): { ok: true; value: Ex
   if (!p.success) return { ok: false, error: "Couldn't read that screenshot — type it instead." };
   const v = { ...p.data, title: privacyTitle(p.data.title, p.data.type), questions: [...p.data.questions] };
   const ask = (q: string) => { if (!v.questions.includes(q)) v.questions.push(q); };
+  // Round-trip: "2026-02-31" matches the regex but is not a real day.
+  if (v.date && !isRealDate(v.date)) v.date = null;
+  if (v.deadline && !isRealDate(v.deadline)) v.deadline = null;
   if (v.type === "fixed") {
     if (!v.date) ask("What date is it?");
     if (!v.start) ask("What time does it start?");

@@ -32,3 +32,15 @@ test("bad dates/times and junk are rejected", () => {
   assert.equal(parseExtraction("not json").ok, false);
   assert.equal(parseExtraction(undefined).ok, false);
 });
+test("privacy: phone runs in any format are stripped whole, leaving no stray punctuation", () => {
+  assert.equal(privacyTitle("Call +44 7700 900123 re gym", "task"), "Call re gym");
+  assert.equal(privacyTitle("07700-900-123 Dentist", "task"), "Dentist");
+  assert.equal(privacyTitle("(0113) 496 0000 Nails", "task"), "Nails");
+  assert.equal(privacyTitle("Room123 meeting", "task"), "Room meeting");
+});
+test("impossible dates become null plus a question", () => {
+  const f = parseExtraction(JSON.stringify({ ...base, date: "2026-02-31" }));
+  assert.ok(f.ok && f.value.date === null && f.value.questions.includes("What date is it?"));
+  const t = parseExtraction(JSON.stringify({ ...base, type: "task", date: null, start: null, end: null, estimate_min: 30, deadline: "2026-13-01", category: "Admin", area: "PTLL" }));
+  assert.ok(t.ok && t.value.deadline === null && t.value.questions.includes("When is it due?"));
+});

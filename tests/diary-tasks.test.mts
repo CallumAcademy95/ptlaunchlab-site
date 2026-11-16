@@ -56,3 +56,7 @@ test("end_at must be after start_at", async () => {
   assert.equal((await handleTaskAction({ ...base, start_at: B, end_at: A }, deps())).status, 400);
   assert.equal((await handleTaskAction({ ...base, start_at: A, end_at: B }, deps())).status, 200);
 });
+test("an impossible deadline is a 400, not a Postgres error", async () => {
+  const r = await handleTaskAction({ action: "task-save", title: "Fix page", category: "SEO", estimate_min: 60, deadline: "2026-02-31" }, deps());
+  assert.equal(r.status, 400);
+});

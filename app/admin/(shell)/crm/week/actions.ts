@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "@/app/lib/admin-auth";
 import { handleDiary } from "@/app/lib/diary/diary-core";
+import { privacyTitle } from "@/app/lib/diary/screenshot";
 import { createGoogleDiaryDeps } from "@/app/lib/diary/diary-google";
 import { dataTaskDeps, getTask, claimForPlacing } from "@/app/lib/diary/diary-data";
 import { TaskFields } from "@/app/lib/diary/tasks-core";
@@ -10,8 +11,8 @@ import { proposeSlot } from "@/app/lib/diary/placement";
 import { findClashes, planMoves, type MovePlan } from "@/app/lib/diary/clashes";
 import { layoutWeek, type LayoutEvent } from "@/app/lib/diary/template";
 import { readScreenshot } from "@/app/lib/diary/vision";
-import { loadPlacementCtx, loadWeek, placedTasks, mondayOf } from "@/app/lib/diary/week-data";
-import { londonDate, addDays, slotLabel } from "@/app/lib/booking/london";
+import { loadPlacementCtx, loadWeek, placedTasks, mondayOf, diary } from "@/app/lib/diary/week-data";
+import { londonDate, addDays, slotLabel, londonWallToUtc } from "@/app/lib/booking/london";
 import type { TaskRow } from "@/app/lib/diary/types";
 
 type Fail = { ok: false; error: string };
@@ -23,11 +24,7 @@ async function isAdmin() {
 const isUuid = (s: unknown): s is string => typeof s === "string" && /^[0-9a-f-]{36}$/i.test(s);
 const done = () => revalidatePath("/admin/crm/week");
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
-async function diary(raw: Record<string, unknown>) {
-  const r = await handleDiary(raw, createGoogleDiaryDeps());
-  if (r.status !== 200 || r.body.ok !== true) throw new Error(String(r.body.error ?? "Calendar write failed"));
-  return r.body;
-}
+const todayStartIso = () => new Date(londonWallToUtc(londonDate(Date.now()), "00:00")).toISOString();
 export type Proposal = { start: string; end: string; label: string; blockTitle: string | null };
 
 /** Add a task. With start/end it is pinned to that time; otherwise a slot is proposed. Nothing is written to Google here. */
@@ -35,7 +32,7 @@ export async function addTask(input: unknown): Promise<{ ok: true; task: TaskRow
   if (!(await isAdmin())) return DENIED;
   const p = TaskFields.safeParse(input);
   if (!p.success || !p.data.title || !p.data.category) return { ok: false, error: "Title and category are required; check the fields." };
-  const f = p.data;
+  const f = p.data; // the TaskFields date schema already rejects impossible deadlines (e.g. 2026-02-31)
   if (f.kind === "fixed" && (!f.start_at || !f.end_at)) return { ok: false, error: "A personal/fixed event needs a start and end time." };
   if (!!f.start_at !== !!f.end_at) return { ok: false, error: "Give both a start and an end time, or neither." };
   if (f.start_at && f.end_at && Date.parse(f.end_at) <= Date.parse(f.start_at)) return { ok: false, error: "End must be after start." };
@@ -54,7 +51,7 @@ export async function addTask(input: unknown): Promise<{ ok: true; task: TaskRow
     if (f.deadline && f.deadline < today) return { ok: true, task, proposal: null, reason: "Deadline has passed — it's in the inbox." };
     const cap = addDays(today, 28);
     const to = f.deadline && f.deadline < cap ? f.deadline : cap;
-    const r = proposeSlot(task, await loadPlacementCtx(today, to < today ? today : to));
+    const r = proposeSlot(task, await loadPlacementCtx(today, to < today ? today : to, undefined, createGoogleDiaryDeps()));
     return r.ok
       ? { ok: true, task, proposal: { start: new Date(r.start).toISOString(), end: new Date(r.end).toISOString(), label: slotLabel(r.start), blockTitle: r.blockTitle }, reason: null }
       : { ok: true, task, proposal: null, reason: r.reason };
@@ -65,6 +62,7 @@ export async function addTask(input: unknown): Promise<{ ok: true; task: TaskRow
 export async function confirmSlot(taskId: unknown, start: unknown, end: unknown): Promise<{ ok: true; moves: MovePlan[]; warning?: string } | Fail> {
   if (!(await isAdmin())) return DENIED;
   if (!isUuid(taskId) || typeof start !== "string" || typeof end !== "string") return { ok: false, error: "Bad request." };
+  const deps = createGoogleDiaryDeps(); // one client/token for every calendar call in this action
   let t: TaskRow | null;
   let prior: "inbox" | "approved" = "inbox";
   const why = (c: TaskRow | null): Fail => {
@@ -85,8 +83,9 @@ export async function confirmSlot(taskId: unknown, start: unknown, end: unknown)
   // (b) create the event
   let eventId: string;
   try {
-    const summary = t.kind === "fixed" ? t.title : `[${t.category}] ${t.title}`;
-    const r = await handleDiary({ action: "create", summary, start, end, kind: t.kind, description: `PA task ${t.ref}` }, createGoogleDiaryDeps());
+    // Personal/appointment titles are re-sanitised at the Google write, whatever was stored.
+    const summary = t.kind === "fixed" ? privacyTitle(t.title, "fixed") : `[${t.category}] ${t.title}`;
+    const r = await handleDiary({ action: "create", summary, start, end, kind: t.kind, description: `PA task ${t.ref}` }, deps);
     if (r.status !== 200 || r.body.ok !== true) throw new Error(String(r.body.error ?? "Calendar write failed"));
     eventId = String(r.body.id);
   } catch (e) { await revert(); done(); return { ok: false, error: msg(e) }; }
@@ -97,7 +96,7 @@ export async function confirmSlot(taskId: unknown, start: unknown, end: unknown)
   } catch {
     let removed = false;
     try {
-      const d = await handleDiary({ action: "delete", id: eventId }, createGoogleDiaryDeps());
+      const d = await handleDiary({ action: "delete", id: eventId }, deps);
       removed = d.status === 200 || d.status === 404;
     } catch { removed = false; }
     if (removed) {
@@ -116,30 +115,34 @@ export async function confirmSlot(taskId: unknown, start: unknown, end: unknown)
   try {
     const s = Date.parse(start), e = Date.parse(end);
     const today = londonDate(Date.now());
-    const ctx = await loadPlacementCtx(today, addDays(today, 28), t.id);
-    const others = placedTasks(await dataTaskDeps.list({ status: ["placed"] })).filter((x) => x.id !== t.id);
+    const ctx = await loadPlacementCtx(today, addDays(today, 28), t.id, deps);
+    const others = placedTasks(await dataTaskDeps.list({ status: ["placed"], from: todayStartIso() })).filter((x) => x.id !== t.id);
     const clashes = findClashes({ start: s, end: e }, others);
     return { ok: true, moves: clashes.length ? planMoves(clashes, ctx, { start: s, end: e }) : [] };
   } catch (e) { return { ok: true, moves: [], warning: `Added, but couldn't check for clashes: ${msg(e)}` }; }
 }
 
 /** Apply proposed moves (one tap). Returns how many moved; any failure is reported per task. */
-export async function applyMoves(moves: unknown): Promise<{ ok: true; moved: number; failed: string[] } | Fail> {
+export async function applyMoves(moves: unknown): Promise<{ ok: true; moved: number; failed: string[]; failedIds: string[] } | Fail> {
   if (!(await isAdmin())) return DENIED;
   if (!Array.isArray(moves) || moves.length > 20) return { ok: false, error: "Bad request." };
-  let moved = 0; const failed: string[] = [];
+  const deps = createGoogleDiaryDeps();
+  let moved = 0; const failed: string[] = []; const failedIds: string[] = [];
   for (const m of moves as { id: unknown; start: unknown; end: unknown }[]) {
+    let label = "a task";
     try {
       if (!isUuid(m.id) || typeof m.start !== "string" || typeof m.end !== "string") throw new Error("bad move");
       const t = await getTask(m.id);
+      if (t) label = t.title;
       if (!t?.event_id) throw new Error("not in the calendar");
-      await diary({ action: "move", id: t.event_id, start: m.start, end: m.end });
-      await dataTaskDeps.update({ id: t.id }, { start_at: m.start, end_at: m.end });
+      await diary(deps, { action: "move", id: t.event_id, start: m.start, end: m.end });
+      const row = await dataTaskDeps.update({ id: t.id }, { start_at: m.start, end_at: m.end });
+      if (!row) throw new Error("moved in the calendar but the task record wasn't found");
       moved++;
-    } catch (e) { failed.push(`${String(m.id)}: ${msg(e)}`); }
+    } catch (e) { failed.push(`${label}: ${msg(e)}`); if (typeof m.id === "string") failedIds.push(m.id); }
   }
   done();
-  return { ok: true, moved, failed };
+  return { ok: true, moved, failed, failedIds };
 }
 
 /** Propose a new slot for a placed task (not written until applyMoves). */
@@ -150,7 +153,7 @@ export async function moveTask(taskId: unknown): Promise<{ ok: true; proposal: P
     const t = await getTask(taskId);
     if (!t) return { ok: false, error: "Task not found." };
     const today = londonDate(Date.now());
-    const ctx = await loadPlacementCtx(today, addDays(today, 28), t.id);
+    const ctx = await loadPlacementCtx(today, addDays(today, 28), t.id, createGoogleDiaryDeps());
     if (t.start_at && t.end_at) ctx.busy.push({ start: Date.parse(t.start_at), end: Date.parse(t.end_at) }); // a move must actually move
     const r = proposeSlot(t, ctx);
     return r.ok ? { ok: true, proposal: { start: new Date(r.start).toISOString(), end: new Date(r.end).toISOString(), label: slotLabel(r.start), blockTitle: r.blockTitle }, reason: null }
@@ -189,15 +192,28 @@ async function setStatus(taskId: unknown, status: "done" | "dropped" | "inbox" |
 export async function markDone(taskId: unknown) { return setStatus(taskId, "done", false); }
 export async function dropTask(taskId: unknown) { return setStatus(taskId, "dropped", true); }
 export async function returnToInbox(taskId: unknown) { return setStatus(taskId, "inbox", true); }
-export async function approveClaudeTask(taskId: unknown) { return setStatus(taskId, "approved", false); }
+export async function approveClaudeTask(taskId: unknown): Promise<{ ok: true } | Fail> {
+  if (!(await isAdmin())) return DENIED;
+  if (!isUuid(taskId)) return { ok: false, error: "Bad request." };
+  try {
+    const t = await getTask(taskId);
+    if (!t) return { ok: false, error: "Task not found." };
+    if (t.event_id) return { ok: false, error: "That task is already in the calendar; it can't be approved." };
+    if (t.status !== "inbox") return { ok: false, error: `Only inbox tasks can be approved (this one is ${t.status}).` };
+  } catch (e) { return { ok: false, error: msg(e) }; }
+  return setStatus(taskId, "approved", false);
+}
 
 const isDate = (s: unknown): s is string => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
 /** Preview the template blocks for a week (nothing written). */
 export async function previewLayout(monday: unknown): Promise<{ ok: true; events: LayoutEvent[] } | Fail> {
   if (!(await isAdmin())) return DENIED;
+  return previewLayoutWith(monday, createGoogleDiaryDeps());
+}
+async function previewLayoutWith(monday: unknown, deps: ReturnType<typeof createGoogleDiaryDeps>): Promise<{ ok: true; events: LayoutEvent[] } | Fail> {
   if (!isDate(monday) || mondayOf(monday) !== monday) return { ok: false, error: "Pick a Monday." };
   try {
-    const w = await loadWeek(monday);
+    const w = await loadWeek(monday, deps);
     if (w.errors.length) return { ok: false, error: w.errors.join(" · ") };
     const existing = w.events.filter((e) => e.kind === "block").map((e) => ({ summary: e.summary, start: Date.parse(e.start), end: Date.parse(e.end) }));
     return { ok: true, events: layoutWeek(w.template, monday, existing) };
@@ -205,15 +221,23 @@ export async function previewLayout(monday: unknown): Promise<{ ok: true; events
 }
 /** Create the template blocks for a week. Reports created vs planned. */
 export async function applyLayout(monday: unknown): Promise<{ ok: true; created: number; planned: number; failed: string[] } | Fail> {
-  const prev = await previewLayout(monday);
+  if (!(await isAdmin())) return DENIED;
+  const deps = createGoogleDiaryDeps();
+  const prev = await previewLayoutWith(monday, deps);
   if (!prev.ok) return prev;
   let created = 0; const failed: string[] = [];
-  for (const ev of prev.events) {
-    try {
-      await diary({ action: "create", summary: ev.summary, start: new Date(ev.start).toISOString(), end: new Date(ev.end).toISOString(), kind: "block" });
-      created++;
-    } catch (e) { failed.push(`${ev.summary}: ${msg(e)}`); }
-  }
+  // Create with a concurrency of 4 so a full week fits the time limit.
+  let next = 0;
+  const worker = async () => {
+    while (next < prev.events.length) {
+      const ev = prev.events[next++];
+      try {
+        await diary(deps, { action: "create", summary: ev.summary, start: new Date(ev.start).toISOString(), end: new Date(ev.end).toISOString(), kind: "block" });
+        created++;
+      } catch (e) { failed.push(`${ev.summary}: ${msg(e)}`); }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(4, prev.events.length) }, worker));
   done();
   return { ok: true, created, planned: prev.events.length, failed };
 }
