@@ -37,6 +37,20 @@ export async function getTask(id: string): Promise<TaskRow | null> {
   return (r.data ?? null) as unknown as TaskRow | null;
 }
 
+/** Atomically claim an unplaced task for placing (status placed, no event yet). Null when it no longer qualifies. */
+export async function claimForPlacing(id: string): Promise<TaskRow | null> {
+  const r = await db()
+    .from("diary_tasks")
+    .update({ status: "placed", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .is("event_id", null)
+    .in("status", ["inbox", "approved"])
+    .select(TASK_COLS)
+    .maybeSingle();
+  if (r.error) throw new Error(`claim task: ${r.error.message}`);
+  return (r.data ?? null) as unknown as TaskRow | null;
+}
+
 export async function loadSettings(): Promise<{ template: TemplateRow[]; buffer_min: number }> {
   return must(await db().from("diary_settings").select("template, buffer_min").eq("id", 1).single(), "load diary settings") as { template: TemplateRow[]; buffer_min: number };
 }

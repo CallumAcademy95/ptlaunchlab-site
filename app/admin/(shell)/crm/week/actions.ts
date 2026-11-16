@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ADMIN_AUTH_COOKIE, verifyAuthCookieValue } from "@/app/lib/admin-auth";
 import { handleDiary } from "@/app/lib/diary/diary-core";
 import { createGoogleDiaryDeps } from "@/app/lib/diary/diary-google";
-import { dataTaskDeps, getTask } from "@/app/lib/diary/diary-data";
+import { dataTaskDeps, getTask, claimForPlacing } from "@/app/lib/diary/diary-data";
 import { TaskFields } from "@/app/lib/diary/tasks-core";
 import { proposeSlot } from "@/app/lib/diary/placement";
 import { findClashes, planMoves, type MovePlan } from "@/app/lib/diary/clashes";
@@ -39,41 +39,72 @@ export async function addTask(input: unknown): Promise<{ ok: true; task: TaskRow
   if (f.kind === "fixed" && (!f.start_at || !f.end_at)) return { ok: false, error: "A personal/fixed event needs a start and end time." };
   if (!!f.start_at !== !!f.end_at) return { ok: false, error: "Give both a start and an end time, or neither." };
   if (f.start_at && f.end_at && Date.parse(f.end_at) <= Date.parse(f.start_at)) return { ok: false, error: "End must be after start." };
+  let task: TaskRow;
   try {
-    const task = await dataTaskDeps.insert({ ...f, status: "inbox", start_at: null, end_at: null, event_id: null });
-    if (f.start_at && f.end_at) {
-      const s = Date.parse(f.start_at), e = Date.parse(f.end_at);
-      return { ok: true, task, proposal: { start: f.start_at, end: f.end_at, label: slotLabel(s), blockTitle: null }, reason: e > s ? null : "End is before start." };
-    }
+    task = await dataTaskDeps.insert({ ...f, status: "inbox", start_at: null, end_at: null, event_id: null });
+  } catch (e) { return { ok: false, error: msg(e) }; }
+  // From here the task is saved: never report an error, always revalidate.
+  done();
+  if (f.start_at && f.end_at) {
+    const s = Date.parse(f.start_at);
+    return { ok: true, task, proposal: { start: f.start_at, end: f.end_at, label: slotLabel(s), blockTitle: null }, reason: null };
+  }
+  try {
     const today = londonDate(Date.now());
-    const to = f.deadline && f.deadline < addDays(today, 28) ? f.deadline : addDays(today, 28);
-    const r = proposeSlot(task, await loadPlacementCtx(today, to));
-    done();
+    if (f.deadline && f.deadline < today) return { ok: true, task, proposal: null, reason: "Deadline has passed — it's in the inbox." };
+    const cap = addDays(today, 28);
+    const to = f.deadline && f.deadline < cap ? f.deadline : cap;
+    const r = proposeSlot(task, await loadPlacementCtx(today, to < today ? today : to));
     return r.ok
       ? { ok: true, task, proposal: { start: new Date(r.start).toISOString(), end: new Date(r.end).toISOString(), label: slotLabel(r.start), blockTitle: r.blockTitle }, reason: null }
       : { ok: true, task, proposal: null, reason: r.reason };
-  } catch (e) { return { ok: false, error: msg(e) }; }
+  } catch (e) { return { ok: true, task, proposal: null, reason: `Couldn't find a slot right now (${msg(e)}). It's in the inbox.` }; }
 }
 
 /** Put a task in the calendar at start/end, then report any placed tasks it clashes with and proposed moves. */
-export async function confirmSlot(taskId: unknown, start: unknown, end: unknown): Promise<{ ok: true; moves: MovePlan[] } | Fail> {
+export async function confirmSlot(taskId: unknown, start: unknown, end: unknown): Promise<{ ok: true; moves: MovePlan[]; warning?: string } | Fail> {
   if (!(await isAdmin())) return DENIED;
   if (!isUuid(taskId) || typeof start !== "string" || typeof end !== "string") return { ok: false, error: "Bad request." };
+  let t: TaskRow | null;
   try {
-    const t = await getTask(taskId);
-    if (!t) return { ok: false, error: "Task not found." };
-    if (t.event_id) return { ok: false, error: "Already in the calendar." };
+    // (a) claim the row first so a double tap cannot create two events
+    t = await claimForPlacing(taskId);
+    if (!t) {
+      const cur = await getTask(taskId);
+      if (!cur) return { ok: false, error: "Task not found." };
+      if (cur.event_id) return { ok: false, error: "Already in the calendar." };
+      return { ok: false, error: "Task is done or dropped." };
+    }
+  } catch (e) { return { ok: false, error: msg(e) }; }
+  const revert = async () => { try { await dataTaskDeps.update({ id: taskId }, { status: "inbox", start_at: null, end_at: null, event_id: null }); } catch { /* best effort */ } };
+  // (b) create the event
+  let eventId: string;
+  try {
     const summary = t.kind === "fixed" ? t.title : `[${t.category}] ${t.title}`;
-    const body = await diary({ action: "create", summary, start, end, kind: t.kind, description: `PA task ${t.ref}` });
-    await dataTaskDeps.update({ id: t.id }, { status: "placed", start_at: start, end_at: end, event_id: String(body.id) });
+    const r = await handleDiary({ action: "create", summary, start, end, kind: t.kind, description: `PA task ${t.ref}` }, createGoogleDiaryDeps());
+    if (r.status !== 200 || r.body.ok !== true) throw new Error(String(r.body.error ?? "Calendar write failed"));
+    eventId = String(r.body.id);
+  } catch (e) { await revert(); done(); return { ok: false, error: msg(e) }; }
+  // (c) record the slot; compensate if that fails
+  try {
+    const row = await dataTaskDeps.update({ id: taskId }, { status: "placed", start_at: start, end_at: end, event_id: eventId });
+    if (!row) throw new Error("Task not found.");
+  } catch {
+    try { await handleDiary({ action: "delete", id: eventId }, createGoogleDiaryDeps()); } catch { /* 404 or already gone */ }
+    await revert();
+    done();
+    return { ok: false, error: "Couldn't save the slot; the calendar event was removed. Try again." };
+  }
+  // (d) the task is placed now
+  done();
+  try {
     const s = Date.parse(start), e = Date.parse(end);
     const today = londonDate(Date.now());
     const ctx = await loadPlacementCtx(today, addDays(today, 28), t.id);
     const others = placedTasks(await dataTaskDeps.list({ status: ["placed"] })).filter((x) => x.id !== t.id);
     const clashes = findClashes({ start: s, end: e }, others);
-    done();
     return { ok: true, moves: clashes.length ? planMoves(clashes, ctx, { start: s, end: e }) : [] };
-  } catch (e) { return { ok: false, error: msg(e) }; }
+  } catch (e) { return { ok: true, moves: [], warning: `Added, but couldn't check for clashes: ${msg(e)}` }; }
 }
 
 /** Apply proposed moves (one tap). Returns how many moved; any failure is reported per task. */
@@ -129,8 +160,12 @@ async function setStatus(taskId: unknown, status: "done" | "dropped" | "inbox" |
   try {
     const t = await getTask(taskId);
     if (!t) return { ok: false, error: "Task not found." };
-    if (unplace && t.event_id) await diary({ action: "delete", id: t.event_id });
-    await dataTaskDeps.update({ id: t.id }, unplace ? { status, start_at: null, end_at: null, event_id: null } : { status });
+    if (unplace && t.event_id) {
+      const r = await handleDiary({ action: "delete", id: t.event_id }, createGoogleDiaryDeps());
+      if (r.status !== 200 && r.status !== 404) return { ok: false, error: String(r.body.error ?? "Calendar delete failed") };
+    }
+    const row = await dataTaskDeps.update({ id: t.id }, unplace ? { status, start_at: null, end_at: null, event_id: null } : { status });
+    if (!row) return { ok: false, error: "Task not found." };
     done();
     return { ok: true };
   } catch (e) { return { ok: false, error: msg(e) }; }
