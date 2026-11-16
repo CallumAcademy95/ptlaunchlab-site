@@ -9,9 +9,9 @@ import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
 // page, which is what puts a sale in the partner portal. Deliberately not the
 // gym academy template: that one is written around a gym floor.
 //
-// DRAFT: built to show the partner before anything is signed. The dashed
-// "to confirm" boxes stand in for details only he can give; nothing about his
-// offer is invented. Not in the sitemap, noindex.
+// DRAFT until his agreement is signed. The mentoring, bio and results copy is
+// PT Mentor Hub's own (sent 14 Nov 2026), lightly edited; the client photos
+// are his. Not in the sitemap, noindex.
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/pt-mentor-hub-academy";
 const ENROL = "/pt-mentor-hub-academy/enrol";
@@ -36,29 +36,34 @@ const COURSE = [
   { title: "A gym introduction", body: "When you qualify, we approach at least one gym on your behalf and introduce you." },
 ];
 
+const MENTORING = [
+  { title: "1-to-1 introduction call", body: "We'll discuss your goals and where you want to take your PT business." },
+  { title: "Personalised 12-week business roadmap", body: "A clear, practical plan designed to help you work towards your first 10 clients." },
+  { title: "Monthly 1-to-1 check-in calls", body: "Review your progress, tackle challenges and keep you accountable." },
+  { title: "Unlimited daily group mentoring", body: "Get support, advice and answers when you need them." },
+];
+
+const RESULTS = [
+  { name: "Jacob", result: "Added £990 to his monthly income in his first 4 weeks", src: "/partners/pt-mentor-hub/jacob.jpg", w: 700, h: 933 },
+  { name: "Jovan", result: "Added £750 to his monthly income in his first 4 weeks", src: "/partners/pt-mentor-hub/jovan.jpg", w: 700, h: 933 },
+  { name: "Cameron", result: "Added 7 clients to his diary in his first 5 weeks", src: "/partners/pt-mentor-hub/cameron.jpg", w: 700, h: 864 },
+];
+
 const STEPS = [
   { title: "Enrol", body: "One payment, online. It takes a few minutes." },
-  { title: "Start both", body: "Your tutor is in touch within 24 hours, and you join PT Mentor Hub." },
-  { title: "Get mentored", body: "Three months of practical business mentoring from PT Mentor Hub." },
-  { title: "Start coaching", body: "Finish with the qualification and a plan for your first clients." },
+  { title: "Qualify", body: "Your tutor is in touch within 24 hours. Study online at your own pace; most learners finish in 8–16 weeks." },
+  { title: "Start as a PT", body: "Your three months of mentoring begin: an introduction call with Luke and your 12-week roadmap." },
+  { title: "Build your business", body: "Monthly 1-to-1 check-ins and daily group sessions while you work towards your first 10 clients." },
 ];
 
 const FAQ = [
   { q: "Who delivers the qualification?", a: "PT Launch Lab, an NCFE Accredited Centre (No. 9002788). You get exactly the same NCFE Level 2 and Level 3 qualifications as any of our learners." },
-  { q: "Who does the mentoring?", a: "PT Mentor Hub. You get three months of practical business mentoring, normally £499 on its own, so you have support to start building a business, not just a certificate." },
+  { q: "Who does the mentoring?", a: "Luke at PT Mentor Hub. You get three months of practical business mentoring, normally £499 on its own." },
+  { q: "When does the mentoring start?", a: "When you're working as a personal trainer, so you can put what you learn into practice straight away. Until then, your PT Launch Lab tutor supports you through the course." },
   { q: "Do I need any experience?", a: "No. The course starts at Level 2, the foundations, and builds to Level 3." },
   { q: "Can I do it around a full-time job?", a: "Yes. It's online and self-paced with no fixed class times. Most learners finish in 8–16 weeks." },
   { q: "What if I change my mind?", a: "You have a 14-day cooling-off period. Tell us within 14 days of paying and you get a full refund." },
 ];
-
-function ToConfirm({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border-2 border-dashed border-white/25 p-5 text-sm text-white/60 leading-relaxed">
-      <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: ORANGE }}>To confirm with PT Mentor Hub</p>
-      {children}
-    </div>
-  );
-}
 
 function EnrolButton({ label = "Enrol now" }: { label?: string }) {
   return (
@@ -76,7 +81,7 @@ export default function PtMentorHubAcademyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="text-center text-xs font-semibold py-2 px-4 text-black" style={{ backgroundColor: ORANGE }}>
-        Draft preview for PT Mentor Hub. Wording and details still to be confirmed.
+        Draft preview for PT Mentor Hub. Not yet open for enrolments.
       </div>
 
       {/* HERO */}
@@ -142,31 +147,75 @@ export default function PtMentorHubAcademyPage() {
             </div>
             <div className="rounded-3xl border p-7" style={{ borderColor: ORANGE, backgroundColor: "rgba(219,74,43,0.08)" }}>
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: ORANGE }}>The mentorship</p>
-              <h3 className="font-display font-extrabold text-2xl mb-6">From PT Mentor Hub</h3>
-              <p className="text-white/80 leading-relaxed mb-5">
-                Three months of practical business mentoring, normally £499 when bought on its own. Support with the side of personal training the course doesn&apos;t cover: getting your first clients, pricing, and building a business you can actually live on.
+              <h3 className="font-display font-extrabold text-2xl mb-3">From PT Mentor Hub</h3>
+              <p className="text-white/80 leading-relaxed mb-6">
+                Your qualification gets you started. PT Mentor Hub helps you build the business. Three months of mentoring (normally £499), starting when you&apos;re working as a PT, so you can put what you learn into practice straight away.
               </p>
-              <ToConfirm>
-                How the mentoring runs, in his words: format, how often you&apos;re in contact, and when the three months start.
-              </ToConfirm>
+              <ul className="space-y-5">
+                {MENTORING.map((m) => (
+                  <li key={m.title} className="flex gap-3">
+                    <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: ORANGE }} />
+                    <div>
+                      <p className="font-bold">{m.title}</p>
+                      <p className="text-sm text-white/65 leading-relaxed">{m.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* MEET YOUR MENTOR */}
+      {/* COMMITMENT: PT Mentor Hub's own; its terms are still being agreed */}
       <section className="px-6 pb-16 md:pb-24">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-[280px_1fr] gap-8 items-center">
-          <div className="flex justify-center">
-            <Image src="/gym-logos/pt-mentor-hub.png" alt="PT Mentor Hub" width={236} height={286} className="w-48 md:w-full h-auto max-w-[236px]" />
-          </div>
+        <div className="max-w-3xl mx-auto rounded-3xl p-8 md:p-10 text-black" style={{ backgroundColor: ORANGE }}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3">Our commitment</p>
+          <p className="font-display font-extrabold text-2xl md:text-3xl leading-tight mb-4">
+            If you don&apos;t earn back your investment within your first three months as a PT, we continue mentoring you for free until you do.
+          </p>
+          <p className="text-sm font-medium text-black/75">
+            No guesswork. No being left to figure it all out alone. Just a clear plan, practical support and someone in your corner who understands what it takes to build a PT business.
+          </p>
+          <p className="text-xs text-black/60 mt-4">Commitment given by PT Mentor Hub. Terms apply.</p>
+        </div>
+      </section>
+
+      {/* MEET YOUR MENTOR */}
+      <section className="bg-white text-black px-6 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-[340px_1fr] gap-10 items-center">
+          <Image src="/partners/pt-mentor-hub/luke.jpg" alt="Luke, founder of PT Mentor Hub" width={900} height={1200} className="w-full max-w-[340px] mx-auto h-auto rounded-3xl" />
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: ORANGE }}>Meet your mentor</p>
-            <h2 className="font-display font-extrabold text-3xl md:text-4xl leading-none tracking-tight mb-6">Mentored by someone who&apos;s done it.</h2>
-            <ToConfirm>
-              His story, coaching background and results, plus a photo and two or three short quotes from people he has mentored. Taken from him directly, not written for him.
-            </ToConfirm>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#B23A20" }}>Meet your mentor</p>
+            <h2 className="font-display font-extrabold text-3xl md:text-4xl leading-none tracking-tight mb-6">
+              Luke has helped hundreds of PTs build successful businesses. <span style={{ color: "#B23A20" }}>Now he&apos;ll help you build yours.</span>
+            </h2>
+            <div className="space-y-4 text-black/75 leading-relaxed">
+              <p>Luke has spent the last 12 years in the fitness industry, building a successful face-to-face personal training business and managing gyms and fitness operations across Virgin Active, PureGym and David Lloyd.</p>
+              <p>Most recently he was Head of Personal Training for PureGym Denmark. He stepped away from that role to build PT Mentor Hub, helping personal trainers turn their qualifications into successful, sustainable businesses.</p>
+              <p>He knows what it takes to attract clients, sell your services and build a PT business, and how to turn that into practical actions that get results. His goal is simple: help you avoid the trial and error, take action with confidence and build a PT business you&apos;re proud of.</p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      <section className="px-6 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-center" style={{ color: ORANGE }}>Results</p>
+          <h2 className="font-display font-extrabold text-3xl md:text-5xl leading-none tracking-tight mb-12 text-center">PTs who&apos;ve been through PT Mentor Hub.</h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {RESULTS.map((r) => (
+              <figure key={r.name} className="rounded-3xl overflow-hidden border border-white/10 bg-white/[0.04]">
+                <Image src={r.src} alt={`${r.name}, a PT mentored by PT Mentor Hub`} width={r.w} height={r.h} className="w-full aspect-[3/4] object-cover" />
+                <figcaption className="p-5">
+                  <p className="font-bold text-lg">{r.name}</p>
+                  <p className="text-sm text-white/70 leading-relaxed">{r.result}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+          <p className="text-xs text-white/45 text-center mt-6">Individual results. What you earn depends on your effort, location and circumstances.</p>
         </div>
       </section>
 
@@ -196,7 +245,7 @@ export default function PtMentorHubAcademyPage() {
             <p className="font-display font-extrabold text-6xl leading-none mb-5">{COURSE_PRICE_LABEL}</p>
             <ul className="space-y-2 text-sm font-medium">
               <li>✓ NCFE Level 2 &amp; Level 3 qualification</li>
-              <li>✓ Three months of PT Mentor Hub mentoring</li>
+              <li>✓ Three months of PT Mentor Hub mentoring (normally £499)</li>
               <li>✓ Personal tutor and a gym introduction</li>
               <li>✓ One payment, nothing further to pay</li>
             </ul>
