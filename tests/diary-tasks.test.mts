@@ -7,7 +7,8 @@ import { handleTaskAction, type TaskDeps } from "../app/lib/diary/tasks-core.ts"
 
 const row = { id: "00000000-0000-0000-0000-000000000001", ref: "T001", title: "x" } as never;
 const deps = (over: Partial<TaskDeps> = {}): TaskDeps => ({
-  async list() { return [row]; }, async insert() { return row; }, async update() { return row; }, ...over,
+  async list() { return [row]; }, async insert() { return row; }, async update() { return row; },
+  async get() { return row; }, async propose() { return { proposal: null, reason: null }; }, async place() { return { ok: true, moves: [] }; }, ...over,
 });
 test("tasks lists with a status filter", async () => {
   let seen: unknown;
@@ -59,4 +60,44 @@ test("end_at must be after start_at", async () => {
 test("an impossible deadline is a 400, not a Postgres error", async () => {
   const r = await handleTaskAction({ action: "task-save", title: "Fix page", category: "SEO", estimate_min: 60, deadline: "2026-02-31" }, deps());
   assert.equal(r.status, 400);
+});
+
+const T = { id: "00000000-0000-0000-0000-000000000001", ref: "T014", title: "Fix pin", status: "inbox" } as never;
+const P = { start: "2026-11-18T10:30:00.000Z", end: "2026-11-18T11:30:00.000Z", label: "Wed 18 Nov, 10:30am", blockTitle: "Scaling" };
+
+test("task-propose returns the proposal and writes nothing", async () => {
+  let placed = false;
+  const r = await handleTaskAction({ action: "task-propose", ref: "T014" }, deps({
+    async get() { return T; }, async propose() { return { proposal: P, reason: null }; }, async place() { placed = true; return { ok: true, moves: [] }; },
+  }));
+  assert.deepEqual(r.body, { ok: true, task: T, proposal: P, reason: null }); assert.equal(placed, false);
+});
+test("task-propose / task-place on a missing task is 404", async () => {
+  const d = deps({ async get() { return null; } });
+  assert.equal((await handleTaskAction({ action: "task-propose", ref: "T999" }, d)).status, 404);
+  assert.equal((await handleTaskAction({ action: "task-place", ref: "T999", start_at: P.start, end_at: P.end }, d)).status, 404);
+});
+test("task-propose/place need id or ref", async () => {
+  assert.equal((await handleTaskAction({ action: "task-propose" }, deps())).status, 400);
+});
+test("task-place validates times", async () => {
+  const d = deps({ async get() { return T; } });
+  for (const bad of [{}, { start_at: P.start }, { start_at: "2026-11-18T10:30", end_at: P.end }, { start_at: P.end, end_at: P.start },
+    { start_at: "2026-11-18T09:00:00Z", end_at: "2026-11-19T10:00:00Z" }]) {
+    assert.equal((await handleTaskAction({ action: "task-place", ref: "T014", ...bad }, d)).status, 400, JSON.stringify(bad));
+  }
+});
+test("task-place passes through success with moves", async () => {
+  let args: unknown[] = [];
+  const r = await handleTaskAction({ action: "task-place", ref: "T014", start_at: P.start, end_at: P.end }, deps({
+    async get() { return T; }, async place(...a) { args = a; return { ok: true, moves: [{ id: "x" }], warning: "w" }; },
+  }));
+  assert.deepEqual(r.body, { ok: true, moves: [{ id: "x" }], warning: "w" });
+  assert.deepEqual(args, ["00000000-0000-0000-0000-000000000001", P.start, P.end]);
+});
+test("task-place failure is never ok", async () => {
+  const r = await handleTaskAction({ action: "task-place", ref: "T014", start_at: P.start, end_at: P.end }, deps({
+    async get() { return T; }, async place() { return { ok: false, error: "Already in the calendar." }; },
+  }));
+  assert.equal(r.status, 409); assert.equal(r.body.ok, false);
 });

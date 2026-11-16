@@ -11,7 +11,7 @@ const must = <T,>(r: { data: T | null; error: { message: string } | null }, what
   return r.data;
 };
 
-export const dataTaskDeps: TaskDeps = {
+export const dataTaskDeps: Pick<TaskDeps, "list" | "insert" | "update"> = {
   async list(f) {
     let q = db().from("diary_tasks").select(TASK_COLS).order("start_at", { ascending: true, nullsFirst: false }).order("created_at").limit(500);
     if (f.status?.length) q = q.in("status", f.status);
@@ -40,6 +40,12 @@ export async function listPlacedWithoutEvent(): Promise<TaskRow[]> {
 export async function getTask(id: string): Promise<TaskRow | null> {
   const r = await db().from("diary_tasks").select(TASK_COLS).eq("id", id).maybeSingle();
   if (r.error) throw new Error(`get task: ${r.error.message}`);
+  return (r.data ?? null) as unknown as TaskRow | null;
+}
+
+export async function getTaskByRef(ref: string): Promise<TaskRow | null> {
+  const r = await db().from("diary_tasks").select(TASK_COLS).eq("ref", ref).maybeSingle();
+  if (r.error) throw new Error(`get task by ref: ${r.error.message}`);
   return (r.data ?? null) as unknown as TaskRow | null;
 }
 
