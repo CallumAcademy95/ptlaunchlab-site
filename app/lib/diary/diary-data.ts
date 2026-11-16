@@ -38,13 +38,13 @@ export async function getTask(id: string): Promise<TaskRow | null> {
 }
 
 /** Atomically claim an unplaced task for placing (status placed, no event yet). Null when it no longer qualifies. */
-export async function claimForPlacing(id: string): Promise<TaskRow | null> {
+export async function claimForPlacing(id: string, prior: "inbox" | "approved"): Promise<TaskRow | null> {
   const r = await db()
     .from("diary_tasks")
     .update({ status: "placed", updated_at: new Date().toISOString() })
     .eq("id", id)
     .is("event_id", null)
-    .in("status", ["inbox", "approved"])
+    .eq("status", prior)
     .select(TASK_COLS)
     .maybeSingle();
   if (r.error) throw new Error(`claim task: ${r.error.message}`);

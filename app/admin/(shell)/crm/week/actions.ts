@@ -66,17 +66,22 @@ export async function confirmSlot(taskId: unknown, start: unknown, end: unknown)
   if (!(await isAdmin())) return DENIED;
   if (!isUuid(taskId) || typeof start !== "string" || typeof end !== "string") return { ok: false, error: "Bad request." };
   let t: TaskRow | null;
+  let prior: "inbox" | "approved" = "inbox";
+  const why = (c: TaskRow | null): Fail => {
+    if (!c) return { ok: false, error: "Task not found." };
+    if (c.event_id) return { ok: false, error: "Already in the calendar." };
+    if (c.status === "placed") return { ok: false, error: "Already being added to the calendar." };
+    return { ok: false, error: "Task is done or dropped." };
+  };
   try {
     // (a) claim the row first so a double tap cannot create two events
-    t = await claimForPlacing(taskId);
-    if (!t) {
-      const cur = await getTask(taskId);
-      if (!cur) return { ok: false, error: "Task not found." };
-      if (cur.event_id) return { ok: false, error: "Already in the calendar." };
-      return { ok: false, error: "Task is done or dropped." };
-    }
+    const pre = await getTask(taskId);
+    if (!pre || pre.event_id || (pre.status !== "inbox" && pre.status !== "approved")) return why(pre);
+    t = await claimForPlacing(taskId, pre.status);
+    if (!t) return why(await getTask(taskId));
+    prior = pre.status;
   } catch (e) { return { ok: false, error: msg(e) }; }
-  const revert = async () => { try { await dataTaskDeps.update({ id: taskId }, { status: "inbox", start_at: null, end_at: null, event_id: null }); } catch { /* best effort */ } };
+  const revert = async () => { try { await dataTaskDeps.update({ id: taskId }, { status: prior, start_at: null, end_at: null, event_id: null }); } catch { /* best effort */ } };
   // (b) create the event
   let eventId: string;
   try {
@@ -90,10 +95,21 @@ export async function confirmSlot(taskId: unknown, start: unknown, end: unknown)
     const row = await dataTaskDeps.update({ id: taskId }, { status: "placed", start_at: start, end_at: end, event_id: eventId });
     if (!row) throw new Error("Task not found.");
   } catch {
-    try { await handleDiary({ action: "delete", id: eventId }, createGoogleDiaryDeps()); } catch { /* 404 or already gone */ }
-    await revert();
+    let removed = false;
+    try {
+      const d = await handleDiary({ action: "delete", id: eventId }, createGoogleDiaryDeps());
+      removed = d.status === 200 || d.status === 404;
+    } catch { removed = false; }
+    if (removed) {
+      await revert();
+      done();
+      return { ok: false, error: "Couldn't save the slot; the calendar event was removed. Try again." };
+    }
+    // The event may still exist: keep the row pointing at it so it is not lost.
+    let recorded = false;
+    try { recorded = !!(await dataTaskDeps.update({ id: taskId }, { status: "placed", start_at: start, end_at: end, event_id: eventId })); } catch { recorded = false; }
     done();
-    return { ok: false, error: "Couldn't save the slot; the calendar event was removed. Try again." };
+    return { ok: false, error: `Saved the event but couldn't finish recording it; it's in your calendar — use Back to inbox if you don't want it.${recorded ? "" : ` (Calendar event id: ${eventId})`}` };
   }
   // (d) the task is placed now
   done();
