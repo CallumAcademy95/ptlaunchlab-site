@@ -44,9 +44,10 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         hint: "Every lead and conversation, and who's in charge of it",
         // The old Leads and Site leads screens now live inside the CRM.
         alsoActiveOn: ["/admin/leads", "/admin/site-leads"],
-        excludeOn: ["/admin/crm/calls"],
+        excludeOn: ["/admin/crm/calls", "/admin/crm/week"],
       },
       { href: "/admin/crm/calls", label: "Calls", icon: "phone", hint: "Booked calls, your hours, and who you're ringing next" },
+      { href: "/admin/crm/week", label: "Week", icon: "calendar", hint: "Your diary: today, this week, what to fit in" },
       { href: "/admin/social", label: "Social calendar", icon: "calendar", hint: "Reels and carousels going out, and days of content left" },
       { href: "/admin/ads", label: "Ad performance", icon: "chart" },
       { href: "/admin/whatsapp", label: "WhatsApp inbox", icon: "message" },
