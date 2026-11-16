@@ -21,7 +21,9 @@ function londonIso(date: string, hhmm: string): string {
   const guess = Date.parse(`${date}T${hhmm}:00Z`);
   const wall = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(guess));
   const [h, m] = wall.split(":").map(Number); const [gh, gm] = hhmm.split(":").map(Number);
-  const offMin = (h * 60 + m) - (gh * 60 + gm);
+  let offMin = (h * 60 + m) - (gh * 60 + gm);
+  if (offMin > 720) offMin -= 1440;
+  if (offMin < -720) offMin += 1440;
   return new Date(guess - offMin * 60_000).toISOString();
 }
 async function downscale(file: File): Promise<File> {
@@ -37,7 +39,9 @@ async function downscale(file: File): Promise<File> {
   throw new Error("Screenshot too large even after resizing.");
 }
 
-type Pending = { task: TaskRow; proposal: Proposal | null; reason: string | null } | null;
+type Pending = { task: TaskRow; proposal: Proposal | null; reason: string | null; questions: string[] } | null;
+/** Merge move plans by task id: keep existing, add or replace by id. */
+const mergeMoves = (prev: MovePlan[], next: MovePlan[]) => [...prev.filter((p) => !next.some((n) => n.id === p.id)), ...next];
 
 export default function WeekClient({ data, clashMoves }: { data: WeekData; clashMoves: MovePlan[] }) {
   const router = useRouter();
@@ -48,6 +52,8 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
   // Starts with any call/appointment-vs-task clashes found on page load (calls win; tasks move).
   const [moves, setMoves] = useState<MovePlan[]>(clashMoves);
   const [questions, setQuestions] = useState<string[]>([]);
+  const [fromShot, setFromShot] = useState(false);
+  const [ack, setAck] = useState(false);
   const [layout, setLayout] = useState<{ count: number; titles: string[] } | null>(null);
   const [form, setForm] = useState({ title: "", area: "PTLL", category: "Admin", estimate_min: 30, deadline: addDaysStr(data.monday, 4), kind: "task", date: "", start: "", end: "", notes: "" });
   const run = (fn: () => Promise<void>) => { setError(null); setInfo(null); start(async () => { try { await fn(); } catch (e) { setError(e instanceof Error ? e.message : String(e)); } }); };
@@ -64,16 +70,22 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
 
   function submit() {
     run(async () => {
-      if (questions.length && (!form.date && form.kind === "fixed")) throw new Error("Answer the questions first.");
-      const pinned = form.date && form.start && form.end;
+      const any = !!(form.date || form.start || form.end);
+      const all = !!(form.date && form.start && form.end);
+      if ((any || form.kind === "fixed") && !all) throw new Error("Fill in date, start and end — or clear them to let me find a slot.");
+      if (all && form.end <= form.start) throw new Error("End must be after start.");
+      const pinned = all;
+      const qs = questions;
       const r = await addTask({
         title: form.title, area: form.area, category: form.kind === "fixed" ? "Fixed" : form.category, kind: form.kind,
         estimate_min: form.kind === "fixed" ? null : Number(form.estimate_min), deadline: form.kind === "fixed" ? null : form.deadline || null,
         start_at: pinned ? londonIso(form.date, form.start) : null, end_at: pinned ? londonIso(form.date, form.end) : null,
-        notes: form.notes || null, source: questions.length || form.notes === "[screenshot]" ? "screenshot" : "typed",
+        notes: null, source: fromShot ? "screenshot" : "typed",
       });
       if (!r.ok) throw new Error(r.error);
-      setQuestions([]);
+      // Saved: clear the form on every path so a second press cannot duplicate it.
+      setQuestions([]); setFromShot(false); setAck(false);
+      setForm((f) => ({ ...f, title: "", date: "", start: "", end: "", notes: "" }));
       if (!r.proposal) {
         // The task is saved in the inbox but no slot was found: say why and refresh.
         setPending(null);
@@ -81,18 +93,19 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
         router.refresh();
         return;
       }
-      setPending({ task: r.task, proposal: r.proposal, reason: r.reason });
+      setPending({ task: r.task, proposal: r.proposal, reason: r.reason, questions: qs });
     });
   }
   function confirm() {
     if (!pending?.proposal) return;
+    if (pending.questions.length && !ack) return;
     run(async () => {
       const r = await confirmSlot(pending.task.id, pending.proposal!.start, pending.proposal!.end);
       if (!r.ok) throw new Error(r.error);
-      setPending(null); setMoves(r.moves);
+      setPending(null); setAck(false); setMoves((prev) => mergeMoves(prev, r.moves));
       const base = r.moves.length ? "Added — it clashes with something, see below." : "Added to your calendar.";
       setInfo(r.warning ? `${base} ${r.warning}` : base);
-      setForm((f) => ({ ...f, title: "", date: "", start: "", end: "", notes: "" })); router.refresh();
+      router.refresh();
     });
   }
   function doMoves() {
@@ -101,7 +114,9 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
       const r = await applyMoves(ok.map((m) => ({ id: m.id, start: new Date(m.to!.start).toISOString(), end: new Date(m.to!.end).toISOString() })));
       if (!r.ok) throw new Error(r.error);
       if (r.failed.length) setError(`Some moves failed: ${r.failed.join("; ")}`);
-      setInfo(`Moved ${r.moved} of ${ok.length}.`); setMoves([]); router.refresh();
+      const failedIds = new Set(r.failed.map((f) => f.split(":")[0]));
+      const appliedIds = new Set(ok.filter((m) => !failedIds.has(m.id)).map((m) => m.id));
+      setInfo(`Moved ${r.moved} of ${ok.length}.`); setMoves((prev) => prev.filter((m) => !appliedIds.has(m.id))); router.refresh();
     });
   }
   function onShot(file: File | undefined) {
@@ -115,16 +130,17 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
       // Prefill only: nothing is added until "Find a slot / add" and then Confirm.
       setForm((f) => ({ ...f, title: v.title, kind: v.type === "fixed" ? "fixed" : "task", area: v.area ?? (v.type === "fixed" ? "Personal" : f.area),
         category: v.category && v.category !== "Fixed" ? v.category : f.category, estimate_min: v.estimate_min ?? f.estimate_min,
-        deadline: v.deadline ?? f.deadline, date: v.date ?? "", start: v.start ?? "", end: v.end ?? "", notes: "[screenshot]" }));
-      setQuestions(v.questions);
+        deadline: v.deadline ?? f.deadline, date: v.date ?? "", start: v.start ?? "", end: v.end ?? "", notes: "" }));
+      setQuestions(v.questions); setFromShot(true);
     });
   }
   const act = (fn: (id: string) => Promise<{ ok: true } | { ok: false; error: string }>, id: string, done: string) =>
     run(async () => { const r = await fn(id); if (!r.ok) throw new Error(r.error); setInfo(done); router.refresh(); });
   const proposeMove = (t: TaskRow, ev: { start: string; end: string }) => run(async () => {
     const r = await moveTask(t.id); if (!r.ok) throw new Error(r.error);
-    if (!r.proposal) throw new Error(r.reason ?? "No slot.");
-    setMoves([{ id: t.id, title: t.title, from: { start: Date.parse(ev.start), end: Date.parse(ev.end) }, to: { start: Date.parse(r.proposal.start), end: Date.parse(r.proposal.end) }, reason: null }]);
+    const prop = r.proposal;
+    if (!prop) throw new Error(r.reason ?? "No slot.");
+    setMoves((prev) => mergeMoves(prev, [{ id: t.id, title: t.title, from: { start: Date.parse(ev.start), end: Date.parse(ev.end) }, to: { start: Date.parse(prop.start), end: Date.parse(prop.end) }, reason: null }]));
   });
 
   const input = "w-full min-w-0 rounded-lg border border-slate-200 px-3 py-2 text-sm";
@@ -170,10 +186,16 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
         {pending && (
           <div className="rounded-lg border border-slate-200 p-3 text-sm [overflow-wrap:anywhere]">
             {pending.proposal ? <>
+              {pending.questions.length > 0 && (
+                <div className="mb-2 rounded-lg bg-amber-50 p-3 text-amber-900">
+                  <p>Check before adding: {pending.questions.join(" · ")}</p>
+                  <label className="mt-2 flex items-center gap-2"><input type="checkbox" checked={ack} disabled={busy} onChange={(e) => setAck(e.target.checked)} />I&apos;ve checked these details</label>
+                </div>
+              )}
               <p><b>{pending.proposal.label}</b>{pending.proposal.blockTitle ? ` in ${pending.proposal.blockTitle}` : ""} — {pending.task.title}</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                <button disabled={busy} onClick={confirm} className={`${btn} bg-emerald-600 text-white`}>Confirm</button>
-                <button disabled={busy} onClick={() => { setPending(null); setInfo("Left in the inbox."); router.refresh(); }} className={`${btn} border`}>Leave in inbox</button>
+                <button disabled={busy || (pending.questions.length > 0 && !ack)} onClick={confirm} className={`${btn} bg-emerald-600 text-white`}>Confirm</button>
+                <button disabled={busy} onClick={() => { setPending(null); setAck(false); setInfo("Left in the inbox."); router.refresh(); }} className={`${btn} border`}>Leave in inbox</button>
               </div>
             </> : <p>Couldn&apos;t place it: {pending.reason} It&apos;s in the inbox.</p>}
           </div>
@@ -236,7 +258,7 @@ export default function WeekClient({ data, clashMoves }: { data: WeekData; clash
             <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 py-2 text-sm">
               <span className="min-w-0 [overflow-wrap:anywhere]"><Badge>{t.ref}</Badge> [{t.category}] {t.title} {t.deadline && <span className="text-slate-500">· due {dayLabel(t.deadline)}</span>}</span>
               <span className="flex gap-3">
-                <button disabled={busy} className={link} onClick={() => run(async () => { const r = await moveTask(t.id); if (!r.ok) throw new Error(r.error); setPending({ task: t, proposal: r.proposal, reason: r.reason }); })}>Slot</button>
+                <button disabled={busy} className={link} onClick={() => run(async () => { const r = await moveTask(t.id); if (!r.ok) throw new Error(r.error); setAck(false); setPending({ task: t, proposal: r.proposal, reason: r.reason, questions: [] }); })}>Slot</button>
                 <button disabled={busy} className={link} onClick={() => act(markDone, t.id, "Done.")}>Done</button>
                 <button disabled={busy} className={link} onClick={() => act(dropTask, t.id, "Dropped.")}>Drop</button>
               </span>
