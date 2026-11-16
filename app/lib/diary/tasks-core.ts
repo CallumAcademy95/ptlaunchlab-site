@@ -1,5 +1,6 @@
 // Task API for the skills (bearer route). Pure: deps injected.
 import { z } from "zod";
+import { slotLabel } from "../booking/london.ts";
 import { AREAS, CATEGORIES, isRealDate, type Proposal, type TaskRow } from "./types.ts";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isRealDate, "not a real date");
@@ -39,7 +40,7 @@ const PlaceTimes = z.object({ start_at: ts, end_at: ts }).refine(
   (t) => { const s = Date.parse(t.start_at), e = Date.parse(t.end_at); return e > s && e - s <= 24 * 3600_000; },
   "end_at must be after start_at and within 24 hours");
 
-export async function handleTaskAction(raw: unknown, deps: TaskDeps): Promise<Res> {
+export async function handleTaskAction(raw: unknown, deps: TaskDeps, now: () => number = () => Date.now()): Promise<Res> {
   const action = (raw as { action?: unknown })?.action;
   try {
     if (action === "tasks") {
@@ -79,16 +80,20 @@ export async function handleTaskAction(raw: unknown, deps: TaskDeps): Promise<Re
       if (action === "task-place") {
         const t = PlaceTimes.safeParse({ start_at, end_at });
         if (!t.success) return fail(400, t.error.issues.map((i) => i.message).join("; "));
+        if (Date.parse(t.data.end_at) <= now()) return fail(400, "That time has already passed.");
         times = t.data;
       } else if (start_at !== undefined || end_at !== undefined) return fail(400, "task-propose takes no times");
       const task = await deps.get(k.data);
       if (!task) return fail(404, "No such task.");
       if (!times) {
+        if ((task.status !== "inbox" && task.status !== "approved") || task.event_id) {
+          return fail(409, "Task is done, dropped or already placed.");
+        }
         const p = await deps.propose(task);
         return { status: 200, body: { ok: true, task, proposal: p.proposal, reason: p.reason } };
       }
       const r = await deps.place(task.id, times.start_at, times.end_at);
-      return r.ok ? { status: 200, body: { ...r } } : fail(409, r.error);
+      return r.ok ? { status: 200, body: { ...r, start_at: times.start_at, end_at: times.end_at, label: slotLabel(Date.parse(times.start_at)) } } : fail(409, r.error);
     }
     return fail(400, "Unknown task action.");
   } catch (e) {
