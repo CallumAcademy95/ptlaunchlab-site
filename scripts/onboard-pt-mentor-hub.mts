@@ -38,6 +38,10 @@ const H = { apikey: K, Authorization: `Bearer ${K}`, "Content-Type": "applicatio
 const SLUG = "pt-mentor-hub"; // = the enrol page's gymSlug; never change
 const FEE_PENCE = 50_000; // £500 per learner, half of £999.99 (rounded to the pound)
 const TERMS = "payment_5";
+// Released when the 14-day cooling-off ends (commissionReleaseAt adds this to
+// the enrolment date for pay in full); paid within 7 days of release, per
+// clause 3.3 of his Mentor Package Partner Agreement (Callum, 16 Nov 2026).
+const PAYOUT_TERMS_DAYS = 14;
 
 // ── Fill these in when the agreement is signed ──────────────────────────────
 const AGREEMENT_SIGNED_AT: string | null = null;
@@ -55,6 +59,7 @@ const PARTNER: Record<string, unknown> = {
   primary_color: "#DB4A2B",
   fee_per_learner_pence: FEE_PENCE,
   commission_terms: TERMS,
+  payout_terms_days: PAYOUT_TERMS_DAYS,
   contact_name: CONTACT_NAME,
   contact_email: CONTACT_EMAIL,
   agreement_version: AGREEMENT_VERSION,
@@ -70,12 +75,12 @@ const api = async (path: string, init: RequestInit = {}) => {
   return t ? JSON.parse(t) : null;
 };
 
-const [existing] = await api(`pp_partners?slug=eq.${SLUG}&select=id,gym_name,commission_terms,fee_per_learner_pence`);
+const [existing] = await api(`pp_partners?slug=eq.${SLUG}&select=id,gym_name,commission_terms,fee_per_learner_pence,payout_terms_days`);
 
 console.log(`${APPLY ? "APPLYING" : "DRY RUN"} — ${PARTNER.gym_name} (/${SLUG})\n`);
-console.log(existing ? `  partner row EXISTS (${existing.id}) — will update in place` : "  partner row will be CREATED");
+console.log(existing ? `  partner row EXISTS (${existing.id}) — will update in place (payout_terms_days now ${existing.payout_terms_days})` : "  partner row will be CREATED");
 console.log(`  landing page   ${PARTNER.landing_page_path}`);
-console.log(`  terms          ${TERMS}, £${FEE_PENCE / 100} per learner`);
+console.log(`  terms          ${TERMS}, £${FEE_PENCE / 100} per learner, released ${PAYOUT_TERMS_DAYS} days after enrolment`);
 console.log(`  agreement      ${AGREEMENT_SIGNED_AT ? `v${AGREEMENT_VERSION}, signed ${AGREEMENT_SIGNED_AT}` : "not signed yet (draft partner)"}`);
 console.log(`  contact        ${CONTACT_NAME ?? "—"} <${CONTACT_EMAIL ?? "—"}>`);
 
@@ -88,7 +93,7 @@ if (!APPLY) {
 
   console.log(`\npartner ${existing ? "updated" : "created"}: ${partner.id}`);
   console.log(`commission_terms: ${partner.commission_terms}  fee: ${partner.fee_per_learner_pence}  status: ${partner.status}`);
-  if (partner.commission_terms !== TERMS || partner.fee_per_learner_pence !== FEE_PENCE) {
+  if (partner.commission_terms !== TERMS || partner.fee_per_learner_pence !== FEE_PENCE || partner.payout_terms_days !== PAYOUT_TERMS_DAYS) {
     console.error("\n  WRONG TERMS written back; investigate before any sale.");
     process.exitCode = 1;
   }
