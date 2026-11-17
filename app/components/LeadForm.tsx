@@ -145,7 +145,8 @@ export default function LeadForm({
 
   const invalid = (f: string) => (fieldError === f ? true : undefined);
   const described = error ? errId : undefined;
-  const phoneRequired = intent !== "checkout_start";
+  // Mirrors phoneOptional() in app/lib/leads.ts (not imported: it would pull the server validators into the bundle).
+  const phoneRequired = intent !== "checkout_start" && intent !== "partner_enquiry";
 
   return (
     <div className={WRAPPER[variant]}>
