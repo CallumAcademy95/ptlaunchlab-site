@@ -44,10 +44,10 @@ const TERMS = "payment_5";
 const PAYOUT_TERMS_DAYS = 14;
 
 // ── Fill these in when the agreement is signed ──────────────────────────────
-const AGREEMENT_SIGNED_AT: string | null = null;
-const AGREEMENT_VERSION: string | null = null;
-const CONTACT_NAME: string | null = null;
-const CONTACT_EMAIL: string | null = null;
+const AGREEMENT_SIGNED_AT: string | null = "2026-11-16T00:00:00+00:00"; // date on the PDF (ref PTM-0003051), midnight UK (GMT)
+const AGREEMENT_VERSION: string | null = "1.0"; // Mentor Package Partner Agreement
+const CONTACT_NAME: string | null = "Luke Whiston"; // the signatory, Founder
+const CONTACT_EMAIL: string | null = "ptmentorhub@outlook.com"; // the agreement notice address (cl. 14.1)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PARTNER: Record<string, unknown> = {
