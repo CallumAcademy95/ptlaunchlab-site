@@ -50,7 +50,9 @@ export const TYPICAL_COST_LABEL = "£1,200–£2,800";
  * page shows no monthly plan and /api/checkout refuses one for them.
  * PT Mentor Hub: pay-in-full is part of the mentor's own model (Nov 2026).
  */
-export const PAY_IN_FULL_ONLY_PARTNERS: readonly string[] = ["pt-mentor-hub"];
+// The Fitness Accountant: the same package model, the course plus his Business
+// Launch Package for one payment (Nov 2026).
+export const PAY_IN_FULL_ONLY_PARTNERS: readonly string[] = ["pt-mentor-hub", "the-fitness-accountant"];
 
 export function isPayInFullOnly(partnerSlug: string | null | undefined): boolean {
   return !!partnerSlug && PAY_IN_FULL_ONLY_PARTNERS.includes(partnerSlug);

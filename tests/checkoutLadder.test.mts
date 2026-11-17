@@ -200,6 +200,13 @@ test("pay-in-full-only partner: monthly refused, pay in full sold", () => {
   );
   const pif = resolveCheckout({ plan: "pif", gymSlug: "pt-mentor-hub" }, 0, {});
   assert.ok(pif.ok && pif.plan === "pif" && pif.rung === "pif");
+  // The Fitness Accountant: the same package model.
+  assert.deepEqual(
+    resolveCheckout({ plan: "monthly", gymSlug: "the-fitness-accountant" }, 0, {}),
+    { ok: false, reason: "unknown-plan" },
+  );
+  const tfa = resolveCheckout({ plan: "pif", gymSlug: "the-fitness-accountant" }, 0, {});
+  assert.ok(tfa.ok && tfa.plan === "pif");
   // Everyone else still has monthly.
   const other = resolveCheckout({ plan: "monthly", gymSlug: "mclub" }, 0, {});
   assert.ok(other.ok && other.plan === "monthly");
