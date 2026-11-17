@@ -43,14 +43,23 @@ export interface PartnerResource {
 /**
  * Everything this partner can see: shared resources (partner_id null) plus
  * anything uploaded specifically for them.
+ *
+ * `ownOnly` lists just their own uploads. A mentor partner (partnerKind.ts) is
+ * not a gym, and the shared library is gym posters, gym TV adverts and member
+ * handouts.
  */
-export async function getPartnerResources(partnerId: string): Promise<PartnerResource[]> {
-  const { data, error } = await getSupabaseAdmin()
+export async function getPartnerResources(
+  partnerId: string,
+  opts: { ownOnly?: boolean } = {}
+): Promise<PartnerResource[]> {
+  const query = getSupabaseAdmin()
     .from("pp_resources")
     .select(
       "id, partner_id, category, title, description, storage_path, external_url, mime, file_size, version, sort_order, created_at"
-    )
-    .or(`partner_id.is.null,partner_id.eq.${partnerId}`)
+    );
+  const { data, error } = await (opts.ownOnly
+    ? query.eq("partner_id", partnerId)
+    : query.or(`partner_id.is.null,partner_id.eq.${partnerId}`))
     .order("sort_order")
     .order("created_at", { ascending: false });
 

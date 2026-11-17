@@ -1,4 +1,5 @@
 import { requirePartner } from "@/app/lib/partner-auth";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 import {
   getPartnerResources,
   RESOURCE_CATEGORIES,
@@ -119,7 +120,10 @@ function ResourceRow({ resource, gymName }: { resource: PartnerResource; gymName
 
 export default async function ResourcesPage() {
   const { partner } = await requirePartner();
-  const resources = await getPartnerResources(partner.id);
+  const mentor = isMentorPartner(partner.slug);
+  // A mentor sees only what was made for him: the shared library is gym posters,
+  // gym TV adverts and member handouts.
+  const resources = await getPartnerResources(partner.id, { ownOnly: mentor });
 
   const byCategory = RESOURCE_CATEGORIES.map((c) => ({
     ...c,
@@ -131,8 +135,9 @@ export default async function ResourcesPage() {
       <div>
         <h2 className="text-white font-bold text-xl mb-1">Resources</h2>
         <p className="text-soft text-sm leading-relaxed max-w-2xl">
-          Everything you need to promote your academy in the gym — branded, print-ready, and yours to
-          use.
+          {mentor
+            ? "Files made for you: your signed agreement, and artwork as we make it."
+            : "Everything you need to promote your academy in the gym — branded, print-ready, and yours to use."}
         </p>
       </div>
 
@@ -140,8 +145,9 @@ export default async function ResourcesPage() {
         <div className="rounded-xl bg-card border border-white/10 p-6">
           <p className="text-white font-semibold mb-1">We&rsquo;re putting your pack together.</p>
           <p className="text-soft text-sm leading-relaxed">
-            Posters and QR cards for the floor, social graphics, a screen advert for your gym TV, and
-            scripts for your staff — all branded to {partner.gym_name}. You&rsquo;ll get an email the
+            {mentor
+              ? `Social graphics and a QR poster for the gyms you work with, branded to ${partner.gym_name}.`
+              : `Posters and QR cards for the floor, social graphics, a screen advert for your gym TV, and scripts for your staff — all branded to ${partner.gym_name}.`} You&rsquo;ll get an email the
             moment the first ones land. Need something specific before then?{" "}
             <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
               Just ask

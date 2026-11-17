@@ -247,24 +247,6 @@ export function formatPence(pence: number): string {
   return formatPricePence(pence);
 }
 
-/**
- * When a partner's commission is released, in plain words, for their terms.
- * One wording for the portal's home, sales and payments pages so they cannot
- * disagree with each other.
- */
-export function commissionReleaseRule(terms: string | null | undefined): string {
-  if (terms === "payment_5" || terms === "ladder") {
-    return (
-      "If the learner pays in full, your fee is released 30 days after they enrol. " +
-      "If they pay monthly, it's released when their 5th monthly payment clears (their first payment counts as 1). " +
-      "Once paid, it is not clawed back."
-    );
-  }
-  if (terms === "instalment_2") {
-    return (
-      "If the learner pays in full, your fee is released 30 days after they enrol. " +
-      "If they're on an instalment plan, it's released once their second instalment clears, then paid 30 days after that."
-    );
-  }
-  return "Your fee is released 30 days after the learner enrols, whichever way they choose to pay.";
-}
+// commissionReleaseRule lives in partnerCommission.ts (pure, so tests can load
+// it); re-exported here for the portal pages that already import it from here.
+export { commissionReleaseRule } from "./partnerCommission";

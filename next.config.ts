@@ -97,6 +97,13 @@ const EMBED_CSP = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // The partner playbook is markdown read from disk at request time
+  // (app/lib/partner-playbook.ts). A mentor partner's lives in a subfolder,
+  // partner-playbook/partners/<slug>/, built from a runtime path the file
+  // tracer can't follow, so ship the whole folder with the page explicitly.
+  outputFileTracingIncludes: {
+    "/partners/playbook": ["./partner-playbook/**/*.md"],
+  },
   async redirects() {
     return [
       {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { requirePartner } from "@/app/lib/partner-auth";
 import { partnerSignOut } from "../actions";
 import PartnerNav from "./PartnerNav";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
 
 export const metadata: Metadata = {
@@ -49,7 +50,7 @@ export default async function PortalLayout({ children }: { children: React.React
         </div>
       </header>
 
-      <PartnerNav />
+      <PartnerNav mentor={isMentorPartner(partner.slug)} />
 
       <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
 

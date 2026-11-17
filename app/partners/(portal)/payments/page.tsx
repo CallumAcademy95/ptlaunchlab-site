@@ -11,6 +11,7 @@ import {
 import { saleMoney } from "@/app/lib/partnerCommission";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
 import BankDetailsForm from "./BankDetailsForm";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 
 const dateFmt = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -25,7 +26,10 @@ export default async function PaymentsPage() {
 
   // Their actual signed terms, not a generic description. Ebor and a partner
   // who signs tomorrow are owed different things and should be told so.
-  const releaseRule = commissionReleaseRule(partner.commission_terms);
+  const releaseRule = commissionReleaseRule(partner.commission_terms, {
+    mentorPackage: isMentorPartner(partner.slug),
+    payoutTermsDays: partner.payout_terms_days,
+  });
   const terms = partner.commission_terms;
 
   // saleMoney() splits each sale's commission AND any Partner Accelerator top-up
@@ -170,7 +174,8 @@ export default async function PaymentsPage() {
                   ) : (
                     <>
                       You earn <strong className="text-white">{formatPence(partner.fee_per_learner_pence)}</strong>{" "}
-                      for every member who enrols and pays through your academy link.
+                      for every {isMentorPartner(partner.slug) ? "learner" : "member"} who enrols and pays
+                      through your academy link.
                     </>
                   )}
                 </span>

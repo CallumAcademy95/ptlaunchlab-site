@@ -5,6 +5,16 @@ import { getPackResources, formatFileSize, type PartnerResource } from "@/app/li
 import { tokensForPortal } from "@/scripts/lib/promo-calendar.mjs";
 import brands from "@/scripts/gym-brands.json";
 import CopyButton from "../CopyButton";
+import { isMentorPartner } from "@/app/lib/partnerKind";
+
+// A mentor partner's sections, where the gym labels ("Member emails",
+// "In-gym scripts") would read wrong.
+const MENTOR_LABELS: Partial<Record<string, string>> = {
+  script: "DMs & messages",
+  campaign: "Launch plays",
+  email: "Emails",
+  idea: "Ideas",
+};
 
 type GymBrandEntry = {
   gymName: string;
@@ -142,6 +152,7 @@ export default async function PlaybookPage({
 }) {
   const { partner } = await requirePartner();
   const { section } = await searchParams;
+  const mentor = isMentorPartner(partner.slug);
 
   // A brand entry with no `adTown` (the demo tenant) is treated the same as no
   // brand entry at all — otherwise `town` comes back `undefined` and
@@ -159,7 +170,7 @@ export default async function PlaybookPage({
       : null;
 
   const [entries, packs] = await Promise.all([
-    getPlaybook(tokens),
+    getPlaybook(tokens, { partnerSlug: partner.slug }),
     getPackResources(partner.id),
   ]);
 
@@ -167,6 +178,7 @@ export default async function PlaybookPage({
   // a dead end that makes the whole library look unfinished.
   const sections = PLAYBOOK_TYPES.map((t) => ({
     ...t,
+    label: (mentor && MENTOR_LABELS[t.key]) || t.label,
     count: entries.filter((e) => e.type === t.key).length,
   })).filter((t) => t.count > 0);
 
@@ -186,10 +198,22 @@ export default async function PlaybookPage({
     <div className="space-y-6">
       <div>
         <h2 className="text-white font-bold text-xl mb-1">Playbook</h2>
-        <p className="text-soft text-sm leading-relaxed max-w-2xl">
-          The bits that actually move the needle — what to post, what to say, and when to push. Copy
-          it, swap in {partner.gym_name}, use it.
-        </p>
+        {mentor ? (
+          <p className="text-soft text-sm leading-relaxed max-w-2xl">
+            Your launch posts, the ACADEMY keyword DM and a post for your group. We drafted them from your
+            own content and the formats that already work for you. They&rsquo;re a starting point:
+            put them in your own words, and{" "}
+            <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
+              tell us
+            </a>{" "}
+            what to change.
+          </p>
+        ) : (
+          <p className="text-soft text-sm leading-relaxed max-w-2xl">
+            The bits that actually move the needle — what to post, what to say, and when to push. Copy
+            it, swap in {partner.gym_name}, use it.
+          </p>
+        )}
       </div>
 
       {entries.length === 0 ? (

@@ -26,6 +26,7 @@ import {
   type PlaybookTokens,
 } from "./partner-playbook-tokens";
 import { extractSnippets } from "./partner-playbook-snippets";
+import { isMentorPartner } from "./partnerKind";
 
 const PLAYBOOK_DIR = path.join(process.cwd(), "partner-playbook");
 
@@ -66,10 +67,10 @@ function parseFrontmatter(raw: string): { meta: Record<string, string>; body: st
  * Returns an empty list when the directory doesn't exist yet, so the page shows
  * its own empty state rather than this throwing during a build.
  */
-async function getRepoEntries(tokens: PlaybookTokens | null): Promise<PlaybookEntry[]> {
+async function getRepoEntries(tokens: PlaybookTokens | null, dir = PLAYBOOK_DIR): Promise<PlaybookEntry[]> {
   let files: string[];
   try {
-    files = (await readdir(PLAYBOOK_DIR)).filter((f) => f.endsWith(".md"));
+    files = (await readdir(dir)).filter((f) => f.endsWith(".md"));
   } catch {
     return [];
   }
@@ -77,7 +78,7 @@ async function getRepoEntries(tokens: PlaybookTokens | null): Promise<PlaybookEn
   const entries = await Promise.all(
     files.map(async (file): Promise<PlaybookEntry | null> => {
       try {
-        const raw = await readFile(path.join(PLAYBOOK_DIR, file), "utf8");
+        const raw = await readFile(path.join(dir, file), "utf8");
         const { meta, body } = parseFrontmatter(raw);
         const type = (meta.type ?? "script") as PlaybookType;
         if (!PLAYBOOK_TYPES.some((t) => t.key === type)) {
@@ -151,7 +152,18 @@ async function getUploadedEntries(tokens: PlaybookTokens | null): Promise<Playbo
  * partner. Pass `null` for a partner with no matching brand entry — the raw
  * markdown is shown as-is, which is deliberate (see partner-playbook-tokens.ts).
  */
-export async function getPlaybook(tokens: PlaybookTokens | null = null): Promise<PlaybookEntry[]> {
+export async function getPlaybook(
+  tokens: PlaybookTokens | null = null,
+  opts: { partnerSlug?: string } = {}
+): Promise<PlaybookEntry[]> {
+  // A mentor partner gets only his own playbook (partner-playbook/partners/<slug>/,
+  // which the gym listing never reads: it only lists the top-level .md files).
+  // The gym entries and the admin uploads are written for gyms and members.
+  if (isMentorPartner(opts.partnerSlug)) {
+    const own = await getRepoEntries(null, path.join(PLAYBOOK_DIR, "partners", opts.partnerSlug!));
+    return own.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+  }
+
   const [repo, uploaded] = await Promise.all([getRepoEntries(tokens), getUploadedEntries(tokens)]);
 
   const bySlug = new Map<string, PlaybookEntry>();

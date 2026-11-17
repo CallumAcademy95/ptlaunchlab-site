@@ -21,6 +21,7 @@ import {
   volumeProgressMessage,
 } from "@/app/lib/partnerCommission";
 import { getMaskedBankDetails } from "@/app/lib/partner-bank";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 import CopyButton from "./CopyButton";
 import Welcome from "./Welcome";
 
@@ -64,14 +65,18 @@ export default async function MyAcademyPage() {
 
   // The two commission deals behave differently and the difference is money, so
   // say which one they are on rather than showing a bare held balance.
-  const holdExplainer = commissionReleaseRule(partner.commission_terms);
+  const mentor = isMentorPartner(partner.slug);
+  const holdExplainer = commissionReleaseRule(partner.commission_terms, {
+    mentorPackage: mentor,
+    payoutTermsDays: partner.payout_terms_days,
+  });
 
   const firstName = session.fullName?.trim().split(/\s+/)[0] ?? null;
 
   return (
     <div className="space-y-8">
       {!session.onboardingDismissedAt && (
-        <Welcome firstName={firstName} gymName={partner.gym_name} />
+        <Welcome firstName={firstName} gymName={partner.gym_name} mentor={mentor} />
       )}
       {/* ── Academy link ───────────────────────────────────────────────── */}
       <section>
@@ -102,7 +107,9 @@ export default async function MyAcademyPage() {
                 Download QR code
               </a>
               <span className="text-soft text-xs">
-                Print it for the front desk, the changing rooms, or the gym floor.
+                {mentor
+                  ? "For posters in the gyms you work with, slides and anything printed."
+                  : "Print it for the front desk, the changing rooms, or the gym floor."}
               </span>
             </div>
 
@@ -253,13 +260,29 @@ export default async function MyAcademyPage() {
             <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">
               Do this next
             </p>
-            <p className="text-white font-semibold">
-              Put your QR code where your members already stand still.
-            </p>
-            <p className="text-soft text-sm mt-1.5 leading-relaxed">
-              The front desk, the changing room mirror and the gym floor noticeboard convert best.
-              Download the QR above and we&rsquo;ll add print-ready posters to Resources shortly.
-            </p>
+            {mentor ? (
+              <>
+                <p className="text-white font-semibold">Post the launch carousel.</p>
+                <p className="text-soft text-sm mt-1.5 leading-relaxed">
+                  It&rsquo;s first in your{" "}
+                  <Link href="/partners/playbook" className="text-gold hover:underline">
+                    Playbook
+                  </Link>
+                  , ready to put in your own words. Then post in your group and put your
+                  academy link in your bio.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-white font-semibold">
+                  Put your QR code where your members already stand still.
+                </p>
+                <p className="text-soft text-sm mt-1.5 leading-relaxed">
+                  The front desk, the changing room mirror and the gym floor noticeboard convert best.
+                  Download the QR above and we&rsquo;ll add print-ready posters to Resources shortly.
+                </p>
+              </>
+            )}
           </div>
         )}
       </section>
