@@ -23,6 +23,10 @@
     {
       "path": "/api/booking/google-retry",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/partner-nurture",
+      "schedule": "15 * * * *"
     }
   ]
 }

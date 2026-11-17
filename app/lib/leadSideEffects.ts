@@ -62,7 +62,7 @@ export const ZAPIER_ENV: Record<LeadIntent, string[]> = {
   live: ["LIVE_ZAPIER_WEBHOOK_URL", "PROSPECTUS_ZAPIER_WEBHOOK_URL"],
   salary: ["SALARY_CALC_ZAPIER_WEBHOOK_URL", "PROSPECTUS_ZAPIER_WEBHOOK_URL"],
   gym_partnership: ["GYM_PARTNERSHIP_ZAPIER_WEBHOOK_URL"],
-  career_planner: [], whatsapp: [], checkout_start: [],
+  career_planner: [], whatsapp: [], checkout_start: [], partner_enquiry: [],
 };
 
 export function zapierHookFor(intent: LeadIntent, env: Env): string | undefined {

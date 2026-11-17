@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { COURSE_PRICE_LABEL } from "@/app/lib/pricing";
+import LeadForm from "@/app/components/LeadForm";
 
 // PT Mentor Hub: a mentor partner, not a gym (Nov 2026). The same
 // Level 2 & 3 course as every partner, sold with PT Mentor Hub's mentorship,
@@ -253,6 +254,30 @@ export default function PtMentorHubAcademyPage() {
           </div>
           <p className="text-sm text-white/60 mt-6 mb-8">Enrol and start any day.</p>
           <EnrolButton label="Secure your place" />
+        </div>
+      </section>
+
+      {/* ENQUIRY: not ready to enrol. Starts Luke's follow-up emails (app/lib/partnerNurture.ts). */}
+      <section id="details" className="px-6 pb-16 md:pb-24">
+        <div className="max-w-xl mx-auto rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:p-10">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-center" style={{ color: ORANGE }}>Not ready to enrol yet?</p>
+          <h2 className="font-display font-extrabold text-3xl md:text-4xl leading-none tracking-tight mb-3 text-center">Get the details sent to you.</h2>
+          <p className="text-sm text-white/65 text-center mb-6">Leave your details and Luke will email you everything about the Academy, plus a few tips on getting started as a PT.</p>
+          <LeadForm
+            intent="partner_enquiry"
+            source="pt-mentor-hub-academy"
+            gymSlug="pt-mentor-hub"
+            tone="dark"
+            submitLabel="Send me the details"
+            submitStyle={{ backgroundColor: ORANGE, color: "#000" }}
+            successMessage="Thanks, check your inbox. Luke's first email is on its way."
+            footnote={
+              <>
+                We&apos;ll email you about the PT Mentor Hub Academy. Unsubscribe at any time. See our{" "}
+                <a href="/privacy" className="underline">privacy notice</a>.
+              </>
+            }
+          />
         </div>
       </section>
 

@@ -7,7 +7,7 @@
 import { validateAnyPhone } from "./security/phone.ts";
 import { withCleanStage } from "./leadStage.ts";
 
-export const LEAD_INTENTS = ["call", "prospectus", "quiz", "career_planner", "gym_callback", "whatsapp", "live", "salary", "checkout_start", "contact", "gym_partnership"] as const;
+export const LEAD_INTENTS = ["call", "prospectus", "quiz", "career_planner", "gym_callback", "whatsapp", "live", "salary", "checkout_start", "contact", "gym_partnership", "partner_enquiry"] as const;
 export type LeadIntent = (typeof LEAD_INTENTS)[number];
 
 /** Intents that call notifySetter TODAY. Leads Central must see no change (Callum, 11 Oct 2026). */
@@ -18,8 +18,13 @@ export const INTENT_LABEL: Record<LeadIntent, string> = {
   call: "Book a call", prospectus: "Prospectus", quiz: "Quiz", career_planner: "Career planner",
   gym_callback: "Gym page callback", whatsapp: "WhatsApp enquiry", live: "Live session",
   salary: "Salary calculator", checkout_start: "Started checkout", contact: "Contact form",
-  gym_partnership: "Gym partnership",
+  gym_partnership: "Gym partnership", partner_enquiry: "Partner page enquiry",
 };
+
+/** Intents where a phone number is optional (everywhere else it is required). */
+export function phoneOptional(intent: string): boolean {
+  return intent === "checkout_start" || intent === "partner_enquiry";
+}
 
 export type CleanLead = {
   name: string; phone: string | null; email: string; question: string | null;
@@ -78,8 +83,8 @@ export function validateLead(raw: unknown): { ok: true; lead: CleanLead } | { ok
   const partner = intent === "gym_partnership";
   const phone = phoneRaw ? (partner ? partnerPhone(phoneRaw) : normaliseUkPhone(phoneRaw)) : null;
   const phoneMsg = partner ? "Enter a valid phone number." : "Enter a UK phone number.";
-  if (intent !== "checkout_start" && !phone) return { ok: false, field: "phone", message: phoneMsg };
-  if (intent === "checkout_start" && phoneRaw && !phone) return { ok: false, field: "phone", message: phoneMsg };
+  if (!phoneOptional(intent) && !phone) return { ok: false, field: "phone", message: phoneMsg };
+  if (phoneOptional(intent) && phoneRaw && !phone) return { ok: false, field: "phone", message: phoneMsg };
   const extra = withCleanStage(obj(r.extra));
   // /api/gym-partnership required the gym's name (gymPartnershipSchema, min 2).
   if (partner && str(extra.gymName, 200).length < 2) return { ok: false, field: "gymName", message: "Enter your gym's name." };

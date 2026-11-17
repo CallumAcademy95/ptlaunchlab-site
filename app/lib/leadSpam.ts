@@ -4,6 +4,7 @@
 // (app/lib/security/validate.ts):
 //   contact                       → validateContact: full `_sec` check, validateName, validateEmail
 //   prospectus, gym_callback      → validateProspectus: same
+//   partner_enquiry               → the same full gates (new, Nov 2026)
 //   quiz                          → validateQuiz: same
 //   live                          → validateLiveRegister: same
 //   gym_partnership               → validateGymPartnership: honeypot only (validateGymPartnershipSec),
@@ -34,7 +35,7 @@ export type SpamValidators = {
 };
 
 /** Intents whose legacy route ran the full sec + name + email gates. */
-export const FULL_GATE_INTENTS: ReadonlySet<string> = new Set(["contact", "prospectus", "gym_callback", "quiz", "live"]);
+export const FULL_GATE_INTENTS: ReadonlySet<string> = new Set(["contact", "prospectus", "gym_callback", "quiz", "live", "partner_enquiry"]);
 
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
 

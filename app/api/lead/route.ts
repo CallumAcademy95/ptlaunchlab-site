@@ -14,6 +14,8 @@ import { validateName, validateBusinessName } from "@/app/lib/security/name";
 import { validateEmail } from "@/app/lib/security/email";
 import { validateGymPartnershipSec } from "@/app/lib/security/validate";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
+import { sequenceFor } from "@/app/lib/partnerNurture";
+import { runPartnerNurture } from "@/app/lib/server/partnerNurture.server";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,10 @@ export async function POST(req: NextRequest) {
   if (b && b.intent === "gym_callback") {
     const bad = validateGymCallback(b.gymSlug, (slug) => getGymByPartnerSlug(slug));
     if (bad) return NextResponse.json(bad, { status: 400 });
+  }
+  // A partner enquiry must name a partner that has a follow-up sequence.
+  if (b && b.intent === "partner_enquiry" && !sequenceFor(typeof b.gymSlug === "string" ? b.gymSlug.trim() : "")) {
+    return NextResponse.json({ ok: false, field: "gymSlug", message: "Unknown page." }, { status: 400 });
   }
 
   // The client is created lazily inside the deps, so a missing env var or a
@@ -61,7 +67,19 @@ export async function POST(req: NextRequest) {
   };
 
   const result = await processLead(body, deps);
-  if (result.after) after(result.after);
+  const followUp = result.after;
+  if (followUp) {
+    after(async () => {
+      await followUp();
+      // Partner enquiry: email 1 of the partner's sequence goes straight away
+      // (spam and TEST rows are skipped inside). The hourly cron sends the rest,
+      // and retries this one if it failed.
+      if (b?.intent === "partner_enquiry" && result.status === 200) {
+        const id = (result.body as { id?: string }).id;
+        if (id) await runPartnerNurture({ leadId: id }).catch((e) => console.error("[lead] partner nurture failed", e));
+      }
+    });
+  }
   const saved = result.status === 200 && (result.body as { ok?: boolean }).ok === true;
   const intent = typeof b?.intent === "string" ? b.intent : "";
   const out = saved ? { ...result.body, ...liveExtras(intent, process.env) } : result.body;

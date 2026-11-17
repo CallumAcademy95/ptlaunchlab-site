@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mlUnsubscribe } from '@/app/lib/mailerlite';
+import { stopPartnerNurtureByEmail } from '@/app/lib/server/partnerNurture.server';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Unsubscribe — POST only, deliberately.
@@ -43,9 +44,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // Partner-page follow-ups (app/lib/partnerNurture.ts) are sent by the site,
+    // not MailerLite, so they are stopped here too.
+    await stopPartnerNurtureByEmail(email);
     await mlUnsubscribe(email);
   } catch (err) {
-    console.error('[unsubscribe] level:send-blocked — MailerLite update failed:', email, err);
+    console.error('[unsubscribe] level:send-blocked — unsubscribe failed:', email, err);
     // Do not report success we did not achieve. A recipient who believes they
     // unsubscribed and keeps receiving mail reaches for the spam button instead.
     if (oneClick) return new NextResponse('Unsubscribe failed', { status: 500 });
