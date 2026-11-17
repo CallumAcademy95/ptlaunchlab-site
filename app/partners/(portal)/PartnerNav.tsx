@@ -12,14 +12,16 @@ const LINKS = [
   { href: "/partners/playbook", label: "Playbook" },
 ] as const;
 
-export default function PartnerNav() {
+/** `mentor`: a mentor partner (app/lib/partnerKind.ts) has no gym campaign tab. */
+export default function PartnerNav({ mentor = false }: { mentor?: boolean }) {
   const pathname = usePathname();
+  const links = mentor ? LINKS.filter((l) => l.href !== "/partners/october") : LINKS;
 
   return (
     <nav aria-label="Partner portal" className="border-b border-white/10 bg-deep">
       <div className="mx-auto max-w-5xl px-6">
         <ul className="flex gap-1 overflow-x-auto">
-          {LINKS.map(({ href, label }) => {
+          {links.map(({ href, label }) => {
             // "/partners" must match exactly or it would light up on every page.
             const active = href === "/partners" ? pathname === href : pathname.startsWith(href);
             return (

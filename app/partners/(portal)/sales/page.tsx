@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePartner } from "@/app/lib/partner-auth";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 import {
   getPartnerSales,
   commissionState,
@@ -85,7 +86,7 @@ export default async function SalesPage({
         <div className="rounded-xl bg-card border border-white/10 p-6">
           <p className="text-white font-semibold mb-1">No enrolments yet.</p>
           <p className="text-soft text-sm leading-relaxed">
-            As soon as a member enrols through your academy link, they&rsquo;ll appear here — name,
+            As soon as {isMentorPartner(partner.slug) ? "a learner" : "a member"} enrols through your academy link, they&rsquo;ll appear here — name,
             date, and the commission you&rsquo;ve earned.{" "}
             <Link href="/partners" className="text-gold hover:underline">
               Get your link and QR code
@@ -187,7 +188,10 @@ export default async function SalesPage({
           </div>
 
           <p className="text-soft text-xs leading-relaxed">
-            {commissionReleaseRule(partner.commission_terms)}{" "}
+            {commissionReleaseRule(partner.commission_terms, {
+              mentorPackage: isMentorPartner(partner.slug),
+              payoutTermsDays: partner.payout_terms_days,
+            })}{" "}
             Anything that looks wrong?{" "}
             <a href="mailto:info@ptlaunchlab.co.uk" className="text-gold hover:underline">
               Tell us

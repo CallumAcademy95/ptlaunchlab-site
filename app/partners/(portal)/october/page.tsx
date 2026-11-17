@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { isMentorPartner } from "@/app/lib/partnerKind";
 import { requirePartner, partnerAcademyUrl } from "@/app/lib/partner-auth";
 import { getPackResources, isPreviewable } from "@/app/lib/partner-resources";
 import { applyPlaybookTokens } from "@/app/lib/partner-playbook-tokens";
@@ -26,6 +28,9 @@ const PACK = "campaign-october-two-qualifications";
 
 export default async function OctoberCampaignPage() {
   const { partner } = await requirePartner();
+  // A gym campaign ("your gym in {{town}}", member emails, gym TV). Not for a
+  // mentor partner, whose nav doesn't link here either.
+  if (isMentorPartner(partner.slug)) redirect("/partners");
   const academyUrl = partnerAcademyUrl(partner);
 
   const tokens = {

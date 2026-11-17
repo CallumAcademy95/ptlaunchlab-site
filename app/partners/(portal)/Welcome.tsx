@@ -33,6 +33,36 @@ const STEPS = [
   },
 ];
 
+// A mentor partner (app/lib/partnerKind.ts) sells online to his own audience,
+// not to members in a gym.
+const MENTOR_STEPS: typeof STEPS = [
+  {
+    href: "/partners",
+    label: "My Academy",
+    body: "Your academy link and QR code. Put the link in your bio, your group and every ACADEMY DM, and the QR on any poster in the gyms you work with.",
+  },
+  {
+    href: "/partners/playbook",
+    label: "Playbook",
+    body: "Your launch posts, the ACADEMY keyword DM, a post for your group and a gym poster line. We drafted them from your own content, so rewrite anything that doesn't sound like you and tell us what to change.",
+  },
+  {
+    href: "/partners/resources",
+    label: "Resources",
+    body: "Files made for you, including your signed agreement, so you never have to go looking for it.",
+  },
+  {
+    href: "/partners/sales",
+    label: "Enrolments",
+    body: "Every learner who enrols through your link, as it happens. They're also the people you'll be mentoring once they start working as a PT.",
+  },
+  {
+    href: "/partners/payments",
+    label: "Payments",
+    body: "What you're owed, when it becomes payable, and what we've already paid. Add your bank details here so nothing waits on a chase.",
+  },
+];
+
 function DismissButton() {
   const { pending } = useFormStatus();
   return (
@@ -54,10 +84,19 @@ function DismissButton() {
  * what the Playbook is for. Each step links to the tab it describes, so someone
  * who wants to jump straight there can.
  */
-export default function Welcome({ firstName, gymName }: { firstName: string | null; gymName: string }) {
+export default function Welcome({
+  firstName,
+  gymName,
+  mentor = false,
+}: {
+  firstName: string | null;
+  gymName: string;
+  mentor?: boolean;
+}) {
+  const steps = mentor ? MENTOR_STEPS : STEPS;
   const [step, setStep] = useState(0);
-  const current = STEPS[step];
-  const last = step === STEPS.length - 1;
+  const current = steps[step];
+  const last = step === steps.length - 1;
 
   return (
     <section className="rounded-xl border border-gold/40 bg-gold/5 p-6">
@@ -71,7 +110,7 @@ export default function Welcome({ firstName, gymName }: { firstName: string | nu
           </h2>
         </div>
         <span className="text-soft text-xs shrink-0 mt-1">
-          {step + 1} of {STEPS.length}
+          {step + 1} of {steps.length}
         </span>
       </div>
 

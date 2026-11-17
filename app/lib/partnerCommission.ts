@@ -483,3 +483,41 @@ export function saleMoney(s: PayableSale, nowMs: number): SaleMoney {
   out.payable = out.payableCommission + out.payableBonus;
   return out;
 }
+
+/**
+ * When a partner's commission is released, in plain words, for their terms.
+ * One wording for the portal's home, sales and payments pages so they cannot
+ * disagree with each other.
+ *
+ * `mentorPackage`: the Mentor Package agreement (v1.0, cl. 3.3-3.4) has its own
+ * rule: pay in full only, released when the 14-day cooling-off ends (that is
+ * the partner's payout_terms_days, which sets the real release date), paid
+ * within 7 days, and returned if the learner is refunded later. The gym wording
+ * ("30 days", "monthly", "not clawed back") is wrong on all three counts.
+ */
+export function commissionReleaseRule(
+  terms: string | null | undefined,
+  opts: { mentorPackage?: boolean; payoutTermsDays?: number } = {}
+): string {
+  if (opts.mentorPackage) {
+    const days = opts.payoutTermsDays ?? 14;
+    return (
+      `Your fee is released ${days} days after the learner enrols, when their cooling-off period ends, ` +
+      "and paid to your bank within 7 days of that."
+    );
+  }
+  if (terms === "payment_5" || terms === "ladder") {
+    return (
+      "If the learner pays in full, your fee is released 30 days after they enrol. " +
+      "If they pay monthly, it's released when their 5th monthly payment clears (their first payment counts as 1). " +
+      "Once paid, it is not clawed back."
+    );
+  }
+  if (terms === "instalment_2") {
+    return (
+      "If the learner pays in full, your fee is released 30 days after they enrol. " +
+      "If they're on an instalment plan, it's released once their second instalment clears, then paid 30 days after that."
+    );
+  }
+  return "Your fee is released 30 days after the learner enrols, whichever way they choose to pay.";
+}

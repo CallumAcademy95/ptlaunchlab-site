@@ -74,6 +74,8 @@ export interface PartnerRecord {
   primary_color: string | null;
   fee_per_learner_pence: number;
   commission_terms: "on_enrolment" | "instalment_2" | "payment_5" | "ladder";
+  /** Days from enrolment to a pay-in-full sale's commission release. */
+  payout_terms_days: number;
 }
 
 export interface PartnerSession {
@@ -114,7 +116,7 @@ export const getPartnerSession = cache(async function getPartnerSession(): Promi
     // created yet fails the whole query, which resolves every partner to "not
     // signed in" and locks all of them out. That has happened once.
     .select(
-      "id, email, full_name, role, must_change_password, partner:pp_partners!inner(id, slug, gym_name, status, landing_page_path, promo_code, logo_url, primary_color, fee_per_learner_pence, commission_terms)"
+      "id, email, full_name, role, must_change_password, partner:pp_partners!inner(id, slug, gym_name, status, landing_page_path, promo_code, logo_url, primary_color, fee_per_learner_pence, commission_terms, payout_terms_days)"
     )
     .eq("id", user.id)
     .maybeSingle();
