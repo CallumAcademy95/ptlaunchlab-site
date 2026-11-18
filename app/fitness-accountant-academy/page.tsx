@@ -68,7 +68,7 @@ const STEPS = [
 
 const FAQ = [
   { q: "Who delivers the qualification?", a: "PT Launch Lab, an NCFE Accredited Centre (No. 9002788). You get exactly the same NCFE Level 2 and Level 3 qualifications as any of our learners." },
-  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, and works only with the fitness industry." },
+  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, and specialises in the fitness industry." },
   { q: "When does the Business Launch Package start?", a: "When you're qualified and ready to start working as a PT. Until then, your PT Launch Lab tutor supports you through the course." },
   { q: "Does it include my first tax return?", a: "Yes. Jay prepares and submits your first Self Assessment tax return when it's due." },
   { q: "Do I need any experience?", a: "No. The course starts at Level 2, the foundations, and builds to Level 3." },
@@ -207,7 +207,7 @@ export default function FitnessAccountantAcademyPage() {
             </h2>
             <div className="space-y-4 text-black/75 leading-relaxed">
               <p>Jay Johnston is both an accountant and a personal trainer, so he understands the industry from both sides. He knows what it&apos;s like to work in fitness, and he understands the financial and tax responsibilities that come with running your own business.</p>
-              <p>Based in Belfast, The Fitness Accountant works only with fitness professionals: personal trainers, gym owners and fitness businesses.</p>
+              <p>Based in Belfast, The Fitness Accountant specialises in the fitness industry: personal trainers, gym owners and fitness businesses. His background in training and in accountancy is what lets him specialise, so you&apos;re working with someone who already knows how a PT business runs.</p>
               <p>His aim is to help you avoid the common financial mistakes, understand your responsibilities and build good financial habits from the beginning.</p>
             </div>
           </div>

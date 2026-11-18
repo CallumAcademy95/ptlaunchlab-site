@@ -40,3 +40,10 @@ test("no finance, instalments, guarantees or promised savings", () => {
 test("it's Jay's page only: no other course provider", () => {
   assert.doesNotMatch(PAGE, /uni ?learning/i);
 });
+
+// Jay, 18 Nov 2026: he also has non-fitness clients (bars, barbers), so the
+// page says he specialises in fitness, never that he works only with it.
+test("Jay specialises in fitness; the page never says 'only'", () => {
+  assert.doesNotMatch(PAGE, /works? only with|only works with/i);
+  assert.match(PAGE, /specialises in the fitness industry/);
+});
