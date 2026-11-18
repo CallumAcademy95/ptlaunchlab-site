@@ -6,7 +6,7 @@
 // partner like PT Mentor Hub:
 //   - the enrol page's gymSlug is the pay-in-full-only slug, so monthly is
 //     never offered, and it matches the onboard script's partner row;
-//   - the page stays a draft (noindex) until he signs;
+//   - the page stays noindex (a bio-link page, like PT Mentor Hub's);
 //   - the copy never offers finance or instalments, never promises tax savings
 //     or a guarantee, and never mentions another course provider.
 
@@ -26,7 +26,7 @@ test("the enrol page, pricing and the onboard script agree on one slug", () => {
   assert.equal(isPayInFullOnly(SLUG), true);
 });
 
-test("the page is not indexed while it's a draft", () => {
+test("the page is not indexed", () => {
   assert.match(PAGE, /robots: \{ index: false/);
   assert.match(ENROL, /robots: \{ index: false/);
 });
@@ -46,4 +46,9 @@ test("it's Jay's page only: no other course provider", () => {
 test("Jay specialises in fitness; the page never says 'only'", () => {
   assert.doesNotMatch(PAGE, /works? only with|only works with/i);
   assert.match(PAGE, /specialises in the fitness industry/);
+});
+
+// Live since 18 Nov 2026: no draft strip or placeholder boxes left on it.
+test("no draft leftovers on the live page", () => {
+  assert.doesNotMatch(PAGE, /Draft preview|Not public yet|To confirm/i);
 });

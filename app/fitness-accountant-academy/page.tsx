@@ -10,9 +10,9 @@ import { FitnessAccountantWordmark, TFA_BLUE } from "./Wordmark";
 // pay in full ONLY (see PAY_IN_FULL_ONLY_PARTNERS). Attribution is gymSlug
 // "the-fitness-accountant" on the enrol page.
 //
-// DRAFT (17 Nov 2026): Jay's own copy, sent 17 Nov, lightly edited. Not signed
-// yet, so noindex, not in the sitemap, with a draft strip and dashed "to
-// confirm" boxes where his graduate rates go. A bio-link page, not SEO.
+// LIVE (18 Nov 2026): Jay's own copy, lightly edited, signed off by him.
+// noindex like PT Mentor Hub's page: a bio-link page he promotes, not SEO.
+// Graduate rates show no figures until Jay gives them.
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/fitness-accountant-academy";
 const ENROL = "/fitness-accountant-academy/enrol";
@@ -88,22 +88,17 @@ function EnrolButton({ label = "Enrol now" }: { label?: string }) {
   );
 }
 
-function ToConfirm({ children }: { children: React.ReactNode }) {
+function GraduateRate() {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-amber-400/70 bg-amber-400/10 p-4 text-sm text-amber-200">
-      <p className="font-bold uppercase tracking-widest text-[10px] mb-1">To confirm with The Fitness Accountant</p>
-      {children}
-    </div>
+    <p className="rounded-xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: BLUE }}>
+      Discounted for PT Launch Lab graduates. Ask Jay for your rate.
+    </p>
   );
 }
 
 export default function FitnessAccountantAcademyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="bg-amber-400 text-black text-center text-xs font-bold px-4 py-2">
-        Draft preview for The Fitness Accountant. Not public yet.
-      </div>
-
       {/* HERO */}
       <header className="px-6 pt-10 pb-16 md:pt-14 md:pb-24 relative overflow-hidden">
         <div
@@ -253,12 +248,12 @@ export default function FitnessAccountantAcademyPage() {
             <div className="rounded-2xl border border-black/10 p-6">
               <p className="font-bold text-lg mb-1">1-to-1 business mentoring</p>
               <p className="text-sm text-black/65 leading-relaxed mb-4">Ongoing support from Jay as your business grows.</p>
-              <div className="bg-black rounded-xl"><ToConfirm>Graduate price, and the usual price it&apos;s discounted from.</ToConfirm></div>
+              <GraduateRate />
             </div>
             <div className="rounded-2xl border border-black/10 p-6">
               <p className="font-bold text-lg mb-1">Jay as your accountant</p>
               <p className="text-sm text-black/65 leading-relaxed mb-4">Keep Jay on to look after your accounts and tax returns year after year.</p>
-              <div className="bg-black rounded-xl"><ToConfirm>Graduate price, and the usual price it&apos;s discounted from.</ToConfirm></div>
+              <GraduateRate />
             </div>
           </div>
         </div>
