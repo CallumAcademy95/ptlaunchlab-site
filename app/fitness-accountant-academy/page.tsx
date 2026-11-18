@@ -10,9 +10,9 @@ import { FitnessAccountantWordmark, TFA_BLUE } from "./Wordmark";
 // pay in full ONLY (see PAY_IN_FULL_ONLY_PARTNERS). Attribution is gymSlug
 // "the-fitness-accountant" on the enrol page.
 //
-// DRAFT (17 Nov 2026): Jay's own copy, sent 17 Nov, lightly edited. Not signed
-// yet, so noindex, not in the sitemap, with a draft strip and dashed "to
-// confirm" boxes where his graduate rates go. A bio-link page, not SEO.
+// LIVE (18 Nov 2026): Jay's own copy, lightly edited, signed off by him.
+// noindex like PT Mentor Hub's page: a bio-link page he promotes, not SEO.
+// Graduate rates show no figures until Jay gives them.
 
 const PAGE_URL = "https://ptlaunchlab.co.uk/fitness-accountant-academy";
 const ENROL = "/fitness-accountant-academy/enrol";
@@ -68,7 +68,7 @@ const STEPS = [
 
 const FAQ = [
   { q: "Who delivers the qualification?", a: "PT Launch Lab, an NCFE Accredited Centre (No. 9002788). You get exactly the same NCFE Level 2 and Level 3 qualifications as any of our learners." },
-  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, and works only with the fitness industry." },
+  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, and specialises in the fitness industry." },
   { q: "When does the Business Launch Package start?", a: "When you're qualified and ready to start working as a PT. Until then, your PT Launch Lab tutor supports you through the course." },
   { q: "Does it include my first tax return?", a: "Yes. Jay prepares and submits your first Self Assessment tax return when it's due." },
   { q: "Do I need any experience?", a: "No. The course starts at Level 2, the foundations, and builds to Level 3." },
@@ -88,22 +88,17 @@ function EnrolButton({ label = "Enrol now" }: { label?: string }) {
   );
 }
 
-function ToConfirm({ children }: { children: React.ReactNode }) {
+function GraduateRate() {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-amber-400/70 bg-amber-400/10 p-4 text-sm text-amber-200">
-      <p className="font-bold uppercase tracking-widest text-[10px] mb-1">To confirm with The Fitness Accountant</p>
-      {children}
-    </div>
+    <p className="rounded-xl px-4 py-3 text-sm font-bold text-white" style={{ backgroundColor: BLUE }}>
+      Discounted for PT Launch Lab graduates. Ask Jay for your rate.
+    </p>
   );
 }
 
 export default function FitnessAccountantAcademyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="bg-amber-400 text-black text-center text-xs font-bold px-4 py-2">
-        Draft preview for The Fitness Accountant. Not public yet.
-      </div>
-
       {/* HERO */}
       <header className="px-6 pt-10 pb-16 md:pt-14 md:pb-24 relative overflow-hidden">
         <div
@@ -207,7 +202,7 @@ export default function FitnessAccountantAcademyPage() {
             </h2>
             <div className="space-y-4 text-black/75 leading-relaxed">
               <p>Jay Johnston is both an accountant and a personal trainer, so he understands the industry from both sides. He knows what it&apos;s like to work in fitness, and he understands the financial and tax responsibilities that come with running your own business.</p>
-              <p>Based in Belfast, The Fitness Accountant works only with fitness professionals: personal trainers, gym owners and fitness businesses.</p>
+              <p>Based in Belfast, The Fitness Accountant specialises in the fitness industry: personal trainers, gym owners and fitness businesses. His background in training and in accountancy is what lets him specialise, so you&apos;re working with someone who already knows how a PT business runs.</p>
               <p>His aim is to help you avoid the common financial mistakes, understand your responsibilities and build good financial habits from the beginning.</p>
             </div>
           </div>
@@ -253,12 +248,12 @@ export default function FitnessAccountantAcademyPage() {
             <div className="rounded-2xl border border-black/10 p-6">
               <p className="font-bold text-lg mb-1">1-to-1 business mentoring</p>
               <p className="text-sm text-black/65 leading-relaxed mb-4">Ongoing support from Jay as your business grows.</p>
-              <div className="bg-black rounded-xl"><ToConfirm>Graduate price, and the usual price it&apos;s discounted from.</ToConfirm></div>
+              <GraduateRate />
             </div>
             <div className="rounded-2xl border border-black/10 p-6">
               <p className="font-bold text-lg mb-1">Jay as your accountant</p>
               <p className="text-sm text-black/65 leading-relaxed mb-4">Keep Jay on to look after your accounts and tax returns year after year.</p>
-              <div className="bg-black rounded-xl"><ToConfirm>Graduate price, and the usual price it&apos;s discounted from.</ToConfirm></div>
+              <GraduateRate />
             </div>
           </div>
         </div>
