@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { trackEvent } from "@/app/lib/gtag";
 import LeadForm from "@/app/components/LeadForm";
+import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
 
 export default function ProspectusButton() {
   const [open, setOpen] = useState(false);
@@ -49,9 +50,10 @@ export default function ProspectusButton() {
               source="prospectus_button"
               tone="dark"
               stageQuestion
+              extra={withWaConsent()}
               submitLabel="Yes, send me the prospectus →"
               successMessage="Thanks, opening the prospectus…"
-              footnote="We'll also send you useful emails about the course and becoming a PT. Unsubscribe any time."
+              footnote={<>We&apos;ll also send you useful emails about the course and becoming a PT. Unsubscribe any time. {WA_CONSENT_LINE}</>}
               onSuccess={handleSuccess}
             />
           </div>

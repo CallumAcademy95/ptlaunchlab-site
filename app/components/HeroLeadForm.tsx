@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { trackEvent } from "@/app/lib/gtag";
 import LeadForm from "./LeadForm";
+import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HeroLeadForm
@@ -76,13 +77,13 @@ export default function HeroLeadForm({ avatar }: { avatar: Avatar }) {
         intent="prospectus"
         source={`vsl_hero_${avatar}`}
         tone="dark"
-        extra={{ avatar }}
+        extra={withWaConsent({ avatar })}
         submitLabel={copy.submit}
         onSuccess={() => {
           trackEvent("lead_capture_submitted", { avatar, source: "hero-form" });
           setSubmitted(true);
         }}
-        footnote="We'll be in touch with a quick intro · No spam · Unsubscribe any time"
+        footnote={<>We&apos;ll be in touch with a quick intro · No spam · Unsubscribe any time<br />{WA_CONSENT_LINE}</>}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { CALL_QUESTION, callSuccessMessage, popupAllowedOnPath } from "@/app/lib/homeCta";
 import { CallModalContext, type CallModalApi } from "./callModalContext";
+import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
 
 // LeadForm (and submitLead and the form security code behind it) loads only
 // when the pop-up first opens, so it doesn't ship with the page.
@@ -135,7 +136,9 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
                 tone="dark"
                 variant="modal"
                 question={CALL_QUESTION}
+                extra={withWaConsent()}
                 successMessage={(first) => callSuccessMessage(first)}
+                footnote={WA_CONSENT_LINE}
               />
             </div>
           </div>

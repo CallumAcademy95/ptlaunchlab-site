@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import LeadForm from "@/app/components/LeadForm";
+import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
 import CallLink from "@/app/components/cta/CallLink";
 import NapLine from "@/app/components/NapLine";
 import { GOOGLE_PROFILE_URL } from "@/app/lib/contactDetails";
@@ -151,10 +152,11 @@ export default function FunnelClient({ hero, pricing }: { hero: ReactNode; prici
               intent="prospectus"
               source="funnel_prospectus_modal"
               tone="dark"
+              extra={withWaConsent()}
               submitLabel="View & Download Prospectus →"
               successMessage="Thanks, opening the prospectus…"
               onSuccess={handleProspectusSuccess}
-              footnote="No spam. We'll only use this to follow up if you'd like."
+              footnote={<>No spam. We&apos;ll only use this to follow up if you&apos;d like. {WA_CONSENT_LINE}</>}
             />
           </div>
         </div>
