@@ -575,10 +575,10 @@ export default function MentorSignForm({ kind }: { kind: MentorAgreementKind }) 
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <div className="text-center mb-10">
-            <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">{agreement.title}</p>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Mentor Partner Agreement</h1>
+            <p className="text-[#F5C518] text-xs font-bold tracking-widest uppercase mb-3">PT Launch Lab partner agreement</p>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{agreement.title}</h1>
             <p className="text-[#8CA3BF] text-base">
-              Sign your PT Launch Lab mentor partner agreement digitally. Both parties receive a signed PDF copy by email.
+              Sign your PT Launch Lab partner agreement digitally. Both parties receive a signed PDF copy by email.
             </p>
           </div>
 
