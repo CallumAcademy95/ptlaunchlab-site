@@ -9,6 +9,9 @@
  *   package     /mentor-partnership/package/sign  mentor sells our course with
  *               their mentoring as a package, flat commission (PT Mentor Hub,
  *               Nov 2026)
+ *   accountancy /mentor-partnership/accountancy/sign  accountant sells our
+ *               course with their Business Launch Package, flat commission
+ *               (The Fitness Accountant, Nov 2026)
  */
 
 import type { Clause } from "./partnershipAgreement";
@@ -26,8 +29,15 @@ import {
   MENTOR_PACKAGE_AGREEMENT_VERSION,
   MENTOR_PACKAGE_KEY_TERMS_FOR_ACKNOWLEDGEMENT,
 } from "./mentorPackageAgreement.ts";
+import {
+  buildAccountancyPackageAgreementClauses,
+  ACCOUNTANCY_PACKAGE_ACK_NOTE,
+  ACCOUNTANCY_PACKAGE_AGREEMENT_SUMMARY,
+  ACCOUNTANCY_PACKAGE_AGREEMENT_VERSION,
+  ACCOUNTANCY_PACKAGE_KEY_TERMS_FOR_ACKNOWLEDGEMENT,
+} from "./accountancyPackageAgreement.ts";
 
-export type MentorAgreementKind = "mentorship" | "package";
+export type MentorAgreementKind = "mentorship" | "package" | "accountancy";
 
 export interface MentorAgreementDef {
   kind: MentorAgreementKind;
@@ -68,9 +78,20 @@ export const MENTOR_AGREEMENTS: Record<MentorAgreementKind, MentorAgreementDef> 
     businessPlaceholder: "e.g. PT Mentor Hub",
     filenamePrefix: "ptll-mentor-package-agreement",
   },
+  accountancy: {
+    kind: "accountancy",
+    title: "Accountancy Package Partner Agreement",
+    version: ACCOUNTANCY_PACKAGE_AGREEMENT_VERSION,
+    summary: ACCOUNTANCY_PACKAGE_AGREEMENT_SUMMARY,
+    keyTerms: ACCOUNTANCY_PACKAGE_KEY_TERMS_FOR_ACKNOWLEDGEMENT,
+    ackNote: ACCOUNTANCY_PACKAGE_ACK_NOTE,
+    buildClauses: buildAccountancyPackageAgreementClauses,
+    businessPlaceholder: "e.g. The Fitness Accountant",
+    filenamePrefix: "ptll-accountancy-package-agreement",
+  },
 };
 
 /** Anything unrecognised is the original mentorship agreement. */
 export function parseMentorAgreementKind(v: unknown): MentorAgreementKind {
-  return v === "package" ? "package" : "mentorship";
+  return v === "package" || v === "accountancy" ? v : "mentorship";
 }
