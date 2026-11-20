@@ -10,9 +10,46 @@ import { withCleanStage } from "./leadStage.ts";
 export const LEAD_INTENTS = ["call", "prospectus", "quiz", "career_planner", "gym_callback", "whatsapp", "live", "salary", "checkout_start", "contact", "gym_partnership"] as const;
 export type LeadIntent = (typeof LEAD_INTENTS)[number];
 
-/** Intents that call notifySetter TODAY. Leads Central must see no change (Callum, 11 Oct 2026). */
-export const SETTER_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["contact", "prospectus", "quiz"]);
+/**
+ * Intents that call notifySetter. contact/prospectus/quiz since 11 Oct 2026;
+ * `call` from 20 Nov 2026 for the setter's WhatsApp opener (Leads Central
+ * ignores call leads unless its WEBSITE_WA_OPENER flag is on). Zapier for
+ * `call` is unchanged.
+ */
+export const SETTER_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["contact", "prospectus", "quiz", "call"]);
 export function setterSourceFor(intent: LeadIntent): string { return intent; }
+
+/** Intents whose setter payload carries the WhatsApp fields (phone, form source, question, consent marker). */
+export const SETTER_WA_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["call", "prospectus", "quiz"]);
+
+export type SetterPayload = {
+  name: string; email: string; message?: string; source: string;
+  phone?: string; intent?: LeadIntent; lead_source?: string; question?: string; wa_consent_copy?: string;
+};
+
+/**
+ * What notifySetter receives. `source` stays the intent (the setter's first-touch
+ * email is worded from it); the form's own source goes in `lead_source`.
+ * wa_consent_copy is passed only when the form sent a well-formed marker.
+ */
+export function setterPayloadFor(lead: CleanLead): SetterPayload {
+  const base: SetterPayload = {
+    name: lead.name, email: lead.email,
+    // /api/contact always sent `message` (it was required there); the others never did.
+    ...(lead.intent === "contact" ? { message: lead.question ?? "" } : {}),
+    source: setterSourceFor(lead.intent),
+  };
+  if (!SETTER_WA_INTENTS.has(lead.intent)) return base;
+  const marker = lead.extra.wa_consent_copy;
+  return {
+    ...base,
+    ...(lead.phone ? { phone: lead.phone } : {}),
+    intent: lead.intent,
+    lead_source: lead.source,
+    ...(lead.question ? { question: lead.question } : {}),
+    ...(typeof marker === "string" && /^\d{4}-\d{2}-\d{2}$/.test(marker) ? { wa_consent_copy: marker } : {}),
+  };
+}
 
 export const INTENT_LABEL: Record<LeadIntent, string> = {
   call: "Book a call", prospectus: "Prospectus", quiz: "Quiz", career_planner: "Career planner",
@@ -166,7 +203,7 @@ export interface LeadDeps {
   insert(row: LeadRow): Promise<{ id: string } | { error: string }>;
   update(id: string, patch: Record<string, unknown>): Promise<void>;
   push(payload: { title: string; body?: string; url?: string; tag?: string }): Promise<{ sent: number; error?: string }>;
-  setter(lead: { name: string; email: string; message?: string; source: string }): Promise<void>;
+  setter(lead: SetterPayload): Promise<void>;
   zapier(intent: LeadIntent, lead: CleanLead & { id: string }): Promise<StepStatus>;
   mailerlite(intent: LeadIntent, lead: CleanLead & { id: string }): Promise<StepStatus>;
   capi(intent: LeadIntent, lead: CleanLead & { id: string }, eventId: string): Promise<StepStatus>;
@@ -231,8 +268,7 @@ export async function processLead(raw: unknown, deps: LeadDeps): Promise<LeadRes
     // TEST leads are saved and pushed-skipped, and never reach external systems.
     await step("setter_status", async () => {
       if (lead.isTest || !SETTER_INTENTS.has(lead.intent)) return "skipped";
-      // /api/contact always sent `message` (it was required there); the others never did.
-      await deps.setter({ name: lead.name, email: lead.email, ...(lead.intent === "contact" ? { message: lead.question ?? "" } : {}), source: setterSourceFor(lead.intent) });
+      await deps.setter(setterPayloadFor(lead));
       return "ok";
     });
     await step("zapier_status", async () => (lead.isTest ? "skipped" : deps.zapier(lead.intent, full)));

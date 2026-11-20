@@ -1,12 +1,20 @@
 // Hand a website lead to the Leads Central setter, which opens a conversation
-// with one warm, reply-inviting email (replies then flow into the setter). Fire-
-// and-forget from the form handlers; the setter enqueues + acks fast.
+// with one warm, reply-inviting email (replies then flow into the setter), or,
+// for call/prospectus/quiz leads with a mobile, a WhatsApp opener when its
+// WEBSITE_WA_OPENER flag is on. Fire-and-forget from the form handlers; the
+// setter enqueues + acks fast.
 
 export async function notifySetter(lead: {
   name?: string | null;
   email: string;
   message?: string | null;
   source: string;
+  // WhatsApp opener fields (app/lib/leads.ts setterPayloadFor).
+  phone?: string;
+  intent?: string;
+  lead_source?: string;
+  question?: string;
+  wa_consent_copy?: string;
 }): Promise<void> {
   const url = process.env.SETTER_INTAKE_URL;
   const key = process.env.SETTER_INTAKE_KEY;

@@ -120,6 +120,7 @@ export default function PrivacyPage() {
                 "Google (Google Sheets / Google Workspace) — enrolment records are stored in a secure, access-controlled Google Sheet.",
                 "Google Analytics — website and conversion analytics. Receives event data about how this site is used, including purchase events sent from our server.",
                 "Meta (Facebook and Instagram) — advertising measurement. When you submit a form on this site or complete a purchase, we send Meta a hashed (scrambled) version of details such as your email address, phone number, name, postcode and country, so we can measure how our adverts perform. Hashing means Meta does not receive these details in readable form.",
+                "WhatsApp (Meta) — messaging. If you give us your mobile number on a form, we may message you on WhatsApp; WhatsApp receives your number and the messages we exchange.",
                 "Anthropic — provider of the AI assistant in our website chat. Messages you type into the chat are sent to Anthropic in order to generate a reply. Please do not enter sensitive personal information into the chat.",
                 ...(CRM
                   ? [
@@ -140,6 +141,7 @@ export default function PrivacyPage() {
           content: (
             <>
               {p("If you submit an enquiry or quiz form on our website, we may contact you with information about our courses. You can opt out at any time by replying to any email with 'unsubscribe' or contacting us directly.")}
+              {p("If you give us your mobile number when you ask us to call you, request the prospectus or take the quiz, we may send you a short WhatsApp message to introduce ourselves and answer your questions. Reply STOP at any time and we won't message you on WhatsApp again.")}
               {p("We will not add you to any marketing list without a legitimate basis for doing so. Enrolled learners may receive course-related communications as part of their contract with us.")}
             </>
           ),
