@@ -52,3 +52,11 @@ test("Jay specialises in fitness; the page never says 'only'", () => {
 test("no draft leftovers on the live page", () => {
   assert.doesNotMatch(PAGE, /Draft preview|Not public yet|To confirm/i);
 });
+
+// Jay, 20 Nov 2026: he's registered in both the UK and Ireland, and Irish
+// learners set up with Revenue the way UK learners set up with HMRC.
+test("Jay covers the UK and Ireland: HMRC or Revenue", () => {
+  assert.match(PAGE, /registered in both the UK and Ireland/);
+  assert.match(PAGE, /HMRC or Revenue registration/);
+  assert.match(PAGE, /income tax return with Revenue in Ireland/);
+});

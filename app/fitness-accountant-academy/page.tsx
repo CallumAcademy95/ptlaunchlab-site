@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 const QUESTIONS = [
-  "How do you register with HMRC?",
+  "How do you register with HMRC or Revenue?",
   "Should you be a sole trader or a limited company?",
   "What expenses can you claim?",
   "How much tax should you put aside?",
@@ -51,26 +51,26 @@ const COURSE = [
 const PACKAGE = [
   { title: "A personalised consultation", body: "Based on your circumstances and your business ambitions." },
   { title: "Setting up your business correctly", body: "Guidance on the right set-up for you, including sole trader or limited company." },
-  { title: "HMRC registration", body: "Registered and your tax affairs in order from the start." },
+  { title: "HMRC or Revenue registration", body: "Registered with HMRC in the UK, or Revenue in Ireland, and your tax affairs in order from the start." },
   { title: "Expenses you can legitimately claim", body: "What counts as a business expense for a PT, and what doesn't." },
   { title: "Bookkeeping and financial records", body: "Guidance on keeping your records simple and right." },
   { title: "Tax and National Insurance", body: "What you'll owe and how much to put aside, so the bill is never a surprise." },
-  { title: "Your first Self Assessment return", body: "Prepared and submitted for you when it's due." },
+  { title: "Your first tax return", body: "Your first Self Assessment return (UK) or income tax return (Ireland), prepared and submitted for you when it's due." },
   { title: "Personalised financial education", body: "So you understand how to manage your business going forward." },
 ];
 
 const STEPS = [
   { title: "Enrol", body: "One payment, online. It takes a few minutes." },
   { title: "Qualify", body: "Your tutor is in touch within 24 hours. Study online at your own pace; most learners finish in 8–16 weeks." },
-  { title: "Set up your business", body: "Your consultation with Jay: the right set-up, HMRC registration and your finances in order." },
+  { title: "Set up your business", body: "Your consultation with Jay: the right set-up, HMRC or Revenue registration and your finances in order." },
   { title: "Run it properly", body: "Know what to claim, what to put aside and how to keep your records. Jay prepares and submits your first tax return when it's due." },
 ];
 
 const FAQ = [
   { q: "Who delivers the qualification?", a: "PT Launch Lab, an NCFE Accredited Centre (No. 9002788). You get exactly the same NCFE Level 2 and Level 3 qualifications as any of our learners." },
-  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, and specialises in the fitness industry." },
+  { q: "Who does the business and tax side?", a: "Jay Johnston, The Fitness Accountant. He's both an accountant and a personal trainer, is registered as an accountant in both the UK and Ireland, and specialises in the fitness industry." },
   { q: "When does the Business Launch Package start?", a: "When you're qualified and ready to start working as a PT. Until then, your PT Launch Lab tutor supports you through the course." },
-  { q: "Does it include my first tax return?", a: "Yes. Jay prepares and submits your first Self Assessment tax return when it's due." },
+  { q: "Does it include my first tax return?", a: "Yes. Jay prepares and submits your first tax return when it's due: your Self Assessment return with HMRC in the UK, or your income tax return with Revenue in Ireland." },
   { q: "Do I need any experience?", a: "No. The course starts at Level 2, the foundations, and builds to Level 3." },
   { q: "Can I do it around a full-time job?", a: "Yes. It's online and self-paced with no fixed class times. Most learners finish in 8–16 weeks." },
   { q: "What if I change my mind?", a: "You have a 14-day cooling-off period. Tell us within 14 days of paying and you get a full refund." },
@@ -115,7 +115,7 @@ export default function FitnessAccountantAcademyPage() {
             <span style={{ color: BLUE_TEXT }}>Then get your business started properly.</span>
           </h1>
           <p className="text-lg md:text-xl text-white/75 leading-relaxed max-w-2xl mb-8">
-            The NCFE Level 2 &amp; 3 personal trainer qualification, plus The Fitness Accountant&apos;s Business Launch Package: your business set up, registered with HMRC and your finances in order. Together, for one price.
+            The NCFE Level 2 &amp; 3 personal trainer qualification, plus The Fitness Accountant&apos;s Business Launch Package: your business set up, registered with HMRC (or Revenue in Ireland) and your finances in order. Together, for one price.
           </p>
           <div className="flex flex-wrap items-center gap-4 mb-8">
             <EnrolButton />
@@ -202,7 +202,7 @@ export default function FitnessAccountantAcademyPage() {
             </h2>
             <div className="space-y-4 text-black/75 leading-relaxed">
               <p>Jay Johnston is both an accountant and a personal trainer, so he understands the industry from both sides. He knows what it&apos;s like to work in fitness, and he understands the financial and tax responsibilities that come with running your own business.</p>
-              <p>Based in Belfast, The Fitness Accountant specialises in the fitness industry: personal trainers, gym owners and fitness businesses. His background in training and in accountancy is what lets him specialise, so you&apos;re working with someone who already knows how a PT business runs.</p>
+              <p>Based in Belfast, The Fitness Accountant specialises in the fitness industry: personal trainers, gym owners and fitness businesses. His background in training and in accountancy is what lets him specialise, so you&apos;re working with someone who already knows how a PT business runs. He&apos;s an accountant registered in both the UK and Ireland, so whether you&apos;re setting up with HMRC or with Revenue, he&apos;ll get you started properly.</p>
               <p>His aim is to help you avoid the common financial mistakes, understand your responsibilities and build good financial habits from the beginning.</p>
             </div>
           </div>
@@ -286,7 +286,7 @@ export default function FitnessAccountantAcademyPage() {
             <ul className="space-y-2 text-sm font-medium">
               <li>✓ NCFE Level 2 &amp; Level 3 qualification</li>
               <li>✓ The Fitness Accountant&apos;s Business Launch Package (normally £500)</li>
-              <li>✓ Your first Self Assessment return prepared and submitted</li>
+              <li>✓ Your first tax return prepared and submitted (HMRC or Revenue)</li>
               <li>✓ Personal tutor and a gym introduction</li>
               <li>✓ One payment, nothing further to pay</li>
             </ul>
