@@ -28,7 +28,7 @@ const party = {
   signedDate: "16 November 2026",
 };
 
-const text = (kind: "mentorship" | "package") =>
+const text = (kind: "mentorship" | "package" | "accountancy") =>
   MENTOR_AGREEMENTS[kind]
     .buildClauses(party)
     .flatMap((c) => [c.title, ...c.blocks.map((b) => b.text)])
@@ -84,7 +84,7 @@ test("the Commitment never reads as an income guarantee or a refund", () => {
 });
 
 test("every key term points at a clause that exists", () => {
-  for (const kind of ["mentorship", "package"] as const) {
+  for (const kind of ["mentorship", "package", "accountancy"] as const) {
     const numbers = new Set(MENTOR_AGREEMENTS[kind].buildClauses(party).map((c) => c.number));
     for (const k of MENTOR_AGREEMENTS[kind].keyTerms) {
       for (const n of k.clause.match(/\d+/g) ?? []) {
@@ -101,4 +101,23 @@ test("the signing page sends which agreement it is, and the route reads it", () 
   assert.match(readFileSync("app/mentor-partnership/sign/page.tsx", "utf8"), /kind="mentorship"/);
   const route = readFileSync("app/api/mentor-partnership/sign/route.ts", "utf8");
   assert.match(route, /parseMentorAgreementKind\(body\.agreement\)/);
+});
+
+// The Fitness Accountant (Jay Johnston), 20 Nov 2026: same commercial terms as
+// the package agreement, but no earn-back Commitment (his page makes none),
+// and the accountancy is his own regulated service.
+test("the accountancy agreement: same money terms, no Commitment, his own service", () => {
+  assert.equal(parseMentorAgreementKind("accountancy"), "accountancy");
+  const t = text("accountancy");
+  assert.match(t, /at £999\.99 paid in full\. No monthly or instalment plan/);
+  assert.match(t, /£500 for each learner who buys the Package/);
+  assert.match(t, /released when the learner’s 14-day cooling-off period ends/);
+  assert.match(t, /within 7 days of release/);
+  assert.match(t, /first Self Assessment tax return/);
+  assert.match(t, /anti-money-laundering/);
+  assert.match(t, /does not give tax, accounting or financial advice/);
+  assert.match(t, /tax savings/);
+  assert.doesNotMatch(t, /Commitment|Mentor Partner|Schedule 1/);
+  assert.match(readFileSync("app/mentor-partnership/accountancy/sign/page.tsx", "utf8"), /kind="accountancy"/);
+  assert.match(readFileSync("app/mentor-partnership/accountancy/sign/layout.tsx", "utf8"), /index: false/);
 });
