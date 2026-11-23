@@ -121,3 +121,13 @@ test("the accountancy agreement: same money terms, no Commitment, his own servic
   assert.match(readFileSync("app/mentor-partnership/accountancy/sign/page.tsx", "utf8"), /kind="accountancy"/);
   assert.match(readFileSync("app/mentor-partnership/accountancy/sign/layout.tsx", "utf8"), /index: false/);
 });
+
+// Jay, 23 Nov 2026: he runs a webinar for Uni Learning's learners. Allowed,
+// as long as he doesn't promote, recommend, sell or bundle their courses.
+test("accountancy v1.1: educating another provider's learners is allowed, promoting them isn't", () => {
+  assert.equal(MENTOR_AGREEMENTS.accountancy.version, "1.1");
+  const t = text("accountancy");
+  assert.match(t, /shall not, directly or indirectly, promote, or enter into any partnership/);
+  assert.match(t, /education, such as webinars, to learners of another course provider, provided the Partner does not promote, recommend or sell that provider’s courses/);
+  assert.match(t, /any similar bundle with them/);
+});
