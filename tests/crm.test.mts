@@ -921,13 +921,14 @@ test("call request outcome: only the four outcomes, only for a real id", () => {
   for (const o of CALL_OUTCOMES) assert.ok(CALL_OUTCOME_LABEL[o]);
 });
 
-test("call request close: mode goes back only if still reply_only; declined closes; booked leaves it", () => {
+test("call request close: only reply_only / human (what the request caused) are restored", () => {
   assert.equal(modeAfterCallClose("reply_only", "auto", "no_answer"), "auto");
-  assert.equal(modeAfterCallClose("reply_only", "auto", "another_time"), "auto");
   assert.equal(modeAfterCallClose("reply_only", null, "no_answer"), "auto");
-  assert.equal(modeAfterCallClose("reply_only", "auto", "declined"), "closed");
-  assert.equal(modeAfterCallClose("reply_only", "auto", "booked"), null);
-  assert.equal(modeAfterCallClose("human", "auto", "no_answer"), null);
+  assert.equal(modeAfterCallClose("human", "auto", "another_time"), "auto");
+  assert.equal(modeAfterCallClose("human", "auto", "declined"), "closed");
+  assert.equal(modeAfterCallClose("reply_only", "auto", "booked"), "auto");
+  assert.equal(modeAfterCallClose("human", "auto", "booked"), null);
+  for (const cur of ["closed", "paused", "booked", "auto"]) assert.equal(modeAfterCallClose(cur, "auto", "no_answer"), null, cur);
 });
 
 test("call request overdue: yours, past reply-by, not yet messaged", () => {

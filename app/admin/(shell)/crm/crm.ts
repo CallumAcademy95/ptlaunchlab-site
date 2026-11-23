@@ -1242,10 +1242,10 @@ export const CALL_OUTCOME_LABEL: Record<CallOutcome, string> = {
   no_answer: "Couldn't reach them",
 };
 export const CALL_OUTCOME_HINT: Record<CallOutcome, string> = {
-  booked: "You've agreed a time with them (book it in Calls if it isn't there). The mode is left as it is.",
+  booked: "You've agreed a time with them (book it in Calls if it isn't there). If you've taken over it stays with you.",
   declined: "They don't want a call or the course. The conversation is closed (not do-not-contact).",
-  another_time: "Not now, maybe later. The setter goes back to how it was, so normal follow-ups resume.",
-  no_answer: "You tried and couldn't get hold of them. The setter goes back to how it was.",
+  another_time: "Not now, maybe later. The setter goes back to how it was before the request, so normal follow-ups resume.",
+  no_answer: "You tried and couldn't get hold of them. The setter goes back to how it was before the request.",
 };
 
 export function validateCallOutcome(input: { id: unknown; outcome: unknown }): { ok: true; id: string; outcome: CallOutcome } | { ok: false; error: string } {
@@ -1254,12 +1254,18 @@ export function validateCallOutcome(input: { id: unknown; outcome: unknown }): {
   return { ok: true, id: input.id as string, outcome: input.outcome as CallOutcome };
 }
 
-/** Mode to put back when a call request closes: only if it is still reply_only (a mode you chose since wins). */
+/**
+ * Mode to put back when a call request closes. Only a mode the request itself
+ * caused is touched: reply_only (booking mode) or human (the hand-over to you,
+ * or your own message taking it over). Closed, paused, booked and do-not-contact
+ * are never overwritten. Mirrors pt-app call-handover.ts modeAfterClose.
+ */
 export function modeAfterCallClose(current: string | null | undefined, prev: string | null | undefined, outcome: CallOutcome): string | null {
-  if (current !== "reply_only") return null;
+  if (current !== "reply_only" && current !== "human") return null;
+  const before = prev === "reply_only" ? "reply_only" : "auto";
   if (outcome === "declined") return "closed";
-  if (outcome === "booked") return null;
-  return prev === "auto" || prev === "reply_only" ? prev : "auto";
+  if (outcome === "booked") return current === "reply_only" ? before : null;
+  return before;
 }
 
 export interface CallRequest {

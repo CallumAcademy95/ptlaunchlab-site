@@ -246,13 +246,16 @@ export async function closeCallRequest(input: { id: unknown; outcome: unknown })
     if (!data || data.length === 0) return { ok: false, conflict: true, error: "Already closed, refresh." };
 
     const cur = await db.from("consultations").select("setter_status").eq("id", v.id).maybeSingle();
-    const next = modeAfterCallClose(cur.data?.setter_status as string | null, data[0].prev_status as string | null, v.outcome);
     let warning: string | undefined;
-    if (next) {
-      const { error: mErr } = await db.from("consultations")
+    const current = cur.data?.setter_status as string | null | undefined;
+    const next = cur.error ? null : modeAfterCallClose(current, data[0].prev_status as string | null, v.outcome);
+    if (cur.error) warning = `Saved, but the setter's mode couldn't be read, so it wasn't changed (${cur.error.message}).`;
+    if (next && current) {
+      const { data: moved, error: mErr } = await db.from("consultations")
         .update({ setter_status: next, mode_changed_at: new Date().toISOString(), mode_changed_by: ACTOR })
-        .eq("id", v.id).eq("setter_status", "reply_only");
+        .eq("id", v.id).eq("setter_status", current).select("id");
       if (mErr) warning = `Saved, but the setter's mode wasn't changed (${mErr.message}).`;
+      else if (!moved?.length) warning = "Saved, but the setter's mode changed elsewhere meanwhile, so it was left as it is.";
     }
     const logWarning = await logActivity({ consultation_id: v.id, action: "call_request_closed", detail: { outcome: v.outcome, mode_to: next } });
     done(v.id);
