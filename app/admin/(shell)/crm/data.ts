@@ -2,7 +2,7 @@ import "server-only";
 import { getSupabaseAdmin } from "@/app/lib/supabase-admin";
 import { parseMedia, signablePaths, LEAD_MEDIA_BUCKET } from "@/app/lib/message-media";
 import type { CallType } from "@/app/lib/booking/callTypes";
-import { normalisePerson, isUuid, incompleteNote, type CrmPerson, type ReplyIdentity } from "./crm";
+import { normalisePerson, isUuid, incompleteNote, type CrmPerson, type ReplyIdentity, type CallRequest } from "./crm";
 
 // Reads for the CRM. Service role, server only.
 //
@@ -327,6 +327,28 @@ export async function upcomingCallsByConsultation(): Promise<Map<string, { start
     for (const r of (data ?? []) as { consultation_id: string; start_at: string; call_type: CallType }[]) {
       if (!out.has(r.consultation_id)) out.set(r.consultation_id, { start_at: r.start_at, call_type: r.call_type });
     }
+  } catch {
+    /* degrade to empty */
+  }
+  return out;
+}
+
+/**
+ * Open call requests (Leads Central call_handovers), keyed by consultation id.
+ * Degrades to an empty Map before the table exists or if it can't be read.
+ */
+export async function openCallRequests(): Promise<Map<string, CallRequest>> {
+  const out = new Map<string, CallRequest>();
+  try {
+    const { client } = db();
+    if (!client) return out;
+    const { data, error } = await client
+      .from("call_handovers")
+      .select("consultation_id, state, trigger, lead_words, needs_callum_reason, due_at, opened_at, first_action_at")
+      .neq("state", "closed")
+      .limit(500);
+    if (error) return out;
+    for (const r of (data ?? []) as CallRequest[]) out.set(r.consultation_id, r);
   } catch {
     /* degrade to empty */
   }

@@ -7,7 +7,8 @@ import { parseMedia, mediaViews } from "@/app/lib/message-media";
 import { Card, SectionTitle, Badge, EmptyState, Notice, DefRow, type BadgeTone } from "../ui/praxel";
 import { CALL_TYPES } from "@/app/lib/booking/callTypes";
 import { longLabel } from "@/app/lib/booking/london";
-import { loadPersonDetail, upcomingCallsByConsultation, type Activity } from "./data";
+import { loadPersonDetail, upcomingCallsByConsultation, openCallRequests, type Activity } from "./data";
+import { CallRequestOutcome } from "./CallRequestCard";
 import {
   AUTHOR_LABEL,
   BAND_LABEL,
@@ -34,6 +35,7 @@ import {
   type Author,
   type CrmMode,
   type CrmPerson,
+  callRequestOverdue,
 } from "./crm";
 import { ModeControls, ModeChip } from "./ModeControls";
 import { QualifiedToggle } from "./ClientBits";
@@ -128,8 +130,9 @@ const ACTION_BTN =
   "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold shadow-sm sm:flex-none md:min-h-9";
 
 export async function PersonPanel({ id }: { id: string }) {
-  const [detail, upcoming] = await Promise.all([loadPersonDetail(id), upcomingCallsByConsultation()]);
+  const [detail, upcoming, callRequests] = await Promise.all([loadPersonDetail(id), upcomingCallsByConsultation(), openCallRequests()]);
   const call = upcoming.get(id);
+  const callRequest = callRequests.get(id) ?? null;
 
   if (!detail) {
     return <EmptyState title="Nobody with that id" hint="They may have been removed, or the link is wrong." />;
@@ -159,8 +162,31 @@ export async function PersonPanel({ id }: { id: string }) {
   const mode: CrmMode | null = modeOf(p.setter_status);
   const intentLabel = (i: string | null) => (i ? ((INTENT_LABEL as Record<string, string>)[i] ?? i) : "—");
 
+  const requestOverdue = callRequest ? callRequestOverdue(callRequest, now) : false;
+
   return (
     <div className="space-y-4">
+      {callRequest && (
+        <div className={`space-y-3 rounded-2xl border p-4 text-sm shadow-sm ${requestOverdue ? "border-rose-300 bg-rose-50/70 text-rose-950" : callRequest.state === "needs_callum" ? "border-amber-300 bg-amber-50/70 text-amber-950" : "border-violet-200 bg-violet-50/60 text-violet-950"}`}>
+          <div>
+            <p className="font-semibold">
+              {callRequest.state === "needs_callum"
+                ? `${requestOverdue ? "Overdue: " : ""}Call request, waiting for you`
+                : "Asked for a call: the setter is booking it"}
+            </p>
+            {callRequest.state === "needs_callum" && (
+              <p className="mt-0.5">
+                {callRequest.needs_callum_reason ?? "Wants a call"}
+                {callRequest.due_at && <> · reply by {stamp(callRequest.due_at)}</>}
+                {callRequest.first_action_at && <> · you messaged them {stamp(callRequest.first_action_at)}</>}
+              </p>
+            )}
+            {callRequest.lead_words && <p className="mt-1 italic [overflow-wrap:anywhere]">&ldquo;{callRequest.lead_words.slice(0, 280)}&rdquo;</p>}
+            <p className="mt-1 text-xs opacity-80">Since {stamp(callRequest.opened_at)}{callRequest.trigger === "accepted_invite" ? " · said yes to a call" : ""}</p>
+          </div>
+          <CallRequestOutcome id={id} />
+        </div>
+      )}
       {call && (
         <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-4 text-sm text-blue-900 shadow-sm">
           <p className="font-semibold">Call booked: {CALL_TYPES[call.call_type].title}</p>
