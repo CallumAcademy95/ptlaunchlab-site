@@ -5,8 +5,8 @@
  * (/fitness-accountant-academy), PAY IN FULL ONLY (£999.99; see
  * PAY_IN_FULL_ONLY_PARTNERS in app/lib/pricing.ts).
  *
- * NOT RUN YET (17 Nov 2026). Until this row exists, a sale through his page
- * carries gym_slug "the-fitness-accountant" in Stripe but reaches no partner.
+ * Row created 18 Nov 2026. SIGNED 23 Nov 2026: Accountancy Package Partner
+ * Agreement v1.1, ref PTM-3088890, trading as JJACCOUNTANCY.
  *
  *   npx tsx scripts/onboard-fitness-accountant.mts            # dry run, shows the plan
  *   npx tsx scripts/onboard-fitness-accountant.mts --apply    # write it
@@ -40,10 +40,10 @@ const TERMS = "payment_5";
 const PAYOUT_TERMS_DAYS = 14;
 
 // ── Fill these in when the agreement is signed ──────────────────────────────
-const AGREEMENT_SIGNED_AT: string | null = null;
-const AGREEMENT_VERSION: string | null = null;
-const CONTACT_NAME: string | null = null;
-const CONTACT_EMAIL: string | null = null;
+const AGREEMENT_SIGNED_AT: string | null = "2026-11-23T12:00:00Z"; // ref PTM-3088890
+const AGREEMENT_VERSION: string | null = "1.1"; // Accountancy Package Partner Agreement
+const CONTACT_NAME: string | null = "Jay Johnston";
+const CONTACT_EMAIL: string | null = "jjprofessionalservices.info@gmail.com"; // notices, Clause 14.1
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PARTNER: Record<string, unknown> = {
