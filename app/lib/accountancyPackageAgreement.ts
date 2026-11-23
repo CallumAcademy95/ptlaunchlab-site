@@ -21,13 +21,16 @@
  * text changes.
  *
  *   v1.0 2026-11-20  first version, written for The Fitness Accountant.
+ *   v1.1 2026-11-23  Clause 7.2: the Partner may educate another provider's
+ *                    existing learners (Jay's Uni Learning webinar), but not
+ *                    promote, recommend or sell their courses or bundle with them.
  */
 
 import type { Block, Clause } from "./partnershipAgreement";
 import type { MentorAgreementParties } from "./mentorPartnerAgreement.ts";
 import { PACKAGE_COMMISSION_LABEL, PACKAGE_PRICE_LABEL } from "./mentorPackageAgreement.ts";
 
-export const ACCOUNTANCY_PACKAGE_AGREEMENT_VERSION = "1.0";
+export const ACCOUNTANCY_PACKAGE_AGREEMENT_VERSION = "1.1";
 
 export const ACCOUNTANCY_PACKAGE_AGREEMENT_SUMMARY =
   "package sold pay in full only at £999.99 · £500 per learner, released when the 14-day cooling-off ends, paid within 7 days · the accountancy is the partner's own regulated service, no earnings or tax-saving promises · exclusive among PT course providers · contact data as processor";
@@ -55,7 +58,7 @@ export const ACCOUNTANCY_PACKAGE_KEY_TERMS_FOR_ACKNOWLEDGEMENT = [
   {
     clause: "Clauses 5 & 7",
     title: "Marketing and exclusivity",
-    detail: "No promises of earnings, clients, jobs or tax savings, and never advertise payment plans, finance or 'pay later'. While this agreement runs, you don't promote or partner with any other PT course provider. Your accountancy practice is unaffected.",
+    detail: "No promises of earnings, clients, jobs or tax savings, and never advertise payment plans, finance or 'pay later'. While this agreement runs, you don't promote or partner with any other PT course provider. Your accountancy practice, and educating other providers' existing learners (e.g. a webinar), are unaffected as long as you don't promote or bundle with their courses.",
   },
   {
     clause: "Clause 8",
@@ -209,7 +212,8 @@ export function buildAccountancyPackageAgreementClauses(party: MentorAgreementPa
         ),
         p("7.2  Nothing in Clause 7.1 restricts the Partner from:"),
         b("running its own accountancy practice, and acting for any client, including personal trainers who come to it directly and not through another course or qualification provider;"),
-        b("creating and publishing its own content, podcasts or educational material under its own name."),
+        b("creating and publishing its own content, podcasts or educational material under its own name;"),
+        b("delivering business, tax or financial education, such as webinars, to learners of another course provider, provided the Partner does not promote, recommend or sell that provider’s courses or qualifications, or offer the Business Launch Package or any similar bundle with them."),
         p(
           "7.3  This Agreement does not restrict PT Launch Lab from working with other partners. The restriction in Clause 7.1 lasts only for the term of this Agreement and goes no further than is reasonable to protect PT Launch Lab’s business."
         ),
