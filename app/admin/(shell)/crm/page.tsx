@@ -19,7 +19,8 @@ import {
   type BadgeTone,
 } from "../ui/praxel";
 import { slotLabel } from "@/app/lib/booking/london";
-import { loadPeople, loadSavedViews, upcomingCallsByConsultation } from "./data";
+import { loadPeople, loadSavedViews, upcomingCallsByConsultation, openCallRequests } from "./data";
+import { callRequestOverdue } from "./crm";
 import {
   parseCrmQuery,
   serialiseCrmQuery,
@@ -172,7 +173,12 @@ export default async function CrmPage({
   const openId = isUuid(openRaw) ? openRaw : null;
   const canonical = serialiseCrmQuery(query);
 
-  const [{ people, problem, fallback, incomplete }, saved, calls] = await Promise.all([loadPeople(), loadSavedViews(ACTOR), upcomingCallsByConsultation()]);
+  const [{ people, problem, fallback, incomplete }, saved, calls, callRequests] = await Promise.all([loadPeople(), loadSavedViews(ACTOR), upcomingCallsByConsultation(), openCallRequests()]);
+  const waitingCalls = [...callRequests.values()]
+    .filter((r) => r.state === "needs_callum")
+    .sort((a, b) => (a.due_at ?? "").localeCompare(b.due_at ?? ""));
+  const nameOf = (cid: string) => people.find((x) => x.id === cid)?.name ?? "A lead";
+  const settingUp = [...callRequests.values()].filter((r) => r.state === "booking").length;
   const now = requestTime();
   const rows = filterPeople(people, query, now);
   const tiles = tileCounts(people, now);
@@ -217,6 +223,28 @@ export default async function CrmPage({
         <Notice tone="amber" title="List may be incomplete">
           {incomplete}
         </Notice>
+      )}
+
+      {(waitingCalls.length > 0 || settingUp > 0) && (
+        <Card className="space-y-2 border-amber-200 bg-amber-50/60 p-4">
+          <p className="text-sm font-semibold text-amber-950">
+            Call requests waiting for you: {waitingCalls.length}
+            <span className="ml-2 font-normal text-amber-900">· the setter is booking {settingUp} more</span>
+          </p>
+          {waitingCalls.length > 0 && (
+            <ul className="space-y-1 text-sm">
+              {waitingCalls.map((r) => (
+                <li key={r.consultation_id}>
+                  <Link href={crmHref(query, { open: r.consultation_id })} className="font-medium text-amber-950 underline-offset-2 hover:underline">
+                    {callRequestOverdue(r, requestTime()) ? "OVERDUE · " : ""}
+                    {nameOf(r.consultation_id)}
+                  </Link>
+                  <span className="text-amber-900"> · {r.needs_callum_reason ?? "wants a call"}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
       )}
 
       {/* Headline tiles: each one is a filter. */}

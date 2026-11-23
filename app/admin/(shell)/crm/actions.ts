@@ -15,6 +15,8 @@ import {
   interpretSendResponse,
   interpretSendError,
   type SendResult,
+  validateCallOutcome,
+  modeAfterCallClose,
 } from "./crm";
 
 // The CRM's writes.
@@ -219,5 +221,43 @@ export async function deleteView(input: { id: unknown }): Promise<ActionResult> 
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Could not delete the view." };
+  }
+}
+
+/**
+ * Record what happened to a call request and close it (Leads Central
+ * call_handovers). Only an open one is closed, so a double tap or a stale panel
+ * does nothing twice. The setter's mode is put back only if it is still the
+ * reply_only that booking mode set; a mode you chose since is left alone.
+ */
+export async function closeCallRequest(input: { id: unknown; outcome: unknown }): Promise<ActionResult> {
+  if (!(await isAdmin())) return DENIED;
+  const v = validateCallOutcome(input);
+  if (!v.ok) return v;
+  try {
+    const db = getSupabaseAdmin();
+    const { data, error } = await db
+      .from("call_handovers")
+      .update({ state: "closed", outcome: v.outcome, outcome_at: new Date().toISOString(), outcome_by: ACTOR })
+      .eq("consultation_id", v.id)
+      .neq("state", "closed")
+      .select("prev_status");
+    if (error) return { ok: false, error: `The database refused it: ${error.message}` };
+    if (!data || data.length === 0) return { ok: false, conflict: true, error: "Already closed, refresh." };
+
+    const cur = await db.from("consultations").select("setter_status").eq("id", v.id).maybeSingle();
+    const next = modeAfterCallClose(cur.data?.setter_status as string | null, data[0].prev_status as string | null, v.outcome);
+    let warning: string | undefined;
+    if (next) {
+      const { error: mErr } = await db.from("consultations")
+        .update({ setter_status: next, mode_changed_at: new Date().toISOString(), mode_changed_by: ACTOR })
+        .eq("id", v.id).eq("setter_status", "reply_only");
+      if (mErr) warning = `Saved, but the setter's mode wasn't changed (${mErr.message}).`;
+    }
+    const logWarning = await logActivity({ consultation_id: v.id, action: "call_request_closed", detail: { outcome: v.outcome, mode_to: next } });
+    done(v.id);
+    return { ok: true, warning: warning ?? logWarning };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Could not save." };
   }
 }

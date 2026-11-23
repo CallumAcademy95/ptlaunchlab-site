@@ -909,3 +909,32 @@ test("error mapping: only a connection that never opened is 'nothing was sent'; 
   assert.deepEqual(interpretSendError(new TypeError("fetch failed")), unconfirmed);
   assert.deepEqual(interpretSendError("weird"), unconfirmed);
 });
+
+// ── Call requests ────────────────────────────────────────────────────────────
+import { validateCallOutcome, modeAfterCallClose, callRequestOverdue, CALL_OUTCOMES, CALL_OUTCOME_LABEL } from "../app/admin/(shell)/crm/crm.ts";
+
+test("call request outcome: only the four outcomes, only for a real id", () => {
+  const id = "3f2b6c1e-1a2b-4c3d-8e9f-0a1b2c3d4e5f";
+  assert.deepEqual(validateCallOutcome({ id, outcome: "booked" }), { ok: true, id, outcome: "booked" });
+  assert.equal(validateCallOutcome({ id, outcome: "closed" }).ok, false);
+  assert.equal(validateCallOutcome({ id: "nope", outcome: "booked" }).ok, false);
+  for (const o of CALL_OUTCOMES) assert.ok(CALL_OUTCOME_LABEL[o]);
+});
+
+test("call request close: mode goes back only if still reply_only; declined closes; booked leaves it", () => {
+  assert.equal(modeAfterCallClose("reply_only", "auto", "no_answer"), "auto");
+  assert.equal(modeAfterCallClose("reply_only", "auto", "another_time"), "auto");
+  assert.equal(modeAfterCallClose("reply_only", null, "no_answer"), "auto");
+  assert.equal(modeAfterCallClose("reply_only", "auto", "declined"), "closed");
+  assert.equal(modeAfterCallClose("reply_only", "auto", "booked"), null);
+  assert.equal(modeAfterCallClose("human", "auto", "no_answer"), null);
+});
+
+test("call request overdue: yours, past reply-by, not yet messaged", () => {
+  const now = Date.parse("2026-11-24T13:00:00Z");
+  const base = { state: "needs_callum" as const, due_at: "2026-11-24T12:00:00Z", first_action_at: null };
+  assert.equal(callRequestOverdue(base, now), true);
+  assert.equal(callRequestOverdue({ ...base, first_action_at: "2026-11-24T11:00:00Z" }, now), false);
+  assert.equal(callRequestOverdue({ ...base, state: "booking" as const }, now), false);
+  assert.equal(callRequestOverdue({ ...base, due_at: "2026-11-24T17:00:00Z" }, now), false);
+});

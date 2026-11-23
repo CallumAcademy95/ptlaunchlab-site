@@ -1227,3 +1227,53 @@ export function whatsappLastMessageAt(
     ? { at: new Date(Math.max(...earlier)).toISOString(), exact: true }
     : { at: new Date(row).toISOString(), exact: false };
 }
+
+// ── Call requests (Leads Central call_handovers) ────────────────────────────
+// A lead who asked for a call. "booking": the setter is booking it. "needs_callum":
+// it's yours, with a reply-by time. Closing one records what happened; the rules
+// mirror pt-app lib/setter/call-handover.ts (modeAfterClose) and must stay in step.
+
+export const CALL_OUTCOMES = ["booked", "declined", "another_time", "no_answer"] as const;
+export type CallOutcome = (typeof CALL_OUTCOMES)[number];
+export const CALL_OUTCOME_LABEL: Record<CallOutcome, string> = {
+  booked: "Call arranged",
+  declined: "Not interested",
+  another_time: "Wants another time",
+  no_answer: "Couldn't reach them",
+};
+export const CALL_OUTCOME_HINT: Record<CallOutcome, string> = {
+  booked: "You've agreed a time with them (book it in Calls if it isn't there). The mode is left as it is.",
+  declined: "They don't want a call or the course. The conversation is closed (not do-not-contact).",
+  another_time: "Not now, maybe later. The setter goes back to how it was, so normal follow-ups resume.",
+  no_answer: "You tried and couldn't get hold of them. The setter goes back to how it was.",
+};
+
+export function validateCallOutcome(input: { id: unknown; outcome: unknown }): { ok: true; id: string; outcome: CallOutcome } | { ok: false; error: string } {
+  if (!isUuid(input.id)) return { ok: false, error: "Unknown person." };
+  if (typeof input.outcome !== "string" || !(CALL_OUTCOMES as readonly string[]).includes(input.outcome)) return { ok: false, error: "Pick what happened." };
+  return { ok: true, id: input.id as string, outcome: input.outcome as CallOutcome };
+}
+
+/** Mode to put back when a call request closes: only if it is still reply_only (a mode you chose since wins). */
+export function modeAfterCallClose(current: string | null | undefined, prev: string | null | undefined, outcome: CallOutcome): string | null {
+  if (current !== "reply_only") return null;
+  if (outcome === "declined") return "closed";
+  if (outcome === "booked") return null;
+  return prev === "auto" || prev === "reply_only" ? prev : "auto";
+}
+
+export interface CallRequest {
+  consultation_id: string;
+  state: "booking" | "needs_callum";
+  trigger: string;
+  lead_words: string | null;
+  needs_callum_reason: string | null;
+  due_at: string | null;
+  opened_at: string;
+  first_action_at: string | null;
+}
+
+/** Overdue: yours, past its reply-by time, and you haven't messaged them. */
+export function callRequestOverdue(r: Pick<CallRequest, "state" | "due_at" | "first_action_at">, nowMs: number): boolean {
+  return r.state === "needs_callum" && !r.first_action_at && !!r.due_at && Date.parse(r.due_at) < nowMs;
+}
