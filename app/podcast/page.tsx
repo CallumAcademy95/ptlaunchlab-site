@@ -36,6 +36,15 @@ export const metadata = {
 
 const episodes: Episode[] = [
   {
+    id: "rvJz8mCylFQ",
+    slug: "from-architect-to-online-personal-trainer-quitting-a-career-to-coach",
+    ep: 42,
+    title: "From Architect to Online Personal Trainer: Quitting a Career to Coach",
+    desc: "Josh Lancaster had a first-class degree in architecture, was chartered and doing well in the field, and was massively unfulfilled. He flew home from Thailand the day before the UK went into lockdown, signed his best friend as his first client, and built a coaching business on the side of his architecture job. He sits down with Callum to talk about going from a bullied, unconfident teenager to a coach people trust: doing the reps on camera every morning, giving up years of blackout Saturdays, and settling in Dubai. They get into why it's cool to care, why people buy into people and not bicep curl tutorials, why results start with the inner self, why two sessions a week forever beats a 12-week plan, and the one question Josh asks before investing in any mentor: would I want their life?",
+    date: "2026-11",
+    category: "transformation",
+  },
+  {
     id: "evqyB-dGQ5s",
     slug: "personal-trainer-red-flags-what-bad-trainers-get-wrong",
     ep: 38,
