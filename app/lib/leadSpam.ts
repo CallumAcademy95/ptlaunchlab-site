@@ -6,8 +6,9 @@
 //   prospectus, gym_callback      → validateProspectus: same
 //   quiz                          → validateQuiz: same
 //   live                          → validateLiveRegister: same
-//   gym_partnership               → validateGymPartnership: honeypot only (validateGymPartnershipSec),
-//                                   validateName, validateBusinessName(gymName), validateEmail allowRole
+//   gym_partnership               → full `_sec` check (25 Nov 2026: bots got through the honeypot-only
+//                                   check), validateName, validateBusinessName(gymName), validateEmail
+//                                   allowRole, and looksRandom on gymName / location / referredBy
 //   call, salary, whatsapp, …     → none (PhoneCallbackForm and /api/salary-calculator had no gates)
 // Phone format is NOT a spam signal here: validateLead already requires a valid phone.
 //
@@ -23,8 +24,6 @@ type Check = { ok: boolean; reason?: string };
 export type SpamValidators = {
   /** honeypot.ts checkHoneypot — `_sec` hp + time-trap + nonce. */
   checkHoneypot(sec: unknown): Check;
-  /** validate.ts validateGymPartnershipSec — honeypot only. */
-  gymPartnershipSec(raw: unknown): Check;
   /** name.ts validateName. */
   validateName(input: unknown): Check;
   /** name.ts validateBusinessName. */
@@ -35,6 +34,18 @@ export type SpamValidators = {
 
 /** Intents whose legacy route ran the full sec + name + email gates. */
 export const FULL_GATE_INTENTS: ReadonlySet<string> = new Set(["contact", "prospectus", "gym_callback", "quiz", "live"]);
+
+/**
+ * True for a bot-generated filler token such as "xImCAnWnzDyqEADMmrcBU": one word of 12+
+ * letters with 3+ lower-to-upper case flips inside it. Real names have spaces or at most
+ * one or two internal capitals ("McDonald", "PureGym", "Meridian FItness").
+ */
+export function looksRandom(input: unknown): boolean {
+  if (typeof input !== "string") return false;
+  const s = input.trim();
+  if (s.length < 12 || /\s/.test(s) || !/^[A-Za-z]+$/.test(s)) return false;
+  return (s.match(/[a-z](?=[A-Z])/g) ?? []).length >= 3;
+}
 
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
 
@@ -53,8 +64,11 @@ export function spamReasonFor(raw: unknown, v: SpamValidators): string | null {
   }
 
   if (intent === "gym_partnership") {
-    const sec = v.gymPartnershipSec(raw);
+    // PartnershipForm sends `_sec` (hp + time-trap + nonce), so the full check applies.
+    const sec = v.checkHoneypot(r._sec);
     if (!sec.ok) return `sec:${sec.reason ?? "fail"}`;
+    const ex = obj(r.extra);
+    for (const f of ["gymName", "location", "referredBy"]) if (looksRandom(ex[f])) return `random:${f}`;
     const name = v.validateName(r.name);
     if (!name.ok) return `name:${name.reason ?? "fail"}`;
     const gym = v.validateBusinessName(obj(r.extra).gymName, { min: 2, max: 200 });

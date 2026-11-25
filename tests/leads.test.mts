@@ -226,7 +226,7 @@ test("a spam lead never pushes or reaches setter, zapier or capi", async () => {
 
 // ---- final review fixes ----
 import { capJson, JSON_FIELD_MAX, pushTone, pushStatus } from "../app/lib/leads.ts";
-import { spamReasonFor, type SpamValidators } from "../app/lib/leadSpam.ts";
+import { spamReasonFor, looksRandom, type SpamValidators } from "../app/lib/leadSpam.ts";
 import { checkHoneypot } from "../app/lib/security/honeypot.ts";
 import { validateName, validateBusinessName } from "../app/lib/security/name.ts";
 
@@ -242,10 +242,6 @@ const fakeEmail: SpamValidators["validateEmail"] = (e, opts = {}) => {
 };
 const V: SpamValidators = {
   checkHoneypot: (s) => checkHoneypot(s),
-  gymPartnershipSec: (raw) => {
-    const hp = (raw as { _sec?: { hp?: unknown } })?._sec?.hp;
-    return typeof hp === "string" && hp ? { ok: false, reason: "honeypot" } : { ok: true };
-  },
   validateName: (n) => validateName(n),
   validateBusinessName,
   validateEmail: fakeEmail,
@@ -273,12 +269,25 @@ test("spam gates: each intent runs exactly its legacy checks", () => {
   }
 });
 
-test("spam gates: gym_partnership is honeypot-only and allows role emails, like /api/gym-partnership", () => {
-  const p = { ...GOOD, intent: "gym_partnership", email: "info@ironwolf.co.uk", extra: { gymName: "F45" } };
-  assert.equal(spamReasonFor(p, V), null, "no _sec, fast or no-js is fine; info@ is fine; F45 is a real gym");
-  assert.equal(spamReasonFor({ ...p, _sec: { hp: "x" } }, V), "sec:honeypot");
+test("spam gates: gym_partnership runs the full _sec check, catches random filler, allows role emails", () => {
+  const p = { ...GOOD, intent: "gym_partnership", email: "info@ironwolf.co.uk", _sec: SEC,
+    extra: { gymName: "F45", location: "Dundee", referredBy: "" } };
+  assert.equal(spamReasonFor(p, V), null, "info@ is fine; F45 is a real gym");
+  assert.equal(spamReasonFor({ ...p, _sec: undefined }, V), "sec:missing");
+  assert.equal(spamReasonFor({ ...p, _sec: { ...SEC, n: "" } }, V), "sec:no-js");
+  assert.equal(spamReasonFor({ ...p, _sec: { ...SEC, t: 200 } }, V), "sec:too-fast");
+  assert.equal(spamReasonFor({ ...p, _sec: { ...SEC, hp: "x" } }, V), "sec:honeypot");
+  // The 25 Nov 2026 bot leads, verbatim filler.
+  assert.equal(spamReasonFor({ ...p, name: "Plgsbohtr", extra: { gymName: "xImCAnWnzDyqEADMmrcBU", location: "nuIZlXXqnieQETPxGlp", referredBy: "nTrKskUENGgorlXAqFbDu" } }, V), "random:gymName");
+  assert.equal(spamReasonFor({ ...p, name: "Aemqqkvfv", extra: { gymName: "OZjRwQeFIHNPuxHG", location: "snCvBMPFhPiaFwevpvzZwOaa" } }, V), "random:gymName");
+  assert.equal(spamReasonFor({ ...p, extra: { gymName: "F45", location: "snCvBMPFhPiaFwevpvzZwOaa" } }, V), "random:location");
   assert.equal(spamReasonFor({ ...p, extra: { gymName: "www.spam.com" } }, V), "gym:url");
   assert.equal(spamReasonFor({ ...p, email: "a@mailinator.com" }, V), "email:disposable");
+});
+
+test("looksRandom: bot filler yes, real gym names and places no", () => {
+  for (const s of ["xImCAnWnzDyqEADMmrcBU", "OZjRwQeFIHNPuxHG", "nTrKskUENGgorlXAqFbDu", "UmOYCDUpnuKNnfKE", "heNxRYQkXqRLEfWqUiF"]) assert.ok(looksRandom(s), s);
+  for (const s of ["Meridian FItness", "Skyaxe", "PureGym", "TheGymGroup", "McDonaldsFitness", "Greenwich London", "Ministry of Fitness", "Wolverhampton", "anytimefitness", "", undefined, "F45"]) assert.ok(!looksRandom(s), String(s));
 });
 
 test("a spam-gate hit saves the lead with is_spam and spamReason, sends nothing external, track:false", async () => {
