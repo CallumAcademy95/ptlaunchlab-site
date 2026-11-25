@@ -12,7 +12,6 @@ import { spamReasonFor } from "@/app/lib/leadSpam";
 import { checkHoneypot } from "@/app/lib/security/honeypot";
 import { validateName, validateBusinessName } from "@/app/lib/security/name";
 import { validateEmail } from "@/app/lib/security/email";
-import { validateGymPartnershipSec } from "@/app/lib/security/validate";
 import { createRateLimiter, getIP } from "@/app/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -21,7 +20,6 @@ const limiter = createRateLimiter(10, 60_000);
 
 const SPAM_VALIDATORS = {
   checkHoneypot: (sec: unknown) => checkHoneypot(sec),
-  gymPartnershipSec: validateGymPartnershipSec,
   validateName: (n: unknown) => validateName(n),
   validateBusinessName,
   validateEmail,
