@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { CALL_QUESTION, callSuccessMessage, popupAllowedOnPath } from "@/app/lib/homeCta";
 import { CallModalContext, type CallModalApi } from "./callModalContext";
 import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
+import { CALLER_DISPLAY } from "@/app/lib/contactDetails";
 
 // LeadForm (and submitLead and the form security code behind it) loads only
 // when the pop-up first opens, so it doesn't ship with the page.
@@ -128,7 +129,7 @@ export function CallModalProvider({ children }: { children: ReactNode }) {
               <span aria-hidden="true">&times;</span>
             </button>
             <h2 id={titleId} className="text-white font-black text-xl pr-10">Book a free call</h2>
-            <p className="text-soft text-sm mt-1">Tell us when suits you. We&apos;ll call you today.</p>
+            <p className="text-soft text-sm mt-1">Tell us when suits you. We&apos;ll call you today from {CALLER_DISPLAY}.</p>
             <div className="-mx-6 -mb-6">
               <LeadForm
                 intent="call"

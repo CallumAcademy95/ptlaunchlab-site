@@ -20,7 +20,7 @@ export const SETTER_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["con
 export function setterSourceFor(intent: LeadIntent): string { return intent; }
 
 /** Intents whose setter payload carries the WhatsApp fields (phone, form source, question, consent marker). */
-export const SETTER_WA_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["call", "prospectus", "quiz"]);
+export const SETTER_WA_INTENTS: ReadonlySet<LeadIntent> = new Set<LeadIntent>(["call", "prospectus", "quiz", "contact"]);
 
 export type SetterPayload = {
   name: string; email: string; message?: string; source: string;

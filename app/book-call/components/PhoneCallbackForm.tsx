@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import LeadForm from "@/app/components/LeadForm";
 import { trackEvent } from "@/app/lib/gtag";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
-import { WHATSAPP_DISPLAY } from "@/app/lib/contactDetails";
+import { WHATSAPP_DISPLAY, CALLER_DISPLAY } from "@/app/lib/contactDetails";
 
 export default function PhoneCallbackForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -85,7 +85,7 @@ export default function PhoneCallbackForm() {
             <div>
               <p className="text-white text-sm font-semibold">The call — 15 mins</p>
               <p className="text-soft text-xs leading-relaxed mt-0.5">
-                Real conversation. No pressure. You decide what happens after.
+                Callum rings from {CALLER_DISPLAY}. Real conversation. No pressure. You decide what happens after.
               </p>
             </div>
           </li>

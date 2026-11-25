@@ -41,6 +41,13 @@ export const PHONE_SCHEMA = PHONE_TEL.replace(/^(\+44)(\d{4})(\d{6})$/, "$1 $2 $
 export const WHATSAPP_DISPLAY = "+44 7418 609039";
 export const WHATSAPP_LINK = "https://wa.me/447418609039";
 
+/**
+ * The mobile Callum rings leads from (25 Nov 2026). Unknown numbers go unanswered,
+ * so every "we'll call you" line names it. Not the landline above, not WhatsApp.
+ * The setter's copy lives in pt-launch-lab-pt-app lib/setter/caller.ts.
+ */
+export const CALLER_DISPLAY = "07822 012186";
+
 /** Public contact inbox, repeated in the same templates as the phone. */
 export const CONTACT_EMAIL = "info@ptlaunchlab.co.uk";
 

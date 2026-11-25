@@ -79,7 +79,7 @@ test("honeypot and TEST leads are saved but never pushed", async () => {
   }
 });
 
-test("the setter is called for call, contact, prospectus and quiz; call/prospectus/quiz carry the WhatsApp fields", async () => {
+test("the setter is called for call, contact, prospectus and quiz; all four carry the WhatsApp fields", async () => {
   assert.deepEqual([...SETTER_INTENTS].sort(), ["call", "contact", "prospectus", "quiz"]);
   const seen: unknown[] = [];
   for (const intent of ["call", "contact", "prospectus", "quiz", "gym_callback", "whatsapp"]) {
@@ -90,14 +90,14 @@ test("the setter is called for call, contact, prospectus and quiz; call/prospect
   const wa = { phone: "07700900123", lead_source: "home-hero", question: "hi" };
   assert.deepEqual(seen, [
     { name: "Jane Smith", email: "jane@example.com", source: "call", intent: "call", ...wa },
-    // contact: exactly today's payload.
-    { name: "Jane Smith", email: "jane@example.com", message: "hi", source: "contact" },
+    // contact: today's payload (message, for the email path) plus the WhatsApp fields.
+    { name: "Jane Smith", email: "jane@example.com", message: "hi", source: "contact", intent: "contact", ...wa },
     { name: "Jane Smith", email: "jane@example.com", source: "prospectus", intent: "prospectus", ...wa },
     { name: "Jane Smith", email: "jane@example.com", source: "quiz", intent: "quiz", ...wa },
   ]);
 });
 
-test("setter payload: the form's consent marker is passed for call/prospectus/quiz only, and only when well-formed", async () => {
+test("setter payload: the form's consent marker is passed for call/prospectus/quiz/contact only, and only when well-formed", async () => {
   const run = async (raw: Record<string, unknown>) => {
     const seen: Record<string, unknown>[] = [];
     const { deps } = fakeDeps({ setter: async (l) => { seen.push(l as Record<string, unknown>); } });
@@ -105,12 +105,11 @@ test("setter payload: the form's consent marker is passed for call/prospectus/qu
     await r.after!();
     return seen[0];
   };
-  for (const intent of ["call", "prospectus", "quiz"]) {
+  for (const intent of ["call", "prospectus", "quiz", "contact"]) {
     assert.equal((await run({ intent, extra: { wa_consent_copy: WA_CONSENT_COPY_VERSION } })).wa_consent_copy, "2026-11-20", intent);
     assert.equal("wa_consent_copy" in (await run({ intent })), false, `${intent} without marker`);
     assert.equal("wa_consent_copy" in (await run({ intent, extra: { wa_consent_copy: "yes please" } })), false, `${intent} bad marker`);
   }
-  assert.equal("wa_consent_copy" in (await run({ intent: "contact", extra: { wa_consent_copy: WA_CONSENT_COPY_VERSION } })), false);
   // No question → no question key; /book-call's source arrives as lead_source.
   const bookCall = await run({ intent: "call", source: "book_call_phone" });
   assert.equal(bookCall.lead_source, "book_call_phone");
@@ -124,11 +123,11 @@ test("call keeps its Zapier hook alongside the setter", async () => {
   assert.ok(log.includes("setter") && log.includes("zapier"));
 });
 
-test("consent copy: the home pop-up and the three prospectus forms show the WhatsApp line and send the marker", () => {
+test("consent copy: the home pop-up, the three prospectus forms and /contact show the WhatsApp line and send the marker", () => {
   assert.equal(WA_CONSENT_LINE, "We'll WhatsApp you a quick intro. Reply STOP any time.");
   assert.deepEqual(withWaConsent({ avatar: "a" }), { avatar: "a", wa_consent_copy: WA_CONSENT_COPY_VERSION });
   const src = (p: string) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
-  for (const f of ["app/components/cta/CallModal.tsx", "app/components/HeroLeadForm.tsx", "app/components/ProspectusButton.tsx", "app/funnel/FunnelClient.tsx"]) {
+  for (const f of ["app/components/cta/CallModal.tsx", "app/components/HeroLeadForm.tsx", "app/components/ProspectusButton.tsx", "app/funnel/FunnelClient.tsx", "app/contact/page.tsx"]) {
     const s = src(f);
     assert.match(s, /footnote=\{[^}]*WA_CONSENT_LINE/, `${f} footnote`);
     assert.match(s, /extra=\{withWaConsent\(/, `${f} marker`);
@@ -338,7 +337,7 @@ test("contact always sends the setter a message, even an empty one, as /api/cont
   const { deps } = fakeDeps({ setter: async (l) => { seen.push(l); } });
   const r = await processLead({ ...GOOD, intent: "contact" }, deps);
   await r.after!();
-  assert.deepEqual(seen, [{ name: "Jane Smith", email: "jane@example.com", message: "", source: "contact" }]);
+  assert.deepEqual(seen, [{ name: "Jane Smith", email: "jane@example.com", message: "", source: "contact", intent: "contact", phone: "07700900123", lead_source: "home-hero" }]);
 });
 
 test("gym_partnership: any valid phone (validateAnyPhone) and gymName required", () => {

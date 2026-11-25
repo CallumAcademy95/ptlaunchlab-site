@@ -5,6 +5,7 @@ import { submitLead, type SubmitLeadResult } from "@/app/lib/submitLead";
 import { useFormSecurity } from "@/app/lib/security/client";
 import type { LeadIntent } from "@/app/lib/leads";
 import { LEAD_STAGES } from "@/app/lib/leadStage";
+import { CALLER_DISPLAY } from "@/app/lib/contactDetails";
 
 // The one lead form. Posts to /api/lead via submitLead, which saves first and
 // fires the Meta Pixel Lead only after the lead is saved.
@@ -60,7 +61,7 @@ const BUTTON =
   "w-full py-3.5 rounded-full font-black bg-gold text-deep text-sm uppercase tracking-wide hover:opacity-90 transition-all disabled:opacity-60";
 
 function defaultSuccess(intent: LeadIntent, first: string): string {
-  return intent === "call" ? `Thanks ${first}, we'll call you today.` : `Thanks ${first}, we've got your details.`;
+  return intent === "call" ? `Thanks ${first}, we'll call you today from ${CALLER_DISPLAY}. Save it so you know it's us.` : `Thanks ${first}, we've got your details.`;
 }
 
 export default function LeadForm({

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CallType, Question } from "@/app/lib/booking/callTypes";
 import PhoneCallbackForm from "@/app/book-call/components/PhoneCallbackForm";
+import { CALLER_DISPLAY } from "@/app/lib/contactDetails";
 
 type Slot = { iso: string; label: string };
 type Prefill = { name: string | null; email: string | null; phone: string | null; answers: Record<string, string> } | null;
@@ -67,7 +68,7 @@ export default function BookingFlow({ callType, questions, prefill, token, onBoo
     return (
       <div className="bg-card border border-gold/40 rounded-2xl p-6">
         <h2 className="text-white font-bold text-xl mb-2">Booked</h2>
-        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label} (UK time).</p>
+        <p className="text-soft/80 mb-4">Callum will ring you on {done.phone} at {done.label} (UK time) from <strong className="text-white">{CALLER_DISPLAY}</strong>. Save it so you know it&apos;s us.</p>
         {done.manageUrl && (
           <div className="flex flex-col gap-2 text-sm">
             <a className="text-gold underline" href={`/api/booking/ics?token=${done.manageUrl.split("/").pop()}`}>Add to my calendar</a>
