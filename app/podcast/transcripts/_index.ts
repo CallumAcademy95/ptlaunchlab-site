@@ -13,6 +13,15 @@ export interface EpisodeIndex {
 
 export const episodesIndex: EpisodeIndex[] = [
   {
+    "id": "rvJz8mCylFQ",
+    "slug": "from-architect-to-online-personal-trainer-quitting-a-career-to-coach",
+    "ep": 42,
+    "title": "From Architect to Online Personal Trainer: Quitting a Career to Coach",
+    "date": "2026-11-25",
+    "category": "transformation",
+    "wordCount": 10839
+  },
+  {
     "id": "evqyB-dGQ5s",
     "slug": "personal-trainer-red-flags-what-bad-trainers-get-wrong",
     "ep": 38,
