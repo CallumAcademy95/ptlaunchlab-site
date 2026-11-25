@@ -6,6 +6,7 @@ import { CALL_TYPES, callTypeFromSlug } from "@/app/lib/booking/callTypes";
 import { verifyLinkToken } from "@/app/lib/booking/tokens";
 import { loadPrefill } from "@/app/lib/booking/data";
 import BookingFlow from "../BookingFlow";
+import { CALLER_DISPLAY } from "@/app/lib/contactDetails";
 
 const nowMs = () => Date.now();
 
@@ -26,7 +27,7 @@ export default async function BookPage({ params, searchParams }: { params: Promi
       <main className="bg-base min-h-screen px-4 pt-[112px] pb-10 md:pb-16">
         <div className="max-w-xl mx-auto">
           <h1 className="font-display font-extrabold text-3xl md:text-4xl text-white mb-2">{def.title}</h1>
-          <p className="text-soft/70 mb-8">{def.minutes} minutes. Callum will ring you at the time you pick.</p>
+          <p className="text-soft/70 mb-8">{def.minutes} minutes. Callum will ring you at the time you pick, from {CALLER_DISPLAY}.</p>
           <BookingFlow callType={callType} questions={def.questions} prefill={prefill} token={tok ? t! : null} />
         </div>
       </main>

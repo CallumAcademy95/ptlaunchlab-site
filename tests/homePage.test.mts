@@ -18,7 +18,7 @@ test("enrol goes to /enrol and labels use the live price", () => {
 
 test("call form question and success copy", () => {
   assert.deepEqual(CALL_QUESTION, { label: "Best time to call? (optional)", options: ["Morning", "Afternoon", "Evening"] });
-  assert.equal(callSuccessMessage("Jane"), "Thanks Jane, we'll call you today.");
+  assert.equal(callSuccessMessage("Jane"), "Thanks Jane, we'll call you today from 07822 012186. Save it so you know it's us.");
 });
 
 import { readFileSync } from "node:fs";
