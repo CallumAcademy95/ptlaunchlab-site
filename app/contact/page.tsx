@@ -3,6 +3,7 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import LeadForm from "../components/LeadForm";
 import { PHONE_NATIONAL, PHONE_TEL } from "@/app/lib/contactDetails";
+import { WA_CONSENT_LINE, withWaConsent } from "@/app/lib/waConsent";
 
 export default function ContactPage() {
   return (
@@ -78,6 +79,8 @@ export default function ContactPage() {
                 source="contact_page"
                 tone="dark"
                 question={{ label: "Message (optional)" }}
+                extra={withWaConsent()}
+                footnote={WA_CONSENT_LINE}
                 submitLabel="Send Message →"
                 successMessage={(first) => `Message sent, ${first}. We'll get back to you as soon as possible, usually within a few hours.`}
               />
