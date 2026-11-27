@@ -97,7 +97,7 @@ export default async function OctoberCampaignPage() {
       <Section n={1} title="Download your advert">
         {creative.length === 0 ? (
           <p className="text-soft text-sm">
-            Your October artwork is being finished. It will appear here — or find everything
+            Your campaign artwork is being finished. It will appear here — or find everything
             in <Link href="/partners/resources" className="text-gold">Resources</Link>.
           </p>
         ) : (
