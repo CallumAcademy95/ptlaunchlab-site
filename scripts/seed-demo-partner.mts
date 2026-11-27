@@ -11,6 +11,9 @@
  * one — enrolments in several states, commission already paid, commission due,
  * and commission still accruing.
  *
+ * Updated 27 Nov 2026 to the current gym terms (ladder commission, £999.99 in
+ * full or 10 × £99.99, no promo codes), so it can be shown to prospects.
+ *
  * Everything is flagged is_demo, so none of the invented money reaches the
  * admin totals or the audit. Re-runnable: it clears its own rows first.
  */
@@ -47,27 +50,70 @@ const api = async (path: string, init: RequestInit = {}) => {
   return t ? JSON.parse(t) : null;
 };
 
+const NOW = new Date();
 const day = (n: number) => {
-  const d = new Date();
+  const d = new Date(NOW);
   d.setUTCDate(d.getUTCDate() + n);
   d.setUTCHours(12, 0, 0, 0);
-  return d.toISOString();
+  return d;
 };
 
 /**
- * A spread that shows every state the portal can display. A demo where
+ * Learners spread over the last quarter and this one, on the current terms:
+ *   - £999.99 in full, or 10 × £99.99 monthly;
+ *   - £400 (in full) / £250 (monthly) per learner, and from the 4th learner in
+ *     a calendar quarter the Partner Accelerator rate, £500 / £300;
+ *   - released 30 days after enrolment in full, or at the 5th monthly payment.
+ * Days are relative to the day it is seeded, so the picture stays current: the
+ * last quarter is settled (Accelerator top-ups included), and this quarter has
+ * learners ready to pay, accruing and on the Accelerator rate. A demo where
  * everything is "paid" teaches a prospect nothing about how they get paid.
+ *
+ * monthlyPaid = monthly payments collected so far.
  */
-const LEARNERS = [
-  { name: "Rachel Okonkwo", enrolled: -142, plan: "PIF", paid: 109900, due: 109900, state: "paid" },
-  { name: "Daniel Whitfield", enrolled: -128, plan: "PIF", paid: 109900, due: 109900, state: "paid" },
-  { name: "Priya Raman", enrolled: -96, plan: "PIF", paid: 129900, due: 129900, state: "paid" },
-  { name: "Callum Ferguson", enrolled: -74, plan: "deposit", paid: 159900, due: 159900, state: "paid" },
-  { name: "Sophie Mensah", enrolled: -48, plan: "PIF", paid: 109900, due: 109900, state: "due" },
-  { name: "Marcus Bell", enrolled: -36, plan: "PIF", paid: 109900, due: 109900, state: "due" },
-  { name: "Aisha Karim", enrolled: -21, plan: "deposit", paid: 99900, due: 159900, state: "accruing" },
-  { name: "Tom Whelan", enrolled: -6, plan: "deposit", paid: 59900, due: 159900, state: "accruing" },
-] as const;
+type DemoLearner = { name: string; enrolled: number; plan: "PIF" | "deposit"; monthlyPaid?: number };
+const LEARNERS: DemoLearner[] = [
+  { name: "Rachel Okonkwo", enrolled: -140, plan: "PIF" },
+  { name: "Daniel Whitfield", enrolled: -125, plan: "PIF" },
+  { name: "Priya Raman", enrolled: -112, plan: "deposit", monthlyPaid: 4 },
+  { name: "Callum Ferguson", enrolled: -96, plan: "PIF" },
+  { name: "Hannah Price", enrolled: -78, plan: "PIF" },
+  { name: "Sophie Mensah", enrolled: -50, plan: "PIF" },
+  { name: "Marcus Bell", enrolled: -38, plan: "PIF" },
+  { name: "Aisha Karim", enrolled: -27, plan: "deposit", monthlyPaid: 1 },
+  { name: "Tom Whelan", enrolled: -14, plan: "PIF" },
+  { name: "Jade Mistry", enrolled: -4, plan: "deposit", monthlyPaid: 1 },
+];
+
+const PIF_PRICE = 99_999;
+const MONTHLY = 9_999;
+const BASE = { PIF: 40_000, deposit: 25_000 } as const;
+const BONUS = { PIF: 10_000, deposit: 5_000 } as const;
+const quarterStart = (d: Date) => Date.UTC(d.getUTCFullYear(), Math.floor(d.getUTCMonth() / 3) * 3, 1);
+const THIS_QUARTER = quarterStart(NOW);
+
+const counts = new Map<number, number>();
+const plan = LEARNERS.map((l) => {
+  const enrolledAt = day(l.enrolled);
+  const q = quarterStart(enrolledAt);
+  const position = (counts.get(q) ?? 0) + 1;
+  counts.set(q, position);
+  const monthlyPaid = l.monthlyPaid ?? 1;
+  const paidPence = l.plan === "PIF" ? PIF_PRICE : MONTHLY * monthlyPaid;
+  const duePence = l.plan === "PIF" ? PIF_PRICE : MONTHLY * 10;
+  const releaseAt =
+    l.plan === "PIF"
+      ? new Date(enrolledAt.getTime() + 30 * 864e5)
+      : monthlyPaid >= 5
+        ? new Date(enrolledAt.getTime() + 4 * 30 * 864e5) // the 5th payment
+        : null;
+  const released = releaseAt !== null && releaseAt.getTime() <= NOW.getTime();
+  const pastQuarter = q < THIS_QUARTER;
+  // Last quarter's released commission has been paid; this quarter's waits for the next payment run.
+  const state: "paid" | "due" | "accruing" = released ? (pastQuarter ? "paid" : "due") : "accruing";
+  const bonus = position >= 4 ? BONUS[l.plan] : 0;
+  return { ...l, enrolledAt, position, paidPence, duePence, releaseAt, state, pastQuarter, bonus };
+});
 
 async function destroy() {
   const [p] = await api(`pp_partners?slug=eq.${SLUG}&select=id`);
@@ -89,17 +135,15 @@ if (DESTROY) {
 }
 
 console.log(`${APPLY ? "SEEDING" : "DRY RUN"} — ${GYM} (/${SLUG})\n`);
-let paid = 0, due = 0, accruing = 0;
-for (const l of LEARNERS) {
-  if (l.state === "paid") paid += 50000;
-  else if (l.state === "due") due += 50000;
-  else accruing += 50000;
+for (const l of plan) {
   console.log(
-    `  ${day(l.enrolled).slice(0, 10)}  ${l.name.padEnd(20)} ${l.plan.padEnd(8)} ` +
-      `£${(l.paid / 100).toFixed(0).padStart(4)}/${(l.due / 100).toFixed(0).padStart(4)}  commission ${l.state}`
+    `  ${l.enrolledAt.toISOString().slice(0, 10)}  ${l.name.padEnd(17)} ${l.plan === "PIF" ? "in full" : "monthly"}  ` +
+      `£${(l.paidPence / 100).toFixed(2).padStart(6)} of £${(l.duePence / 100).toFixed(2)}  #${l.position} in its quarter  ` +
+      `£${BASE[l.plan] / 100}${l.bonus ? ` + £${l.bonus / 100} Accelerator` : ""}  ${l.state}`
   );
 }
-console.log(`\n  ${LEARNERS.length} enrolments · £${paid / 100} paid · £${due / 100} ready to pay · £${accruing / 100} accruing`);
+const total = (st: string) => plan.filter((l) => l.state === st).reduce((t, l) => t + BASE[l.plan] + (l.pastQuarter ? l.bonus : 0), 0);
+console.log(`\n  ${plan.length} enrolments · £${total("paid") / 100} paid · £${total("due") / 100} ready to pay · £${total("accruing") / 100} accruing (+ this quarter's Accelerator, worked out live)`);
 console.log(`  login: ${LOGIN_EMAIL}`);
 
 if (!APPLY) { console.log("\nNothing written. Add --apply."); process.exit(0); }
@@ -115,44 +159,37 @@ const [partner] = await api("pp_partners", {
     gym_name: GYM,
     status: "active",
     landing_page_path: "/demo-academy",
-    promo_code: "NORTHGATEPT",
     legacy_referral_names: [GYM],
-    commission_terms: "instalment_2",
+    commission_terms: "ladder",
     is_demo: true,
     contact_name: "Demo Account",
     contact_email: LOGIN_EMAIL,
     bank_account_name: "Northgate Strength Ltd",
     bank_sort_code: "040004",
     bank_account_number: "12345678",
-    bank_details_updated_at: day(-150),
+    bank_details_updated_at: day(-150).toISOString(),
   }),
 });
 console.log("\npartner created");
 
-// One payout covering everything already settled, so the payments page shows a
-// real history rather than a bare total.
-const settled = LEARNERS.filter((l) => l.state === "paid");
+// One payout covering last quarter, Accelerator top-ups included, so the
+// payments page shows a real history rather than a bare total.
+const settled = plan.filter((l) => l.state === "paid");
 const [payout] = await api("pp_payouts", {
   method: "POST",
   headers: { Prefer: "return=representation" },
   body: JSON.stringify({
     partner_id: partner.id,
-    period_label: "Paid " + new Date(day(-60)).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
-    total_pence: settled.length * 50000,
+    period_label: "Paid " + day(-50).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+    total_pence: settled.reduce((t, l) => t + BASE[l.plan] + l.bonus, 0),
     status: "paid",
     reference: "bank-transfer",
-    paid_at: day(-60),
+    paid_at: day(-50).toISOString(),
   }),
 });
 
-for (const l of LEARNERS) {
-  const enrolledAt = day(l.enrolled);
-  // Mirrors the real rules: released 30 days after enrolment for pay-in-full,
-  // and held until the second instalment on a deposit plan.
-  const release = new Date(enrolledAt);
-  release.setUTCDate(release.getUTCDate() + 30);
-  const releaseAt = l.state === "accruing" && l.plan === "deposit" && l.paid < 99900 ? null : release.toISOString();
-
+for (const l of plan) {
+  const settledBonus = l.pastQuarter && l.bonus > 0;
   await api("pp_sales", {
     method: "POST",
     body: JSON.stringify({
@@ -161,18 +198,23 @@ for (const l of LEARNERS) {
       learner_name: l.name,
       learner_email: `${l.name.toLowerCase().replace(/\s+/g, ".")}@example.invalid`,
       plan_type: l.plan,
-      amount_paid_pence: l.paid,
-      amount_due_pence: l.due,
+      rung: l.plan === "PIF" ? "pif" : "monthly",
+      amount_paid_pence: l.paidPence,
+      amount_due_pence: l.duePence,
       status: "confirmed",
-      commission_pence: 50000,
-      commission_status: l.state === "paid" ? "paid" : "accruing",
-      commission_release_at: l.state === "accruing" ? releaseAt : release.toISOString(),
+      commission_pence: BASE[l.plan],
+      commission_status: l.state,
+      commission_release_at: l.releaseAt ? l.releaseAt.toISOString() : null,
+      // Last quarter's top-ups were paid with the payout; this quarter's the
+      // portal works out live from each learner's position.
+      volume_bonus_pence: settledBonus ? l.bonus : 0,
+      volume_bonus_payout_id: settledBonus ? payout.id : null,
       payout_id: l.state === "paid" ? payout.id : null,
-      enrolled_at: enrolledAt,
+      enrolled_at: l.enrolledAt.toISOString(),
     }),
   });
 }
-console.log(`${LEARNERS.length} sales + 1 payout created`);
+console.log(`${plan.length} sales + 1 payout created`);
 
 // Share every shared resource. Per-gym artwork belongs to real gyms, so the
 // demo shows the common set rather than borrowing somebody's posters.
@@ -197,8 +239,8 @@ if (user.id) {
       email: LOGIN_EMAIL,
       full_name: "Demo Account",
       role: "owner",
-      // No forced password change and no walkthrough: this account is for
-      // recording, and both would interrupt the take.
+      // No forced password change and no walkthrough: this account is shown
+      // to prospects, and both would get in the way.
       must_change_password: false,
       onboarding_dismissed_at: new Date().toISOString(),
     }),
