@@ -157,7 +157,7 @@ export function allOctoberStrings(tokens = null) {
 /** The campaign's own numbers, in one place so the page and the email agree. */
 export const CAMPAIGN = {
   month: "October",
-  title: "Your October Academy Campaign",
+  title: "Your Academy Campaign",
   goal: "Get your PT academy seen locally",
   recommendedSpendGbp: 150,
   commissionGbp: 500,
