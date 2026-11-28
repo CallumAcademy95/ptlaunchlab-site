@@ -114,3 +114,17 @@ test("next token secret is derived from the service role key, and empty without 
   assert.notEqual(a, "k");
   assert.equal(a, nextTokenSecret({ SUPABASE_SERVICE_ROLE_KEY: "k" }));
 });
+
+test("next step by band: every option always shown; call first when ready, WhatsApp first when exploring", async () => {
+  const { nextStepLayout } = await import("../app/lib/plannerNextStep.ts");
+  for (const band of ["prime", "strong", "nurture"] as const) {
+    const l = nextStepLayout(band);
+    assert.deepEqual([...l.order].sort(), ["book", "start", "whatsapp"], `${band}: all three options`);
+    assert.equal(l.order[0], l.primary, `${band}: the highlighted option comes first`);
+    assert.ok(l.framing.length > 0);
+    assert.doesNotMatch(l.framing, /free|limited|hurry|—|£/i);
+  }
+  assert.equal(nextStepLayout("prime").primary, "book");
+  assert.equal(nextStepLayout("strong").primary, "book");
+  assert.equal(nextStepLayout("nurture").primary, "whatsapp");
+});

@@ -86,3 +86,28 @@ test("consent text is exact", () => {
   // Must name email: planner leads receive the 14-day email sequence.
   assert.equal(CONSENT_TEXT, "OK for PT Launch Lab to email, WhatsApp, text or call me about my plan and the course. I can unsubscribe or reply STOP any time.");
 });
+
+test("anything else: optional, trimmed, control/bidi characters removed, capped at 500", async () => {
+  const { cleanAnythingElse, ANYTHING_ELSE_MAX } = await import("../app/lib/careerPlannerV2.ts");
+  assert.equal(ANYTHING_ELSE_MAX, 500);
+  assert.equal(cleanAnythingElse(undefined), null);
+  assert.equal(cleanAnythingElse(null), null);
+  assert.equal(cleanAnythingElse(42), null);
+  assert.equal(cleanAnythingElse("   \n\t "), null);
+  assert.equal(cleanAnythingElse("  I start a new job in March  "), "I start a new job in March");
+  assert.equal(cleanAnythingElse("a‮b\u0000c​d"), "a b c d");
+  assert.equal(cleanAnythingElse("one\r\n\r\n\r\n\r\ntwo"), "one\n\ntwo");
+  assert.equal(cleanAnythingElse("x".repeat(900))!.length, 500);
+});
+
+test("intro headline: the Worth it? ads get their own question, everything else the default", async () => {
+  const { introHeadlineFor, DEFAULT_INTRO_HEADLINE } = await import("../app/lib/careerPlannerV2.ts");
+  assert.equal(introHeadlineFor("worthit30_product"), "Is becoming a PT worth it after 30?");
+  assert.equal(introHeadlineFor("WorthIt30"), "Is becoming a PT worth it after 30?");
+  assert.equal(introHeadlineFor("worthitjob_cream"), "Is PT worth it with a full-time job?");
+  assert.equal(introHeadlineFor("worthit"), "Is becoming a PT actually worth it?");
+  assert.equal(introHeadlineFor("worthitnot"), DEFAULT_INTRO_HEADLINE);
+  assert.equal(introHeadlineFor("<script>"), DEFAULT_INTRO_HEADLINE);
+  assert.equal(introHeadlineFor(undefined), DEFAULT_INTRO_HEADLINE);
+  assert.equal(DEFAULT_INTRO_HEADLINE, "Could personal training be your next career?");
+});

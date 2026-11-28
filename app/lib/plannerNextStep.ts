@@ -23,6 +23,24 @@ export function showCommitmentCard(band: Band): boolean {
   return band === "prime" || band === "strong";
 }
 
+/**
+ * Next step by band: every option is always shown; only the order, which one is
+ * highlighted, and the one-line framing change. Ready soon (prime/strong) leads
+ * with the call; still exploring (nurture) leads with a WhatsApp question.
+ */
+export function nextStepLayout(band: Band): { order: NextStepChoice[]; primary: NextStepChoice; framing: string } {
+  if (band === "prime") {
+    return { order: ["book", "start", "whatsapp"], primary: "book",
+      framing: "You're ready to go. A short call is the quickest way to agree your start date and check the course fits." };
+  }
+  if (band === "strong") {
+    return { order: ["book", "whatsapp", "start"], primary: "book",
+      framing: "You're close. A short call is the easiest way to plan your start and get your questions answered." };
+  }
+  return { order: ["whatsapp", "book", "start"], primary: "whatsapp",
+    framing: "No rush. If you've got a question, send us a WhatsApp. You can book a call whenever you're ready." };
+}
+
 function londonYearMonth(now: Date): { y: number; m: number } {
   const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", year: "numeric", month: "numeric" }).formatToParts(now);
   return { y: Number(parts.find((p) => p.type === "year")!.value), m: Number(parts.find((p) => p.type === "month")!.value) };

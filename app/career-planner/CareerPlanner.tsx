@@ -2,6 +2,7 @@
 // Career Planner v2: nine intent questions → name/email/mobile/consent gate →
 // server-computed plan. No income forecast; mentorship described, not named.
 import { useRef, useState } from "react";
+import Image from "next/image";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import NextStep from "./NextStep";
@@ -9,12 +10,12 @@ import ObjectionCapture from "../components/ObjectionCapture";
 import FunnelPricingBlock from "@/app/components/FunnelPricingBlock";
 import { trackEvent } from "@/app/lib/gtag";
 import { useFormSecurity } from "@/app/lib/security/client";
-import { QUESTIONS, REGIONS, CONSENT_TEXT, type PlannerAnswers, type CareerPlanV2 } from "@/app/lib/careerPlannerV2";
+import { QUESTIONS, REGIONS, CONSENT_TEXT, ANYTHING_ELSE_MAX, DEFAULT_INTRO_HEADLINE, type PlannerAnswers, type CareerPlanV2 } from "@/app/lib/careerPlannerV2";
 
 type ChoiceKey = "why" | "job" | "goal" | "timeframe" | "blocker" | "hours" | "training" | "payment";
 type StepKey = ChoiceKey | "location";
 const STEPS: StepKey[] = ["why", "job", "goal", "timeframe", "blocker", "hours", "training", "location", "payment"];
-type Draft = Partial<PlannerAnswers> & { blockerNote?: string | null };
+type Draft = Partial<PlannerAnswers> & { blockerNote?: string | null; anythingElse?: string | null };
 
 const MENTORSHIP = [
   "A client profile worksheet to work out who you want to coach",
@@ -36,7 +37,7 @@ function readTouch(key: string): Record<string, string> | null {
   }
 }
 
-export default function CareerPlanner() {
+export default function CareerPlanner({ headline = DEFAULT_INTRO_HEADLINE }: { headline?: string }) {
   const [phase, setPhase] = useState<"intro" | "steps" | "gate" | "results">("intro");
   const [idx, setIdx] = useState(0);
   const [draft, setDraft] = useState<Draft>({ blockerNote: null });
@@ -85,7 +86,7 @@ export default function CareerPlanner() {
           firstName: lead.firstName.trim(), surname: lead.surname.trim(), email: lead.email.trim().toLowerCase(),
           phone: lead.phone.trim(), consent: lead.consent, event_id: eventId,
           utm: last ? { source: last.utm_source, medium: last.utm_medium, campaign: last.utm_campaign, content: last.utm_content } : null,
-          answers: { ...draft, blockerNote: draft.blocker === "other" ? (draft.blockerNote ?? null) : null },
+          answers: { ...draft, blockerNote: draft.blocker === "other" ? (draft.blockerNote ?? null) : null, anythingElse: draft.anythingElse?.trim() || null },
           [sec.SEC_KEY]: sec.payload(),
         }),
       });
@@ -109,7 +110,7 @@ export default function CareerPlanner() {
       <main className="pt-[72px] min-h-screen bg-deep">
         <div className="max-w-2xl mx-auto px-5 py-12 md:py-16">
           <sec.Honeypot />
-          {phase === "intro" && <Intro onStart={begin} />}
+          {phase === "intro" && <Intro headline={headline} onStart={begin} />}
           {phase === "steps" && (
             <div>
               <Progress current={idx + 1} total={STEPS.length} />
@@ -141,6 +142,14 @@ export default function CareerPlanner() {
                       <textarea id="cp-blocker-note" aria-label="Tell us more (optional)" className={`${INPUT} mt-3`} maxLength={200} rows={2}
                         placeholder="Tell us more (optional)" value={draft.blockerNote ?? ""} onChange={(e) => setDraft({ ...draft, blockerNote: e.target.value })} />
                     )}
+                    {step === "payment" && (
+                      <div className="mt-6">
+                        <label htmlFor="cp-anything-else" className="block text-white font-semibold text-sm mb-1">Anything else we should know? <span className="text-faint font-normal">(optional)</span></label>
+                        <textarea id="cp-anything-else" className={INPUT} maxLength={ANYTHING_ELSE_MAX} rows={3}
+                          placeholder="e.g. what you've tried already, or a question you'd like answered"
+                          value={draft.anythingElse ?? ""} onChange={(e) => setDraft({ ...draft, anythingElse: e.target.value })} />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -157,7 +166,7 @@ export default function CareerPlanner() {
           {phase === "gate" && (
             <form onSubmit={(e) => { e.preventDefault(); void submit(); }} className="grid gap-3">
               <h2 className="font-display font-extrabold text-2xl md:text-3xl text-white leading-tight tracking-tight">Where should we send your plan?</h2>
-              <p className="text-soft">We&apos;ll email it now, and someone from the team will WhatsApp you about it. Real person, no spam.</p>
+              <p className="text-soft">Your plan is ready. Tell us where to send a copy. Real person, no spam.</p>
               <label htmlFor="cp-first" className="sr-only">First name</label>
               <input id="cp-first" name="firstName" required autoComplete="given-name" placeholder="First name" maxLength={40} className={INPUT} value={lead.firstName} onChange={(e) => setLead({ ...lead, firstName: e.target.value })} />
               <label htmlFor="cp-surname" className="sr-only">Surname (optional)</label>
@@ -175,6 +184,7 @@ export default function CareerPlanner() {
                 <button type="button" onClick={back} className={`px-6 py-3.5 rounded-full border border-white/15 text-soft font-semibold text-sm hover:border-white/30 transition-all ${FOCUS}`}>← Back</button>
                 <button type="submit" disabled={submitting} className={`flex-1 py-3.5 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all disabled:opacity-60 ${FOCUS}`}>{submitting ? "Building your plan…" : "Show my plan →"}</button>
               </div>
+              <p id="cp-what-next" className="text-soft text-sm text-center mt-1">What happens next: you&apos;ll see your plan straight away and we&apos;ll email you a copy. Then someone from our team will WhatsApp you to talk it through and, if you&apos;d like, arrange a short call.</p>
             </form>
           )}
           {phase === "results" && plan && (
@@ -204,13 +214,25 @@ function Progress({ current, total }: { current: number; total: number }) {
   );
 }
 
-function Intro({ onStart }: { onStart: () => void }) {
+function Intro({ headline, onStart }: { headline: string; onStart: () => void }) {
+  // Above the fold, one column: headline, a real face, subheading, then the button
+  // with one verifiable proof line (the accreditation wording used on the results page).
   return (
     <div className="text-center">
       <p className="text-gold text-xs font-bold tracking-widest uppercase mb-3">Free PT Career Plan</p>
-      <h1 className="font-display font-extrabold text-4xl md:text-5xl text-white leading-none tracking-tight mb-4">Could personal training be your next career?</h1>
-      <p className="text-soft text-base md:text-lg leading-relaxed mb-8 max-w-xl mx-auto">Answer 9 quick questions and get a plan built around your life: your route, your timeline, and what you&apos;d get to help you get there. Takes about two minutes.</p>
+      <h1 className="font-display font-extrabold text-4xl md:text-5xl text-white leading-none tracking-tight mb-5">{headline}</h1>
+      <figure className="flex items-center justify-center gap-3 mb-5">
+        <span className="relative block w-16 h-16 rounded-full overflow-hidden border-2 border-gold/60 shrink-0">
+          <Image src="/callum.webp" alt="Callum Brown, Head of Education at PT Launch Lab" fill sizes="64px" priority className="object-cover" style={{ objectPosition: "45% 15%" }} />
+        </span>
+        <figcaption className="text-left text-sm leading-snug">
+          <span className="block text-white font-semibold">Callum</span>
+          <span className="block text-soft">Head of Education, PT Launch Lab</span>
+        </figcaption>
+      </figure>
+      <p className="text-soft text-base md:text-lg leading-relaxed mb-7 max-w-xl mx-auto">Answer 9 quick questions and get a plan built around your life: your route, your timeline, and what you&apos;d get to help you get there. Takes about two minutes.</p>
       <button type="button" onClick={onStart} className={`w-full sm:w-auto px-10 py-4 rounded-full bg-gold text-deep font-bold text-base hover:brightness-110 transition-all ${FOCUS}`}>Build my career plan →</button>
+      <p id="cp-proof" className="text-soft text-sm mt-3">NCFE Level 2 and Level 3, Ofqual regulated and CIMSPA recognised</p>
     </div>
   );
 }

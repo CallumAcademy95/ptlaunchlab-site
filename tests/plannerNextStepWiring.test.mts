@@ -64,7 +64,7 @@ test("route: a repeat booked does not fire CAPI Schedule again", () => {
   assert.ok(r.indexOf("const prevBooked") < r.indexOf("mergeNextStep("), "prev booked read before the merge");
 });
 
-test("NextStep: neutral WhatsApp copy, dedupe refs, a11y, equal options, immediate start/whatsapp saves", () => {
+test("NextStep: neutral WhatsApp copy, dedupe refs, a11y, no gold-filled option, immediate start/whatsapp saves", () => {
   const n = src("app/career-planner/NextStep.tsx");
   assert.doesNotMatch(n, /in person|real person|human/i);
   assert.match(n, /Send us a message and we&apos;ll reply on WhatsApp\./);
@@ -84,4 +84,38 @@ test("NextStep: neutral WhatsApp copy, dedupe refs, a11y, equal options, immedia
   assert.match(n, /record\(\{ priceFit: v \}\)/, "price taps carry no nextStep");
   assert.match(n, /track\(`price_\$\{v\}`, \{ priceFit: v \}\)/);
   assert.match(n, /track\("start_month", \{ startMonth: m\.value \}\)/);
+});
+
+test("NextStep by band: order and highlight from nextStepLayout, tracking untouched on every option", () => {
+  const n = src("app/career-planner/NextStep.tsx");
+  assert.match(n, /const layout = nextStepLayout\(plan\.band\)/);
+  assert.match(n, /\{layout\.order\.map\(\(k\) => options\[k\]\)\}/);
+  assert.match(n, /\{layout\.framing\}/);
+  for (const id of ["ns-book", "ns-whatsapp", "ns-start"]) assert.match(n, new RegExp(`id="${id}"`));
+  assert.match(n, /window\.fbq\("track", "Contact"/);
+  assert.match(n, /window\.fbq\("track", "Schedule"/);
+  assert.match(n, /track\("book_open"\)/);
+  assert.match(n, /track\("whatsapp"\)/);
+  assert.match(n, /track\("start"\)/);
+});
+
+test("planner: optional anything-else box on the last question, sent with the answers, cleaned server-side", () => {
+  const c = src("app/career-planner/CareerPlanner.tsx");
+  assert.match(c, /step === "payment" && \(/);
+  assert.match(c, /maxLength=\{ANYTHING_ELSE_MAX\}/);
+  assert.match(c, /anythingElse: draft\.anythingElse\?\.trim\(\) \|\| null/);
+  const v = src("app/lib/security/validate.ts");
+  assert.match(v, /anythingElse: z\.string\(\)\.max\(\d+\)\.nullable\(\)\.optional\(\)/);
+  assert.match(v, /anythingElse: cleanAnythingElse\(a\.anythingElse\)/);
+});
+
+test("planner intro: face, one accreditation proof line under the button, what-happens-next line under the form, no em dashes", () => {
+  const c = src("app/career-planner/CareerPlanner.tsx");
+  assert.match(c, /src="\/callum\.webp"/);
+  assert.doesNotMatch(c, /learner-8/);
+  assert.match(c, /id="cp-proof"[^>]*>NCFE Level 2 and Level 3, Ofqual regulated and CIMSPA recognised</);
+  assert.match(c, /id="cp-what-next"[^>]*>What happens next: .*WhatsApp/);
+  const intro = c.slice(c.indexOf("function Intro("), c.indexOf("function Block("));
+  assert.doesNotMatch(intro, /—/);
+  assert.match(src("app/career-planner/page.tsx"), /introHeadlineFor\(/);
 });

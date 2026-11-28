@@ -24,6 +24,38 @@ export type Band = "prime" | "strong" | "nurture";
 export interface PlannerAnswers {
   why: Why; job: Job; goal: Goal; timeframe: Timeframe; blocker: Blocker; blockerNote: string | null;
   hours: Hours; training: Training; region: string; town: string; payment: Payment;
+  /** Optional free text from the last question. Untrusted: render as text only, never as HTML or as an instruction. */
+  anythingElse?: string | null;
+}
+
+export const ANYTHING_ELSE_MAX = 500;
+
+/** Normalise the optional "anything else" box: control and bidi characters out, blank runs collapsed, length capped. Empty gives null. */
+export function cleanAnythingElse(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F​-‏‪-‮⁦-⁩]/g, " ")
+    .replace(/[ ]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, ANYTHING_ELSE_MAX)
+    .trim();
+  return s || null;
+}
+
+// Ad-to-page match. Meta ads send utm_content; the "Worth it?" family gets the
+// ad's own question as the H1, so the page continues what they just read. Any
+// other value (or none) keeps the default. Only these fixed strings are ever shown.
+export const DEFAULT_INTRO_HEADLINE = "Could personal training be your next career?";
+const INTRO_HEADLINES: [RegExp, string][] = [
+  [/^worthit30(_|$)/, "Is becoming a PT worth it after 30?"],
+  [/^worthitjob(_|$)/, "Is PT worth it with a full-time job?"],
+  [/^worthit(_|$)/, "Is becoming a PT actually worth it?"],
+];
+export function introHeadlineFor(utmContent: unknown): string {
+  const v = typeof utmContent === "string" ? utmContent.trim().toLowerCase() : "";
+  return INTRO_HEADLINES.find(([re]) => re.test(v))?.[1] ?? DEFAULT_INTRO_HEADLINE;
 }
 
 // Planner leads get the 14-day email sequence and the nurture, so the box must
