@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CareerPlanner from "./CareerPlanner";
+import { introHeadlineFor } from "@/app/lib/careerPlannerV2";
 
 export const metadata: Metadata = {
   title: "Free PT Career Plan | PT Launch Lab",
@@ -15,6 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
-  return <CareerPlanner />;
+// Ad-to-page match: a known utm_content from the "Worth it?" ads swaps the H1 for the
+// ad's own question. Only fixed strings from introHeadlineFor are ever rendered.
+export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const sp = await searchParams;
+  const content = Array.isArray(sp.utm_content) ? sp.utm_content[0] : sp.utm_content;
+  return <CareerPlanner headline={introHeadlineFor(content)} />;
 }

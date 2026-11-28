@@ -18,7 +18,7 @@ import { validateUKPhone, validateAnyPhone } from "./phone";
 import { checkHoneypot, SEC_KEY, type SecCheck } from "./honeypot";
 import {
   WHY_VALUES, JOB_VALUES, GOAL_VALUES, TIMEFRAME_VALUES, BLOCKER_VALUES, HOURS_VALUES,
-  TRAINING_VALUES, PAYMENT_VALUES, REGIONS, isUkMobileE164, type PlannerAnswers,
+  TRAINING_VALUES, PAYMENT_VALUES, REGIONS, isUkMobileE164, cleanAnythingElse, type PlannerAnswers,
 } from "../careerPlannerV2";
 import { hasReachableContact, isSelfReferral } from "./referralRules";
 
@@ -119,6 +119,9 @@ const careerPlannerSchema = z.object({
     region: z.string().refine((r) => REGIONS.includes(r), "region"),
     town: z.string().trim().min(2).max(60),
     payment: z.enum(PAYMENT_VALUES),
+    // Optional free text. A generous schema cap so a long note never loses the lead;
+    // cleanAnythingElse trims it to ANYTHING_ELSE_MAX below.
+    anythingElse: z.string().max(5000).nullable().optional(),
   }),
   [SEC_KEY]: secSchema,
 });
@@ -436,7 +439,7 @@ export function validateCareerPlannerV2(raw: unknown): ValidationResult<CareerPl
       surname,
       email: ec.normalised!,
       phone: pc.normalised!,
-      answers: { ...a, blockerNote: a.blocker === "other" ? a.blockerNote?.trim() || null : null, town: a.town.trim() },
+      answers: { ...a, blockerNote: a.blocker === "other" ? a.blockerNote?.trim() || null : null, town: a.town.trim(), anythingElse: cleanAnythingElse(a.anythingElse) },
       consentAt: new Date().toISOString(),
       utm: parsed.data.utm ?? null,
       eventId: parsed.data.event_id ?? null,

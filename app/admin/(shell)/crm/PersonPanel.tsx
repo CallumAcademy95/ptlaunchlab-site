@@ -91,6 +91,8 @@ function plannerRows(profile: unknown): { k: string; v: string }[] {
   }
   const where = [str(a.town), str(a.region)].filter(Boolean).join(", ");
   if (where) rows.push({ k: "Where", v: where });
+  // Free text from the lead: rendered as plain text by React, never as HTML.
+  if (str(a.anythingElse)) rows.push({ k: "Anything else (in their words)", v: String(a.anythingElse) });
   return rows;
 }
 

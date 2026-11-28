@@ -11,7 +11,7 @@ import { COURSE_PRICE_LABEL, MONTHLY_PLAN_LABEL } from "@/app/lib/pricing";
 import { trackEvent } from "@/app/lib/gtag";
 import type { CareerPlanV2, PlannerAnswers } from "@/app/lib/careerPlannerV2";
 import {
-  startMonthOptions, whatsappMessage, whatsappHref, bookingPrefill, showCommitmentCard,
+  startMonthOptions, whatsappMessage, whatsappHref, bookingPrefill, showCommitmentCard, nextStepLayout,
   type PriceFit, type NextStepChoice,
 } from "@/app/lib/plannerNextStep";
 
@@ -84,6 +84,49 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
   const monthLabel = months.find((m) => m.value === startMonth)?.label ?? null;
   const waHref = whatsappHref(WHATSAPP_LINK, whatsappMessage({ startMonthLabel: monthLabel, blocker: answers.blocker ?? null }));
 
+  // Order and emphasis vary by band; every option stays available and keeps its own tracking.
+  const layout = nextStepLayout(plan.band);
+  const optionClass = (k: NextStepChoice) =>
+    `rounded-xl px-4 py-4 border text-white font-semibold text-sm ${FOCUS} ${k === layout.primary ? "border-gold bg-gold/10" : "border-white/25"}`;
+  const options: Record<NextStepChoice, React.ReactNode> = {
+    book: (
+      <button key="book" type="button" id="ns-book"
+        aria-expanded={booking} aria-controls="ns-booking"
+        onClick={() => {
+          setBooking(true);
+          if (lastStep.current !== "book") { lastStep.current = "book"; record({ nextStep: "book" }); track("book_open"); }
+        }}
+        className={`${optionClass("book")} text-left`}>
+        <span aria-hidden="true">📅</span> Book a {minutes}-minute call<span className="block text-soft font-normal mt-1">Pick a time that suits you.</span>
+      </button>
+    ),
+    whatsapp: (
+      <a key="whatsapp" id="ns-whatsapp" href={waHref} target="_blank" rel="noopener noreferrer"
+        onClick={() => {
+          if (contactSent.current) return; // the link still opens; nothing is re-recorded
+          contactSent.current = true;
+          lastStep.current = "whatsapp";
+          const eventId = newEventId("contact");
+          recordNow({ nextStep: "whatsapp", eventId });
+          try { if (typeof window.fbq === "function") window.fbq("track", "Contact", { content_name: "career_planner", content_category: plan.band }, { eventID: eventId }); } catch {}
+          track("whatsapp");
+        }}
+        className={optionClass("whatsapp")}>
+        <span aria-hidden="true">💬</span> Chat on WhatsApp<span className="block text-soft font-normal mt-1">Send us a message and we&apos;ll reply on WhatsApp.</span>
+      </a>
+    ),
+    start: (
+      <a key="start" id="ns-start" href="/enrol?source=career_planner"
+        onClick={() => {
+          if (lastStep.current !== "start") { lastStep.current = "start"; recordNow({ nextStep: "start" }); }
+          track("start");
+        }}
+        className={optionClass("start")}>
+        <span aria-hidden="true">🚀</span> I&apos;m ready to start<span className="block text-soft font-normal mt-1">Enrol online now.</span>
+      </a>
+    ),
+  };
+
   return (
     <div className="grid gap-4 mt-2">
       {showCommitmentCard(plan.band) && (
@@ -113,38 +156,10 @@ export default function NextStep({ plan, answers, lead, nextToken }: {
       )}
 
       <section className="rounded-xl bg-base border border-white/10 p-5" aria-labelledby="ns-choose">
-        <h3 id="ns-choose" className="font-display font-extrabold text-xl text-white mb-4">How would you like to take this forward?</h3>
+        <h3 id="ns-choose" className="font-display font-extrabold text-xl text-white mb-2">How would you like to take this forward?</h3>
+        <p id="ns-framing" className="text-soft text-sm mb-4">{layout.framing}</p>
         <div className="grid sm:grid-cols-3 gap-3">
-          <button type="button" id="ns-book"
-            aria-expanded={booking} aria-controls="ns-booking"
-            onClick={() => {
-              setBooking(true);
-              if (lastStep.current !== "book") { lastStep.current = "book"; record({ nextStep: "book" }); track("book_open"); }
-            }}
-            className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm text-left ${FOCUS}`}>
-            <span aria-hidden="true">📅</span> Book a {minutes}-minute call<span className="block text-soft font-normal mt-1">Pick a time that suits you.</span>
-          </button>
-          <a id="ns-whatsapp" href={waHref} target="_blank" rel="noopener noreferrer"
-            onClick={() => {
-              if (contactSent.current) return; // the link still opens; nothing is re-recorded
-              contactSent.current = true;
-              lastStep.current = "whatsapp";
-              const eventId = newEventId("contact");
-              recordNow({ nextStep: "whatsapp", eventId });
-              try { if (typeof window.fbq === "function") window.fbq("track", "Contact", { content_name: "career_planner", content_category: plan.band }, { eventID: eventId }); } catch {}
-              track("whatsapp");
-            }}
-            className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm ${FOCUS}`}>
-            <span aria-hidden="true">💬</span> Chat on WhatsApp<span className="block text-soft font-normal mt-1">Send us a message and we&apos;ll reply on WhatsApp.</span>
-          </a>
-          <a id="ns-start" href="/enrol?source=career_planner"
-            onClick={() => {
-              if (lastStep.current !== "start") { lastStep.current = "start"; recordNow({ nextStep: "start" }); }
-              track("start");
-            }}
-            className={`rounded-xl px-4 py-4 border border-white/25 text-white font-semibold text-sm ${FOCUS}`}>
-            <span aria-hidden="true">🚀</span> I&apos;m ready to start<span className="block text-soft font-normal mt-1">Enrol online now.</span>
-          </a>
+          {layout.order.map((k) => options[k])}
         </div>
 
         {booking && (
