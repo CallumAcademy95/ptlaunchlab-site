@@ -307,7 +307,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "title": "How to Become a Personal Trainer in the UK — Our Online Course",
     "date": "2025-10-17",
     "category": "business",
-    "wordCount": 842
+    "wordCount": 715
   },
   {
     "id": "CDR39D_Esg8",
@@ -343,7 +343,7 @@ export const episodesIndex: EpisodeIndex[] = [
     "title": "Are Fitness Influencers Good Role Models for New Personal Trainers?",
     "date": "2025-07-19",
     "category": "industry",
-    "wordCount": 6514
+    "wordCount": 6394
   }
 ];
 
