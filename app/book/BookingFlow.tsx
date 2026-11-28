@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CallType, Question } from "@/app/lib/booking/callTypes";
 import PhoneCallbackForm from "@/app/book-call/components/PhoneCallbackForm";
 import { CALLER_DISPLAY } from "@/app/lib/contactDetails";
+import CallPrep from "./CallPrep";
 
 type Slot = { iso: string; label: string };
 type Prefill = { name: string | null; email: string | null; phone: string | null; answers: Record<string, string> } | null;
@@ -65,6 +66,8 @@ export default function BookingFlow({ callType, questions, prefill, token, onBoo
   }
 
   if (done) {
+    // Course calls get the "prepare for your call" page; gym partner calls keep the short card.
+    if (callType === "consultation") return <CallPrep label={done.label} phone={done.phone} manageUrl={done.manageUrl} />;
     return (
       <div className="bg-card border border-gold/40 rounded-2xl p-6">
         <h2 className="text-white font-bold text-xl mb-2">Booked</h2>

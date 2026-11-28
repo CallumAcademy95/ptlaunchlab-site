@@ -13,7 +13,7 @@ export interface Question {
 
 export const CALL_TYPES: Record<CallType, { title: string; minutes: number; slug: string; questions: Question[] }> = {
   consultation: {
-    title: "Free consultation call",
+    title: "Call with Callum",
     minutes: 30,
     slug: "consultation",
     questions: [
