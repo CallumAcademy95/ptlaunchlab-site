@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   if (!b || b.status !== "booked") return new Response("Not found", { status: 404 });
   const ics = icsFor({
     id: b.id, startMs: Date.parse(b.start_at), endMs: Date.parse(b.end_at),
-    title: `${CALL_TYPES[b.call_type].title} with PT Launch Lab`,
+    title: `${CALL_TYPES[b.call_type].title}, PT Launch Lab`,
     description: `Callum will ring you on ${b.phone} from ${CALLER_DISPLAY}. To move or cancel: https://ptlaunchlab.co.uk/book/manage/${token}`,
   });
   return new Response(ics, { headers: { "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": 'attachment; filename="ptll-call.ics"' } });
